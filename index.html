@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aakaara Studios NYC — Where Photography Feels Like Cinema</title>
+<meta name="description" content="Aakaara Studios NYC — Wedding, couple, maternity & celebration photography in New York City. Crafting Love Into Art.">
+<meta property="og:title" content="Aakaara Studios NYC — Crafting Love Into Art">
+<meta property="og:description" content="Wedding & portrait photography in New York City — Giving Shape to What You Feel">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Outfit:wght@200;300;400;500;600&family=Noto+Sans+Telugu:wght@300;400&family=Noto+Sans+Devanagari:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="intro-active">
+<div class="cursor-follow" id="cursorFollow">View</div>
+
+<!-- ════════════════════ CINEMATIC INTRO ════════════════════ -->
+<div class="intro-overlay" id="intro">
+  <div class="intro-bg-fade"></div>
+  <div class="intro-content-group" id="introGroup">
+    <div class="intro-mark" id="introMark">
+      <svg viewBox="0 0 140 140">
+        <g transform="translate(70,70)">
+          <path id="petal1" d="M0,-52 C15,-52 27,-35 22,-10 C17,15 -7,22 -22,10 C-37,-2 -27,-38 -10,-50 C-6,-51.5 -3,-52 0,-52Z" fill="none" stroke="#c9956b" stroke-width="1.5" opacity="0.85"/>
+          <path id="petal2" d="M0,-52 C15,-52 27,-35 22,-10 C17,15 -7,22 -22,10 C-37,-2 -27,-38 -10,-50 C-6,-51.5 -3,-52 0,-52Z" fill="none" stroke="#c9956b" stroke-width="1.5" opacity="0.5" transform="rotate(60)"/>
+          <path id="petal3" d="M0,-52 C15,-52 27,-35 22,-10 C17,15 -7,22 -22,10 C-37,-2 -27,-38 -10,-50 C-6,-51.5 -3,-52 0,-52Z" fill="none" stroke="#c9956b" stroke-width="1.5" opacity="0.28" transform="rotate(120)"/>
+          <path id="petal4" d="M0,-52 C15,-52 27,-35 22,-10 C17,15 -7,22 -22,10 C-37,-2 -27,-38 -10,-50 C-6,-51.5 -3,-52 0,-52Z" fill="none" stroke="#c9956b" stroke-width="1.5" opacity="0.12" transform="rotate(180)"/>
+          <circle id="centerDot" cx="0" cy="0" r="0" fill="#c9956b" opacity="0"/>
+        </g>
+      </svg>
+    </div>
+    <div class="intro-title" id="introTitle">
+      <span class="v-dots" id="introDots"><span></span><span></span></span>
+      <span class="letter">A</span><span class="letter">a</span><span class="letter">k</span><span class="letter">a</span><span class="letter">a</span><span class="letter">r</span><span class="letter">a</span>
+    </div>
+    <div class="intro-subtitle" id="introSub">Studios · New York City</div>
+    <div class="intro-tagline" id="introTag">For couples, creatives &amp; brands who believe photography should feel like cinema.</div>
+  </div>
+</div>
+
+<!-- ════════════════════ NAVIGATION ════════════════════ -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <svg viewBox="0 0 60 60"><g class="petal-group" transform="translate(30,30)"><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.8"/><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.4" transform="rotate(60)"/><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.2" transform="rotate(120)"/><circle cx="0" cy="0" r="2.5" fill="#c9956b" opacity="0.85"/></g></svg>
+    <span class="nav-logo-text"><span class="nav-logo-dots"><span></span><span></span></span>Aakaara</span>
+  </a>
+  <div class="nav-links" id="navLinks">
+    <a href="#portfolio">Portfolio</a>
+    <a href="#video-works">Films</a>
+    <a href="#nyc">NYC Portraits</a>
+    <a href="#about">About</a>
+    <a href="#services-overview">Services</a>
+    <a href="#testimonials">Kind Words</a>
+    <a href="#contact" class="nav-cta">Book a Session</a>
+  </div>
+  <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('show')"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- ════════════════════ HERO ════════════════════ -->
+<section class="hero" id="home">
+  <div class="hero-grain"></div>
+  <div class="hero-bg-mark" id="heroBgMark">
+    <svg viewBox="0 0 140 140" opacity="0.03"><g transform="translate(70,70)"><path d="M0,-52 C15,-52 27,-35 22,-10 C17,15 -7,22 -22,10 C-37,-2 -27,-38 -10,-50 C-6,-51.5 -3,-52 0,-52Z" fill="none" stroke="#c9956b" stroke-width="1" opacity="0.6"/><path d="M0,-52 C15,-52 27,-35 22,-10 C17,15 -7,22 -22,10 C-37,-2 -27,-38 -10,-50 C-6,-51.5 -3,-52 0,-52Z" fill="none" stroke="#c9956b" stroke-width="1" opacity="0.3" transform="rotate(60)"/><path d="M0,-52 C15,-52 27,-35 22,-10 C17,15 -7,22 -22,10 C-37,-2 -27,-38 -10,-50 C-6,-51.5 -3,-52 0,-52Z" fill="none" stroke="#c9956b" stroke-width="1" opacity="0.15" transform="rotate(120)"/></g></svg>
+  </div>
+  <div class="hero-content" id="heroContent" style="opacity:0">
+    <div class="hero-mark">
+      <svg viewBox="0 0 140 140"><g class="outer-ring"><circle cx="70" cy="70" r="64" fill="none" stroke="rgba(201,149,107,0.06)" stroke-width="0.5"/></g><g transform="translate(70,70)"><path d="M0,-52 C15,-52 27,-35 22,-10 C17,15 -7,22 -22,10 C-37,-2 -27,-38 -10,-50 C-6,-51.5 -3,-52 0,-52Z" fill="none" stroke="#c9956b" stroke-width="1.5" opacity="0.85"/><path d="M0,-52 C15,-52 27,-35 22,-10 C17,15 -7,22 -22,10 C-37,-2 -27,-38 -10,-50 C-6,-51.5 -3,-52 0,-52Z" fill="none" stroke="#c9956b" stroke-width="1.5" opacity="0.5" transform="rotate(60)"/><path d="M0,-52 C15,-52 27,-35 22,-10 C17,15 -7,22 -22,10 C-37,-2 -27,-38 -10,-50 C-6,-51.5 -3,-52 0,-52Z" fill="none" stroke="#c9956b" stroke-width="1.5" opacity="0.28" transform="rotate(120)"/><circle cx="0" cy="0" r="5" fill="#c9956b" opacity="0.85"/></g></svg>
+    </div>
+    <!-- FIX 5: Float wrapper handles Y-axis bobbing; title handles 3D mouse-tilt via JS -->
+    <div class="hero-title-float">
+      <h1 class="hero-title" id="heroTitle"><span class="v-dots"><span></span><span></span></span>Aakaara</h1>
+    </div>
+    <div class="hero-subtitle">Studios · New York City</div>
+    <div class="hero-tagline">For couples, creatives &amp; brands who believe photography should feel like cinema.</div>
+    <div class="hero-cta-group">
+      <a href="#portfolio" class="hero-cta"><span>I'm Getting Married</span> <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      <a href="#services-overview" class="hero-cta hero-cta-ghost"><span>I'm a Creative or Brand</span> <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+    </div>
+  </div>
+  <div class="hero-scroll" id="heroScroll" style="opacity:0"><span>Scroll</span><div class="scroll-line"></div></div>
+</section>
+
+<!-- ════════════════════ PORTFOLIO ════════════════════ -->
+<section class="section section-dark" id="portfolio">
+  <div class="container reveal">
+    <div class="section-tag">Our Work</div>
+    <div class="section-title">Selected Stories</div>
+    <div class="section-desc">Every frame holds a universe of emotion. Click any project to browse the full gallery.</div>
+    <div class="portfolio-tools">
+      <div class="portfolio-filters">
+        <button class="active" onclick="filterGallery('all', this)">All</button>
+        <button onclick="filterGallery('wedding', this)">Weddings</button>
+        <button onclick="filterGallery('engagement', this)">Engagement</button>
+        <button onclick="filterGallery('couple', this)">Couple Portraits</button>
+        <button onclick="filterGallery('graduation', this)">Graduation</button>
+        <button onclick="filterGallery('maternity', this)">Maternity</button>
+        <button onclick="filterGallery('conceptual', this)">Conceptual</button>
+        <button onclick="filterGallery('spring', this)">Spring</button>
+        <button onclick="filterGallery('brand', this)">Brand Collabs</button>
+        <button onclick="filterGallery('housewarming', this)">House Warming</button>
+        <button onclick="filterGallery('events', this)">Events</button>
+        <button onclick="filterGallery('birthday', this)">First Birthday</button>
+      </div>
+      <div class="portfolio-actions">
+        <div class="portfolio-select">
+          <select id="portfolioSelect" aria-label="Select a specific story">
+            <option value="">Select a Story</option>
+          </select>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div class="portfolio-search">
+          <input type="text" id="portfolioSearch" placeholder="Search...">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="ethereal-carousel" id="portfolioCarousel">
+    <div class="gallery-grid ec-track" id="galleryGrid">
+      <!--
+      ══════════════════════════════════════════════════════
+      HOW TO ADD A NEW PROJECT — copy one block below and
+      paste it anywhere inside .gallery-grid
+      ══════════════════════════════════════════════════════
+
+      Required attributes on .gallery-item:
+        data-cat     → filter category (wedding|couple|maternity|celebration|commercial|conceptual)
+        data-title   → name shown in the gallery overlay header
+        data-type    → subtitle shown in overlay (e.g. "Wedding · The Plaza")
+        data-folder  → path to the project image folder  (e.g. "images/my-project")
+        data-count   → total number of images in the folder (named 1.jpg, 2.jpg … N.jpg)
+        data-ext     → file extension without dot          (default: jpg)
+
+      Optional:
+        data-cover   → path to a specific cover image; falls back to folder/1.jpg
+
+      Sizing classes (add ONE per item — mix for a dynamic masonry feel):
+        (none)       → standard portrait  4:5
+        .wide        → landscape 8:5, spans 2 columns (use sparingly — max 1–2 per row)
+
+      Placeholder gradient classes gi-1 … gi-8 are used when the image hasn't loaded.
+      Add gi-9, gi-10 etc. in CSS by following the same pattern as the existing ones.
+
+      Example new project:
+      ──────────────────────────────────────────────────────
+      <div class="gallery-item gi-1"
+           data-cat="wedding"
+           data-title="Riya & Karan"
+           data-type="Wedding · The Plaza, NYC"
+           data-folder="images/riya-karan"
+           data-count="32"
+           data-ext="jpg"
+           onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M3 15l6-6 4 4 4-4 4 4"/>
+          </svg>
+          32 photos
+        </span>
+        <div class="gi-overlay">
+          <div>
+            <h4>Riya & Karan</h4>
+            <p>Wedding · The Plaza, NYC</p>
+          </div>
+        </div>
+      </div>
+      ──────────────────────────────────────────────────────
+      Inside images/riya-karan/ place: 1.jpg, 2.jpg … 32.jpg
+      For a custom cover: add data-cover="images/riya-karan/cover.jpg"
+      ══════════════════════════════════════════════════════
+      -->
+      <!-- WEDDINGS -->
+      <div class="gallery-item gi-2" data-cat="wedding" data-title="Pooja & Amit" data-type="Wedding" data-folder="images/weddings/pooja-amit" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Pooja & Amit</h4><p>Wedding</p></div></div>
+      </div>
+      <div class="gallery-item gi-1" data-cat="wedding" data-title="Abhinav & Megha" data-type="Wedding" data-folder="images/weddings/abhinav-megha" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Abhinav & Megha</h4><p>Wedding</p></div></div>
+      </div>
+      <div class="gallery-item gi-3" data-cat="wedding" data-title="Abhishek & Tanya" data-type="Wedding" data-folder="images/weddings/abhishek-tanya" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Abhishek & Tanya</h4><p>Wedding</p></div></div>
+      </div>
+      <div class="gallery-item gi-4" data-cat="wedding" data-title="Sophie & Eric" data-type="Wedding" data-folder="images/weddings/sophie-eric" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Sophie & Eric</h4><p>Wedding</p></div></div>
+      </div>
+      <div class="gallery-item gi-5" data-cat="wedding" data-title="Central Park Wedding" data-type="Wedding" data-folder="images/weddings/central-park-wedding" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Central Park Wedding</h4><p>Wedding</p></div></div>
+      </div>
+
+      <!-- ENGAGEMENT -->
+      <div class="gallery-item gi-6" data-cat="engagement" data-title="Vyshnavi & Daniel" data-type="Engagement" data-folder="images/engagement/vyshnavi-daniel" data-count="70" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>70 photos</span>
+        <div class="gi-overlay"><div><h4>Vyshnavi & Daniel</h4><p>Engagement</p></div></div>
+      </div>
+
+      <!-- COUPLE PORTRAITS -->
+      <div class="gallery-item gi-7" data-cat="couple" data-title="Abhinav & Megha" data-type="Couple Portrait" data-folder="images/couple-portraits/abhinav-megha" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Abhinav & Megha</h4><p>Couple Portrait</p></div></div>
+      </div>
+      <div class="gallery-item gi-8" data-cat="couple" data-title="Sripad & Ritika" data-type="Couple Portrait" data-folder="images/couple-portraits/sripad-ritika" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Sripad & Ritika</h4><p>Couple Portrait</p></div></div>
+      </div>
+      <div class="gallery-item gi-1" data-cat="couple" data-title="Arvind & Nikhila" data-type="Couple Portrait" data-folder="images/couple-portraits/arvind-nikhila" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Arvind & Nikhila</h4><p>Couple Portrait</p></div></div>
+      </div>
+      <div class="gallery-item gi-2" data-cat="couple" data-title="Sachin & Poojitha" data-type="Couple Portrait" data-folder="images/couple-portraits/sachin-poojitha" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Sachin & Poojitha</h4><p>Couple Portrait</p></div></div>
+      </div>
+      <div class="gallery-item gi-3" data-cat="couple" data-title="Vivek & Srujana" data-type="Couple Portrait" data-folder="images/couple-portraits/vivek-srujana" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Vivek & Srujana</h4><p>Couple Portrait</p></div></div>
+      </div>
+      <div class="gallery-item gi-4" data-cat="couple" data-title="Yogesh & Supritha" data-type="Couple Portrait" data-folder="images/couple-portraits/yogesh-supritha" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Yogesh & Supritha</h4><p>Couple Portrait</p></div></div>
+      </div>
+      <div class="gallery-item gi-5" data-cat="couple" data-title="Deekshitha & Varun" data-type="Couple Portrait" data-folder="images/couple-portraits/deekshitha-varun" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Deekshitha & Varun</h4><p>Couple Portrait</p></div></div>
+      </div>
+      <div class="gallery-item gi-6" data-cat="couple" data-title="Sameeksha & Aman" data-type="Couple Portrait" data-folder="images/couple-portraits/sameeksha-aman" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Sameeksha & Aman</h4><p>Couple Portrait</p></div></div>
+      </div>
+      <div class="gallery-item gi-7" data-cat="couple" data-title="Suprith & Pragnya" data-type="Couple Portrait" data-folder="images/couple-portraits/suprith-pragnya" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Suprith & Pragnya</h4><p>Couple Portrait</p></div></div>
+      </div>
+      <div class="gallery-item gi-8" data-cat="couple" data-title="Vyshnavi & Shiva" data-type="Couple Portrait" data-folder="images/couple-portraits/vyshnavi-shiva" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Vyshnavi & Shiva</h4><p>Couple Portrait</p></div></div>
+      </div>
+      <div class="gallery-item gi-1" data-cat="couple" data-title="Anuradha & Suresh" data-type="Couple Portrait" data-folder="images/couple-portraits/anuradha-suresh" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Anuradha & Suresh</h4><p>Couple Portrait</p></div></div>
+      </div>
+      <div class="gallery-item gi-2" data-cat="couple" data-title="Raghu & Pranitha" data-type="Couple Portrait" data-folder="images/couple-portraits/raghu-pranitha" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Raghu & Pranitha</h4><p>Couple Portrait</p></div></div>
+      </div>
+      <div class="gallery-item gi-3" data-cat="couple" data-title="Sowmya & Family" data-type="Couple Portrait" data-folder="images/couple-portraits/sowmya-family" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Sowmya & Family</h4><p>Couple Portrait</p></div></div>
+      </div>
+
+      <!-- GRADUATION -->
+      <div class="gallery-item gi-4" data-cat="graduation" data-title="Nikhila" data-type="Graduation" data-folder="images/graduation/nikhila" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Nikhila</h4><p>Graduation</p></div></div>
+      </div>
+      <div class="gallery-item gi-5" data-cat="graduation" data-title="Shushma" data-type="Graduation" data-folder="images/graduation/shushma" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Shushma</h4><p>Graduation</p></div></div>
+      </div>
+
+      <!-- MATERNITY -->
+      <div class="gallery-item gi-6" data-cat="maternity" data-title="Shreya" data-type="Maternity" data-folder="images/maternity/shreya" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Shreya</h4><p>Maternity</p></div></div>
+      </div>
+      <div class="gallery-item gi-7" data-cat="maternity" data-title="Shivani" data-type="Maternity" data-folder="images/maternity/shivani" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Shivani</h4><p>Maternity</p></div></div>
+      </div>
+      <div class="gallery-item gi-8" data-cat="maternity" data-title="Shwetha" data-type="Maternity" data-folder="images/maternity/shwetha" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Shwetha</h4><p>Maternity</p></div></div>
+      </div>
+      <div class="gallery-item gi-1" data-cat="maternity" data-title="Prithvi & Family" data-type="Maternity" data-folder="images/maternity/prithvi-family" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Prithvi & Family</h4><p>Maternity</p></div></div>
+      </div>
+
+      <!-- CONCEPTUAL -->
+      <div class="gallery-item gi-2" data-cat="conceptual" data-title="Sameeksha Dumbo" data-type="Conceptual" data-folder="images/conceptual/sameeksha-dumbo" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Sameeksha Dumbo</h4><p>Conceptual</p></div></div>
+      </div>
+      <div class="gallery-item gi-3" data-cat="conceptual" data-title="Sameeksha NYC Library" data-type="Conceptual" data-folder="images/conceptual/sameeksha-nyc-library" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Sameeksha NYC Library</h4><p>Conceptual</p></div></div>
+      </div>
+      <div class="gallery-item gi-4" data-cat="conceptual" data-title="Oviya Akshardham" data-type="Conceptual" data-folder="images/conceptual/oviya-akshardham" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Oviya Akshardham</h4><p>Conceptual</p></div></div>
+      </div>
+      <div class="gallery-item gi-5" data-cat="conceptual" data-title="Simran Beach" data-type="Conceptual" data-folder="images/conceptual/simran-beach" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Simran Beach</h4><p>Conceptual</p></div></div>
+      </div>
+      <div class="gallery-item gi-6" data-cat="conceptual" data-title="Varsha Sunset" data-type="Conceptual" data-folder="images/conceptual/varsha-sunset" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Varsha Sunset</h4><p>Conceptual</p></div></div>
+      </div>
+      <div class="gallery-item gi-7" data-cat="conceptual" data-title="Manasa India" data-type="Conceptual" data-folder="images/conceptual/manasa-india" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Manasa India</h4><p>Conceptual</p></div></div>
+      </div>
+      <div class="gallery-item gi-8" data-cat="conceptual" data-title="Divya India" data-type="Conceptual" data-folder="images/conceptual/divya-india" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Divya India</h4><p>Conceptual</p></div></div>
+      </div>
+      <div class="gallery-item gi-1" data-cat="conceptual" data-title="Bhavana TX" data-type="Conceptual" data-folder="images/conceptual/bhavana-tx" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Bhavana TX</h4><p>Conceptual</p></div></div>
+      </div>
+
+      <!-- SPRING -->
+      <div class="gallery-item gi-2" data-cat="spring" data-title="Lilly" data-type="Spring" data-folder="images/spring/lilly" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Lilly</h4><p>Spring</p></div></div>
+      </div>
+
+      <!-- BRAND COLLABS -->
+      <div class="gallery-item gi-3" data-cat="brand" data-title="Darzi Suits" data-type="Brand Collab" data-folder="images/brand-collabs/darzi-suits" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Darzi Suits</h4><p>Brand Collab</p></div></div>
+      </div>
+      <div class="gallery-item gi-4" data-cat="brand" data-title="Mrga" data-type="Brand Collab" data-folder="images/brand-collabs/mrga" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Mrga</h4><p>Brand Collab</p></div></div>
+      </div>
+
+      <!-- HOUSE WARMING -->
+      <div class="gallery-item gi-5" data-cat="housewarming" data-title="Neha" data-type="House Warming" data-folder="images/house-warming/neha" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Neha</h4><p>House Warming</p></div></div>
+      </div>
+      <div class="gallery-item gi-6" data-cat="housewarming" data-title="Rupa" data-type="House Warming" data-folder="images/house-warming/rupa" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Rupa</h4><p>House Warming</p></div></div>
+      </div>
+      <div class="gallery-item gi-7" data-cat="housewarming" data-title="Bhargavi" data-type="House Warming" data-folder="images/house-warming/bhargavi" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Bhargavi</h4><p>House Warming</p></div></div>
+      </div>
+      <div class="gallery-item gi-8" data-cat="housewarming" data-title="Pranusha" data-type="House Warming" data-folder="images/house-warming/pranusha" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Pranusha</h4><p>House Warming</p></div></div>
+      </div>
+
+      <!-- EVENTS -->
+      <div class="gallery-item gi-1" data-cat="events" data-title="Karthik Concert" data-type="Event" data-folder="images/events/karthik-concert" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Karthik Concert</h4><p>Event</p></div></div>
+      </div>
+      <div class="gallery-item gi-2" data-cat="events" data-title="Holi Event" data-type="Event" data-folder="images/events/holi-event" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Holi Event</h4><p>Event</p></div></div>
+      </div>
+      <div class="gallery-item gi-3" data-cat="events" data-title="Noora Fatehi" data-type="Event" data-folder="images/events/noora-fatehi" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Noora Fatehi</h4><p>Event</p></div></div>
+      </div>
+      <div class="gallery-item gi-4" data-cat="events" data-title="Ram Tour USA" data-type="Event" data-folder="images/events/ram-tour-usa" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Ram Tour USA</h4><p>Event</p></div></div>
+      </div>
+      <div class="gallery-item gi-5" data-cat="events" data-title="DSP" data-type="Event" data-folder="images/events/dsp" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>DSP</h4><p>Event</p></div></div>
+      </div>
+
+      <!-- FIRST BIRTHDAY -->
+      <div class="gallery-item gi-6" data-cat="birthday" data-title="Goutham & Family" data-type="First Birthday" data-folder="images/first-birthday/goutham-family" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Goutham & Family</h4><p>First Birthday</p></div></div>
+      </div>
+      <div class="gallery-item gi-7" data-cat="birthday" data-title="Joana Sweet Sixteen" data-type="First Birthday" data-folder="images/first-birthday/joana-sweet-sixteen" data-count="10" data-static="true" onclick="openSwGallery(this)">
+        <div class="gi-bg"></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
+        <div class="gi-overlay"><div><h4>Joana Sweet Sixteen</h4><p>First Birthday</p></div></div>
+      </div>
+    </div>
+    <button class="ec-nav ec-prev" aria-label="Previous"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <button class="ec-nav ec-next" aria-label="Next"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg></button>
+    <div class="ec-counter"><span class="ec-counter-current">1</span><span class="ec-counter-sep">/</span><span class="ec-counter-total">12</span></div>
+    </div>
+    <div id="galleryNoResults" class="gallery-no-results">No stories found matching your search.</div>
+  </div>
+</section>
+
+<!-- ════════════════════ CINEMATIC GALLERY VIEWER ════════════════════ -->
+<div class="sw-gallery" id="swGallery" role="dialog" aria-modal="true" aria-label="Photo gallery">
+  <div class="sw-gallery-bar">
+    <div class="sw-gallery-title-wrap">
+      <div class="sw-gallery-title" id="swGalleryTitle"></div>
+      <div class="sw-gallery-subtitle" id="swGallerySubtitle"></div>
+    </div>
+    <div class="sw-gallery-counter" id="swGalleryCounter"></div>
+    <button class="sw-gallery-close" id="swGalleryClose" aria-label="Close gallery">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      Close &nbsp;<span style="opacity:0.35;font-size:0.5rem">(Esc)</span>
+    </button>
+  </div>
+  <div class="sw-gallery-stage" id="swGalleryStage">
+    <div class="sw-gallery-img" id="swGalleryImg"></div>
+    <button class="sw-gallery-nav sw-gallery-prev" id="swGalleryPrev" aria-label="Previous image">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <button class="sw-gallery-nav sw-gallery-next" id="swGalleryNext" aria-label="Next image">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+    <div class="sw-gallery-strip" id="swGalleryStrip"></div>
+    <div class="sw-progress-bar" id="swProgressBar">
+      <div class="sw-progress-fill" id="swProgressFill"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ VIDEO WORKS ════════════════════ -->
+<!-- FIX 4: Dedicated Video Works section with cinematic modal player.
+     HOW TO ADD A VIDEO:
+       1. Copy a .vw-card block and set data-video="videos/your-film.mp4"
+       2. Set data-title, data-type, data-vcat (wedding|engagement|celebration|prewedding)
+       3. Set data-poster="images/your-poster.jpg" for a custom thumbnail
+       4. Place the video file in the /videos/ folder
+     The hover-preview and modal player load automatically.
+-->
+<section class="section section-dark" id="video-works">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-tag">Moving Images</div>
+      <div class="section-title" style="color:var(--ivory)">Video Works</div>
+      <div class="section-desc">Cinematic films for weddings, engagements & life's most intimate milestones.</div>
+    </div>
+    <div class="vw-filters reveal">
+      <button class="active" onclick="filterVideos('all', this)">All</button>
+      <button onclick="filterVideos('wedding', this)">Weddings</button>
+      <button onclick="filterVideos('engagement', this)">Engagement</button>
+      <button onclick="filterVideos('prewedding', this)">Pre-Wedding</button>
+      <button onclick="filterVideos('housewarming', this)">House Warming</button>
+      <button onclick="filterVideos('conceptual', this)">Conceptual</button>
+    </div>
+    <div class="ethereal-carousel" id="videoCarousel">
+    <div class="vw-grid ec-track reveal" id="vwGrid">
+
+      <!-- ENGAGEMENT VIDEO -->
+      <div class="vw-card vw-gi-1" data-vcat="engagement" data-video="videos/engagement/vyshnavi-daniel/vyshnavi-daniel.mp4" data-title="Vyshnavi & Daniel" data-type="Engagement Film" data-poster="videos/engagement/vyshnavi-daniel/cover.jpg">
+        <div class="vw-poster vw-gi-1"></div>
+        <div class="vw-play-wrap">
+          <div class="vw-play-ring"></div>
+          <div class="vw-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="vw-overlay">
+          <div class="vw-badge">Engagement</div>
+          <h4>Vyshnavi & Daniel</h4>
+          <p>Engagement Film</p>
+        </div>
+        <div class="vw-duration">Full Film</div>
+      </div>
+
+      <!-- WEDDING VIDEO -->
+      <div class="vw-card wide vw-gi-2" data-vcat="wedding" data-video="videos/wedding/pooja-amit.mp4" data-title="Pooja & Amit" data-type="Wedding Film" data-poster="videos/wedding/pooja-amit/cover.jpg">
+        <div class="vw-poster vw-gi-2"></div>
+        <div class="vw-play-wrap">
+          <div class="vw-play-ring"></div>
+          <div class="vw-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="vw-overlay">
+          <div class="vw-badge">Wedding</div>
+          <h4>Pooja & Amit</h4>
+          <p>Wedding Film</p>
+        </div>
+        <div class="vw-duration">Highlight</div>
+      </div>
+
+      <!-- PRE-WEDDING VIDEOS -->
+      <div class="vw-card vw-gi-3" data-vcat="prewedding" data-video="videos/prewedding/abhinav-megha.mp4" data-title="Abhinav & Megha" data-type="Pre-Wedding Film" data-poster="videos/prewedding/abhinav-megha/cover.jpg">
+        <div class="vw-poster vw-gi-3"></div>
+        <div class="vw-play-wrap">
+          <div class="vw-play-ring"></div>
+          <div class="vw-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="vw-overlay">
+          <div class="vw-badge">Pre-Wedding</div>
+          <h4>Abhinav & Megha</h4>
+          <p>Pre-Wedding Film</p>
+        </div>
+        <div class="vw-duration">Coming Soon</div>
+      </div>
+
+      <div class="vw-card vw-gi-4" data-vcat="prewedding" data-video="videos/prewedding/nikitha-arun.mp4" data-title="Nikitha & Arun" data-type="Pre-Wedding Film" data-poster="videos/prewedding/nikitha-arun/cover.jpg">
+        <div class="vw-poster vw-gi-4"></div>
+        <div class="vw-play-wrap">
+          <div class="vw-play-ring"></div>
+          <div class="vw-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="vw-overlay">
+          <div class="vw-badge">Pre-Wedding</div>
+          <h4>Nikitha & Arun</h4>
+          <p>Pre-Wedding Film</p>
+        </div>
+        <div class="vw-duration">Coming Soon</div>
+      </div>
+
+      <div class="vw-card vw-gi-5" data-vcat="prewedding" data-video="videos/prewedding/suprith-pragnya.mp4" data-title="Suprith & Pragnya" data-type="Pre-Wedding Film" data-poster="videos/prewedding/suprith-pragnya/cover.jpg">
+        <div class="vw-poster vw-gi-5"></div>
+        <div class="vw-play-wrap">
+          <div class="vw-play-ring"></div>
+          <div class="vw-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="vw-overlay">
+          <div class="vw-badge">Pre-Wedding</div>
+          <h4>Suprith & Pragnya</h4>
+          <p>Pre-Wedding Film</p>
+        </div>
+        <div class="vw-duration">full film</div>
+      </div>
+
+      <div class="vw-card vw-gi-6" data-vcat="prewedding" data-video="videos/prewedding/hemanth.mp4" data-title="Hemanth" data-type="Pre-Wedding Film" data-poster="videos/prewedding/hemanth/cover.jpg">
+        <div class="vw-poster vw-gi-6"></div>
+        <div class="vw-play-wrap">
+          <div class="vw-play-ring"></div>
+          <div class="vw-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="vw-overlay">
+          <div class="vw-badge">Pre-Wedding</div>
+          <h4>Hemanth</h4>
+          <p>Pre-Wedding Film</p>
+        </div>
+        <div class="vw-duration">full film</div>
+      </div>
+
+      <!-- HOUSE WARMING VIDEOS -->
+      <div class="vw-card vw-gi-7" data-vcat="housewarming" data-video="videos/housewarming/rupa.mp4" data-title="Rupa" data-type="House Warming" data-poster="videos/housewarming/rupa/cover.jpg">
+        <div class="vw-poster vw-gi-7"></div>
+        <div class="vw-play-wrap">
+          <div class="vw-play-ring"></div>
+          <div class="vw-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="vw-overlay">
+          <div class="vw-badge">House Warming</div>
+          <h4>Rupa</h4>
+          <p>House Warming Film</p>
+        </div>
+        <div class="vw-duration">Highlight</div>
+      </div>
+      <div class="vw-card vw-gi-8" data-vcat="housewarming" data-video="videos/housewarming/neha.mp4" data-title="Neha" data-type="House Warming" data-poster="videos/housewarming/neha/cover.jpg">
+        <div class="vw-poster vw-gi-8"></div>
+        <div class="vw-play-wrap">
+          <div class="vw-play-ring"></div>
+          <div class="vw-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="vw-overlay">
+          <div class="vw-badge">House Warming</div>
+          <h4>Neha</h4>
+          <p>House Warming Film</p>
+        </div>
+        <div class="vw-duration">Highlight</div>
+      </div>
+      <div class="vw-card vw-gi-1" data-vcat="housewarming" data-video="videos/housewarming/bhargavi.mp4" data-title="Bhargavi" data-type="House Warming" data-poster="videos/housewarming/bhargavi/cover.jpg">
+        <div class="vw-poster vw-gi-1"></div>
+        <div class="vw-play-wrap">
+          <div class="vw-play-ring"></div>
+          <div class="vw-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="vw-overlay">
+          <div class="vw-badge">House Warming</div>
+          <h4>Bhargavi</h4>
+          <p>House Warming Film</p>
+        </div>
+        <div class="vw-duration">Highlight</div>
+      </div>
+
+      <!-- CONCEPTUAL VIDEOS -->
+      <div class="vw-card vw-gi-2" data-vcat="conceptual" data-video="videos/conceptual/sameeksha-nyc.mp4" data-title="Sameeksha NYC" data-type="Conceptual Film" data-poster="videos/conceptual/sameeksha-nyc/cover.jpg">
+        <div class="vw-poster vw-gi-2"></div>
+        <div class="vw-play-wrap">
+          <div class="vw-play-ring"></div>
+          <div class="vw-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="vw-overlay">
+          <div class="vw-badge">Conceptual</div>
+          <h4>Sameeksha NYC</h4>
+          <p>Conceptual Film</p>
+        </div>
+        <div class="vw-duration">Short</div>
+      </div>
+      <div class="vw-card vw-gi-3" data-vcat="conceptual" data-video="videos/conceptual/sameeksha-chicago.mp4" data-title="Sameeksha Chicago" data-type="Conceptual Film" data-poster="videos/conceptual/sameeksha-chicago/cover.jpg">
+        <div class="vw-poster vw-gi-3"></div>
+        <div class="vw-play-wrap">
+          <div class="vw-play-ring"></div>
+          <div class="vw-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="vw-overlay">
+          <div class="vw-badge">Conceptual</div>
+          <h4>Sameeksha Chicago</h4>
+          <p>Conceptual Film</p>
+        </div>
+        <div class="vw-duration">Short</div>
+      </div>
+      <div class="vw-card vw-gi-4" data-vcat="conceptual" data-video="videos/conceptual/darzi-suits.mp4" data-title="Darzi Suits Collab" data-type="Brand Film" data-poster="videos/conceptual/darzi-suits/cover.jpg">
+        <div class="vw-poster vw-gi-4"></div>
+        <div class="vw-play-wrap">
+          <div class="vw-play-ring"></div>
+          <div class="vw-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="vw-overlay">
+          <div class="vw-badge">Conceptual</div>
+          <h4>Darzi Suits Collab</h4>
+          <p>Brand Film</p>
+        </div>
+        <div class="vw-duration">Promo</div>
+      </div>
+      <div class="vw-card vw-gi-5" data-vcat="conceptual" data-video="videos/conceptual/karthik-concert.mp4" data-title="Karthik Concert" data-type="Event Film" data-poster="videos/conceptual/karthik-concert/cover.jpg">
+        <div class="vw-poster vw-gi-5"></div>
+        <div class="vw-play-wrap">
+          <div class="vw-play-ring"></div>
+          <div class="vw-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="vw-overlay">
+          <div class="vw-badge">Conceptual</div>
+          <h4>Karthik Concert</h4>
+          <p>Event Film</p>
+        </div>
+        <div class="vw-duration">Highlight</div>
+      </div>
+    </div><!-- /.vw-grid -->
+    <button class="ec-nav ec-prev" aria-label="Previous"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <button class="ec-nav ec-next" aria-label="Next"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg></button>
+    <div class="ec-counter"><span class="ec-counter-current">1</span><span class="ec-counter-sep">/</span><span class="ec-counter-total">14</span></div>
+    </div><!-- /.ethereal-carousel -->
+  </div>
+</section>
+<!--<section class="section">
+        <div class="container">
+            <div class="reveal">
+                <div class="section-tag">Media Coverage · Feb 2026</div>
+                <h1 class="section-title">New York Fashion Week</h1>
+                <p class="section-desc">Editorial captures and behind-the-scenes stories from the runways of NYC.</p>
+            </div>
+
+            <div class="gallery-grid">
+                <div class="gallery-item wide" 
+                     data-cat="editorial" 
+                     data-title="Runway Highlights" 
+                     data-folder="images/nyfw-runway" 
+                     data-count="15" 
+                     onclick="openSwGallery(this)">
+                    <div class="gi-bg"></div>
+                    <div class="gi-overlay"><div><h4>The Runway</h4><p>NYFW 2026</p></div></div>
+                </div>
+            </div>
+        </div>
+    </section>-->
+
+    <div class="sw-gallery" id="swGallery">
+        <div class="sw-gallery-bar">
+            <div class="sw-gallery-title-wrap">
+                <div class="sw-gallery-title" id="swGalleryTitle"></div>
+            </div>
+            <button class="sw-gallery-close" id="swGalleryClose">Close</button>
+        </div>
+        <div class="sw-gallery-stage" id="swGalleryStage">
+            <div class="sw-gallery-img" id="swGalleryImg"></div>
+            <button class="sw-gallery-nav sw-gallery-prev" id="swGalleryPrev">←</button>
+            <button class="sw-gallery-nav sw-gallery-next" id="swGalleryNext">→</button>
+        </div>
+    </div>
+
+
+<!-- ════════════ CINEMATIC VIDEO MODAL ════════════ -->
+<div class="video-modal" id="videoModal" role="dialog" aria-modal="true" aria-label="Video player">
+  <div class="vm-backdrop" id="vmBackdrop"></div>
+  <div class="vm-player">
+    <div class="vm-header">
+      <div>
+        <div class="vm-title" id="vmTitle"></div>
+        <div class="vm-subtitle" id="vmSubtitle"></div>
+      </div>
+      <button class="vm-close" id="vmClose" aria-label="Close video">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        Close &nbsp;<span style="opacity:0.35;font-size:0.5rem">(Esc)</span>
+      </button>
+    </div>
+    <div class="vm-stage" id="vmStage">
+      <video id="vmVideo" playsinline></video>
+      <div class="vm-placeholder" id="vmPlaceholder">
+        <div class="vm-placeholder-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="0.8"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <p>Video coming soon</p>
+      </div>
+      <!-- Custom Controls -->
+      <div class="vm-controls" id="vmControls">
+        <button class="vm-ctrl-btn" id="vmPlayToggle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </button>
+        <div class="vm-progress-track" id="vmProgressTrack">
+          <div class="vm-progress-fill" id="vmProgressFill"></div>
+        </div>
+        <div class="vm-time" id="vmTimeDisplay">00:00</div>
+        <button class="vm-ctrl-btn" id="vmMuteToggle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button>
+        <button class="vm-ctrl-btn" id="vmFsToggle"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2-2h3"/></svg></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ NYC PORTRAITS ════════════════════ -->
+<section class="section section-dark" id="nyc">
+  <svg class="nyc-skyline" viewBox="0 0 1200 250" preserveAspectRatio="none"><path d="M0,250 L0,200 L30,200 L30,160 L45,160 L45,140 L55,140 L55,130 L60,110 L65,130 L70,130 L70,150 L85,150 L85,120 L95,120 L95,100 L100,80 L105,100 L110,100 L110,130 L130,130 L130,170 L150,170 L150,140 L160,140 L160,90 L165,70 L170,50 L175,70 L180,90 L185,90 L185,60 L190,40 L195,30 L200,40 L205,60 L210,60 L210,100 L220,100 L220,130 L240,130 L240,160 L260,160 L260,110 L270,110 L270,80 L280,60 L285,40 L290,20 L295,40 L300,60 L310,80 L310,110 L320,110 L320,140 L340,140 L340,120 L360,120 L360,100 L380,100 L380,60 L385,40 L390,25 L395,10 L400,25 L405,40 L410,60 L415,80 L420,80 L420,100 L440,100 L440,130 L460,130 L460,90 L465,70 L470,50 L475,35 L480,50 L485,70 L490,90 L500,90 L500,110 L520,110 L520,140 L540,140 L540,100 L550,80 L555,60 L560,45 L565,30 L570,15 L575,30 L580,45 L585,60 L590,80 L600,100 L610,100 L610,120 L630,120 L630,150 L660,150 L660,130 L680,130 L680,100 L700,100 L700,70 L710,50 L720,35 L730,50 L740,70 L750,100 L760,100 L760,130 L780,130 L780,160 L800,160 L800,140 L820,140 L820,110 L840,110 L840,80 L850,60 L860,80 L870,110 L880,110 L880,140 L900,140 L900,120 L920,120 L920,150 L940,150 L940,170 L960,170 L960,150 L980,150 L980,130 L1000,130 L1000,160 L1020,160 L1020,180 L1050,180 L1050,160 L1080,160 L1080,180 L1100,180 L1100,190 L1120,190 L1120,200 L1150,200 L1150,190 L1180,190 L1180,210 L1200,210 L1200,250 Z" fill="none" stroke="rgba(201,149,107,0.05)" stroke-width="1"/></svg>
+  <div class="container nyc-content">
+    <div class="reveal">
+      <div class="section-tag">Location Guide · Couple Portraits</div>
+      <div class="section-title" style="color:var(--ivory)">NYC's Most Iconic Backdrops</div>
+      <div class="section-desc" style="margin-bottom:3rem">New York is our studio. Hover each location to preview — click to open in Google Maps.</div>
+    </div>
+    <div class="nyc-layout reveal">
+      <div class="nyc-list">
+        <div class="nyc-loc" onmouseenter="showNYC('cp')" onclick="window.open('https://maps.google.com/?q=Central+Park+New+York','_blank')"><div class="nyc-loc-left"><span class="num">01</span><div><h4>Central Park</h4><div class="nyc-sub-text">Timeless Romance · Bow Bridge · Bethesda</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+        <div class="nyc-loc" onmouseenter="showNYC('dumbo')" onclick="window.open('https://maps.google.com/?q=DUMBO+Brooklyn','_blank')"><div class="nyc-loc-left"><span class="num">02</span><div><h4>DUMBO</h4><div class="nyc-sub-text">Urban Poetry · Cobblestone Streets</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+        <div class="nyc-loc" onmouseenter="showNYC('bb')" onclick="window.open('https://maps.google.com/?q=Brooklyn+Bridge','_blank')"><div class="nyc-loc-left"><span class="num">03</span><div><h4>Brooklyn Bridge</h4><div class="nyc-sub-text">Iconic Grandeur · Gothic Arches</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+        <div class="nyc-loc" onmouseenter="showNYC('subway')" onclick="window.open('https://maps.google.com/?q=Grand+Central+Station+NYC','_blank')"><div class="nyc-loc-left"><span class="num">04</span><div><h4>NYC Subway</h4><div class="nyc-sub-text">Raw & Real · Underground Soul</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+        <div class="nyc-loc" onmouseenter="showNYC('lib')" onclick="window.open('https://maps.google.com/?q=New+York+Public+Library','_blank')"><div class="nyc-loc-left"><span class="num">05</span><div><h4>NYC Public Library</h4><div class="nyc-sub-text">Literary Elegance · Beaux-Arts</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+        <div class="nyc-loc" onmouseenter="showNYC('st')" onclick="window.open('https://maps.google.com/?q=Times+Square+NYC','_blank')"><div class="nyc-loc-left"><span class="num">06</span><div><h4>NYC Streets</h4><div class="nyc-sub-text">City as Canvas · Neon & Steam</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </div>
+      <div class="nyc-preview">
+  <div class="nyc-preview-img active nyc-cp">
+    <div class="preview-bg" style="background-image: url('images/nyc/cp.jpg');"></div>
+    <div class="nyc-preview-info">
+      <h5>Central Park</h5>
+      <div class="tag-line">Best · Golden Hour · Spring & Autumn</div>
+      <a href="https://maps.google.com/?q=Central+Park+New+York" target="_blank" class="nyc-maps-link">Maps</a>
+    </div>
+  </div>
+
+  <div class="nyc-preview-img nyc-dumbo">
+    <div class="preview-bg" style="background-image: url('images/nyc/dumbo.jpg'); background-size: cover;"></div>
+    <div class="nyc-preview-info"><h5>DUMBO</h5>
+      <div class="tag-line">Best · Sunrise · Blue Hour</div>
+      <a href="https://maps.google.com/?q=DUMBO+Brooklyn" target="_blank" class="nyc-maps-link">Maps</a></div>
+  </div>
+
+  <div class="nyc-preview-img nyc-bb">
+    <div class="preview-bg" style="background-image: url('images/nyc/bb.jpg'); background-size: cover;"></div>
+    <div class="nyc-preview-info"><h5>Brooklyn Bridge</h5><div class="tag-line">Best · Early Morning · Sunset</div><a href="https://maps.google.com/?q=Brooklyn+Bridge" target="_blank" class="nyc-maps-link">Maps</a></div>
+  </div>
+  
+  <div class="nyc-preview-img nyc-subway">
+    <div class="preview-bg" style="background-image: url('images/nyc/subway.jpg'); background-size: cover;"></div>
+    <div class="nyc-preview-info"><h5>NYC Subway</h5><div class="tag-line">Best · Off-Peak · Any Season</div><a href="https://maps.google.com/?q=Grand+Central+Station" target="_blank" class="nyc-maps-link">Maps</a></div>
+  </div>
+
+  <div class="nyc-preview-img nyc-lib">
+    <div class="preview-bg" style="background-image: url('images/nyc/lib.jpg'); background-size: cover;"></div>
+    <div class="nyc-preview-info"><h5>NYC Public Library</h5><div class="tag-line">Best · Weekdays · Soft Light</div><a href="https://maps.google.com/?q=New+York+Public+Library" target="_blank" class="nyc-maps-link">Maps</a></div>
+  </div>
+
+  <div class="nyc-preview-img nyc-st">
+    <div class="preview-bg" style="background-image: url('images/nyc/st.jpg'); background-size: cover;"></div>
+    <div class="nyc-preview-info"><h5>NYC Streets</h5><div class="tag-line">Best · Blue Hour · Rainy Evenings</div><a href="https://maps.google.com/?q=Times+Square+NYC" target="_blank" class="nyc-maps-link">Maps</a></div>
+  </div>
+</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ ABOUT ════════════════════ -->
+<section class="section section-warm" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-image reveal"></div>
+      <div class="about-text reveal">
+        <div class="section-tag">Our Story</div>
+        <div class="section-title">Where Every Click Reveals<br>the Artistry of Love</div>
+        <p>We don't just take photographs — we hunt for the light that lives between two people. That stolen glance during the pheras. The nervous laugh before a first look. The quiet exhale when a mother holds her belly and imagines the future.</p>
+        <p>Aakaara Studios was born from a simple truth: love is the most beautiful thing in the world, and it deserves to be captured with reverence. Based in New York City with roots running deep into South Indian heritage, we bring a perspective that honors both tradition and the electric energy of the city.</p>
+        <p>Our name comes from the ancient Sanskrit word meaning "shape" and "form" — because that's what we do: we give shape to your most fleeting, most precious emotions and transform them into art you can hold forever.</p>
+        <p style="font-style:italic;color:rgba(30,26,22,0.35);font-size:0.82rem;line-height:1.9;border-left:2px solid rgba(201,149,107,0.3);padding-left:1.2rem;margin-top:1.5rem;">We work across three registers — cinematic, editorial, and intimate — because your story decides the aesthetic, not the other way around.</p>
+        <div class="about-sanskrit">
+          <span class="telugu">ఆకారం(Ākāram)</span> <span style="color:rgba(30,26,22,0.12)">·</span>
+          <span class="devnag">आकार</span> <span style="color:rgba(30,26,22,0.12)">·</span>
+          <span class="english">Giving Shape to What You Feel</span>
+        </div>
+        <div class="about-stats">
+          <div class="stat"><h4>200+</h4><p>Stories captured</p></div>
+          <div class="stat"><h4>4</h4><p>Years of craft</p></div>
+          <div class="stat"><h4>3</h4><p>Countries</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ SERVICES OVERVIEW ════════════════════ -->
+<section class="section section-dark" id="services-overview" style="padding-top:4.5rem;padding-bottom:4.5rem;">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:2.5rem;">
+      <div class="section-tag">What We Offer</div>
+      <div class="section-title" style="color:var(--ivory);">Six Ways We Tell<br>Your Story</div>
+      <div class="section-desc" style="margin:0 auto;text-align:center;color:rgba(250,246,241,0.3);">
+        From grand weddings to quiet intimate portraits — every session is crafted with intention.
+      </div>
+    </div>
+    <div class="sov-grid reveal">
+      <div class="sov-card">
+        <div class="sov-num">01</div>
+        <div class="sov-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </div>
+        <h3 class="sov-title">Weddings</h3>
+        <p class="sov-desc">Full-day coverage, second shooter, and a beautifully curated online gallery — every chapter of your day preserved.</p>
+        <div class="sov-price">Starting from <strong>$2,500</strong></div>
+        <a href="#contact" class="sov-link">Inquire <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+      <div class="sov-card">
+        <div class="sov-num">02</div>
+        <div class="sov-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+        </div>
+        <h3 class="sov-title">Couple Portraits</h3>
+        <p class="sov-desc">Engagement sessions, pre-wedding shoots, or simply celebrating your love in New York's most iconic backdrops.</p>
+        <a href="#contact" class="sov-link">Inquire <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        <a href="couple-portraits.html" class="sov-link sov-link-view" onclick="sessionStorage.setItem('returnScrollY', window.scrollY)">View Work</a>
+      </div>
+      <div class="sov-card">
+        <div class="sov-num">03</div>
+        <div class="sov-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <h3 class="sov-title">Maternity</h3>
+        <p class="sov-desc">Intimate, beautifully styled sessions celebrating the quiet power and radiance of motherhood — in studio or on location.</p>
+        <a href="#contact" class="sov-link">Inquire <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+      <div class="sov-card">
+        <div class="sov-num">04</div>
+        <div class="sov-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3 class="sov-title">Celebrations</h3>
+        <p class="sov-desc">Baby showers, housewarmings, first birthdays — every milestone deserves to be preserved with joy and artistry.</p>
+        <a href="#contact" class="sov-link">Inquire <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+      <div class="sov-card">
+        <div class="sov-num">05</div>
+        <div class="sov-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <h3 class="sov-title">Commercial</h3>
+        <p class="sov-desc">Product photography, brand campaigns, and editorial content for businesses and creators who refuse to be ordinary.</p>
+        <div class="sov-tags">
+          <span>Brand Campaigns</span><span>Lookbooks</span><span>Social-First Content</span><span>Usage Rights Available</span>
+        </div>
+        <a href="#contact" class="sov-link">Inquire <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+      <div class="sov-card">
+        <div class="sov-num">06</div>
+        <div class="sov-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <h3 class="sov-title">Conceptual</h3>
+        <p class="sov-desc">Surreal, editorial, and experimental visual storytelling — for those who see photography as pure art, unbound by convention.</p>
+        <div class="sov-tags">
+          <span>Editorial</span><span>Artist Collabs</span><span>Portfolio Projects</span><span>Exhibition Prints</span>
+        </div>
+        <a href="#contact" class="sov-link">Inquire <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+    </div>
+    <div class="reveal" style="text-align:center;margin-top:4rem;">
+      <a href="#services" class="sov-cta">
+        <span>Explore our Video work in Detail</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ SERVICES — CINEMATIC SCROLL STACK ════════════════════ -->
+<section id="services">
+  <div class="cs-wrapper">
+
+    <!-- Section intro — scrolls up to reveal the sticky stack -->
+    <div class="cs-intro" id="csIntro">
+      <div class="cs-intro-inner reveal">
+        <div class="section-tag">What We Offer</div>
+        <div class="cs-intro-title">Every Story<br>Deserves Its Own<br>Canvas</div>
+        <div class="cs-intro-rule"><span></span><i></i><span></span></div>
+        <div class="cs-intro-sub">Scroll to explore our services</div>
+      </div>
+    </div>
+
+    <!-- Sticky viewport stage -->
+    <div class="cs-sticky-zone" id="csStickyZone">
+
+      <!-- Counter -->
+      <div class="cs-counter" id="csCounter">
+        <div class="cs-counter-current" id="csCounterCurrent">01</div>
+        <div class="cs-counter-divider"></div>
+        <div class="cs-counter-total">05</div>
+      </div>
+
+      <!-- Progress dots — 5 panels after removing Maternity -->
+      <div class="cs-dots" id="csDots">
+        <div class="cs-dot active" data-panel="0"></div>
+        <div class="cs-dot" data-panel="1"></div>
+        <div class="cs-dot" data-panel="2"></div>
+        <div class="cs-dot" data-panel="3"></div>
+        <div class="cs-dot" data-panel="4"></div>
+      </div>
+
+      <!-- Scroll hint -->
+      <div class="cs-scroll-hint" id="csScrollHint">
+        <span>Scroll</span>
+        <div class="cs-scroll-line"></div>
+      </div>
+
+      <!-- Mute Toggle for Scroll Stack -->
+      <button class="cs-mute-toggle" id="csMuteToggle" aria-label="Toggle audio">
+        <svg class="cs-icon-muted" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+        <svg class="cs-icon-unmuted" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+      </button>
+
+      <div class="cs-panel cs-active" data-video="videos/weddings.mp4" data-bg="" data-bg-fallback="cs-bg-1">
+        <div class="cs-bg cs-bg-1" id="csBg0">
+          <video class="cs-video" id="csVid0" muted loop playsinline preload="auto"></video>
+        </div>
+        <div class="cs-vignette"></div>
+      </div>
+
+      <div class="cs-panel" data-video="videos/couple-portraits.mp4" data-bg="" data-bg-fallback="cs-bg-2">
+        <div class="cs-bg cs-bg-2" id="csBg1">
+          <video class="cs-video" id="csVid1" muted loop playsinline preload="auto"></video>
+        </div>
+        <div class="cs-vignette"></div>
+      </div>
+
+      <!-- FIX 3: Maternity panel removed. Panels: 0=Weddings 1=Couples 2=Celebrations 3=Commercial 4=Conceptual -->
+      <div class="cs-panel" data-video="" data-bg="" data-bg-fallback="cs-bg-4">
+        <div class="cs-bg cs-bg-4" id="csBg2">
+          <video class="cs-video" id="csVid2" muted loop playsinline preload="auto"></video>
+        </div>
+        <div class="cs-vignette"></div>
+      </div>
+
+      <div class="cs-panel" data-video="" data-bg="" data-bg-fallback="cs-bg-5">
+        <div class="cs-bg cs-bg-5" id="csBg3">
+          <video class="cs-video" id="csVid3" muted loop playsinline preload="auto"></video>
+        </div>
+        <div class="cs-vignette"></div>
+      </div>
+
+      <div class="cs-panel" data-video="" data-bg="" data-bg-fallback="cs-bg-6">
+        <div class="cs-bg cs-bg-6" id="csBg4">
+          <video class="cs-video" id="csVid4" muted loop playsinline preload="auto"></video>
+        </div>
+        <div class="cs-vignette"></div>
+      </div>
+
+      <!-- SHARED TEXT OVERLAY — floats above ALL panels, never covered -->
+      <div class="cs-text-overlay" id="csTextOverlay">
+        <div class="cs-text-slide" data-slide="0">
+          <div class="cs-label">01 · Weddings</div>
+          <h2 class="cs-title">Where Two Souls Become One Story</h2>
+          <p class="cs-desc">Full-day coverage from getting-ready moments to the final dance. Second photographer and online gallery included.</p>
+          <a href="#contact" class="cs-link">Book a Session <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+        <div class="cs-text-slide" data-slide="1">
+          <div class="cs-label">02 · Couple Portraits</div>
+          <h2 class="cs-title">Love, Caught Mid-Breath</h2>
+          <p class="cs-desc">Engagement sessions, pre-wedding shoots, or simply celebrating your love story in iconic NYC locations.</p>
+          <a href="#contact" class="cs-link">Book a Session <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+        <div class="cs-text-slide" data-slide="2">
+          <div class="cs-label">03 · Celebrations</div>
+          <h2 class="cs-title">Moments That Make Life Extraordinary</h2>
+          <p class="cs-desc">Baby showers, housewarmings, first birthdays — every milestone deserves to be captured with joy and artistry.</p>
+          <a href="#contact" class="cs-link">Book a Session <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+        <div class="cs-text-slide" data-slide="3">
+          <div class="cs-label">04 · Commercial</div>
+          <h2 class="cs-title">Your Brand, Elevated</h2>
+          <p class="cs-desc">Product photography, brand campaigns, and editorial content for businesses and creators who refuse to be ordinary.</p>
+          <a href="#contact" class="cs-link">Book a Session <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+        <div class="cs-text-slide" data-slide="4">
+          <div class="cs-label">05 · Conceptual</div>
+          <h2 class="cs-title">Art That Defies the Frame</h2>
+          <p class="cs-desc">Surreal, editorial, and experimental visual storytelling — for those who see photography as pure art.</p>
+          <a href="#contact" class="cs-link">Book a Session <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+      </div>
+
+    </div><!-- /.cs-sticky-zone -->
+  </div><!-- /.cs-wrapper -->
+</section>
+
+<!-- ════════════════════ TESTIMONIALS ════════════════════ -->
+<section class="section section-dark" id="testimonials">
+  <div class="container reveal">
+    <div class="section-tag">Kind Words</div>
+    <div class="section-title" style="color:var(--ivory)">What Our Clients Say</div>
+    <div class="section-desc">We build relationships, not just portfolios. Real words from real people.</div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card"><div class="testimonial-stars"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><blockquote>"Your client's testimonial here — paste their kind words when they send them to you."</blockquote><div class="testimonial-author"><div class="testimonial-avatar"></div><div><h5>Client Name</h5><p>Service · Location</p></div></div></div>
+      <div class="testimonial-card"><div class="testimonial-stars"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><blockquote>"Your client's testimonial here — paste their kind words when they send them to you."</blockquote><div class="testimonial-author"><div class="testimonial-avatar"></div><div><h5>Client Name</h5><p>Service · Location</p></div></div></div>
+      <div class="testimonial-card"><div class="testimonial-stars"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><blockquote>"Your client's testimonial here — paste their kind words when they send them to you."</blockquote><div class="testimonial-author"><div class="testimonial-avatar"></div><div><h5>Client Name</h5><p>Service · Location</p></div></div></div>
+      <div class="testimonial-card"><div class="testimonial-stars"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><blockquote>"Your client's testimonial here — paste their kind words when they send them to you."</blockquote><div class="testimonial-author"><div class="testimonial-avatar"></div><div><h5>Client Name</h5><p>Service · Location</p></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ CONTACT ════════════════════ -->
+<section class="section" id="contact">
+  <div class="container reveal">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="section-tag">Get In Touch</div>
+        <h3>Let's Create Something Beautiful Together</h3>
+        <p>Whether you're planning a grand wedding or an intimate portrait session, we'd love to hear your story.</p>
+        <div class="contact-details">
+          <div class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><h5>New York City</h5><p>Available for travel worldwide</p></div></div>
+          <a href="mailto:avala.sudhakar@gmail.com" class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div><h5>avala.sudhakar@gmail.com</h5><p>We respond within 24 hours</p></div></a>
+          <a href="tel:+14753322020" class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg></div><div><h5>+1 (475) 332-2020</h5><p>Mon–Sat, 10am–7pm EST</p></div></a>
+          <a href="https://www.instagram.com/sudhakar_3697?igsh=MWxodHZrOWlhcmpzOA%3D%3D&utm_source=qr" target="_blank" class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="var(--rose)" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke="var(--rose)" stroke-width="1.5"/><circle cx="17.5" cy="6.5" r="1.5" fill="var(--rose)"/></svg></div><div><h5>@sudhakar_3697</h5><p>Follow us on Instagram</p></div></a>
+        </div>
+      </div>
+      <!-- PASTE YOUR REAL FORMSPREE ID BELOW (replace YOUR_UNIQUE_FORM_ID) -->
+      <!-- IMPORTANT: Replace YOUR_UNIQUE_FORM_ID with your actual Formspree ID (e.g. xbqnzlq) -->
+      <form id="contactForm" class="contact-form" action="https://formspree.io/f/xlgwznnz" method="POST">
+        <input type="hidden" name="_subject" value="New inquiry from aakaarastudiosnyc.com">
+        <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+        <div class="form-row"><div class="form-group"><label>Your Name</label><input type="text" name="name" placeholder="Full name" required></div><div class="form-group"><label>Email</label><input type="email" name="email" placeholder="you@email.com" required></div></div>
+        <div class="form-row"><div class="form-group"><label>Event Type</label><select name="event_type"><option value="">Select a service</option><option>Wedding</option><option>Couple Portrait</option><option>Maternity</option><option>Baby Shower</option><option>Housewarming</option><option>First Birthday</option><option>Sweet Sixteen</option><option>Commercial</option><option>Conceptual</option><option>Other</option></select></div><div class="form-group"><label>Preferred Date</label><input type="text" id="preferredDate" name="date" placeholder="Select a date..."></div></div>
+        <div class="form-group"><label>Tell Us Your Story</label><textarea name="message" placeholder="Share a bit about your vision — we'd love to know what makes your celebration special..."></textarea></div>
+        <button type="submit" class="form-submit">Send Message</button>
+        <div id="formStatus"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<button id="backToTop" class="back-to-top" aria-label="Back to Top">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
+
+<!-- ════════════════════ FOOTER ════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div style="display:flex;gap:6px;margin-bottom:0.6rem;"><span style="width:6px;height:6px;border-radius:50%;background:var(--rose);opacity:0.85;"></span><span style="width:6px;height:6px;border-radius:50%;background:var(--rose);opacity:0.85;"></span></div>
+        <div style="font-family:var(--font-display);font-weight:300;font-size:1.1rem;letter-spacing:0.3em;color:var(--ivory);margin-bottom:0.8rem;">Aakaara</div>
+        <p>Giving shape to what you feel. A photography sanctuary where love and art converge.</p>
+      </div>
+      <div class="footer-col"><h5>Navigate</h5><a href="#home">Home</a><a href="#portfolio">Portfolio</a><a href="#video-works">Films</a><a href="#nyc">NYC Portraits</a><a href="#about">About</a><a href="#services">Services</a><a href="#contact">Contact</a></div>
+      <div class="footer-col"><h5>Services</h5><a href="#services">Weddings</a><a href="#services">Couples</a><a href="#services">Maternity</a><a href="#services">Celebrations</a><a href="#services">Commercial</a><a href="#services">Conceptual</a></div>
+      <div class="footer-col"><h5>Connect</h5><a href="https://www.instagram.com/sudhakar_3697?igsh=MWxodHZrOWlhcmpzOA%3D%3D&utm_source=qr" target="_blank">Instagram</a><a href="mailto:avala.sudhakar@gmail.com">Email Us</a><a href="tel:+14753322020">Call Us</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Aakaara Studios NYC · Crafting Love Into Art</p>
+      <div class="footer-social"><a href="https://www.instagram.com/sudhakar_3697?igsh=MWxodHZrOWlhcmpzOA%3D%3D&utm_source=qr" target="_blank" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg></a></div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="Script.js"></script>
+</body>
+</html>
