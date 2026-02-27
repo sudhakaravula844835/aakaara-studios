@@ -549,10 +549,10 @@ nav.scrolled {
   aspect-ratio: 4/5;
   margin: 0;
   transform: translate(-50%, -50%);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity, filter;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
@@ -695,6 +695,101 @@ nav.scrolled {
   transform: scale(1.06) !important;
   filter: grayscale(0%) brightness(1) contrast(1);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   NYC PORTRAITS
+   ═══════════════════════════════════════════════════════════ */
+#nyc { overflow: hidden; padding-bottom: 11rem; }
+.nyc-skyline { position: absolute; bottom: 0; left: 0; right: 0; height: 250px; pointer-events: none; opacity: 0; transition: opacity 1.5s var(--ease-smooth); }
+#nyc.nyc-visible .nyc-skyline { opacity: 1; }
+.nyc-content { position: relative; z-index: 2; }
+.nyc-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+.nyc-list { display: flex; flex-direction: column; }
+.nyc-loc { padding: 1rem 0; border-bottom: 1px solid rgba(201,149,107,0.05); cursor: pointer; transition: all 0.4s; display: flex; align-items: center; justify-content: space-between; }
+.nyc-loc:hover { padding-left: 1rem; }
+.nyc-loc-left { display: flex; align-items: center; gap: 1.2rem; }
+.nyc-loc .num { font-family: var(--font-display); font-size: 1.6rem; font-weight: 300; color: var(--rose); opacity: 0.15; min-width: 36px; transition: opacity 0.4s; }
+.nyc-loc:hover .num { opacity: 0.5; }
+.nyc-loc h4 { font-family: var(--font-display); font-weight: 300; font-size: 1.2rem; color: var(--ivory); letter-spacing: 0.03em; transition: color 0.3s; }
+.nyc-loc:hover h4 { color: var(--rose); }
+.nyc-loc .nyc-sub-text { font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(250,246,241,0.15); margin-top: 0.1rem; }
+.nyc-loc .nyc-arrow { opacity: 0; transform: translateX(-8px); transition: all 0.4s var(--ease); }
+.nyc-loc:hover .nyc-arrow { opacity: 0.4; transform: translateX(0); }
+.nyc-preview { position: relative; height: 380px; align-self: center; border-radius: 6px; overflow: hidden; background: rgba(30,26,22,0.4); border: 1px solid rgba(201,149,107,0.2); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+
+.nyc-preview-img {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.8s ease, visibility 0.8s;
+}
+
+.nyc-preview-img.active {
+    opacity: 1;
+    visibility: visible;
+}
+/* Background image with subtle zoom */
+.preview-bg {
+    position: absolute;
+    inset: 0;
+    background-size: contain;
+    background-position: center center;
+    transform: scale(1.08); 
+    transition: transform 1.5s var(--ease);
+}
+
+.nyc-preview-img.active .preview-bg {
+    transform: scale(1);
+}
+
+/* Bottom text overlay */
+.nyc-preview-info { 
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 3rem 2.5rem;
+    z-index: 5;
+    background: linear-gradient(to top, rgba(9, 8, 11, 0.95) 0%, transparent 100%);
+    pointer-events: none; /* Allows click to pass through to the button */
+}
+
+/* Re-enable clicks for the button */
+.nyc-maps-link {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.6rem;
+    color: var(--ivory);
+    border: 1px solid rgba(250, 246, 241, 0.2);
+    padding: 0.5rem 1rem;
+    transition: all 0.3s;
+}
+
+.nyc-maps-link:hover {
+    border-color: var(--rose);
+    background: rgba(201, 149, 107, 0.1);
+}
+.nyc-maps-link svg { width: 10px; height: 10px; }
+.nyc-cp .preview-bg {
+    position: absolute;
+    inset: 0;
+    background-size: contain; 
+    background-position: center; /* Keeps the subject centered */
+    background-repeat: no-repeat;
+    /* Reduced scale from 1.15 to 1.05 for a subtler cinematic movement */
+    transform: scale(1.05); 
+    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nyc-preview-img.active .preview-bg {
+    transform: scale(1); /* Smoothly settles into the frame */
+}
+.nyc-dumbo .preview-bg { background: linear-gradient(145deg, #3a3540, #7a3b4e, #c9956b, #e8c4a8); }
+.nyc-bb .preview-bg { background: linear-gradient(145deg, #2a2832, #6b7280, #c9956b, #faf6f1); }
+.nyc-subway .preview-bg { background: linear-gradient(145deg, #1e1a16, #3a3530, #c9956b, #7a3b4e); }
+.nyc-lib .preview-bg { background: linear-gradient(145deg, #d4c5b0, #c9956b, #7a3b4e, #1e1a16); }
+.nyc-st .preview-bg { background: linear-gradient(145deg, #09080b, #2a2832, #c9956b, #e8c4a8); }
 
 /* ═══════════════════════════════════════════════════════════
    ABOUT
@@ -1374,6 +1469,8 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 @media (max-width: 1024px) {
   .gallery-grid { grid-template-columns: repeat(2, 1fr); }
   .gallery-item.wide { grid-column: span 1; aspect-ratio: 4/5; }
+  .nyc-layout { grid-template-columns: 1fr; }
+  .nyc-preview { display: none; }
   .footer-top { grid-template-columns: 1fr 1fr; }
   /* Carousel responsive */
   .ethereal-carousel { height: 480px; }
@@ -1435,18 +1532,6 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .ec-prev { left: 0.5rem; }
   .ec-next { right: 0.5rem; }
 }
-/* ── Small phones (≤480px) ── */
-@media (max-width: 480px) {
-  .ethereal-carousel { height: 340px; }
-  .ethereal-carousel .gallery-item { width: 220px; }
-  .ethereal-carousel .vw-card,
-  .ethereal-carousel .vw-card.wide { width: 300px; }
-  .ec-nav { width: 34px; height: 34px; }
-  .ec-prev { left: 0.3rem; }
-  .ec-next { right: 0.3rem; }
-  .ec-counter { font-size: 0.6rem; }
-}
-
 .nav-links.show { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: rgba(9,8,11,0.95); backdrop-filter: blur(20px); padding: 2rem; gap: 1.5rem; max-height: 85vh; overflow-y: auto; }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1678,11 +1763,6 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .vw-card.wide { grid-column: span 1; aspect-ratio: 4/5; }
   .vm-player { width: 95vw; }
 }
-@media (max-width: 480px) {
-  .vw-filters { gap: 0.2rem; margin-bottom: 1.5rem; }
-  .vw-filters button { font-size: 0.5rem; padding: 0.4rem 0.9rem; }
-  .vm-player { width: 98vw; }
-}
 
 @media (hover: none) {
   .gallery-item .gi-bg { filter: grayscale(0%) brightness(1) contrast(1); }
@@ -1701,16 +1781,10 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .cursor-follow { display: none !important; }
   .gallery-item { cursor: pointer; }
   .gallery-item, .portfolio-filters button, .nyc-loc, .hero-cta, .nav-cta { touch-action: manipulation; }
-  /* Carousel touch overrides — portfolio */
+  /* Carousel touch overrides */
   .ethereal-carousel .gallery-item[data-ec-offset="0"] .gi-overlay { opacity: 1; }
   .ethereal-carousel .gallery-item[data-ec-offset="0"] .gi-overlay > div { transform: translateY(0); }
   .ethereal-carousel .gallery-item[data-ec-offset="0"] .gi-count { opacity: 1; transform: translateY(0); }
-  /* Carousel touch overrides — video works */
-  .ethereal-carousel .vw-card[data-ec-offset="0"] .vw-overlay { opacity: 1; }
-  .ethereal-carousel .vw-card[data-ec-offset="0"] .vw-overlay > * { transform: translateY(0); }
-  .ethereal-carousel .vw-card[data-ec-offset="0"] .vw-duration { opacity: 1; }
-  .vw-card { cursor: pointer; }
-  .vw-card, .vw-filters button { touch-action: manipulation; }
   .ec-nav { width: 42px; height: 42px; opacity: 0.85; }
   .ec-nav:hover { transform: translateY(-50%); }
 }
