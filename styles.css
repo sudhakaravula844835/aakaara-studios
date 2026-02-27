@@ -533,7 +533,7 @@ nav.scrolled {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 15%;
+  width: 22%;
   z-index: 6;
   pointer-events: none;
 }
@@ -616,16 +616,16 @@ nav.scrolled {
     0 30px 60px rgba(0,0,0,0.45) !important;
 }
 
-/* ── Offset ±1 (side cards) ── */
+/* ── Offset ±1 (side cards) — subtle atmospheric hints ── */
 .ethereal-carousel .gallery-item[data-ec-offset="1"],
 .ethereal-carousel .gallery-item[data-ec-offset="-1"],
 .ethereal-carousel .vw-card[data-ec-offset="1"],
 .ethereal-carousel .vw-card[data-ec-offset="-1"] {
   z-index: 3;
-  opacity: 0.55;
-  filter: blur(2px) brightness(0.75);
+  opacity: 0.2;
+  filter: blur(6px) brightness(0.6);
   cursor: pointer;
-  border: 1px solid rgba(250,246,241,0.04);
+  border: none;
 }
 
 /* ── Hidden (beyond ±1) ── */
