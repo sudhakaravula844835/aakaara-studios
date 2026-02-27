@@ -1455,8 +1455,8 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .sw-strip-thumb-img { position: absolute; inset: 0; background-size: cover; background-position: center; filter: grayscale(60%); transition: filter 0.4s; border-radius: 2px; }
 .sw-strip-thumb.active .sw-strip-thumb-img { filter: grayscale(0%); }
 .sw-strip-thumb:hover .sw-strip-thumb-img { filter: grayscale(20%); }
-/* Mac Dock Effect: snap-fast transform on interact, smooth return on leave */
-.sw-gallery-strip:hover .sw-strip-thumb { transition: transform 0.06s ease-out, width 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.4s, box-shadow 0.4s; }
+/* Mac Dock Effect: smooth transform on interact, gentle return on leave */
+.sw-gallery-strip:hover .sw-strip-thumb { transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), width 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.4s, box-shadow 0.4s; }
 /* Disable dock scale on touch/mobile — use normal tap instead */
 @media (hover: none) {
   .sw-gallery-strip:hover .sw-strip-thumb { transition: all 0.4s cubic-bezier(0.16,1,0.3,1); }
