@@ -34,7 +34,6 @@
         .masonry-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-            grid-auto-rows: 10px;
             gap: 20px;
             padding: 0 2rem 8rem;
             max-width: 1400px;
@@ -43,15 +42,12 @@
 
         .work-item {
             position: relative;
-            grid-row-end: span 40;
             overflow: hidden;
             background: #1a1a1a;
             border-radius: 2px;
             transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             aspect-ratio: 4/5;
         }
-
-        .work-item.landscape { grid-row-end: span 40; }
 
         .work-item img {
             width: 100%;
@@ -173,9 +169,8 @@
             color: #c9956b;
         }
 
-        /* Ensure grid items fill height naturally */
-        .work-item { height: auto; min-height: 280px; }
-        .work-item img { height: 100%; min-height: 280px; }
+        /* Ensure images fill their card */
+        .work-item img { height: 100%; }
 
         @media (max-width: 768px) {
             .masonry-grid {
@@ -184,8 +179,7 @@
                 gap: 12px;
                 padding: 0 1rem 4rem;
             }
-            .work-item { grid-row-end: auto !important; }
-            .work-item.landscape { grid-row-end: auto !important; }
+            .work-item { aspect-ratio: 4/5; }
             .back-btn { font-size: 0.55rem; }
             .filter-bar { gap: 0.5rem; padding: 0 1rem; }
             .filter-btn { padding: 0.4rem 0.9rem; font-size: 0.65rem; }
@@ -231,7 +225,7 @@
             max-width: 500px;
             margin: 0 auto;
         }
-        .nyc-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+        .nyc-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: stretch; }
         .nyc-list { display: flex; flex-direction: column; }
         .nyc-loc { padding: 1rem 0; border-bottom: 1px solid rgba(201,149,107,0.05); cursor: pointer; transition: all 0.4s; display: flex; align-items: center; justify-content: space-between; }
         .nyc-loc:hover { padding-left: 1rem; }
@@ -243,10 +237,10 @@
         .nyc-loc .nyc-sub-text { font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(250,246,241,0.15); margin-top: 0.1rem; }
         .nyc-loc .nyc-arrow { opacity: 0; transform: translateX(-8px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .nyc-loc:hover .nyc-arrow { opacity: 0.4; transform: translateX(0); }
-        .nyc-preview { position: relative; height: 380px; align-self: center; border-radius: 6px; overflow: hidden; background: rgba(30,26,22,0.4); border: 1px solid rgba(201,149,107,0.2); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .nyc-preview { position: relative; border-radius: 6px; overflow: hidden; background: rgba(30,26,22,0.4); border: 1px solid rgba(201,149,107,0.2); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         .nyc-preview-img { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, visibility 0.8s; }
         .nyc-preview-img.active { opacity: 1; visibility: visible; }
-        .preview-bg { position: absolute; inset: 0; background-size: contain; background-repeat: no-repeat; background-position: center; transform: scale(1.05); transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
+        .preview-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transform: scale(1.02); transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
         .nyc-preview-img.active .preview-bg { transform: scale(1); }
         .nyc-preview-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 3rem 2.5rem; z-index: 5; background: linear-gradient(to top, rgba(9,8,11,0.95) 0%, transparent 100%); pointer-events: none; }
         .nyc-preview-info h5 { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 1.3rem; color: #faf6f1; margin: 0 0 0.3rem; }
