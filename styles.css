@@ -526,6 +526,25 @@ nav.scrolled {
   align-items: center;
   justify-content: center;
 }
+/* Soft fade-out on left & right edges so cards don't clip abruptly */
+.ethereal-carousel::before,
+.ethereal-carousel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 15%;
+  z-index: 6;
+  pointer-events: none;
+}
+.ethereal-carousel::before {
+  left: 0;
+  background: linear-gradient(to right, #09080b 0%, transparent 100%);
+}
+.ethereal-carousel::after {
+  right: 0;
+  background: linear-gradient(to left, #09080b 0%, transparent 100%);
+}
 
 /* Track — override grid to positioning container */
 .ethereal-carousel .ec-track {
