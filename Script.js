@@ -80,10 +80,6 @@ const revealObs = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 
-// ═══════ NYC SKYLINE REVEAL ═══════
-const nycSection = document.getElementById('nyc');
-new IntersectionObserver(([e]) => { nycSection.classList.toggle('nyc-visible', e.isIntersecting); }, { threshold: 0.1 }).observe(nycSection);
-
 // ═══════ PORTFOLIO FILTER ═══════
 function filterGallery(cat, btn) {
   const search = document.getElementById('portfolioSearch');
