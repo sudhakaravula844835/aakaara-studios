@@ -1271,7 +1271,7 @@ class EtherealCarousel {
     this.container.addEventListener('touchend', (e) => {
       const dx = e.changedTouches[0].clientX - touchStartX;
       const dy = e.changedTouches[0].clientY - touchStartY;
-      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+      if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy)) {
         this.navigate(dx < 0 ? 1 : -1);
       }
     }, { passive: true });
@@ -1295,19 +1295,21 @@ class EtherealCarousel {
       mouseDown = false;
       this.container.style.cursor = '';
       const dx = e.clientX - mouseStartX;
-      if (Math.abs(dx) > 50 && mouseMoved) {
+      if (Math.abs(dx) > 30 && mouseMoved) {
         this.navigate(dx < 0 ? 1 : -1);
       }
     });
 
-    // Scroll wheel navigation (horizontal scroll or trackpad swipe)
+    // Scroll wheel navigation — only intercept horizontal swipes, let vertical scroll pass through
     let wheelTimer = null;
     let wheelAccum = 0;
     this.container.addEventListener('wheel', (e) => {
-      // Use deltaX for horizontal scroll (trackpad) or deltaY for mouse wheel
-      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-      wheelAccum += delta;
+      // Only intercept horizontal gestures (trackpad two-finger swipe left/right)
+      // Let vertical scroll pass through so user can scroll down the page
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      // Horizontal swipe detected — prevent page scroll and navigate carousel
       e.preventDefault();
+      wheelAccum += e.deltaX;
       clearTimeout(wheelTimer);
       wheelTimer = setTimeout(() => {
         if (Math.abs(wheelAccum) > 30) {
