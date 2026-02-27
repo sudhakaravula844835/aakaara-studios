@@ -1317,6 +1317,60 @@ class EtherealCarousel {
         this.render();
       }, 150);
     });
+
+    // ── Mouse-follow 3D tilt on center card ──
+    // Adds subtle rotateX/Y that tracks cursor position over the carousel,
+    // lerped via rAF for buttery 60fps motion.
+    if (!window.matchMedia('(hover: none)').matches) {
+      let tiltTargetX = 0, tiltTargetY = 0;
+      let tiltCurrentX = 0, tiltCurrentY = 0;
+      let tiltRAF = null;
+      const TILT_MAX = 4;    // max degrees of rotation
+      const LERP = 0.08;     // smoothing factor (lower = smoother)
+
+      const tiltLoop = () => {
+        tiltCurrentX += (tiltTargetX - tiltCurrentX) * LERP;
+        tiltCurrentY += (tiltTargetY - tiltCurrentY) * LERP;
+
+        const centerCard = this.filteredItems[this.currentIndex];
+        if (centerCard && centerCard.getAttribute('data-ec-offset') === '0') {
+          // Compose the base transform with the tilt overlay
+          const base = 'translate(-50%, -50%) translateZ(60px) scale(1) rotateY(0deg)';
+          centerCard.style.transform = `${base} rotateX(${tiltCurrentX.toFixed(2)}deg) rotateY(${tiltCurrentY.toFixed(2)}deg)`;
+        }
+        tiltRAF = requestAnimationFrame(tiltLoop);
+      };
+
+      this.track.addEventListener('mouseenter', () => {
+        tiltRAF = requestAnimationFrame(tiltLoop);
+      });
+
+      this.track.addEventListener('mousemove', (e) => {
+        const rect = this.track.getBoundingClientRect();
+        // Map cursor to -1…+1 range
+        const nx = (e.clientX - rect.left) / rect.width * 2 - 1;
+        const ny = (e.clientY - rect.top) / rect.height * 2 - 1;
+        tiltTargetX = -ny * TILT_MAX;  // rotateX: tilt forward/back
+        tiltTargetY = nx * TILT_MAX;   // rotateY: tilt left/right
+      });
+
+      this.track.addEventListener('mouseleave', () => {
+        tiltTargetX = 0;
+        tiltTargetY = 0;
+        // Let the lerp ease back to zero, then stop
+        setTimeout(() => {
+          if (Math.abs(tiltCurrentX) < 0.05 && Math.abs(tiltCurrentY) < 0.05) {
+            cancelAnimationFrame(tiltRAF);
+            tiltRAF = null;
+            // Reset to clean base transform
+            const centerCard = this.filteredItems[this.currentIndex];
+            if (centerCard) {
+              centerCard.style.transform = 'translate(-50%, -50%) translateZ(60px) scale(1) rotateY(0deg)';
+            }
+          }
+        }, 600);
+      });
+    }
   }
 }
 
