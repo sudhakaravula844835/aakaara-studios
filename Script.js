@@ -1167,7 +1167,7 @@ class EtherealCarousel {
     allItems.forEach(item => {
       item.style.animation = 'none';
       item.setAttribute('data-ec-offset', 'hidden');
-      item.style.transform = 'translate(-50%, -50%) scale(0.6)';
+      item.style.transform = 'translate(-50%, -50%) translateZ(-200px) scale(0.5)';
       item.style.pointerEvents = 'none';
     });
 
@@ -1175,25 +1175,25 @@ class EtherealCarousel {
     filtered.forEach((item, i) => {
       const offset = i - ci;
       if (offset === 0) {
-        // Center card
+        // Center card — pops forward
         item.setAttribute('data-ec-offset', '0');
-        item.style.transform = 'translate(-50%, -50%) scale(1) rotateY(0deg)';
+        item.style.transform = 'translate(-50%, -50%) translateZ(60px) scale(1) rotateY(0deg)';
         item.style.pointerEvents = 'auto';
       } else if (offset === 1) {
-        // Right side
+        // Right side — tilts back into depth
         item.setAttribute('data-ec-offset', '1');
-        item.style.transform = `translate(calc(-50% + ${offsetPx}px), -50%) scale(0.82) rotateY(-12deg)`;
+        item.style.transform = `translate(calc(-50% + ${offsetPx}px), -50%) translateZ(-120px) scale(0.75) rotateY(-35deg)`;
         item.style.pointerEvents = 'auto';
       } else if (offset === -1) {
-        // Left side
+        // Left side — tilts back into depth
         item.setAttribute('data-ec-offset', '-1');
-        item.style.transform = `translate(calc(-50% - ${offsetPx}px), -50%) scale(0.82) rotateY(12deg)`;
+        item.style.transform = `translate(calc(-50% - ${offsetPx}px), -50%) translateZ(-120px) scale(0.75) rotateY(35deg)`;
         item.style.pointerEvents = 'auto';
       } else {
-        // Off-screen
+        // Off-screen — deep in background
         item.setAttribute('data-ec-offset', 'hidden');
         const dir = offset > 0 ? 1 : -1;
-        item.style.transform = `translate(calc(-50% + ${dir * offsetPx * 2}px), -50%) scale(0.6)`;
+        item.style.transform = `translate(calc(-50% + ${dir * offsetPx * 2}px), -50%) translateZ(-200px) scale(0.5)`;
         item.style.pointerEvents = 'none';
       }
     });
