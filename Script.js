@@ -183,13 +183,6 @@ if (portfolioSelect) {
   });
 }
 
-// ═══════ NYC PREVIEW ═══════
-function showNYC(loc) {
-  document.querySelectorAll('.nyc-preview-img').forEach(el => el.classList.remove('active'));
-  const t = document.querySelector('.nyc-' + loc);
-  if (t) t.classList.add('active');
-}
-
 // ═══════ AUTO-LOAD COVER IMAGES ═══════
 const galleryObserver = new IntersectionObserver((entries, observer) => {
   entries.forEach(entry => {
