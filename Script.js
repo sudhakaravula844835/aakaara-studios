@@ -1081,14 +1081,24 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
 // ═══════ INITIALIZE FLATPCIKR (DATE PICKER) ═══════
 (function() {
-  const preferredDateInput = document.getElementById('preferredDate');
-  if (preferredDateInput) {
-    flatpickr(preferredDateInput, {
+  const dateFrom = document.getElementById('dateFrom');
+  const dateTo = document.getElementById('dateTo');
+
+  if (dateFrom && dateTo) {
+    const fpFrom = flatpickr(dateFrom, {
       altInput: true,
       altFormat: "F j, Y", // e.g., "November 4, 2023" - what the user sees
       dateFormat: "Y-m-d", // Actual value submitted in the form (e.g., "2023-11-04")
       minDate: "today", // Prevents selecting past dates
-      // Add more options here if needed, e.g., disable specific dates, enable time, etc.
+      onChange: function(selectedDates, dateStr, instance) {
+        fpTo.set('minDate', dateStr);
+      }
+    });
+    const fpTo = flatpickr(dateTo, {
+      altInput: true,
+      altFormat: "F j, Y",
+      dateFormat: "Y-m-d",
+      minDate: "today"
     });
   }
 })();

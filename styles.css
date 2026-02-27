@@ -1246,6 +1246,7 @@ nav.scrolled {
 .contact-form { display: flex; flex-direction: column; gap: 0.9rem; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
 .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+.date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
 .form-group label { font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(30,26,22,0.3); font-weight: 400; }
 .form-group input, .form-group select, .form-group textarea { font-family: var(--font-body); font-weight: 300; font-size: 0.82rem; padding: 0.8rem 1rem; border: 1px solid rgba(30,26,22,0.05); border-radius: 3px; background: rgba(250,246,241,0.35); color: var(--umber); transition: border-color 0.3s; outline: none; }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--rose); }
@@ -1497,7 +1498,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
   .about-image { max-height: 450px; }
   .gallery-grid, .testimonials-grid { grid-template-columns: 1fr; }
-  .form-row { grid-template-columns: 1fr; }
+  .form-row, .date-grid { grid-template-columns: 1fr; }
   .footer-top { grid-template-columns: 1fr; gap: 1.5rem; }
   .footer-bottom { flex-direction: column; gap: 0.8rem; text-align: center; }
   .about-stats { gap: 2rem; }
