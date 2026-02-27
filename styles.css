@@ -515,36 +515,18 @@ nav.scrolled {
    ETHEREAL COVERFLOW CAROUSEL
    ═══════════════════════════════════════════════════════════ */
 
-/* Container */
+/* Container — open, frameless: cards float in page space */
 .ethereal-carousel {
   position: relative;
   width: 100%;
   height: 580px;
-  perspective: 900px;
-  overflow: hidden;
+  perspective: 1200px;
+  overflow: visible;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-/* Soft fade-out on left & right edges so cards don't clip abruptly */
-.ethereal-carousel::before,
-.ethereal-carousel::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 22%;
-  z-index: 6;
-  pointer-events: none;
-}
-.ethereal-carousel::before {
-  left: 0;
-  background: linear-gradient(to right, #09080b 0%, transparent 100%);
-}
-.ethereal-carousel::after {
-  right: 0;
-  background: linear-gradient(to left, #09080b 0%, transparent 100%);
-}
+/* body already has overflow-x:hidden — floating cards won't cause scrollbar */
 
 /* Track — override grid to positioning container */
 .ethereal-carousel .ec-track {
@@ -596,36 +578,35 @@ nav.scrolled {
   width: 520px;
 }
 
-/* ── Active card (center, offset 0) ── */
+/* ── Active card (center, offset 0) — hero floating card ── */
 .ethereal-carousel .gallery-item[data-ec-offset="0"],
 .ethereal-carousel .vw-card[data-ec-offset="0"] {
   z-index: 5;
   opacity: 1;
   filter: blur(0) brightness(1);
   box-shadow:
-    0 0 80px rgba(201,149,107,0.12),
-    0 0 160px rgba(201,149,107,0.04),
-    0 30px 60px rgba(0,0,0,0.45);
-  border: 1px solid rgba(201,149,107,0.18);
+    0 25px 50px rgba(0,0,0,0.55),
+    0 0 100px rgba(201,149,107,0.08);
+  border: 1px solid rgba(201,149,107,0.15);
 }
 .ethereal-carousel .gallery-item[data-ec-offset="0"]:hover,
 .ethereal-carousel .vw-card[data-ec-offset="0"]:hover {
   box-shadow:
-    0 0 80px rgba(201,149,107,0.12),
-    0 0 160px rgba(201,149,107,0.04),
-    0 30px 60px rgba(0,0,0,0.45) !important;
+    0 30px 60px rgba(0,0,0,0.6),
+    0 0 120px rgba(201,149,107,0.1) !important;
 }
 
-/* ── Offset ±1 (side cards) — subtle atmospheric hints ── */
+/* ── Offset ±1 (side cards) — visible recessed depth ── */
 .ethereal-carousel .gallery-item[data-ec-offset="1"],
 .ethereal-carousel .gallery-item[data-ec-offset="-1"],
 .ethereal-carousel .vw-card[data-ec-offset="1"],
 .ethereal-carousel .vw-card[data-ec-offset="-1"] {
   z-index: 3;
-  opacity: 0.2;
-  filter: blur(6px) brightness(0.6);
+  opacity: 0.5;
+  filter: blur(1.5px) brightness(0.7) saturate(0.6);
   cursor: pointer;
-  border: none;
+  border: 1px solid rgba(250,246,241,0.05);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
 }
 
 /* ── Hidden (beyond ±1) ── */
