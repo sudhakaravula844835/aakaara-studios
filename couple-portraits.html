@@ -196,6 +196,76 @@
             .filter-bar { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; padding: 0 0.75rem 0.5rem; -webkit-overflow-scrolling: touch; }
             .filter-btn { flex-shrink: 0; }
         }
+
+        /* ── Location Guide ── */
+        .location-guide {
+            max-width: 1200px;
+            margin: 0 auto 3rem;
+            padding: 0 2rem 3rem;
+            border-bottom: 1px solid rgba(201,149,107,0.08);
+        }
+        .lg-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .lg-tag {
+            font-size: 0.6rem;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: #c9956b;
+            margin-bottom: 0.8rem;
+        }
+        .lg-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            font-weight: 300;
+            color: #faf6f1;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.8rem;
+        }
+        .lg-desc {
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            color: rgba(250,246,241,0.4);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .nyc-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+        .nyc-list { display: flex; flex-direction: column; }
+        .nyc-loc { padding: 1.4rem 0; border-bottom: 1px solid rgba(201,149,107,0.05); cursor: pointer; transition: all 0.4s; display: flex; align-items: center; justify-content: space-between; }
+        .nyc-loc:hover { padding-left: 1rem; }
+        .nyc-loc-left { display: flex; align-items: center; gap: 1.2rem; }
+        .nyc-loc .num { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; color: #c9956b; opacity: 0.15; min-width: 36px; transition: opacity 0.4s; }
+        .nyc-loc:hover .num { opacity: 0.5; }
+        .nyc-loc h4 { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 1.2rem; color: #faf6f1; letter-spacing: 0.03em; transition: color 0.3s; margin: 0; }
+        .nyc-loc:hover h4 { color: #c9956b; }
+        .nyc-loc .nyc-sub-text { font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(250,246,241,0.15); margin-top: 0.1rem; }
+        .nyc-loc .nyc-arrow { opacity: 0; transform: translateX(-8px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .nyc-loc:hover .nyc-arrow { opacity: 0.4; transform: translateX(0); }
+        .nyc-preview { position: relative; aspect-ratio: 3/4; min-height: 500px; margin-top: -3rem; border-radius: 6px; overflow: hidden; background: rgba(30,26,22,0.4); border: 1px solid rgba(201,149,107,0.04); }
+        .nyc-preview-img { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, visibility 0.8s; }
+        .nyc-preview-img.active { opacity: 1; visibility: visible; }
+        .preview-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transform: scale(1.05); transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
+        .nyc-preview-img.active .preview-bg { transform: scale(1); }
+        .nyc-preview-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 3rem 2.5rem; z-index: 5; background: linear-gradient(to top, rgba(9,8,11,0.95) 0%, transparent 100%); pointer-events: none; }
+        .nyc-preview-info h5 { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 1.3rem; color: #faf6f1; margin: 0 0 0.3rem; }
+        .nyc-preview-info .tag-line { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(250,246,241,0.4); margin-bottom: 0.8rem; }
+        .nyc-maps-link { pointer-events: auto; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.6rem; color: #faf6f1; border: 1px solid rgba(250,246,241,0.2); padding: 0.5rem 1rem; transition: all 0.3s; text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; }
+        .nyc-maps-link:hover { border-color: #c9956b; background: rgba(201,149,107,0.1); }
+        .nyc-dumbo .preview-bg { background: linear-gradient(145deg, #3a3540, #7a3b4e, #c9956b, #e8c4a8); }
+        .nyc-bb .preview-bg { background: linear-gradient(145deg, #2a2832, #6b7280, #c9956b, #faf6f1); }
+        .nyc-subway .preview-bg { background: linear-gradient(145deg, #1e1a16, #3a3530, #c9956b, #7a3b4e); }
+        .nyc-lib .preview-bg { background: linear-gradient(145deg, #d4c5b0, #c9956b, #7a3b4e, #1e1a16); }
+        .nyc-st .preview-bg { background: linear-gradient(145deg, #09080b, #2a2832, #c9956b, #e8c4a8); }
+
+        @media (max-width: 1024px) {
+            .nyc-layout { grid-template-columns: 1fr; }
+            .nyc-preview { display: none; }
+        }
+        @media (max-width: 768px) {
+            .location-guide { padding: 0 1.5rem 2rem; margin-bottom: 2rem; }
+            .nyc-loc h4 { font-size: 1.05rem; }
+        }
     </style>
 </head>
 <body>
@@ -207,6 +277,51 @@
         <h1>Couple Portraits</h1>
         <div style="width: 60px; height: 1px; background: #c9956b; margin: 2rem auto;"></div>
     </header>
+
+    <!-- Location Guide -->
+    <section class="location-guide">
+      <div class="lg-header">
+        <div class="lg-tag">Location Guide</div>
+        <div class="lg-title">NYC's Most Iconic Backdrops</div>
+        <div class="lg-desc">New York is our studio. Hover each location to preview — click to open in Google Maps.</div>
+      </div>
+      <div class="nyc-layout">
+        <div class="nyc-list">
+          <div class="nyc-loc" onmouseenter="showNYC('cp')" onclick="window.open('https://maps.google.com/?q=Central+Park+New+York','_blank')"><div class="nyc-loc-left"><span class="num">01</span><div><h4>Central Park</h4><div class="nyc-sub-text">Timeless Romance · Bow Bridge · Bethesda</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9956b" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+          <div class="nyc-loc" onmouseenter="showNYC('dumbo')" onclick="window.open('https://maps.google.com/?q=DUMBO+Brooklyn','_blank')"><div class="nyc-loc-left"><span class="num">02</span><div><h4>DUMBO</h4><div class="nyc-sub-text">Urban Poetry · Cobblestone Streets</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9956b" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+          <div class="nyc-loc" onmouseenter="showNYC('bb')" onclick="window.open('https://maps.google.com/?q=Brooklyn+Bridge','_blank')"><div class="nyc-loc-left"><span class="num">03</span><div><h4>Brooklyn Bridge</h4><div class="nyc-sub-text">Iconic Grandeur · Gothic Arches</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9956b" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+          <div class="nyc-loc" onmouseenter="showNYC('subway')" onclick="window.open('https://maps.google.com/?q=Grand+Central+Station+NYC','_blank')"><div class="nyc-loc-left"><span class="num">04</span><div><h4>NYC Subway</h4><div class="nyc-sub-text">Raw &amp; Real · Underground Soul</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9956b" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+          <div class="nyc-loc" onmouseenter="showNYC('lib')" onclick="window.open('https://maps.google.com/?q=New+York+Public+Library','_blank')"><div class="nyc-loc-left"><span class="num">05</span><div><h4>NYC Public Library</h4><div class="nyc-sub-text">Literary Elegance · Beaux-Arts</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9956b" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+          <div class="nyc-loc" onmouseenter="showNYC('st')" onclick="window.open('https://maps.google.com/?q=Times+Square+NYC','_blank')"><div class="nyc-loc-left"><span class="num">06</span><div><h4>NYC Streets</h4><div class="nyc-sub-text">City as Canvas · Neon &amp; Steam</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9956b" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+        </div>
+        <div class="nyc-preview">
+          <div class="nyc-preview-img active nyc-cp">
+            <div class="preview-bg" style="background-image: url('images/nyc/cp.jpg');"></div>
+            <div class="nyc-preview-info"><h5>Central Park</h5><div class="tag-line">Best · Golden Hour · Spring &amp; Autumn</div><a href="https://maps.google.com/?q=Central+Park+New+York" target="_blank" class="nyc-maps-link">Maps</a></div>
+          </div>
+          <div class="nyc-preview-img nyc-dumbo">
+            <div class="preview-bg" style="background-image: url('images/nyc/dumbo.jpg');"></div>
+            <div class="nyc-preview-info"><h5>DUMBO</h5><div class="tag-line">Best · Sunrise · Blue Hour</div><a href="https://maps.google.com/?q=DUMBO+Brooklyn" target="_blank" class="nyc-maps-link">Maps</a></div>
+          </div>
+          <div class="nyc-preview-img nyc-bb">
+            <div class="preview-bg" style="background-image: url('images/nyc/bb.jpg');"></div>
+            <div class="nyc-preview-info"><h5>Brooklyn Bridge</h5><div class="tag-line">Best · Early Morning · Sunset</div><a href="https://maps.google.com/?q=Brooklyn+Bridge" target="_blank" class="nyc-maps-link">Maps</a></div>
+          </div>
+          <div class="nyc-preview-img nyc-subway">
+            <div class="preview-bg" style="background-image: url('images/nyc/subway.jpg');"></div>
+            <div class="nyc-preview-info"><h5>NYC Subway</h5><div class="tag-line">Best · Off-Peak · Any Season</div><a href="https://maps.google.com/?q=Grand+Central+Station" target="_blank" class="nyc-maps-link">Maps</a></div>
+          </div>
+          <div class="nyc-preview-img nyc-lib">
+            <div class="preview-bg" style="background-image: url('images/nyc/lib.jpg');"></div>
+            <div class="nyc-preview-info"><h5>NYC Public Library</h5><div class="tag-line">Best · Weekdays · Soft Light</div><a href="https://maps.google.com/?q=New+York+Public+Library" target="_blank" class="nyc-maps-link">Maps</a></div>
+          </div>
+          <div class="nyc-preview-img nyc-st">
+            <div class="preview-bg" style="background-image: url('images/nyc/st.jpg');"></div>
+            <div class="nyc-preview-info"><h5>NYC Streets</h5><div class="tag-line">Best · Blue Hour · Rainy Evenings</div><a href="https://maps.google.com/?q=Times+Square+NYC" target="_blank" class="nyc-maps-link">Maps</a></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <div class="filter-bar">
         <button class="filter-btn active" onclick="filterSelection('all', this)">All</button>
@@ -362,6 +477,12 @@
     </footer>
 
     <script>
+        function showNYC(loc) {
+            document.querySelectorAll('.nyc-preview-img').forEach(el => el.classList.remove('active'));
+            const t = document.querySelector('.nyc-' + loc);
+            if (t) t.classList.add('active');
+        }
+
         function filterSelection(category, btn) {
             // Update active button
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
