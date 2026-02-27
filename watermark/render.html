@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Aakaara Watermark Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Outfit:wght@300&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #1a1612; display: flex; flex-direction: column; align-items: center; padding: 3rem 1rem; font-family: 'Outfit', sans-serif; color: #faf6f1; }
+  h2 { font-family: 'Cormorant Garamond', serif; font-weight: 300; margin-bottom: 0.5rem; font-size: 1.8rem; }
+  .preview { background: repeating-conic-gradient(#333 0% 25%, #444 0% 50%) 50% / 16px 16px; padding: 1.5rem 2rem; border-radius: 8px; margin: 0.8rem 0; display: inline-block; }
+  .preview-dark { background: #0a0a0a; padding: 1.5rem 2rem; border-radius: 8px; margin: 0.8rem 0; display: inline-block; }
+  .preview-photo { background: url('../images/about/1.JPG') center/cover; padding: 3rem 2rem 1.5rem; border-radius: 8px; margin: 0.8rem 0; min-width: 500px; display: flex; align-items: flex-end; justify-content: flex-end; }
+  canvas { display: block; }
+  .downloads { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; justify-content: center; }
+  button { background: #c9956b; color: #09080b; border: none; padding: 0.8rem 2rem; font-family: 'Outfit', sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; cursor: pointer; border-radius: 3px; text-transform: uppercase; }
+  button:hover { background: #dbb08a; }
+  .btn-outline { background: transparent; color: #c9956b; border: 1px solid rgba(201,149,107,0.5); }
+  .btn-outline:hover { border-color: #c9956b; background: rgba(201,149,107,0.1); }
+  .label { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(250,246,241,0.35); margin-top: 2rem; margin-bottom: 0.3rem; }
+  .note { font-size: 0.72rem; color: rgba(250,246,241,0.25); max-width: 500px; text-align: center; margin-top: 0.5rem; line-height: 1.6; }
+</style>
+</head>
+<body>
+<h2>Aakaara Watermark</h2>
+<p class="note">White version for dark/colorful photos. Gold version for light photos.</p>
+
+<div class="label">Transparent Background</div>
+<div class="preview">
+  <canvas id="previewWhite" width="750" height="200"></canvas>
+</div>
+
+<div class="label">On Dark Background</div>
+<div class="preview-dark">
+  <canvas id="previewDark" width="750" height="200"></canvas>
+</div>
+
+<div class="label">Gold Version (for light photos)</div>
+<div class="preview" style="background: #f5f0eb;">
+  <canvas id="previewGold" width="750" height="200"></canvas>
+</div>
+
+<div class="label">On Photo Preview</div>
+<div class="preview-photo">
+  <canvas id="previewPhoto" width="350" height="90"></canvas>
+</div>
+
+<div class="downloads">
+  <button onclick="downloadCropped('#ffffff', 'aakaara-watermark-white.png')">Download White PNG</button>
+  <button class="btn-outline" onclick="downloadCropped('#c9956b', 'aakaara-watermark-gold.png')">Download Gold PNG</button>
+</div>
+<p class="note" style="margin-top:1.5rem">PNGs are 1200px wide with transparent background.<br>In Lightroom: Edit → Watermark → Graphic → choose the PNG file.<br>Set Opacity ~30-50%, Anchor: bottom-right, Size: ~15%.</p>
+
+<!-- Hidden full-res canvases for export -->
+<canvas id="exportWhite" width="1200" height="320" style="display:none"></canvas>
+<canvas id="exportGold" width="1200" height="320" style="display:none"></canvas>
+
+<script>
+function drawWatermark(ctx, w, h, color, opacity) {
+  const scale = w / 600;
+  ctx.save();
+  ctx.scale(scale, scale);
+
+  // ── Logo Mark (lotus petals) ──
+  ctx.save();
+  ctx.translate(55, 68);
+  ctx.scale(0.52, 0.52);
+
+  // Outer ring
+  ctx.beginPath();
+  ctx.arc(0, 0, 64, 0, Math.PI * 2);
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = 0.18 * opacity;
+  ctx.lineWidth = 0.8;
+  ctx.stroke();
+
+  // Petal path
+  function drawPetal(rot, op) {
+    ctx.save();
+    ctx.rotate(rot * Math.PI / 180);
+    ctx.beginPath();
+    ctx.moveTo(0, -52);
+    ctx.bezierCurveTo(15, -52, 27, -35, 22, -10);
+    ctx.bezierCurveTo(17, 15, -7, 22, -22, 10);
+    ctx.bezierCurveTo(-37, -2, -27, -38, -10, -50);
+    ctx.bezierCurveTo(-6, -51.5, -3, -52, 0, -52);
+    ctx.closePath();
+    ctx.strokeStyle = color;
+    ctx.globalAlpha = op * opacity;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  drawPetal(0, 0.9);
+  drawPetal(60, 0.55);
+  drawPetal(120, 0.3);
+
+  // Center dot
+  ctx.beginPath();
+  ctx.arc(0, 0, 5.5, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.globalAlpha = 0.9 * opacity;
+  ctx.fill();
+
+  ctx.restore();
+
+  // ── Brand Name ──
+  ctx.save();
+  ctx.translate(112, 65);
+
+  // "Aakaara" text — draw first to measure positions
+  ctx.globalAlpha = 0.92 * opacity;
+  ctx.fillStyle = color;
+  ctx.font = '300 48px "Cormorant Garamond", Georgia, serif';
+  ctx.textBaseline = 'middle';
+
+  // Manual letter spacing since canvas doesn't support letterSpacing well
+  const letters = 'A a k a a r a'.split(' ');
+  let xPos = 0;
+  const spacing = 8;
+  const letterPositions = [];
+  letters.forEach(letter => {
+    letterPositions.push({ x: xPos, w: ctx.measureText(letter).width });
+    ctx.fillText(letter, xPos, 2);
+    xPos += ctx.measureText(letter).width + spacing;
+  });
+
+  // Diacritic dots — positioned above the 2nd letter "a" (matching site hero: left: 0.9em)
+  const secondA = letterPositions[1]; // index 1 = the lowercase "a" after capital "A"
+  const dotCenterX = secondA.x + secondA.w / 2; // center of the "a"
+  const dotY = -22; // above the text
+  const dotR = 2.2;
+  const dotGap = 7;
+  ctx.globalAlpha = 0.85 * opacity;
+  ctx.fillStyle = color;
+  ctx.beginPath(); ctx.arc(dotCenterX - dotGap / 2, dotY, dotR, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(dotCenterX + dotGap / 2, dotY, dotR, 0, Math.PI * 2); ctx.fill();
+
+  ctx.restore();
+
+  // ── Tagline ──
+  ctx.save();
+  ctx.globalAlpha = 0.4 * opacity;
+  ctx.fillStyle = color;
+  ctx.font = '300 9px "Outfit", "Helvetica Neue", sans-serif';
+
+  const tagLetters = 'S T U D I O S   ·   N E W   Y O R K   C I T Y'.split('');
+  let tagX = 115;
+  tagLetters.forEach(ch => {
+    ctx.fillText(ch, tagX, 100);
+    tagX += ch === ' ' ? 3 : 5.2;
+  });
+
+  ctx.restore();
+  ctx.restore();
+}
+
+// Wait for fonts
+document.fonts.ready.then(() => {
+  // Preview canvases
+  drawWatermark(document.getElementById('previewWhite').getContext('2d'), 750, 200, '#ffffff', 1);
+  drawWatermark(document.getElementById('previewDark').getContext('2d'), 750, 200, '#ffffff', 1);
+  drawWatermark(document.getElementById('previewGold').getContext('2d'), 750, 200, '#c9956b', 1);
+  drawWatermark(document.getElementById('previewPhoto').getContext('2d'), 350, 90, '#ffffff', 0.6);
+
+  // Export canvases (high-res)
+  drawWatermark(document.getElementById('exportWhite').getContext('2d'), 1200, 320, '#ffffff', 1);
+  drawWatermark(document.getElementById('exportGold').getContext('2d'), 1200, 320, '#c9956b', 1);
+});
+
+function downloadCropped(color, filename) {
+  const srcId = color === '#ffffff' ? 'exportWhite' : 'exportGold';
+  const src = document.getElementById(srcId);
+  const sCtx = src.getContext('2d');
+  const data = sCtx.getImageData(0, 0, src.width, src.height).data;
+
+  // Find content bounds
+  let minX = src.width, maxX = 0, minY = src.height, maxY = 0;
+  for (let y = 0; y < src.height; y++) {
+    for (let x = 0; x < src.width; x++) {
+      if (data[(y * src.width + x) * 4 + 3] > 5) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+    }
+  }
+
+  // Add padding
+  const pad = 30;
+  minX = Math.max(0, minX - pad);
+  minY = Math.max(0, minY - pad);
+  maxX = Math.min(src.width, maxX + pad);
+  maxY = Math.min(src.height, maxY + pad);
+
+  // Create cropped canvas
+  const cw = maxX - minX;
+  const ch = maxY - minY;
+  const crop = document.createElement('canvas');
+  crop.width = cw;
+  crop.height = ch;
+  crop.getContext('2d').drawImage(src, minX, minY, cw, ch, 0, 0, cw, ch);
+
+  // Download
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = crop.toDataURL('image/png');
+  link.click();
+}
+</script>
+</body>
+</html>
