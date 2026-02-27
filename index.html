@@ -1035,7 +1035,13 @@
         <input type="hidden" name="_subject" value="New inquiry from aakaarastudiosnyc.com">
         <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
         <div class="form-row"><div class="form-group"><label>Your Name</label><input type="text" name="name" placeholder="Full name" required></div><div class="form-group"><label>Email</label><input type="email" name="email" placeholder="you@email.com" required></div></div>
-        <div class="form-row"><div class="form-group"><label>Event Type</label><select name="event_type"><option value="">Select a service</option><option>Wedding</option><option>Couple Portrait</option><option>Maternity</option><option>Baby Shower</option><option>Housewarming</option><option>First Birthday</option><option>Sweet Sixteen</option><option>Commercial</option><option>Conceptual</option><option>Other</option></select></div><div class="form-group"><label>Preferred Date</label><input type="text" id="preferredDate" name="date" placeholder="Select a date..."></div></div>
+        <div class="form-row">
+          <div class="form-group"><label>Event Type</label><select name="event_type"><option value="">Select a service</option><option>Wedding</option><option>Couple Portrait</option><option>Maternity</option><option>Baby Shower</option><option>Housewarming</option><option>First Birthday</option><option>Sweet Sixteen</option><option>Commercial</option><option>Conceptual</option><option>Other</option></select></div>
+          <div class="form-group">
+            <label>Preferred Dates</label>
+            <div class="date-grid"><input type="text" id="dateFrom" name="date_from" placeholder="From"><input type="text" id="dateTo" name="date_to" placeholder="To"></div>
+          </div>
+        </div>
         <div class="form-group"><label>Tell Us Your Story</label><textarea name="message" placeholder="Share a bit about your vision — we'd love to know what makes your celebration special..."></textarea></div>
         <button type="submit" class="form-submit">Send Message</button>
         <div id="formStatus"></div>
