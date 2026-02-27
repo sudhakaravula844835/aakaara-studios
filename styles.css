@@ -15,7 +15,7 @@
   --ease-expo: cubic-bezier(0.87, 0, 0.13, 1);
 }
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 80px; overflow-x: clip; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
 body {
   background: linear-gradient(135deg, #1a1612 0%, #0a0a0f 50%, #1a2020 100%); color: var(--umber);
   font-family: var(--font-body); font-weight: 300;
