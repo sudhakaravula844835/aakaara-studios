@@ -1152,9 +1152,17 @@ class EtherealCarousel {
       this._cachedCardW = sampleCard ? sampleCard.offsetWidth : 380;
     }
     const cardW = this._cachedCardW;
+    const isMobile = window.innerWidth <= 768;
+    const isTablet = window.innerWidth <= 1024;
     let offsetPx = cardW * 0.9;
-    if (window.innerWidth <= 768) offsetPx = cardW * 0.85;
-    else if (window.innerWidth <= 1024) offsetPx = cardW * 0.87;
+    if (isMobile) offsetPx = cardW * 0.72;
+    else if (isTablet) offsetPx = cardW * 0.87;
+
+    // 3D depth values — reduced on mobile for cleaner look inside overflow:hidden
+    const sideZ    = isMobile ? -60  : -120;
+    const sideRot  = isMobile ? 18   : 35;
+    const sideScale = isMobile ? 0.8 : 0.75;
+    const centerZ  = isMobile ? 30   : 60;
 
     // Hide every item first (clear fadeIn animation — its fill-mode overrides inline transforms)
     allItems.forEach(item => {
@@ -1170,17 +1178,17 @@ class EtherealCarousel {
       if (offset === 0) {
         // Center card — pops forward
         item.setAttribute('data-ec-offset', '0');
-        item.style.transform = 'translate(-50%, -50%) translateZ(60px) scale(1) rotateY(0deg)';
+        item.style.transform = `translate(-50%, -50%) translateZ(${centerZ}px) scale(1) rotateY(0deg)`;
         item.style.pointerEvents = 'auto';
       } else if (offset === 1) {
         // Right side — tilts back into depth
         item.setAttribute('data-ec-offset', '1');
-        item.style.transform = `translate(calc(-50% + ${offsetPx}px), -50%) translateZ(-120px) scale(0.75) rotateY(-35deg)`;
+        item.style.transform = `translate(calc(-50% + ${offsetPx}px), -50%) translateZ(${sideZ}px) scale(${sideScale}) rotateY(-${sideRot}deg)`;
         item.style.pointerEvents = 'auto';
       } else if (offset === -1) {
         // Left side — tilts back into depth
         item.setAttribute('data-ec-offset', '-1');
-        item.style.transform = `translate(calc(-50% - ${offsetPx}px), -50%) translateZ(-120px) scale(0.75) rotateY(35deg)`;
+        item.style.transform = `translate(calc(-50% - ${offsetPx}px), -50%) translateZ(${sideZ}px) scale(${sideScale}) rotateY(${sideRot}deg)`;
         item.style.pointerEvents = 'auto';
       } else {
         // Off-screen — deep in background

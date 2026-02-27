@@ -15,7 +15,7 @@
   --ease-expo: cubic-bezier(0.87, 0, 0.13, 1);
 }
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; overflow-x: clip; }
 body {
   background: linear-gradient(135deg, #1a1612 0%, #0a0a0f 50%, #1a2020 100%); color: var(--umber);
   font-family: var(--font-body); font-weight: 300;
@@ -1523,11 +1523,11 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .hero-title-float { animation: heroTitleFloat 8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; }
   /* About stats: wrap on very small screens */
   .about-stats { flex-wrap: wrap; }
-  /* Carousel responsive — mobile */
-  .ethereal-carousel { height: 400px; }
-  .ethereal-carousel .gallery-item { width: 260px; }
+  /* Carousel responsive — mobile: clip overflow to prevent iOS Safari viewport expansion */
+  .ethereal-carousel { height: 400px; overflow: hidden; perspective: 800px; }
+  .ethereal-carousel .gallery-item { width: min(260px, 70vw); }
   .ethereal-carousel .vw-card,
-  .ethereal-carousel .vw-card.wide { width: 380px; }
+  .ethereal-carousel .vw-card.wide { width: min(380px, 85vw); }
   .ec-nav { width: 38px; height: 38px; }
   .ec-prev { left: 0.5rem; }
   .ec-next { right: 0.5rem; }
@@ -1785,6 +1785,9 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .ethereal-carousel .gallery-item[data-ec-offset="0"] .gi-overlay { opacity: 1; }
   .ethereal-carousel .gallery-item[data-ec-offset="0"] .gi-overlay > div { transform: translateY(0); }
   .ethereal-carousel .gallery-item[data-ec-offset="0"] .gi-count { opacity: 1; transform: translateY(0); }
+  .ethereal-carousel .vw-card[data-ec-offset="0"] .vw-overlay { opacity: 1; }
+  .ethereal-carousel .vw-card[data-ec-offset="0"] .vw-overlay > * { transform: translateY(0); }
+  .ethereal-carousel .vw-card[data-ec-offset="0"] .vw-duration { opacity: 1; }
   .ec-nav { width: 42px; height: 42px; opacity: 0.85; }
   .ec-nav:hover { transform: translateY(-50%); }
 }
