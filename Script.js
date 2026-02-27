@@ -1119,6 +1119,7 @@ class EtherealCarousel {
     this.nextBtn = containerEl.querySelector('.ec-next');
     this.counterCurrent = containerEl.querySelector('.ec-counter-current');
     this.counterTotal = containerEl.querySelector('.ec-counter-total');
+    this._cachedCardW = 0;
     this._bindEvents();
   }
 
@@ -1156,9 +1157,12 @@ class EtherealCarousel {
     const filtered = this.filteredItems;
     const ci = this.currentIndex;
 
-    // Responsive translateX offset — measure from actual card width for accuracy
-    const sampleCard = filtered[0] || allItems[0];
-    const cardW = sampleCard ? parseFloat(getComputedStyle(sampleCard).width) : 380;
+    // Use cached card width (updated on resize) — avoids getComputedStyle every render
+    if (!this._cachedCardW) {
+      const sampleCard = filtered[0] || allItems[0];
+      this._cachedCardW = sampleCard ? sampleCard.offsetWidth : 380;
+    }
+    const cardW = this._cachedCardW;
     let offsetPx = cardW * 0.9;
     if (window.innerWidth <= 768) offsetPx = cardW * 0.85;
     else if (window.innerWidth <= 1024) offsetPx = cardW * 0.87;
@@ -1310,14 +1314,17 @@ class EtherealCarousel {
           this.navigate(wheelAccum > 0 ? 1 : -1);
         }
         wheelAccum = 0;
-      }, 80);
+      }, 50);
     }, { passive: false });
 
-    // Responsive — re-render on resize
+    // Responsive — invalidate cached width and re-render on resize
     let resizeTimer;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => this.render(), 150);
+      resizeTimer = setTimeout(() => {
+        this._cachedCardW = 0; // Force recalculation
+        this.render();
+      }, 150);
     });
   }
 }

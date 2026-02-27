@@ -1532,6 +1532,18 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .ec-prev { left: 0.5rem; }
   .ec-next { right: 0.5rem; }
 }
+/* ── Small phones (≤480px) ── */
+@media (max-width: 480px) {
+  .ethereal-carousel { height: 340px; }
+  .ethereal-carousel .gallery-item { width: 220px; }
+  .ethereal-carousel .vw-card,
+  .ethereal-carousel .vw-card.wide { width: 300px; }
+  .ec-nav { width: 34px; height: 34px; }
+  .ec-prev { left: 0.3rem; }
+  .ec-next { right: 0.3rem; }
+  .ec-counter { font-size: 0.6rem; }
+}
+
 .nav-links.show { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: rgba(9,8,11,0.95); backdrop-filter: blur(20px); padding: 2rem; gap: 1.5rem; max-height: 85vh; overflow-y: auto; }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1763,6 +1775,11 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .vw-card.wide { grid-column: span 1; aspect-ratio: 4/5; }
   .vm-player { width: 95vw; }
 }
+@media (max-width: 480px) {
+  .vw-filters { gap: 0.2rem; margin-bottom: 1.5rem; }
+  .vw-filters button { font-size: 0.5rem; padding: 0.4rem 0.9rem; }
+  .vm-player { width: 98vw; }
+}
 
 @media (hover: none) {
   .gallery-item .gi-bg { filter: grayscale(0%) brightness(1) contrast(1); }
@@ -1781,10 +1798,16 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .cursor-follow { display: none !important; }
   .gallery-item { cursor: pointer; }
   .gallery-item, .portfolio-filters button, .nyc-loc, .hero-cta, .nav-cta { touch-action: manipulation; }
-  /* Carousel touch overrides */
+  /* Carousel touch overrides — portfolio */
   .ethereal-carousel .gallery-item[data-ec-offset="0"] .gi-overlay { opacity: 1; }
   .ethereal-carousel .gallery-item[data-ec-offset="0"] .gi-overlay > div { transform: translateY(0); }
   .ethereal-carousel .gallery-item[data-ec-offset="0"] .gi-count { opacity: 1; transform: translateY(0); }
+  /* Carousel touch overrides — video works */
+  .ethereal-carousel .vw-card[data-ec-offset="0"] .vw-overlay { opacity: 1; }
+  .ethereal-carousel .vw-card[data-ec-offset="0"] .vw-overlay > * { transform: translateY(0); }
+  .ethereal-carousel .vw-card[data-ec-offset="0"] .vw-duration { opacity: 1; }
+  .vw-card { cursor: pointer; }
+  .vw-card, .vw-filters button { touch-action: manipulation; }
   .ec-nav { width: 42px; height: 42px; opacity: 0.85; }
   .ec-nav:hover { transform: translateY(-50%); }
 }
