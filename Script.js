@@ -1272,6 +1272,47 @@ class EtherealCarousel {
       }
     }, { passive: true });
 
+    // Mouse drag swipe (trackpad / click-and-drag)
+    let mouseDown = false, mouseStartX = 0, mouseMoved = false;
+    this.container.addEventListener('mousedown', (e) => {
+      // Ignore clicks on nav buttons
+      if (e.target.closest('.ec-nav')) return;
+      mouseDown = true;
+      mouseMoved = false;
+      mouseStartX = e.clientX;
+      this.container.style.cursor = 'grabbing';
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (!mouseDown) return;
+      if (Math.abs(e.clientX - mouseStartX) > 10) mouseMoved = true;
+    });
+    document.addEventListener('mouseup', (e) => {
+      if (!mouseDown) return;
+      mouseDown = false;
+      this.container.style.cursor = '';
+      const dx = e.clientX - mouseStartX;
+      if (Math.abs(dx) > 50 && mouseMoved) {
+        this.navigate(dx < 0 ? 1 : -1);
+      }
+    });
+
+    // Scroll wheel navigation (horizontal scroll or trackpad swipe)
+    let wheelTimer = null;
+    let wheelAccum = 0;
+    this.container.addEventListener('wheel', (e) => {
+      // Use deltaX for horizontal scroll (trackpad) or deltaY for mouse wheel
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      wheelAccum += delta;
+      e.preventDefault();
+      clearTimeout(wheelTimer);
+      wheelTimer = setTimeout(() => {
+        if (Math.abs(wheelAccum) > 30) {
+          this.navigate(wheelAccum > 0 ? 1 : -1);
+        }
+        wheelAccum = 0;
+      }, 80);
+    }, { passive: false });
+
     // Responsive — re-render on resize
     let resizeTimer;
     window.addEventListener('resize', () => {
