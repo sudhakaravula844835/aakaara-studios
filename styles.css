@@ -526,6 +526,12 @@ nav.scrolled {
 .gallery-item.gi-cinematic {
   overflow: visible !important; /* Allow story to slide out of the box */
 }
+.gallery-item.gi-cinematic .gi-bg {
+  transition: filter 0.8s var(--ease), transform 6s var(--ease);
+}
+.gallery-item.gi-cinematic:hover .gi-bg {
+  filter: brightness(0.55) saturate(0.85);
+}
 .gallery-item.gi-cinematic:hover {
   z-index: 20; /* Ensure the slide-out floats above neighboring cards */
 }
@@ -535,7 +541,7 @@ nav.scrolled {
   justify-content: center; /* Center horizontally */
   padding: 2rem;
   z-index: 5; /* Keep title on top of image */
-  background: none; /* Remove the black gradient overlay */
+  background: radial-gradient(ellipse at center, rgba(9,8,11,0.78) 0%, rgba(9,8,11,0.5) 45%, rgba(9,8,11,0.15) 80%);
 }
 
 /* Reset default overlay animations for this specific card type */
@@ -551,17 +557,19 @@ nav.scrolled {
 }
 
 .gi-cinematic .gi-title-group h4 {
-  font-size: 1.5rem; /* Larger title for center stage */
+  font-size: 1.6rem; /* Larger title for center stage */
   margin-bottom: 0.5rem;
-  text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  color: #f0e6d3;
+  text-shadow: 0 1px 3px rgba(0,0,0,1), 0 2px 20px rgba(0,0,0,0.9), 0 0 50px rgba(0,0,0,0.7);
+  -webkit-text-stroke: 0.3px rgba(255,255,255,0.15);
 }
 
 .gi-cinematic .gi-title-group p {
-  opacity: 0.9;
-  font-size: 0.55rem;
+  opacity: 1;
+  font-size: 0.58rem;
   letter-spacing: 0.3em;
-  color: var(--rose);
-  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  color: #daa06d;
+  text-shadow: 0 1px 2px rgba(0,0,0,1), 0 2px 16px rgba(0,0,0,0.9);
 }
 
 .gi-cinematic .gi-story-group {
