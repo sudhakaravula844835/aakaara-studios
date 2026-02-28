@@ -522,117 +522,123 @@ nav.scrolled {
   margin-top: 0.8rem; max-height: 160px; opacity: 1; transition-delay: 0.1s;
 }
 
-/* ─── Cinematic Center Card (The Silent Archive) ─── */
+/* ─── Focus Pull Reveal (Cinematic Cards) ─── */
 .gallery-item.gi-cinematic {
-  overflow: visible !important; /* Allow story to slide out of the box */
+  overflow: hidden;
 }
+
+/* Image — smooth blur + dim on hover (like racking focus away) */
 .gallery-item.gi-cinematic .gi-bg {
-  transition: filter 0.8s var(--ease), transform 6s var(--ease);
+  transition: filter 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 8s var(--ease);
 }
 .gallery-item.gi-cinematic:hover .gi-bg {
-  filter: brightness(0.55) saturate(0.85);
-}
-.gallery-item.gi-cinematic:hover {
-  z-index: 20; /* Ensure the slide-out floats above neighboring cards */
+  filter: blur(8px) brightness(0.35) saturate(0.7);
+  transform: scale(1.08);
 }
 
+/* Overlay — centered flex column, no gradient needed (blur handles contrast) */
 .gallery-item.gi-cinematic .gi-overlay {
-  align-items: center;     /* Center vertically */
-  justify-content: center; /* Center horizontally */
-  padding: 2rem;
-  z-index: 5; /* Keep title on top of image */
-  background: radial-gradient(ellipse at center, rgba(9,8,11,0.78) 0%, rgba(9,8,11,0.5) 45%, rgba(9,8,11,0.15) 80%);
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.8rem;
+  z-index: 5;
+  background: none;
+  flex-direction: column;
 }
 
-/* Reset default overlay animations for this specific card type */
+/* Reset default overlay slide-up animation */
 .gallery-item.gi-cinematic .gi-overlay > div {
   transform: none !important;
 }
 
+/* Title group — centered, all text stacked */
 .gi-cinematic .gi-title-group {
   text-align: center;
-  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   z-index: 5;
-}
-
-.gi-cinematic .gi-title-group h4 {
-  font-size: 1.6rem; /* Larger title for center stage */
-  margin-bottom: 0.5rem;
-  color: #f0e6d3;
-  text-shadow: 0 1px 3px rgba(0,0,0,1), 0 2px 20px rgba(0,0,0,0.9), 0 0 50px rgba(0,0,0,0.7);
-  -webkit-text-stroke: 0.3px rgba(255,255,255,0.15);
-}
-
-.gi-cinematic .gi-title-group p {
-  opacity: 1;
-  font-size: 0.58rem;
-  letter-spacing: 0.3em;
-  color: #daa06d;
-  text-shadow: 0 1px 2px rgba(0,0,0,1), 0 2px 16px rgba(0,0,0,0.9);
-}
-
-.gi-cinematic .gi-story-group {
-  position: absolute;
-  top: 15%;
-  bottom: 15%;
-  right: 10px; /* Start slightly inside */
-  width: 240px; /* Fixed width for the story card */
-  background: transparent;
-  border: none;
-  padding: 1rem 0 1rem 1.5rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  
-  /* Hide behind the card initially (z-index 0 is < gi-bg z-index 1) */
-  z-index: 0; 
-  opacity: 0;
-  transform: translateX(0) scale(0.95);
-  transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1); /* Slower, more elegant slide */
-  
-  /* Visual polish */
-  box-shadow: none;
-  backdrop-filter: none;
-  pointer-events: none;
+  gap: 0;
 }
 
+/* Subtitle — small caps above title */
+.gi-cinematic .gi-subtitle {
+  font-size: 0.5rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #daa06d;
+  margin-bottom: 0.6rem;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: 0s;
+}
+.gallery-item.gi-cinematic:hover .gi-subtitle {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.1s;
+}
+
+/* Title — large, elegant */
+.gi-cinematic .gi-title-group h4 {
+  font-size: 1.7rem;
+  margin-bottom: 0;
+  color: #fff;
+  text-shadow: 0 2px 30px rgba(0,0,0,0.8);
+  letter-spacing: 0.02em;
+  transform: scale(0.92);
+  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+}
+.gallery-item.gi-cinematic:hover .gi-title-group h4 {
+  transform: scale(1);
+}
+
+/* Divider — thin gold line, grows on hover */
+.gi-cinematic .gi-divider {
+  display: block;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #daa06d, transparent);
+  margin: 0.8rem 0;
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: 0s;
+}
+.gallery-item.gi-cinematic:hover .gi-divider {
+  width: 80px;
+  transition-delay: 0.3s;
+}
+
+/* Story text — fades in below divider */
 .gi-cinematic .gi-story {
-  font-size: 0.75rem;
-  line-height: 1.7;
-  color: var(--ivory);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.78rem;
+  line-height: 1.8;
+  color: rgba(250,246,241,0.9);
   margin: 0;
   opacity: 1;
   max-height: none;
   font-weight: 300;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+  text-align: center;
+  overflow: visible;
+  text-shadow: none;
 }
 
-/* Staggered Text Lines */
+/* Staggered story lines — float up into place */
 .gi-cinematic .story-line {
   display: block;
   opacity: 0;
-  transform: translateX(-10px);
-  transition: all 0.8s ease;
+  transform: translateY(12px);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .gallery-item.gi-cinematic:hover .story-line {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateY(0);
 }
-.gallery-item.gi-cinematic:hover .story-line:nth-child(1) { transition-delay: 0.3s; }
-.gallery-item.gi-cinematic:hover .story-line:nth-child(2) { transition-delay: 0.5s; }
-.gallery-item.gi-cinematic:hover .story-line:nth-child(3) { transition-delay: 0.7s; }
-
-/* Hover Actions */
-.gallery-item.gi-cinematic:hover .gi-title-group {
-  transform: translateX(-20px); /* Subtle shift to balance */
-}
-
-.gallery-item.gi-cinematic:hover .gi-story-group {
-  opacity: 1;
-  /* Slide out to the right, completely outside the box */
-  transform: translateX(105%) scale(1); 
-  pointer-events: auto;
-}
+.gallery-item.gi-cinematic:hover .story-line:nth-child(1) { transition-delay: 0.5s; }
+.gallery-item.gi-cinematic:hover .story-line:nth-child(2) { transition-delay: 0.7s; }
+.gallery-item.gi-cinematic:hover .story-line:nth-child(3) { transition-delay: 0.9s; }
 
 .gi-1 .gi-bg { background-image: linear-gradient(135deg, #d4a574, #8b6f5c, #c9956b); }
 .gi-2 .gi-bg { background-image: linear-gradient(135deg, #b8967a, #7a3b4e, #dbb08a); }
