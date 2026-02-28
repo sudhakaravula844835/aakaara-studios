@@ -4,11 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aakaara — Logo Exploration</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet">
 <style>
   :root {
     --gold: #c9956b;
     --gold-light: #dbb08a;
+    --gold-dim: rgba(201,149,107,0.5);
     --ivory: #faf6f1;
     --dark: #09080b;
     --display: 'Cormorant Garamond', Georgia, serif;
@@ -22,612 +23,751 @@
     color: var(--ivory);
     font-family: var(--body);
     min-height: 100vh;
+    overflow-x: hidden;
   }
 
-  /* ── Header ── */
+  /* ── Page Header ── */
   .page-header {
     text-align: center;
-    padding: 4rem 2rem 2rem;
+    padding: 5rem 2rem 1.5rem;
   }
   .page-header h1 {
     font-family: var(--display);
     font-weight: 300;
-    font-size: 2.4rem;
-    letter-spacing: 0.04em;
+    font-size: 2.6rem;
+    letter-spacing: 0.06em;
     color: var(--ivory);
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.8rem;
   }
-  .page-header p {
-    font-size: 0.72rem;
-    letter-spacing: 0.2em;
+  .page-header .sub {
+    font-size: 0.65rem;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: rgba(250,246,241,0.35);
+    color: rgba(250,246,241,0.25);
+    margin-bottom: 1rem;
+  }
+  .page-header .manifesto {
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 1.05rem;
+    line-height: 2;
+    color: rgba(250,246,241,0.4);
+    max-width: 540px;
+    margin: 0 auto;
   }
 
-  /* ── Current Logo (reference) ── */
-  .current-ref {
-    text-align: center;
-    padding: 2rem 2rem 3rem;
-    border-bottom: 1px solid rgba(201,149,107,0.1);
-    margin-bottom: 2rem;
+  /* ── Divider ── */
+  .gold-line {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 3rem auto;
+    opacity: 0.4;
   }
-  .current-ref .label {
+
+  /* ── Concept Section ── */
+  .concept {
+    max-width: 900px;
+    margin: 0 auto 6rem;
+    padding: 0 2rem;
+  }
+
+  /* ── Sanskrit Name ── */
+  .concept .sanskrit-label {
+    text-align: center;
+    margin-bottom: 0.4rem;
+  }
+  .concept .sanskrit-label .script {
+    font-family: var(--display);
+    font-weight: 300;
+    font-size: 0.9rem;
+    color: var(--gold);
+    opacity: 0.6;
+    letter-spacing: 0.08em;
+  }
+  .concept .concept-name {
+    text-align: center;
+    font-family: var(--display);
+    font-weight: 300;
+    font-size: 2rem;
+    letter-spacing: 0.04em;
+    color: var(--ivory);
+    margin-bottom: 0.5rem;
+  }
+  .concept .concept-meaning {
+    text-align: center;
     font-size: 0.6rem;
     letter-spacing: 0.25em;
     text-transform: uppercase;
     color: rgba(250,246,241,0.25);
-    margin-bottom: 1.5rem;
+    margin-bottom: 3rem;
   }
-  .current-ref .current-logo {
-    display: inline-flex;
+
+  /* ── Mark Preview (large, centered) ── */
+  .mark-showcase {
+    text-align: center;
+    padding: 3rem 0;
+  }
+  .mark-showcase svg.mark-large {
+    height: 140px;
+    width: auto;
+    display: inline-block;
+  }
+
+  /* ── Full Lockup ── */
+  .lockup-row {
+    display: flex;
     align-items: center;
-    gap: 1rem;
+    justify-content: center;
+    gap: 1.2rem;
+    margin: 2.5rem 0;
   }
-  .current-ref svg { height: 50px; width: auto; }
-  .current-ref .brand-text {
+  .lockup-row svg {
+    height: 50px;
+    width: auto;
+  }
+  .lockup-text {
+    text-align: left;
+  }
+  .lockup-text .name {
     font-family: var(--display);
     font-weight: 300;
     font-size: 1.8rem;
     letter-spacing: 0.06em;
     color: var(--ivory);
     position: relative;
-  }
-  .current-ref .brand-dots {
-    position: absolute;
-    top: -8px;
-    left: 3px;
-    display: flex;
-    gap: 5px;
-  }
-  .current-ref .brand-dots span {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--gold);
-    opacity: 0.85;
-  }
-
-  /* ── Grid ── */
-  .concepts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-    gap: 2rem;
-    padding: 2rem 3rem 4rem;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  /* ── Concept Card ── */
-  .concept-card {
-    background: rgba(250,246,241,0.02);
-    border: 1px solid rgba(201,149,107,0.08);
-    border-radius: 12px;
-    overflow: hidden;
-    transition: border-color 0.5s ease;
-  }
-  .concept-card:hover {
-    border-color: rgba(201,149,107,0.25);
-  }
-
-  .card-preview {
-    padding: 3.5rem 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 280px;
-    position: relative;
-  }
-
-  .card-preview .logo-lockup {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .card-preview .logo-mark svg {
-    height: 52px;
-    width: auto;
-    display: block;
-  }
-
-  .card-preview .logo-text {
-    font-family: var(--display);
-    font-weight: 300;
-    font-size: 1.7rem;
-    letter-spacing: 0.06em;
-    color: var(--ivory);
-    position: relative;
     line-height: 1;
   }
-
-  .card-preview .logo-dots {
+  .lockup-text .dots {
     position: absolute;
     top: -7px;
     left: 2px;
     display: flex;
     gap: 4px;
   }
-  .card-preview .logo-dots span {
+  .lockup-text .dots span {
     width: 3.5px;
     height: 3.5px;
     border-radius: 50%;
     background: var(--gold);
     opacity: 0.85;
   }
-
-  .card-preview .tagline {
-    font-size: 0.52rem;
+  .lockup-text .tagline {
+    font-size: 0.5rem;
     letter-spacing: 0.32em;
     text-transform: uppercase;
-    color: rgba(250,246,241,0.3);
-    margin-top: 0.9rem;
+    color: rgba(250,246,241,0.28);
+    margin-top: 0.6rem;
   }
 
-  /* ── Dark/Light Toggle Previews ── */
-  .card-variants {
+  /* ── Size Scale ── */
+  .size-strip {
     display: flex;
-    border-top: 1px solid rgba(201,149,107,0.06);
+    align-items: flex-end;
+    justify-content: center;
+    gap: 2.5rem;
+    margin: 2rem 0;
+    padding: 1.5rem 0;
   }
-  .card-variants .variant {
+  .size-strip .size-item {
+    text-align: center;
+  }
+  .size-strip .size-item svg {
+    display: block;
+    margin: 0 auto 0.5rem;
+  }
+  .size-strip .size-label {
+    font-size: 0.5rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(250,246,241,0.2);
+  }
+
+  /* ── Variant Strip ── */
+  .variant-strip {
+    display: flex;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 2rem 0;
+    border: 1px solid rgba(201,149,107,0.06);
+  }
+  .variant-strip .variant {
     flex: 1;
-    padding: 1.8rem 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 2rem 1.5rem;
+    gap: 0.8rem;
   }
-  .card-variants .variant svg {
-    height: 32px;
+  .variant-strip .variant svg {
+    height: 36px;
     width: auto;
   }
-  .variant-light {
-    background: #f5f0eb;
-  }
-  .variant-dark {
-    background: #09080b;
-  }
-
-  /* ── Card Info ── */
-  .card-info {
-    padding: 1.5rem 2rem 2rem;
-    border-top: 1px solid rgba(201,149,107,0.06);
-  }
-  .card-info h3 {
+  .variant-strip .variant .v-name {
     font-family: var(--display);
-    font-weight: 400;
-    font-size: 1.15rem;
-    color: var(--gold-light);
-    margin-bottom: 0.5rem;
-    letter-spacing: 0.02em;
-  }
-  .card-info .concept-tag {
-    display: inline-block;
-    font-size: 0.55rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold);
-    background: rgba(201,149,107,0.08);
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    margin-bottom: 0.8rem;
-  }
-  .card-info p {
-    font-size: 0.78rem;
-    line-height: 1.7;
-    color: rgba(250,246,241,0.5);
     font-weight: 300;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+  }
+  .variant-dark { background: #09080b; }
+  .variant-dark .v-name { color: var(--ivory); }
+  .variant-light { background: #f5f0eb; }
+  .variant-light .v-name { color: #1a1612; }
+  .variant-photo {
+    background: linear-gradient(135deg, #2a1f16 0%, #1a120d 50%, #0d0a08 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .variant-photo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 40%, rgba(201,149,107,0.08) 0%, transparent 60%);
+  }
+  .variant-photo .v-name { color: rgba(250,246,241,0.7); }
+
+  /* ── Description ── */
+  .concept-story {
+    max-width: 600px;
+    margin: 2.5rem auto 0;
+    text-align: center;
+  }
+  .concept-story .emotion {
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 1.1rem;
+    line-height: 1.9;
+    color: rgba(250,246,241,0.55);
+    margin-bottom: 1.5rem;
+  }
+  .concept-story .symbolism {
+    font-size: 0.72rem;
+    line-height: 1.9;
+    color: rgba(250,246,241,0.3);
+    font-weight: 300;
+  }
+  .concept-story .symbolism strong {
+    color: var(--gold);
+    font-weight: 400;
   }
 
   /* ── Footer ── */
   .page-footer {
     text-align: center;
-    padding: 2rem 2rem 4rem;
+    padding: 3rem 2rem 5rem;
     border-top: 1px solid rgba(201,149,107,0.06);
     max-width: 600px;
-    margin: 0 auto;
+    margin: 2rem auto 0;
   }
   .page-footer p {
-    font-size: 0.72rem;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 0.95rem;
     line-height: 1.8;
     color: rgba(250,246,241,0.3);
   }
 
   @media (max-width: 768px) {
-    .concepts-grid {
-      grid-template-columns: 1fr;
-      padding: 1.5rem;
-    }
     .page-header h1 { font-size: 1.8rem; }
+    .concept { padding: 0 1.5rem; }
+    .mark-showcase svg.mark-large { height: 100px; }
+    .variant-strip { flex-direction: column; }
+    .lockup-row { flex-direction: column; gap: 0.8rem; }
+    .lockup-text { text-align: center; }
+    .size-strip { gap: 1.5rem; }
   }
 </style>
 </head>
 <body>
 
 <div class="page-header">
-  <h1>Logo Exploration</h1>
-  <p>Aakaara Studios &mdash; mark concepts</p>
+  <h1>Aakaara</h1>
+  <div class="sub">Logo Exploration &mdash; Mark Concepts</div>
+  <p class="manifesto">
+    Two souls. One sacred moment.<br>
+    The form their love takes, preserved in light.
+  </p>
 </div>
 
-<!-- Current Logo Reference -->
-<div class="current-ref">
-  <div class="label">Current Logo</div>
-  <div class="current-logo">
-    <svg viewBox="0 0 60 60"><g transform="translate(30,30)"><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.8"/><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.4" transform="rotate(60)"/><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.2" transform="rotate(120)"/><circle cx="0" cy="0" r="2.5" fill="#c9956b" opacity="0.85"/></g></svg>
-    <span class="brand-text">
-      <span class="brand-dots"><span></span><span></span></span>
-      Aakaara
-    </span>
+<div class="gold-line"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     CONCEPT 1 — JYOTI (Twin Flames)
+     ═══════════════════════════════════════════════════════ -->
+<div class="concept">
+  <div class="sanskrit-label"><span class="script">ज्योति</span></div>
+  <h2 class="concept-name">Jyoti</h2>
+  <p class="concept-meaning">Twin Flames &mdash; The Sacred Light</p>
+
+  <!-- Large mark -->
+  <div class="mark-showcase">
+    <svg class="mark-large" viewBox="0 0 60 68" fill="none">
+      <!-- Left flame — one soul -->
+      <path d="M28,60 C22,52 6,42 9,26 C12,14 22,5 29,10"
+            stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+      <!-- Right flame — the other soul -->
+      <path d="M32,60 C38,52 54,42 51,26 C48,14 38,5 31,10"
+            stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.55"/>
+      <!-- Bindu — the sacred point where they almost touch -->
+      <circle cx="30" cy="4" r="2" fill="#c9956b" opacity="0.85"/>
+      <!-- Subtle lens ring -->
+      <circle cx="30" cy="34" r="27" stroke="#c9956b" stroke-width="0.4" opacity="0.1"/>
+    </svg>
+  </div>
+
+  <!-- Full lockup -->
+  <div class="lockup-row">
+    <svg viewBox="0 0 60 68" fill="none">
+      <path d="M28,60 C22,52 6,42 9,26 C12,14 22,5 29,10" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+      <path d="M32,60 C38,52 54,42 51,26 C48,14 38,5 31,10" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.55"/>
+      <circle cx="30" cy="4" r="2" fill="#c9956b" opacity="0.85"/>
+      <circle cx="30" cy="34" r="27" stroke="#c9956b" stroke-width="0.4" opacity="0.1"/>
+    </svg>
+    <div class="lockup-text">
+      <div class="name">
+        <span class="dots"><span></span><span></span></span>
+        Aakaara
+      </div>
+      <div class="tagline">Studios &middot; New York City</div>
+    </div>
+  </div>
+
+  <!-- Size scale -->
+  <div class="size-strip">
+    <div class="size-item">
+      <svg viewBox="0 0 60 68" fill="none" style="height:60px">
+        <path d="M28,60 C22,52 6,42 9,26 C12,14 22,5 29,10" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+        <path d="M32,60 C38,52 54,42 51,26 C48,14 38,5 31,10" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.55"/>
+        <circle cx="30" cy="4" r="2" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="size-label">Watermark</span>
+    </div>
+    <div class="size-item">
+      <svg viewBox="0 0 60 68" fill="none" style="height:36px">
+        <path d="M28,60 C22,52 6,42 9,26 C12,14 22,5 29,10" stroke="#c9956b" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
+        <path d="M32,60 C38,52 54,42 51,26 C48,14 38,5 31,10" stroke="#c9956b" stroke-width="1.4" stroke-linecap="round" opacity="0.55"/>
+        <circle cx="30" cy="4" r="2.5" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="size-label">Nav</span>
+    </div>
+    <div class="size-item">
+      <svg viewBox="0 0 60 68" fill="none" style="height:20px">
+        <path d="M28,60 C22,52 6,42 9,26 C12,14 22,5 29,10" stroke="#c9956b" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+        <path d="M32,60 C38,52 54,42 51,26 C48,14 38,5 31,10" stroke="#c9956b" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
+        <circle cx="30" cy="4" r="3.5" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="size-label">Favicon</span>
+    </div>
+  </div>
+
+  <!-- Variants -->
+  <div class="variant-strip">
+    <div class="variant variant-dark">
+      <svg viewBox="0 0 60 68" fill="none">
+        <path d="M28,60 C22,52 6,42 9,26 C12,14 22,5 29,10" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+        <path d="M32,60 C38,52 54,42 51,26 C48,14 38,5 31,10" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.55"/>
+        <circle cx="30" cy="4" r="2" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="v-name">Aakaara</span>
+    </div>
+    <div class="variant variant-light">
+      <svg viewBox="0 0 60 68" fill="none">
+        <path d="M28,60 C22,52 6,42 9,26 C12,14 22,5 29,10" stroke="#3d2b1a" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+        <path d="M32,60 C38,52 54,42 51,26 C48,14 38,5 31,10" stroke="#3d2b1a" stroke-width="1.2" stroke-linecap="round" opacity="0.55"/>
+        <circle cx="30" cy="4" r="2" fill="#3d2b1a" opacity="0.85"/>
+      </svg>
+      <span class="v-name">Aakaara</span>
+    </div>
+    <div class="variant variant-photo">
+      <svg viewBox="0 0 60 68" fill="none" style="position:relative;z-index:1">
+        <path d="M28,60 C22,52 6,42 9,26 C12,14 22,5 29,10" stroke="rgba(250,246,241,0.7)" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M32,60 C38,52 54,42 51,26 C48,14 38,5 31,10" stroke="rgba(250,246,241,0.4)" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="30" cy="4" r="2" fill="rgba(250,246,241,0.6)"/>
+      </svg>
+      <span class="v-name">Aakaara</span>
+    </div>
+  </div>
+
+  <!-- Story -->
+  <div class="concept-story">
+    <p class="emotion">
+      Two flames rising from one diya &mdash; the sacred lamp that witnesses every vow.<br>
+      They grow outward, becoming who they are, yet always lean back toward each other.<br>
+      The space between their tips is the sacred gap &mdash; the breath before "I do,"<br>
+      the moment a photographer lives to capture.
+    </p>
+    <p class="symbolism">
+      <strong>The two flames</strong> &mdash; two souls, two lives, growing from one shared root<br>
+      <strong>The lean toward each other</strong> &mdash; commitment, the promise to always return<br>
+      <strong>The bindu (dot)</strong> &mdash; the divine witness, the sacred fire, the shutter click<br>
+      <strong>The lens ring</strong> &mdash; the photographer's eye, framing the moment forever<br>
+      <strong>The negative space</strong> &mdash; a leaf, a lens, the aakaara (form) that love creates
+    </p>
   </div>
 </div>
 
-<div class="concepts-grid">
+<div class="gold-line"></div>
 
-  <!-- ═══════ CONCEPT 1: Continuous Line Lotus ═══════ -->
-  <div class="concept-card">
-    <div class="card-preview">
-      <div class="logo-lockup">
-        <div class="logo-mark">
-          <svg viewBox="0 0 52 52" fill="none">
-            <!-- Single continuous-stroke lotus — one elegant line -->
-            <path d="
-              M26,6
-              C30,6 36,12 34,22
-              C32,30 26,34 22,30
-              C18,26 18,14 22,8
-              C23,5.5 25,5.5 26,6Z
-            " stroke="#c9956b" stroke-width="1.3" stroke-linecap="round" opacity="0.9"/>
-            <path d="
-              M26,6
-              C30,6 36,12 34,22
-              C32,30 26,34 22,30
-              C18,26 18,14 22,8
-              C23,5.5 25,5.5 26,6Z
-            " stroke="#c9956b" stroke-width="1.3" stroke-linecap="round" opacity="0.45" transform="rotate(72,26,26)"/>
-            <path d="
-              M26,6
-              C30,6 36,12 34,22
-              C32,30 26,34 22,30
-              C18,26 18,14 22,8
-              C23,5.5 25,5.5 26,6Z
-            " stroke="#c9956b" stroke-width="1.3" stroke-linecap="round" opacity="0.2" transform="rotate(144,26,26)"/>
-            <path d="
-              M26,6
-              C30,6 36,12 34,22
-              C32,30 26,34 22,30
-              C18,26 18,14 22,8
-              C23,5.5 25,5.5 26,6Z
-            " stroke="#c9956b" stroke-width="1.3" stroke-linecap="round" opacity="0.12" transform="rotate(216,26,26)"/>
-            <path d="
-              M26,6
-              C30,6 36,12 34,22
-              C32,30 26,34 22,30
-              C18,26 18,14 22,8
-              C23,5.5 25,5.5 26,6Z
-            " stroke="#c9956b" stroke-width="1.3" stroke-linecap="round" opacity="0.07" transform="rotate(288,26,26)"/>
-            <circle cx="26" cy="26" r="2" fill="#c9956b" opacity="0.8"/>
-          </svg>
-        </div>
-        <div>
-          <div class="logo-text">
-            <span class="logo-dots"><span></span><span></span></span>
-            Aakaara
-          </div>
-          <div class="tagline">Studios &middot; New York City</div>
-        </div>
+<!-- ═══════════════════════════════════════════════════════
+     CONCEPT 2 — PHERA (Sacred Orbit)
+     ═══════════════════════════════════════════════════════ -->
+<div class="concept">
+  <div class="sanskrit-label"><span class="script">फेरा</span></div>
+  <h2 class="concept-name">Phera</h2>
+  <p class="concept-meaning">Sacred Orbit &mdash; The Eternal Walk</p>
+
+  <div class="mark-showcase">
+    <svg class="mark-large" viewBox="0 0 60 60" fill="none">
+      <!-- Arc 1 — one soul walking the phera (bolder, leading) -->
+      <path d="M16,48 C4,38 2,18 16,8 C24,2 36,4 42,12"
+            stroke="#c9956b" stroke-width="1.3" stroke-linecap="round" opacity="0.9"/>
+      <!-- Arc 2 — the other soul following, completing the circle -->
+      <path d="M44,12 C56,22 58,42 44,52 C36,58 24,56 18,48"
+            stroke="#c9956b" stroke-width="1.3" stroke-linecap="round" opacity="0.4"/>
+      <!-- Small trailing dots — like footsteps around the fire -->
+      <circle cx="15" cy="48" r="1" fill="#c9956b" opacity="0.3"/>
+      <circle cx="43" cy="11" r="1" fill="#c9956b" opacity="0.2"/>
+      <!-- Agni — the sacred fire at center they orbit around -->
+      <circle cx="30" cy="30" r="2.5" fill="#c9956b" opacity="0.85"/>
+      <!-- Subtle heat halo around the fire -->
+      <circle cx="30" cy="30" r="7" stroke="#c9956b" stroke-width="0.4" opacity="0.12"/>
+    </svg>
+  </div>
+
+  <div class="lockup-row">
+    <svg viewBox="0 0 60 60" fill="none">
+      <path d="M16,48 C4,38 2,18 16,8 C24,2 36,4 42,12" stroke="#c9956b" stroke-width="1.3" stroke-linecap="round" opacity="0.9"/>
+      <path d="M44,12 C56,22 58,42 44,52 C36,58 24,56 18,48" stroke="#c9956b" stroke-width="1.3" stroke-linecap="round" opacity="0.45"/>
+      <circle cx="30" cy="30" r="2.5" fill="#c9956b" opacity="0.85"/>
+      <circle cx="30" cy="30" r="6" stroke="#c9956b" stroke-width="0.4" opacity="0.15"/>
+    </svg>
+    <div class="lockup-text">
+      <div class="name">
+        <span class="dots"><span></span><span></span></span>
+        Aakaara
       </div>
-    </div>
-    <div class="card-variants">
-      <div class="variant variant-dark">
-        <svg viewBox="0 0 52 52" fill="none">
-          <path d="M26,6 C30,6 36,12 34,22 C32,30 26,34 22,30 C18,26 18,14 22,8 C23,5.5 25,5.5 26,6Z" stroke="#c9956b" stroke-width="1.3" opacity="0.9"/>
-          <path d="M26,6 C30,6 36,12 34,22 C32,30 26,34 22,30 C18,26 18,14 22,8 C23,5.5 25,5.5 26,6Z" stroke="#c9956b" stroke-width="1.3" opacity="0.45" transform="rotate(72,26,26)"/>
-          <path d="M26,6 C30,6 36,12 34,22 C32,30 26,34 22,30 C18,26 18,14 22,8 C23,5.5 25,5.5 26,6Z" stroke="#c9956b" stroke-width="1.3" opacity="0.2" transform="rotate(144,26,26)"/>
-          <path d="M26,6 C30,6 36,12 34,22 C32,30 26,34 22,30 C18,26 18,14 22,8 C23,5.5 25,5.5 26,6Z" stroke="#c9956b" stroke-width="1.3" opacity="0.12" transform="rotate(216,26,26)"/>
-          <path d="M26,6 C30,6 36,12 34,22 C32,30 26,34 22,30 C18,26 18,14 22,8 C23,5.5 25,5.5 26,6Z" stroke="#c9956b" stroke-width="1.3" opacity="0.07" transform="rotate(288,26,26)"/>
-          <circle cx="26" cy="26" r="2" fill="#c9956b" opacity="0.8"/>
-        </svg>
-      </div>
-      <div class="variant variant-light">
-        <svg viewBox="0 0 52 52" fill="none">
-          <path d="M26,6 C30,6 36,12 34,22 C32,30 26,34 22,30 C18,26 18,14 22,8 C23,5.5 25,5.5 26,6Z" stroke="#5a3d2b" stroke-width="1.3" opacity="0.9"/>
-          <path d="M26,6 C30,6 36,12 34,22 C32,30 26,34 22,30 C18,26 18,14 22,8 C23,5.5 25,5.5 26,6Z" stroke="#5a3d2b" stroke-width="1.3" opacity="0.45" transform="rotate(72,26,26)"/>
-          <path d="M26,6 C30,6 36,12 34,22 C32,30 26,34 22,30 C18,26 18,14 22,8 C23,5.5 25,5.5 26,6Z" stroke="#5a3d2b" stroke-width="1.3" opacity="0.2" transform="rotate(144,26,26)"/>
-          <path d="M26,6 C30,6 36,12 34,22 C32,30 26,34 22,30 C18,26 18,14 22,8 C23,5.5 25,5.5 26,6Z" stroke="#5a3d2b" stroke-width="1.3" opacity="0.12" transform="rotate(216,26,26)"/>
-          <path d="M26,6 C30,6 36,12 34,22 C32,30 26,34 22,30 C18,26 18,14 22,8 C23,5.5 25,5.5 26,6Z" stroke="#5a3d2b" stroke-width="1.3" opacity="0.07" transform="rotate(288,26,26)"/>
-          <circle cx="26" cy="26" r="2" fill="#5a3d2b" opacity="0.8"/>
-        </svg>
-      </div>
-    </div>
-    <div class="card-info">
-      <span class="concept-tag">Organic</span>
-      <h3>Five-Petal Bloom</h3>
-      <p>Five petals instead of three — feels more like a full lotus in bloom. Slightly rotated axis gives it natural asymmetry. Still line-art, same DNA as the current mark but more complete and balanced.</p>
+      <div class="tagline">Studios &middot; New York City</div>
     </div>
   </div>
 
-  <!-- ═══════ CONCEPT 2: Aperture Lotus ═══════ -->
-  <div class="concept-card">
-    <div class="card-preview">
-      <div class="logo-lockup">
-        <div class="logo-mark">
-          <svg viewBox="0 0 52 52" fill="none">
-            <!-- Camera aperture blades that resemble lotus petals -->
-            <circle cx="26" cy="26" r="22" stroke="#c9956b" stroke-width="0.6" opacity="0.15"/>
-            <circle cx="26" cy="26" r="16" stroke="#c9956b" stroke-width="0.6" opacity="0.1"/>
-            <!-- 6 aperture blades -->
-            <path d="M26,4 L32,16 L26,14Z" stroke="#c9956b" stroke-width="1" fill="none" opacity="0.85" stroke-linejoin="round"/>
-            <path d="M26,4 L32,16 L26,14Z" stroke="#c9956b" stroke-width="1" fill="none" opacity="0.65" stroke-linejoin="round" transform="rotate(60,26,26)"/>
-            <path d="M26,4 L32,16 L26,14Z" stroke="#c9956b" stroke-width="1" fill="none" opacity="0.45" stroke-linejoin="round" transform="rotate(120,26,26)"/>
-            <path d="M26,4 L32,16 L26,14Z" stroke="#c9956b" stroke-width="1" fill="none" opacity="0.35" stroke-linejoin="round" transform="rotate(180,26,26)"/>
-            <path d="M26,4 L32,16 L26,14Z" stroke="#c9956b" stroke-width="1" fill="none" opacity="0.25" stroke-linejoin="round" transform="rotate(240,26,26)"/>
-            <path d="M26,4 L32,16 L26,14Z" stroke="#c9956b" stroke-width="1" fill="none" opacity="0.15" stroke-linejoin="round" transform="rotate(300,26,26)"/>
-            <circle cx="26" cy="26" r="2" fill="#c9956b" opacity="0.8"/>
-          </svg>
-        </div>
-        <div>
-          <div class="logo-text">
-            <span class="logo-dots"><span></span><span></span></span>
-            Aakaara
-          </div>
-          <div class="tagline">Studios &middot; New York City</div>
-        </div>
-      </div>
+  <div class="size-strip">
+    <div class="size-item">
+      <svg viewBox="0 0 60 60" fill="none" style="height:60px">
+        <path d="M16,48 C4,38 2,18 16,8 C24,2 36,4 42,12" stroke="#c9956b" stroke-width="1.3" stroke-linecap="round" opacity="0.9"/>
+        <path d="M44,12 C56,22 58,42 44,52 C36,58 24,56 18,48" stroke="#c9956b" stroke-width="1.3" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="30" cy="30" r="2.5" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="size-label">Watermark</span>
     </div>
-    <div class="card-variants">
-      <div class="variant variant-dark">
-        <svg viewBox="0 0 52 52" fill="none">
-          <circle cx="26" cy="26" r="22" stroke="#c9956b" stroke-width="0.6" opacity="0.15"/>
-          <circle cx="26" cy="26" r="16" stroke="#c9956b" stroke-width="0.6" opacity="0.1"/>
-          <path d="M26,4 L32,16 L26,14Z" stroke="#c9956b" stroke-width="1" fill="none" opacity="0.85" stroke-linejoin="round"/>
-          <path d="M26,4 L32,16 L26,14Z" stroke="#c9956b" stroke-width="1" fill="none" opacity="0.65" stroke-linejoin="round" transform="rotate(60,26,26)"/>
-          <path d="M26,4 L32,16 L26,14Z" stroke="#c9956b" stroke-width="1" fill="none" opacity="0.45" stroke-linejoin="round" transform="rotate(120,26,26)"/>
-          <path d="M26,4 L32,16 L26,14Z" stroke="#c9956b" stroke-width="1" fill="none" opacity="0.35" stroke-linejoin="round" transform="rotate(180,26,26)"/>
-          <path d="M26,4 L32,16 L26,14Z" stroke="#c9956b" stroke-width="1" fill="none" opacity="0.25" stroke-linejoin="round" transform="rotate(240,26,26)"/>
-          <path d="M26,4 L32,16 L26,14Z" stroke="#c9956b" stroke-width="1" fill="none" opacity="0.15" stroke-linejoin="round" transform="rotate(300,26,26)"/>
-          <circle cx="26" cy="26" r="2" fill="#c9956b" opacity="0.8"/>
-        </svg>
-      </div>
-      <div class="variant variant-light">
-        <svg viewBox="0 0 52 52" fill="none">
-          <circle cx="26" cy="26" r="22" stroke="#5a3d2b" stroke-width="0.6" opacity="0.15"/>
-          <circle cx="26" cy="26" r="16" stroke="#5a3d2b" stroke-width="0.6" opacity="0.1"/>
-          <path d="M26,4 L32,16 L26,14Z" stroke="#5a3d2b" stroke-width="1" fill="none" opacity="0.85" stroke-linejoin="round"/>
-          <path d="M26,4 L32,16 L26,14Z" stroke="#5a3d2b" stroke-width="1" fill="none" opacity="0.65" stroke-linejoin="round" transform="rotate(60,26,26)"/>
-          <path d="M26,4 L32,16 L26,14Z" stroke="#5a3d2b" stroke-width="1" fill="none" opacity="0.45" stroke-linejoin="round" transform="rotate(120,26,26)"/>
-          <path d="M26,4 L32,16 L26,14Z" stroke="#5a3d2b" stroke-width="1" fill="none" opacity="0.35" stroke-linejoin="round" transform="rotate(180,26,26)"/>
-          <path d="M26,4 L32,16 L26,14Z" stroke="#5a3d2b" stroke-width="1" fill="none" opacity="0.25" stroke-linejoin="round" transform="rotate(240,26,26)"/>
-          <path d="M26,4 L32,16 L26,14Z" stroke="#5a3d2b" stroke-width="1" fill="none" opacity="0.15" stroke-linejoin="round" transform="rotate(300,26,26)"/>
-          <circle cx="26" cy="26" r="2" fill="#5a3d2b" opacity="0.8"/>
-        </svg>
-      </div>
+    <div class="size-item">
+      <svg viewBox="0 0 60 60" fill="none" style="height:36px">
+        <path d="M16,48 C4,38 2,18 16,8 C24,2 36,4 42,12" stroke="#c9956b" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/>
+        <path d="M44,12 C56,22 58,42 44,52 C36,58 24,56 18,48" stroke="#c9956b" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="30" cy="30" r="3" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="size-label">Nav</span>
     </div>
-    <div class="card-info">
-      <span class="concept-tag">Photography</span>
-      <h3>Aperture Bloom</h3>
-      <p>Camera aperture blades arranged like lotus petals — bridges photography and culture. The concentric circles echo a lens barrel. Geometric but not cold, thanks to the fading opacity.</p>
+    <div class="size-item">
+      <svg viewBox="0 0 60 60" fill="none" style="height:20px">
+        <path d="M16,48 C4,38 2,18 16,8 C24,2 36,4 42,12" stroke="#c9956b" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+        <path d="M44,12 C56,22 58,42 44,52 C36,58 24,56 18,48" stroke="#c9956b" stroke-width="2.2" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="30" cy="30" r="4" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="size-label">Favicon</span>
     </div>
   </div>
 
-  <!-- ═══════ CONCEPT 3: Monogram A ═══════ -->
-  <div class="concept-card">
-    <div class="card-preview">
-      <div class="logo-lockup">
-        <div class="logo-mark">
-          <svg viewBox="0 0 52 52" fill="none">
-            <!-- Elegant serif A with integrated diacritic dots -->
-            <text x="26" y="38" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-weight="300" font-size="40" fill="none" stroke="#c9956b" stroke-width="0.8" opacity="0.9" letter-spacing="0">A</text>
-            <!-- Diacritic dots sit inside the apex of the A -->
-            <circle cx="22.5" cy="14" r="1.8" fill="#c9956b" opacity="0.85"/>
-            <circle cx="29.5" cy="14" r="1.8" fill="#c9956b" opacity="0.85"/>
-            <!-- Subtle outer ring -->
-            <circle cx="26" cy="26" r="24" stroke="#c9956b" stroke-width="0.5" opacity="0.12"/>
-          </svg>
-        </div>
-        <div>
-          <div class="logo-text">
-            <span class="logo-dots"><span></span><span></span></span>
-            Aakaara
-          </div>
-          <div class="tagline">Studios &middot; New York City</div>
-        </div>
-      </div>
+  <div class="variant-strip">
+    <div class="variant variant-dark">
+      <svg viewBox="0 0 60 60" fill="none">
+        <path d="M16,48 C4,38 2,18 16,8 C24,2 36,4 42,12" stroke="#c9956b" stroke-width="1.3" stroke-linecap="round" opacity="0.9"/>
+        <path d="M44,12 C56,22 58,42 44,52 C36,58 24,56 18,48" stroke="#c9956b" stroke-width="1.3" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="30" cy="30" r="2.5" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="v-name">Aakaara</span>
     </div>
-    <div class="card-variants">
-      <div class="variant variant-dark">
-        <svg viewBox="0 0 52 52" fill="none">
-          <text x="26" y="38" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-weight="300" font-size="40" fill="none" stroke="#c9956b" stroke-width="0.8" opacity="0.9">A</text>
-          <circle cx="22.5" cy="14" r="1.8" fill="#c9956b" opacity="0.85"/>
-          <circle cx="29.5" cy="14" r="1.8" fill="#c9956b" opacity="0.85"/>
-          <circle cx="26" cy="26" r="24" stroke="#c9956b" stroke-width="0.5" opacity="0.12"/>
-        </svg>
-      </div>
-      <div class="variant variant-light">
-        <svg viewBox="0 0 52 52" fill="none">
-          <text x="26" y="38" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-weight="300" font-size="40" fill="none" stroke="#5a3d2b" stroke-width="0.8" opacity="0.9">A</text>
-          <circle cx="22.5" cy="14" r="1.8" fill="#5a3d2b" opacity="0.85"/>
-          <circle cx="29.5" cy="14" r="1.8" fill="#5a3d2b" opacity="0.85"/>
-          <circle cx="26" cy="26" r="24" stroke="#5a3d2b" stroke-width="0.5" opacity="0.12"/>
-        </svg>
-      </div>
+    <div class="variant variant-light">
+      <svg viewBox="0 0 60 60" fill="none">
+        <path d="M16,48 C4,38 2,18 16,8 C24,2 36,4 42,12" stroke="#3d2b1a" stroke-width="1.3" stroke-linecap="round" opacity="0.9"/>
+        <path d="M44,12 C56,22 58,42 44,52 C36,58 24,56 18,48" stroke="#3d2b1a" stroke-width="1.3" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="30" cy="30" r="2.5" fill="#3d2b1a" opacity="0.85"/>
+      </svg>
+      <span class="v-name">Aakaara</span>
     </div>
-    <div class="card-info">
-      <span class="concept-tag">Lettermark</span>
-      <h3>Monogram A</h3>
-      <p>Stripped to the essence — a single serif "A" from the same typeface (Cormorant Garamond) with the diacritic dots nestled in the apex. Clean, timeless, works at any size. The ghost ring adds just enough ceremony.</p>
+    <div class="variant variant-photo">
+      <svg viewBox="0 0 60 60" fill="none" style="position:relative;z-index:1">
+        <path d="M16,48 C4,38 2,18 16,8 C24,2 36,4 42,12" stroke="rgba(250,246,241,0.7)" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M44,12 C56,22 58,42 44,52 C36,58 24,56 18,48" stroke="rgba(250,246,241,0.35)" stroke-width="1.3" stroke-linecap="round"/>
+        <circle cx="30" cy="30" r="2.5" fill="rgba(250,246,241,0.6)"/>
+      </svg>
+      <span class="v-name">Aakaara</span>
     </div>
   </div>
 
-  <!-- ═══════ CONCEPT 4: Minimal Geometric Form ═══════ -->
-  <div class="concept-card">
-    <div class="card-preview">
-      <div class="logo-lockup">
-        <div class="logo-mark">
-          <svg viewBox="0 0 52 52" fill="none">
-            <!-- Overlapping circles — golden ratio inspired, "form" concept -->
-            <circle cx="20" cy="26" r="14" stroke="#c9956b" stroke-width="0.9" opacity="0.6"/>
-            <circle cx="32" cy="26" r="14" stroke="#c9956b" stroke-width="0.9" opacity="0.35"/>
-            <!-- Vesica piscis highlight (the overlap) -->
-            <clipPath id="clip-left">
-              <circle cx="20" cy="26" r="14"/>
-            </clipPath>
-            <circle cx="32" cy="26" r="14" stroke="#c9956b" stroke-width="1.2" opacity="0.9" clip-path="url(#clip-left)" fill="none"/>
-            <!-- Center dot at intersection -->
-            <circle cx="26" cy="26" r="1.8" fill="#c9956b" opacity="0.85"/>
-          </svg>
-        </div>
-        <div>
-          <div class="logo-text">
-            <span class="logo-dots"><span></span><span></span></span>
-            Aakaara
-          </div>
-          <div class="tagline">Studios &middot; New York City</div>
-        </div>
-      </div>
-    </div>
-    <div class="card-variants">
-      <div class="variant variant-dark">
-        <svg viewBox="0 0 52 52" fill="none">
-          <circle cx="20" cy="26" r="14" stroke="#c9956b" stroke-width="0.9" opacity="0.6"/>
-          <circle cx="32" cy="26" r="14" stroke="#c9956b" stroke-width="0.9" opacity="0.35"/>
-          <clipPath id="clip-left-d">
-            <circle cx="20" cy="26" r="14"/>
-          </clipPath>
-          <circle cx="32" cy="26" r="14" stroke="#c9956b" stroke-width="1.2" opacity="0.9" clip-path="url(#clip-left-d)" fill="none"/>
-          <circle cx="26" cy="26" r="1.8" fill="#c9956b" opacity="0.85"/>
-        </svg>
-      </div>
-      <div class="variant variant-light">
-        <svg viewBox="0 0 52 52" fill="none">
-          <circle cx="20" cy="26" r="14" stroke="#5a3d2b" stroke-width="0.9" opacity="0.6"/>
-          <circle cx="32" cy="26" r="14" stroke="#5a3d2b" stroke-width="0.9" opacity="0.35"/>
-          <clipPath id="clip-left-l">
-            <circle cx="20" cy="26" r="14"/>
-          </clipPath>
-          <circle cx="32" cy="26" r="14" stroke="#5a3d2b" stroke-width="1.2" opacity="0.9" clip-path="url(#clip-left-l)" fill="none"/>
-          <circle cx="26" cy="26" r="1.8" fill="#5a3d2b" opacity="0.85"/>
-        </svg>
-      </div>
-    </div>
-    <div class="card-info">
-      <span class="concept-tag">Geometric</span>
-      <h3>Vesica Piscis</h3>
-      <p>Two overlapping circles creating a vesica piscis — an ancient sacred geometry symbol meaning "creation" and "form." Directly maps to "Aakaara" (form/shape). The emphasized overlap represents the meeting of two stories. Minimal, intellectual, timeless.</p>
-    </div>
+  <div class="concept-story">
+    <p class="emotion">
+      Two arcs, orbiting the same fire &mdash; never quite completing the circle alone.<br>
+      Together they do. This is the saat phera. Seven steps around the sacred flame,<br>
+      where two people promise forever while the world holds still.
+    </p>
+    <p class="symbolism">
+      <strong>Arc one (bold)</strong> &mdash; the one who leads, the one who says "I will"<br>
+      <strong>Arc two (softer)</strong> &mdash; the one who follows, the one who says "I'm here"<br>
+      <strong>Together</strong> &mdash; a complete circle: a camera lens, a wedding ring, eternity<br>
+      <strong>The center flame</strong> &mdash; Agni, the divine witness to every vow, and the focus point<br>
+      <strong>The gaps</strong> &mdash; two individuals, never losing themselves, always choosing each other
+    </p>
   </div>
-
-  <!-- ═══════ CONCEPT 5: Refined Lotus with Ring ═══════ -->
-  <div class="concept-card">
-    <div class="card-preview">
-      <div class="logo-lockup">
-        <div class="logo-mark">
-          <svg viewBox="0 0 52 52" fill="none">
-            <!-- Clean outer ring -->
-            <circle cx="26" cy="26" r="23" stroke="#c9956b" stroke-width="0.6" opacity="0.2"/>
-            <!-- 3 petals — bolder, more symmetrical, filled subtle -->
-            <path d="M26,8 C30,8 35,14 33,24 C31,32 26,35 21,30 C16,25 17,13 22,9 C23.5,7.8 25,7.8 26,8Z" fill="#c9956b" fill-opacity="0.06" stroke="#c9956b" stroke-width="1.1" opacity="0.9"/>
-            <path d="M26,8 C30,8 35,14 33,24 C31,32 26,35 21,30 C16,25 17,13 22,9 C23.5,7.8 25,7.8 26,8Z" fill="#c9956b" fill-opacity="0.03" stroke="#c9956b" stroke-width="1.1" opacity="0.5" transform="rotate(120,26,26)"/>
-            <path d="M26,8 C30,8 35,14 33,24 C31,32 26,35 21,30 C16,25 17,13 22,9 C23.5,7.8 25,7.8 26,8Z" fill="#c9956b" fill-opacity="0.015" stroke="#c9956b" stroke-width="1.1" opacity="0.25" transform="rotate(240,26,26)"/>
-            <!-- Center dot -->
-            <circle cx="26" cy="26" r="2.2" fill="#c9956b" opacity="0.85"/>
-          </svg>
-        </div>
-        <div>
-          <div class="logo-text">
-            <span class="logo-dots"><span></span><span></span></span>
-            Aakaara
-          </div>
-          <div class="tagline">Studios &middot; New York City</div>
-        </div>
-      </div>
-    </div>
-    <div class="card-variants">
-      <div class="variant variant-dark">
-        <svg viewBox="0 0 52 52" fill="none">
-          <circle cx="26" cy="26" r="23" stroke="#c9956b" stroke-width="0.6" opacity="0.2"/>
-          <path d="M26,8 C30,8 35,14 33,24 C31,32 26,35 21,30 C16,25 17,13 22,9 C23.5,7.8 25,7.8 26,8Z" fill="#c9956b" fill-opacity="0.06" stroke="#c9956b" stroke-width="1.1" opacity="0.9"/>
-          <path d="M26,8 C30,8 35,14 33,24 C31,32 26,35 21,30 C16,25 17,13 22,9 C23.5,7.8 25,7.8 26,8Z" fill="#c9956b" fill-opacity="0.03" stroke="#c9956b" stroke-width="1.1" opacity="0.5" transform="rotate(120,26,26)"/>
-          <path d="M26,8 C30,8 35,14 33,24 C31,32 26,35 21,30 C16,25 17,13 22,9 C23.5,7.8 25,7.8 26,8Z" fill="#c9956b" fill-opacity="0.015" stroke="#c9956b" stroke-width="1.1" opacity="0.25" transform="rotate(240,26,26)"/>
-          <circle cx="26" cy="26" r="2.2" fill="#c9956b" opacity="0.85"/>
-        </svg>
-      </div>
-      <div class="variant variant-light">
-        <svg viewBox="0 0 52 52" fill="none">
-          <circle cx="26" cy="26" r="23" stroke="#5a3d2b" stroke-width="0.6" opacity="0.2"/>
-          <path d="M26,8 C30,8 35,14 33,24 C31,32 26,35 21,30 C16,25 17,13 22,9 C23.5,7.8 25,7.8 26,8Z" fill="#5a3d2b" fill-opacity="0.06" stroke="#5a3d2b" stroke-width="1.1" opacity="0.9"/>
-          <path d="M26,8 C30,8 35,14 33,24 C31,32 26,35 21,30 C16,25 17,13 22,9 C23.5,7.8 25,7.8 26,8Z" fill="#5a3d2b" fill-opacity="0.03" stroke="#5a3d2b" stroke-width="1.1" opacity="0.5" transform="rotate(120,26,26)"/>
-          <path d="M26,8 C30,8 35,14 33,24 C31,32 26,35 21,30 C16,25 17,13 22,9 C23.5,7.8 25,7.8 26,8Z" fill="#5a3d2b" fill-opacity="0.015" stroke="#5a3d2b" stroke-width="1.1" opacity="0.25" transform="rotate(240,26,26)"/>
-          <circle cx="26" cy="26" r="2.2" fill="#5a3d2b" opacity="0.85"/>
-        </svg>
-      </div>
-    </div>
-    <div class="card-info">
-      <span class="concept-tag">Refined</span>
-      <h3>Sealed Lotus</h3>
-      <p>Your current lotus concept elevated — petals enclosed in a thin ceremonial ring (like a wax seal), subtle fills give them depth instead of pure wireframe. Bolder center dot. Feels like a stamp of authenticity. Familiar DNA, more polished.</p>
-    </div>
-  </div>
-
-  <!-- ═══════ CONCEPT 6: Abstract Aakaara Script ═══════ -->
-  <div class="concept-card">
-    <div class="card-preview">
-      <div class="logo-lockup">
-        <div class="logo-mark">
-          <svg viewBox="0 0 52 52" fill="none">
-            <!-- Abstract calligraphic stroke inspired by Devanagari आ -->
-            <!-- Main vertical stroke with curve -->
-            <path d="M18,12 C18,12 16,20 18,28 C20,36 26,40 32,36" stroke="#c9956b" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
-            <!-- Top horizontal bar -->
-            <path d="M14,12 L36,12" stroke="#c9956b" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
-            <!-- Second vertical with bowl -->
-            <path d="M32,12 C32,12 30,18 32,24 Q36,32 28,34" stroke="#c9956b" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>
-            <!-- Matra (vowel mark) — the characteristic sweep -->
-            <path d="M36,12 C40,12 42,18 38,22" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
-            <!-- Dot -->
-            <circle cx="26" cy="44" r="1.8" fill="#c9956b" opacity="0.75"/>
-          </svg>
-        </div>
-        <div>
-          <div class="logo-text">
-            <span class="logo-dots"><span></span><span></span></span>
-            Aakaara
-          </div>
-          <div class="tagline">Studios &middot; New York City</div>
-        </div>
-      </div>
-    </div>
-    <div class="card-variants">
-      <div class="variant variant-dark">
-        <svg viewBox="0 0 52 52" fill="none">
-          <path d="M18,12 C18,12 16,20 18,28 C20,36 26,40 32,36" stroke="#c9956b" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
-          <path d="M14,12 L36,12" stroke="#c9956b" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
-          <path d="M32,12 C32,12 30,18 32,24 Q36,32 28,34" stroke="#c9956b" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>
-          <path d="M36,12 C40,12 42,18 38,22" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
-          <circle cx="26" cy="44" r="1.8" fill="#c9956b" opacity="0.75"/>
-        </svg>
-      </div>
-      <div class="variant variant-light">
-        <svg viewBox="0 0 52 52" fill="none">
-          <path d="M18,12 C18,12 16,20 18,28 C20,36 26,40 32,36" stroke="#5a3d2b" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
-          <path d="M14,12 L36,12" stroke="#5a3d2b" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
-          <path d="M32,12 C32,12 30,18 32,24 Q36,32 28,34" stroke="#5a3d2b" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>
-          <path d="M36,12 C40,12 42,18 38,22" stroke="#5a3d2b" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
-          <circle cx="26" cy="44" r="1.8" fill="#5a3d2b" opacity="0.75"/>
-        </svg>
-      </div>
-    </div>
-    <div class="card-info">
-      <span class="concept-tag">Heritage</span>
-      <h3>Devanagari Abstract</h3>
-      <p>Abstracted from the Devanagari character "आ" (Aa) — the first syllable of Aakaara. Not literally readable, but the shirorekha (headline bar), vertical strokes, and flowing curves carry the calligraphic spirit. A cultural signature that non-readers see as elegant abstraction.</p>
-    </div>
-  </div>
-
 </div>
+
+<div class="gold-line"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     CONCEPT 3 — DRISHTI (The Shared Gaze)
+     ═══════════════════════════════════════════════════════ -->
+<div class="concept">
+  <div class="sanskrit-label"><span class="script">दृष्टि</span></div>
+  <h2 class="concept-name">Drishti</h2>
+  <p class="concept-meaning">The Shared Gaze &mdash; Seeing Together</p>
+
+  <div class="mark-showcase">
+    <svg class="mark-large" viewBox="0 0 72 44" fill="none">
+      <!-- Upper arc — one soul reaching toward the other -->
+      <path d="M6,22 C10,6 36,0 66,22"
+            stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.85"/>
+      <!-- Lower arc — the other soul reaching back -->
+      <path d="M6,22 C10,38 36,44 66,22"
+            stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
+      <!-- Inner iris circle — the lens, the focus -->
+      <circle cx="36" cy="22" r="7" stroke="#c9956b" stroke-width="0.7" opacity="0.3"/>
+      <!-- Pupil / flame — the sacred light inside their shared gaze -->
+      <circle cx="36" cy="22" r="2.5" fill="#c9956b" opacity="0.85"/>
+      <!-- Catchlight — the photographer's reflection in the eye -->
+      <circle cx="34" cy="20" r="0.8" fill="#faf6f1" opacity="0.5"/>
+    </svg>
+  </div>
+
+  <div class="lockup-row">
+    <svg viewBox="0 0 72 44" fill="none">
+      <path d="M6,22 C10,6 36,0 66,22" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.85"/>
+      <path d="M6,22 C10,38 36,44 66,22" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
+      <circle cx="36" cy="22" r="7" stroke="#c9956b" stroke-width="0.7" opacity="0.3"/>
+      <circle cx="36" cy="22" r="2.5" fill="#c9956b" opacity="0.85"/>
+      <circle cx="34" cy="20" r="0.8" fill="#faf6f1" opacity="0.5"/>
+    </svg>
+    <div class="lockup-text">
+      <div class="name">
+        <span class="dots"><span></span><span></span></span>
+        Aakaara
+      </div>
+      <div class="tagline">Studios &middot; New York City</div>
+    </div>
+  </div>
+
+  <div class="size-strip">
+    <div class="size-item">
+      <svg viewBox="0 0 72 44" fill="none" style="height:52px">
+        <path d="M6,22 C10,6 36,0 66,22" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.85"/>
+        <path d="M6,22 C10,38 36,44 66,22" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="36" cy="22" r="7" stroke="#c9956b" stroke-width="0.7" opacity="0.3"/>
+        <circle cx="36" cy="22" r="2.5" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="size-label">Watermark</span>
+    </div>
+    <div class="size-item">
+      <svg viewBox="0 0 72 44" fill="none" style="height:30px">
+        <path d="M6,22 C10,6 36,0 66,22" stroke="#c9956b" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
+        <path d="M6,22 C10,38 36,44 66,22" stroke="#c9956b" stroke-width="1.6" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="36" cy="22" r="3" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="size-label">Nav</span>
+    </div>
+    <div class="size-item">
+      <svg viewBox="0 0 72 44" fill="none" style="height:18px">
+        <path d="M6,22 C10,6 36,0 66,22" stroke="#c9956b" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
+        <path d="M6,22 C10,38 36,44 66,22" stroke="#c9956b" stroke-width="2.5" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="36" cy="22" r="4.5" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="size-label">Favicon</span>
+    </div>
+  </div>
+
+  <div class="variant-strip">
+    <div class="variant variant-dark">
+      <svg viewBox="0 0 72 44" fill="none">
+        <path d="M6,22 C10,6 36,0 66,22" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.85"/>
+        <path d="M6,22 C10,38 36,44 66,22" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="36" cy="22" r="7" stroke="#c9956b" stroke-width="0.7" opacity="0.3"/>
+        <circle cx="36" cy="22" r="2.5" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="v-name">Aakaara</span>
+    </div>
+    <div class="variant variant-light">
+      <svg viewBox="0 0 72 44" fill="none">
+        <path d="M6,22 C10,6 36,0 66,22" stroke="#3d2b1a" stroke-width="1.2" stroke-linecap="round" opacity="0.85"/>
+        <path d="M6,22 C10,38 36,44 66,22" stroke="#3d2b1a" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="36" cy="22" r="7" stroke="#3d2b1a" stroke-width="0.7" opacity="0.3"/>
+        <circle cx="36" cy="22" r="2.5" fill="#3d2b1a" opacity="0.85"/>
+      </svg>
+      <span class="v-name">Aakaara</span>
+    </div>
+    <div class="variant variant-photo">
+      <svg viewBox="0 0 72 44" fill="none" style="position:relative;z-index:1">
+        <path d="M6,22 C10,6 36,0 66,22" stroke="rgba(250,246,241,0.7)" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M6,22 C10,38 36,44 66,22" stroke="rgba(250,246,241,0.35)" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="36" cy="22" r="7" stroke="rgba(250,246,241,0.2)" stroke-width="0.7"/>
+        <circle cx="36" cy="22" r="2.5" fill="rgba(250,246,241,0.6)"/>
+      </svg>
+      <span class="v-name">Aakaara</span>
+    </div>
+  </div>
+
+  <div class="concept-story">
+    <p class="emotion">
+      When two people truly see each other, they create a new world between them.<br>
+      That space &mdash; shaped like an eye, shaped like a lens &mdash; is the aakaara.<br>
+      The form of love made visible. And at its center, a light that only they can kindle.
+    </p>
+    <p class="symbolism">
+      <strong>The upper curve</strong> &mdash; one soul reaching across<br>
+      <strong>The lower curve</strong> &mdash; the other soul answering<br>
+      <strong>The mandorla they create</strong> &mdash; a lens, an eye, a leaf; the sacred form (aakaara) born from union<br>
+      <strong>The iris ring</strong> &mdash; the camera lens, the photographer's instrument<br>
+      <strong>The inner light</strong> &mdash; the catchlight in a lover's eye; the spark no one else can see<br>
+      <strong>The catchlight dot</strong> &mdash; the photographer's own reflection, always present, never intrusive
+    </p>
+  </div>
+</div>
+
+<div class="gold-line"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     CONCEPT 4 — BANDHAN (The Sacred Thread)
+     ═══════════════════════════════════════════════════════ -->
+<div class="concept">
+  <div class="sanskrit-label"><span class="script">बंधन</span></div>
+  <h2 class="concept-name">Bandhan</h2>
+  <p class="concept-meaning">The Sacred Thread &mdash; Two Paths, One Knot</p>
+
+  <div class="mark-showcase">
+    <svg class="mark-large" viewBox="0 0 64 64" fill="none">
+      <!-- Thread 1 — flows from lower-left to upper-right, goes BEHIND at crossing -->
+      <path d="M8,52 C16,52 22,40 27,34"
+            stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+      <path d="M37,30 C42,24 48,12 56,12"
+            stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+      <!-- Thread 2 — flows from upper-left to lower-right, goes IN FRONT at crossing -->
+      <path d="M8,12 C16,12 22,24 32,32 C42,40 48,52 56,52"
+            stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
+      <!-- The knot point — where their paths chose to intertwine -->
+      <circle cx="32" cy="32" r="2.2" fill="#c9956b" opacity="0.85"/>
+      <!-- Subtle glow around the knot -->
+      <circle cx="32" cy="32" r="7" stroke="#c9956b" stroke-width="0.4" opacity="0.12"/>
+    </svg>
+  </div>
+
+  <div class="lockup-row">
+    <svg viewBox="0 0 64 64" fill="none">
+      <path d="M8,52 C16,52 22,40 27,34" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+      <path d="M37,30 C42,24 48,12 56,12" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+      <path d="M8,12 C16,12 22,24 32,32 C42,40 48,52 56,52" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
+      <circle cx="32" cy="32" r="2.2" fill="#c9956b" opacity="0.85"/>
+      <circle cx="32" cy="32" r="7" stroke="#c9956b" stroke-width="0.4" opacity="0.12"/>
+    </svg>
+    <div class="lockup-text">
+      <div class="name">
+        <span class="dots"><span></span><span></span></span>
+        Aakaara
+      </div>
+      <div class="tagline">Studios &middot; New York City</div>
+    </div>
+  </div>
+
+  <div class="size-strip">
+    <div class="size-item">
+      <svg viewBox="0 0 64 64" fill="none" style="height:60px">
+        <path d="M8,52 C16,52 22,40 27,34" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+        <path d="M37,30 C42,24 48,12 56,12" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+        <path d="M8,12 C16,12 22,24 32,32 C42,40 48,52 56,52" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="32" cy="32" r="2.2" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="size-label">Watermark</span>
+    </div>
+    <div class="size-item">
+      <svg viewBox="0 0 64 64" fill="none" style="height:36px">
+        <path d="M8,52 C16,52 22,40 27,34" stroke="#c9956b" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/>
+        <path d="M37,30 C42,24 48,12 56,12" stroke="#c9956b" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/>
+        <path d="M8,12 C16,12 22,24 32,32 C42,40 48,52 56,52" stroke="#c9956b" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="32" cy="32" r="2.8" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="size-label">Nav</span>
+    </div>
+    <div class="size-item">
+      <svg viewBox="0 0 64 64" fill="none" style="height:20px">
+        <path d="M8,52 C16,52 22,40 27,34" stroke="#c9956b" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+        <path d="M37,30 C42,24 48,12 56,12" stroke="#c9956b" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+        <path d="M8,12 C16,12 22,24 32,32 C42,40 48,52 56,52" stroke="#c9956b" stroke-width="2.2" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="32" cy="32" r="4" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="size-label">Favicon</span>
+    </div>
+  </div>
+
+  <div class="variant-strip">
+    <div class="variant variant-dark">
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M8,52 C16,52 22,40 27,34" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+        <path d="M37,30 C42,24 48,12 56,12" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+        <path d="M8,12 C16,12 22,24 32,32 C42,40 48,52 56,52" stroke="#c9956b" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="32" cy="32" r="2.2" fill="#c9956b" opacity="0.85"/>
+      </svg>
+      <span class="v-name">Aakaara</span>
+    </div>
+    <div class="variant variant-light">
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M8,52 C16,52 22,40 27,34" stroke="#3d2b1a" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+        <path d="M37,30 C42,24 48,12 56,12" stroke="#3d2b1a" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+        <path d="M8,12 C16,12 22,24 32,32 C42,40 48,52 56,52" stroke="#3d2b1a" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="32" cy="32" r="2.2" fill="#3d2b1a" opacity="0.85"/>
+      </svg>
+      <span class="v-name">Aakaara</span>
+    </div>
+    <div class="variant variant-photo">
+      <svg viewBox="0 0 64 64" fill="none" style="position:relative;z-index:1">
+        <path d="M8,52 C16,52 22,40 27,34" stroke="rgba(250,246,241,0.7)" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M37,30 C42,24 48,12 56,12" stroke="rgba(250,246,241,0.7)" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M8,12 C16,12 22,24 32,32 C42,40 48,52 56,52" stroke="rgba(250,246,241,0.35)" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="32" cy="32" r="2.2" fill="rgba(250,246,241,0.6)"/>
+      </svg>
+      <span class="v-name">Aakaara</span>
+    </div>
+  </div>
+
+  <div class="concept-story">
+    <p class="emotion">
+      Two threads, two lives, traveling their own paths through the world.<br>
+      At one sacred point, they choose to cross, to interweave, to knot.<br>
+      The knot is gentle &mdash; not binding by force, but by choice.<br>
+      And where they cross, a diamond of light appears: the photograph.
+    </p>
+    <p class="symbolism">
+      <strong>Thread one (bold)</strong> &mdash; one life's journey, interrupted only by love<br>
+      <strong>Thread two (softer)</strong> &mdash; the other life, crossing over, choosing to stay<br>
+      <strong>The interweave</strong> &mdash; one thread passing over the other: the mangalsutra knot, the sacred binding<br>
+      <strong>The center light</strong> &mdash; the moment of union; the frame; the photograph that makes it real<br>
+      <strong>The continuing lines</strong> &mdash; life goes on together, forever changed by the crossing
+    </p>
+  </div>
+</div>
+
+<div class="gold-line"></div>
 
 <div class="page-footer">
   <p>
-    All concepts use SVG (infinitely scalable). Each can be adapted for watermarks, favicons, social media, and print.<br>
-    Pick a direction and we'll refine it further.
+    Each mark is pure SVG &mdash; infinitely scalable, from watermark to billboard.<br>
+    Pick the one that moved you, and we will refine it into your identity.
   </p>
 </div>
 
