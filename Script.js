@@ -489,9 +489,7 @@ document.querySelectorAll('.gallery-item').forEach(item => {
     var bg       = bgs[i];
 
     if (videoSrc && videoSrc !== '') {
-      /* VIDEO path — set src attribute directly and let browser handle loading */
-      vid.setAttribute('src', videoSrc);
-
+      /* VIDEO path — HLS (.m3u8) or direct file */
       function showVideo() {
         bg.className = bg.className.replace(/cs-bg-\d/, '').trim();
         vid.classList.add('cs-vid-ready');
@@ -507,8 +505,15 @@ document.querySelectorAll('.gallery-item').forEach(item => {
       /* Hard fallback — force-show after 2s regardless */
       setTimeout(function() { showVideo(); }, 2000);
 
-      /* Start loading */
-      vid.load();
+      if (videoSrc.indexOf('.m3u8') !== -1 && typeof Hls !== 'undefined' && Hls.isSupported()) {
+        var hls = new Hls();
+        hls.loadSource(videoSrc);
+        hls.attachMedia(vid);
+        hls.on(Hls.Events.MANIFEST_PARSED, function() { vid.play().catch(function(){}); });
+      } else {
+        vid.setAttribute('src', videoSrc);
+        vid.load();
+      }
 
     } else if (imgSrc && imgSrc !== '') {
       /* IMAGE path */
@@ -829,14 +834,34 @@ function filterVideos(cat, btn) {
   const vmTime   = document.getElementById('vmTimeDisplay');
   if (!modal) return;
 
+  var activeHls = null; // Track active HLS instance for cleanup
+
+  function attachHLS(videoEl, src) {
+    if (activeHls) { activeHls.destroy(); activeHls = null; }
+    if (src.includes('.m3u8')) {
+      if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+        activeHls = new Hls();
+        activeHls.loadSource(src);
+        activeHls.attachMedia(videoEl);
+        activeHls.on(Hls.Events.MANIFEST_PARSED, function() { videoEl.play().catch(function(){}); });
+      } else if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
+        // Safari native HLS
+        videoEl.src = src;
+        videoEl.play().catch(function(){});
+      }
+    } else {
+      videoEl.src = src;
+      videoEl.play().catch(function(){});
+    }
+  }
+
   function openModal(card) {
     const src = card.dataset.video;
     vmTitle.textContent = card.dataset.title || '';
     vmSub.textContent   = card.dataset.type  || '';
 
     if (src) {
-      vmVideo.src = src;
-      vmVideo.play().catch(() => {});
+      attachHLS(vmVideo, src);
       vmStage.classList.add('vm-has-video');
       // Reset controls
       if (vmPlay) vmPlay.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
@@ -851,6 +876,7 @@ function filterVideos(cat, btn) {
   function closeModal() {
     modal.classList.remove('vm-open');
     vmVideo.pause();
+    if (activeHls) { activeHls.destroy(); activeHls = null; }
     vmVideo.src = '';
     vmStage.classList.remove('vm-has-video');
     document.body.style.overflow = '';
