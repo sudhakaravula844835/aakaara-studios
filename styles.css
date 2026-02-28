@@ -502,6 +502,130 @@ nav.scrolled {
 }
 .gallery-item:hover .gi-count { opacity: 1; transform: translateY(0); }
 .gi-count svg { width: 10px; height: 10px; }
+
+/* ─── Cinematic Story Reveal (Conceptual Cards) ─── */
+.gi-badge {
+  font-size: 0.45rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--rose);
+  margin-bottom: 0.4rem; opacity: 0; transform: translateY(-5px);
+  transition: all 0.6s var(--ease);
+}
+.gallery-item:hover .gi-badge { opacity: 1; transform: translateY(0); }
+
+.gi-story {
+  font-family: var(--font-body); font-size: 0.72rem; line-height: 1.6;
+  color: rgba(250,246,241,0.7); margin-top: 0;
+  max-height: 0; opacity: 0; overflow: hidden;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  font-weight: 300; width: 100%;
+}
+.gallery-item:hover .gi-story {
+  margin-top: 0.8rem; max-height: 160px; opacity: 1; transition-delay: 0.1s;
+}
+
+/* ─── Cinematic Center Card (The Silent Archive) ─── */
+.gallery-item.gi-cinematic {
+  overflow: visible !important; /* Allow story to slide out of the box */
+}
+.gallery-item.gi-cinematic:hover {
+  z-index: 20; /* Ensure the slide-out floats above neighboring cards */
+}
+
+.gallery-item.gi-cinematic .gi-overlay {
+  align-items: center;     /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  padding: 2rem;
+  z-index: 5; /* Keep title on top of image */
+  background: none; /* Remove the black gradient overlay */
+}
+
+/* Reset default overlay animations for this specific card type */
+.gallery-item.gi-cinematic .gi-overlay > div {
+  transform: none !important;
+}
+
+.gi-cinematic .gi-title-group {
+  text-align: center;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 5;
+}
+
+.gi-cinematic .gi-title-group h4 {
+  font-size: 1.5rem; /* Larger title for center stage */
+  margin-bottom: 0.5rem;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.gi-cinematic .gi-title-group p {
+  opacity: 0.9;
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  color: var(--rose);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.gi-cinematic .gi-story-group {
+  position: absolute;
+  top: 15%;
+  bottom: 15%;
+  right: 10px; /* Start slightly inside */
+  width: 240px; /* Fixed width for the story card */
+  background: transparent;
+  border: none;
+  padding: 1rem 0 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  
+  /* Hide behind the card initially (z-index 0 is < gi-bg z-index 1) */
+  z-index: 0; 
+  opacity: 0;
+  transform: translateX(0) scale(0.95);
+  transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1); /* Slower, more elegant slide */
+  
+  /* Visual polish */
+  box-shadow: none;
+  backdrop-filter: none;
+  pointer-events: none;
+}
+
+.gi-cinematic .gi-story {
+  font-size: 0.75rem;
+  line-height: 1.7;
+  color: var(--ivory);
+  margin: 0;
+  opacity: 1;
+  max-height: none;
+  font-weight: 300;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+}
+
+/* Staggered Text Lines */
+.gi-cinematic .story-line {
+  display: block;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.8s ease;
+}
+.gallery-item.gi-cinematic:hover .story-line {
+  opacity: 1;
+  transform: translateX(0);
+}
+.gallery-item.gi-cinematic:hover .story-line:nth-child(1) { transition-delay: 0.3s; }
+.gallery-item.gi-cinematic:hover .story-line:nth-child(2) { transition-delay: 0.5s; }
+.gallery-item.gi-cinematic:hover .story-line:nth-child(3) { transition-delay: 0.7s; }
+
+/* Hover Actions */
+.gallery-item.gi-cinematic:hover .gi-title-group {
+  transform: translateX(-20px); /* Subtle shift to balance */
+}
+
+.gallery-item.gi-cinematic:hover .gi-story-group {
+  opacity: 1;
+  /* Slide out to the right, completely outside the box */
+  transform: translateX(105%) scale(1); 
+  pointer-events: auto;
+}
+
 .gi-1 .gi-bg { background-image: linear-gradient(135deg, #d4a574, #8b6f5c, #c9956b); }
 .gi-2 .gi-bg { background-image: linear-gradient(135deg, #b8967a, #7a3b4e, #dbb08a); }
 .gi-3 .gi-bg { background-image: linear-gradient(135deg, #9b7082, #c9956b, #e8c4a8); }
