@@ -713,7 +713,7 @@ nav.scrolled {
 .ethereal-carousel .vw-card.wide {
   grid-column: unset;
   aspect-ratio: 16/9;
-  width: 520px;
+  width: 760px;
 }
 
 /* ── Active card (center, offset 0) — hero floating card ── */
