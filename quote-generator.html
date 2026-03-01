@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aakaara Studios — Quote Generator</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link rel="stylesheet" href="https://use.typekit.net/uyl0arj.css">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500;600;700&display=swap');
@@ -313,7 +312,7 @@ body {
   <div class="login-box">
     <div class="logo-text">Aakaara Studios</div>
     <div class="logo-sub">QUOTE GENERATOR</div>
-    <input type="password" id="loginPass" placeholder="Enter access code" onkeydown="if(event.key==='Enter')doLogin()">
+    <input type="password" id="loginPass" placeholder="Enter access code">
     <button class="btn btn-primary btn-small" onclick="doLogin()" style="margin-top:1rem;width:100%;">ENTER</button>
     <div class="login-error" id="loginError">Incorrect access code</div>
   </div>
@@ -762,10 +761,7 @@ function formatDate(dateStr) {
   return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
-function formatQuoteDate(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-}
+const formatQuoteDate = formatDate;
 
 // ===== TOAST =====
 function showToast(msg) {
@@ -1396,11 +1392,6 @@ function downloadFromPreview() {
     showToast('PDF downloaded!');
   }
 }
-
-// ===== EMAILJS =====
-const EMAILJS_PUBLIC_KEY = '9JvEoBTlynbZjT45z';
-const EMAILJS_SERVICE_ID = 'service_x3ggfs3';
-const EMAILJS_TEMPLATE_ID = 'template_9r404u1';
 
 function sendToClient() {
   const clientEmail = document.getElementById('clientEmail').value.trim();
