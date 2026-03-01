@@ -686,12 +686,18 @@ function resetForm() {
 }
 
 // ===== PDF GENERATION =====
-function generatePDF(action = 'download') {
+async function generatePDF(action = 'download') {
  if (!document.getElementById('termsCheck').checked) {
    alert('Please check the "I approve this quote & terms" box before generating.');
    return;
  }
  try {
+  // Pre-load all custom fonts
+  const needed = ['cofo-raffine', 'Pinyon Script', 'Playfair Display', 'Cormorant Garamond'];
+  const toLoad = [];
+  document.fonts.forEach(f => { if (needed.includes(f.family)) toLoad.push(f); });
+  await Promise.all(toLoad.map(f => f.load().catch(() => {})));
+
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'pt', 'letter');
   const W = 612, H = 792;
@@ -714,16 +720,54 @@ function generatePDF(action = 'download') {
   }
 
   function watermark() {
-    doc.saveGraphicsState();
-    doc.setGState(new doc.GState({ opacity: 0.04 }));
-    doc.setFontSize(110);
-    doc.setTextColor(...GOLD);
-    doc.text('AAKAARA', W/2, H/2 + 25, { align: 'center' });
-    doc.restoreGraphicsState();
+    const cvs = document.createElement('canvas');
+    const s = 2;
+    cvs.width = W * s;
+    cvs.height = 60 * s;
+    const ctx = cvs.getContext('2d');
+    ctx.clearRect(0, 0, cvs.width, cvs.height);
+    ctx.font = '500 ' + (48 * s) + 'px "cofo-raffine", sans-serif';
+    ctx.fillStyle = 'rgba(201, 149, 107, 0.025)';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('AAKAARA', cvs.width / 2, cvs.height / 2);
+    const img = cvs.toDataURL('image/png');
+    doc.addImage(img, 'PNG', 0, H / 2 - 30, W, 60);
+  }
+
+  // Render web-font text via canvas → PDF image
+  function fancyText(text, family, weight, sizePt, color, x, y, align, style) {
+    const s = 3;
+    const px = Math.round(sizePt * 1.333);
+    const cFont = (style === 'italic' ? 'italic ' : '') + weight + ' ' + (px * s) + 'px "' + family + '", serif';
+    const tmp = document.createElement('canvas').getContext('2d');
+    tmp.font = cFont;
+    const tw = tmp.measureText(text).width;
+    const pad = 8 * s;
+    const cvs = document.createElement('canvas');
+    cvs.width = Math.ceil(tw + pad * 2);
+    cvs.height = Math.ceil(px * s * 1.7);
+    const ctx = cvs.getContext('2d');
+    ctx.font = cFont;
+    ctx.fillStyle = 'rgb(' + color.join(',') + ')';
+    ctx.textBaseline = 'alphabetic';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, cvs.width / 2, cvs.height * 0.62);
+    const pW = cvs.width / s, pH = cvs.height / s;
+    const img = cvs.toDataURL('image/png');
+    let dx = x;
+    if (align === 'center') dx = x - pW / 2;
+    else if (align === 'right') dx = x - pW;
+    doc.addImage(img, 'PNG', dx, y - pH * 0.62, pW, pH);
   }
 
   function goldLine(x1, y, x2) {
     doc.setDrawColor(...GOLD); doc.setLineWidth(0.5);
+    doc.line(x1, y, x2, y);
+  }
+
+  function thinGoldLine(x1, y, x2) {
+    doc.setDrawColor(...GOLD_DIM); doc.setLineWidth(0.3);
     doc.line(x1, y, x2, y);
   }
 
@@ -743,6 +787,14 @@ function generatePDF(action = 'download') {
     doc.text('A A K A A R A   S T U D I O S', M, 38);
     doc.text(`${String(page).padStart(2,'0')} / ${String(total).padStart(2,'0')}`, W - M, 38, { align: 'right' });
     goldLine(M, 48, W - M);
+  }
+
+  function sectionLabel(text, yPos) {
+    doc.setFontSize(5.5); doc.setTextColor(...GOLD);
+    doc.text(text, M, yPos);
+    const tw = doc.getTextWidth(text);
+    thinGoldLine(M + tw + 8, yPos - 2, W - M);
+    return yPos + 20;
   }
 
   // ── Gather Data ──
@@ -817,28 +869,23 @@ function generatePDF(action = 'download') {
 
   centeredGoldLine(185, 40);
 
-  // Main title
+  // Main title — cofo-raffine
   const titleText = eventType.replace(' Photography', '');
-  doc.setFontSize(36); doc.setTextColor(...CREAM);
-  doc.text(titleText, W/2, 240, { align: 'center' });
-  doc.setFontSize(14); doc.setTextColor(...GOLD);
-  doc.text('Photography', W/2, 262, { align: 'center' });
+  fancyText(titleText, 'cofo-raffine', 500, 36, CREAM, W/2, 240, 'center');
+  fancyText('Photography', 'cofo-raffine', 400, 14, GOLD, W/2, 264, 'center');
 
   // Subtitle
   doc.setFontSize(8); doc.setTextColor(...MUTED);
-  doc.text('Coverage Proposal', W/2, 284, { align: 'center' });
+  doc.text('Coverage Proposal', W/2, 286, { align: 'center' });
 
   centeredGoldLine(302, 30);
 
-  // Personal greeting
-  doc.setFontSize(8.5); doc.setTextColor(...CREAM);
-  doc.text('Prepared for', W/2, 330, { align: 'center' });
-  doc.setFontSize(20); doc.setTextColor(...GOLD);
-  doc.text(clientName, W/2, 356, { align: 'center' });
+  // Personal greeting — Pinyon Script + Playfair Display
+  fancyText('Prepared for', 'Pinyon Script', 400, 11, CREAM, W/2, 332, 'center');
+  fancyText(clientName, 'Playfair Display', 400, 22, GOLD, W/2, 360, 'center');
 
-  // Warm personal note
-  doc.setFontSize(7.5); doc.setTextColor(...MUTED);
-  doc.text('We are truly excited to be a part of your special day.', W/2, 384, { align: 'center' });
+  // Warm personal note — Cormorant Garamond italic
+  fancyText('We are truly excited to be a part of your special day.', 'Cormorant Garamond', 300, 8.5, MUTED, W/2, 388, 'center', 'italic');
 
   // Event details box
   let y = 420;
@@ -1148,21 +1195,21 @@ function generatePDF(action = 'download') {
   centeredGoldLine(y, 50);
   y += 30;
 
-  doc.setFontSize(10); doc.setTextColor(...CREAM);
-  doc.text(firstName + ', thank you for trusting us with your story.', W/2, y, { align: 'center' });
-  y += 22;
-  doc.setFontSize(8); doc.setTextColor(...MUTED);
-  doc.text('We don\'t just photograph moments — we preserve the emotions within them.', W/2, y, { align: 'center' });
-  y += 14;
-  doc.text('It would be an honor to be part of your celebration.', W/2, y, { align: 'center' });
+  // Thank you — Cormorant Garamond light
+  fancyText(firstName + ', thank you for trusting us with your story.', 'Cormorant Garamond', 300, 11, CREAM, W/2, y, 'center');
+  y += 24;
+  // Emotional quotes — Cormorant Garamond italic
+  fancyText('We don\u2019t just photograph moments \u2014 we preserve the emotions within them.', 'Cormorant Garamond', 300, 8.5, MUTED, W/2, y, 'center', 'italic');
+  y += 15;
+  fancyText('It would be an honor to be part of your celebration.', 'Cormorant Garamond', 300, 8.5, MUTED, W/2, y, 'center', 'italic');
 
-  y += 30;
-  doc.setFontSize(8.5); doc.setTextColor(...GOLD);
-  doc.text('With warmth,', W/2, y, { align: 'center' });
-  y += 16;
-  doc.setFontSize(11); doc.setTextColor(...CREAM);
-  doc.text('Sudhakar Avula', W/2, y, { align: 'center' });
-  y += 12;
+  y += 32;
+  // "With warmth," — Pinyon Script cursive
+  fancyText('With warmth,', 'Pinyon Script', 400, 12, GOLD, W/2, y, 'center');
+  y += 18;
+  // Signature — Playfair Display bold
+  fancyText('Sudhakar Avula', 'Playfair Display', 700, 12, CREAM, W/2, y, 'center');
+  y += 13;
   doc.setFontSize(6.5); doc.setTextColor(...MUTED);
   doc.text('Founder & Lead Photographer, Aakaara Studios', W/2, y, { align: 'center' });
 
@@ -1170,8 +1217,8 @@ function generatePDF(action = 'download') {
   y += 24;
   centeredGoldLine(y, 25);
   y += 14;
-  doc.setFontSize(7); doc.setTextColor(...GOLD_DIM);
-  doc.text('Every story deserves its own canvas.', W/2, y, { align: 'center' });
+  // Tagline — Cormorant Garamond italic
+  fancyText('Every story deserves its own canvas.', 'Cormorant Garamond', 300, 8, GOLD_DIM, W/2, y, 'center', 'italic');
 
   footerBar(false);
 
@@ -1180,6 +1227,10 @@ function generatePDF(action = 'download') {
   const safeName = clientName.replace(/[^a-zA-Z0-9]/g, '_');
   doc.save(`Aakaara_Studios_Quote_${safeName}.pdf`);
   showToast('PDF generated & downloading!');
+ } catch(e) {
+  console.error('PDF generation error:', e);
+  alert('Error generating PDF: ' + e.message);
+ }
 }
 
 // Init with one day
