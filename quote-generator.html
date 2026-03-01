@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aakaara Studios — Quote Generator</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link rel="stylesheet" href="https://use.typekit.net/uyl0arj.css">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500;600;700&display=swap');
@@ -359,10 +360,14 @@ body {
           </select>
         </div>
       </div>
-      <div class="form-row">
+      <div class="form-row three">
         <div class="form-group">
           <label class="form-label">Location</label>
           <input class="form-input" id="location" placeholder="e.g. San Antonio, Texas">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client Phone</label>
+          <input class="form-input" type="tel" id="clientPhone" placeholder="e.g. (555) 123-4567">
         </div>
         <div class="form-group">
           <label class="form-label">Quote Date</label>
@@ -375,7 +380,7 @@ body {
     <div class="section">
       <div class="section-label">Event Schedule</div>
       <div id="daysContainer"></div>
-      <button class="add-btn" onclick="addDay()">+ Add Day</button>
+      <button class="add-btn" id="addDayBtn" onclick="addDay()">+ Add Day</button>
     </div>
 
     <!-- DELIVERABLES -->
@@ -481,6 +486,12 @@ body {
           <textarea class="form-textarea" id="extraNotes" placeholder="e.g. Multi-day discount applied, package can be customized..."></textarea>
         </div>
       </div>
+      <div class="form-row single" style="margin-top:0.8rem;">
+        <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;font-size:0.8rem;color:var(--muted);">
+          <input type="checkbox" id="termsCheck" style="accent-color:var(--gold);width:16px;height:16px;">
+          I approve this quote & terms
+        </label>
+      </div>
     </div>
 
   </div>
@@ -493,7 +504,7 @@ body {
     </div>
     <div style="display:flex;gap:0.8rem;">
       <button class="btn btn-danger" onclick="resetForm()" style="font-size:0.85rem;padding:14px 20px;">Reset Form</button>
-      <button class="btn btn-primary" onclick="generatePDF()" style="font-size:0.85rem;padding:14px 32px;">
+      <button class="btn btn-primary" onclick="generatePDF('preview')" style="font-size:0.85rem;padding:14px 32px;">
         Generate PDF Quote
       </button>
     </div>
@@ -502,6 +513,21 @@ body {
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Preview Modal -->
+<div class="preview-modal" id="previewModal">
+  <div class="preview-header">
+    <span style="font-family:var(--font-display);font-size:1rem;letter-spacing:0.15em;color:var(--gold);">QUOTE PREVIEW</span>
+    <div style="display:flex;gap:0.6rem;">
+      <button class="btn btn-primary btn-small" onclick="downloadFromPreview()" style="font-size:0.75rem;padding:8px 16px;">Download PDF</button>
+      <button class="btn btn-primary btn-small" onclick="sendToClient()" style="font-size:0.75rem;padding:8px 16px;background:var(--gold);color:var(--dark);">Send to Client</button>
+      <button class="btn btn-danger btn-small" onclick="closePreviewModal()" style="font-size:0.75rem;padding:8px 16px;">Close</button>
+    </div>
+  </div>
+  <div class="preview-body">
+    <iframe class="preview-frame" id="previewFrame"></iframe>
+  </div>
+</div>
 
 <script>
 // ===== LOGIN =====
@@ -527,32 +553,79 @@ document.getElementById('quoteDate').valueAsDate = new Date();
 // ===== DAY MANAGEMENT =====
 let dayCount = 0;
 
+function isWeddingEvent() {
+  return document.getElementById('eventType').value === 'Wedding Photography';
+}
+
+function calcHoursFromTime(fromStr, toStr) {
+  if (!fromStr || !toStr) return 0;
+  const [fH, fM] = fromStr.split(':').map(Number);
+  const [tH, tM] = toStr.split(':').map(Number);
+  let diff = (tH * 60 + tM) - (fH * 60 + fM);
+  if (diff < 0) diff += 24 * 60;
+  return Math.round(diff / 30) / 2;
+}
+
+function formatTime12(timeStr) {
+  if (!timeStr) return '';
+  const [h, m] = timeStr.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const hr = h % 12 || 12;
+  return hr + ':' + String(m).padStart(2, '0') + ' ' + ampm;
+}
+
 function addDay() {
   dayCount++;
   const div = document.createElement('div');
   div.className = 'day-block';
   div.id = `day-${dayCount}`;
   const dayNum = dayCount;
-  div.innerHTML = `
-    <div class="day-header">
-      <div class="day-title">Day ${dayNum}</div>
-      <button class="day-remove" onclick="removeDay(${dayNum})">Remove</button>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Date</label>
-        <input class="form-input" type="date" data-field="date">
+  const wedding = isWeddingEvent();
+
+  if (wedding) {
+    div.innerHTML = `
+      <div class="day-header">
+        <div class="day-title">Day ${dayNum}</div>
+        <button class="day-remove" onclick="removeDay(${dayNum})">Remove</button>
       </div>
-      <div class="form-group">
-        <label class="form-label">Total Hours</label>
-        <input class="form-input" type="number" data-field="hours" placeholder="e.g. 4" oninput="recalcTotal()">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input class="form-input" type="date" data-field="date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Total Hours</label>
+          <input class="form-input" type="number" data-field="hours" placeholder="e.g. 4" oninput="recalcTotal()">
+        </div>
       </div>
-    </div>
-    <div class="events-list" id="events-${dayNum}"></div>
-    <button class="add-btn" onclick="addEvent(${dayNum})" style="margin-top:0.5rem;">+ Add Event to Day ${dayNum}</button>
-  `;
+      <div class="events-list" id="events-${dayNum}"></div>
+      <button class="add-btn" onclick="addEvent(${dayNum})" style="margin-top:0.5rem;">+ Add Event to Day ${dayNum}</button>
+    `;
+  } else {
+    div.innerHTML = `
+      <div class="day-header">
+        <div class="day-title">Event Details</div>
+      </div>
+      <div class="form-row three">
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input class="form-input" type="date" data-field="date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">From</label>
+          <input class="form-input" type="time" data-field="timeFrom" value="14:00" oninput="recalcTotal()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">To</label>
+          <input class="form-input" type="time" data-field="timeTo" value="17:00" oninput="recalcTotal()">
+        </div>
+      </div>
+      <input type="hidden" data-field="hours">
+    `;
+  }
+
   document.getElementById('daysContainer').appendChild(div);
-  addEvent(dayNum);
+  if (wedding) addEvent(dayNum);
   recalcTotal();
 }
 
@@ -585,6 +658,39 @@ function addEvent(dayNum) {
   container.appendChild(div);
 }
 
+// ===== EVENT TYPE CHANGE =====
+function handleEventTypeChange() {
+  const wedding = isWeddingEvent();
+  document.getElementById('addDayBtn').style.display = wedding ? '' : 'none';
+
+  // If switching away from Wedding with multiple days, trim to 1
+  if (!wedding) {
+    const blocks = document.querySelectorAll('.day-block');
+    if (blocks.length > 1) {
+      Array.from(blocks).slice(1).forEach(b => b.remove());
+    }
+  }
+
+  // Rebuild day blocks for the new event type
+  const currentDates = [];
+  document.querySelectorAll('.day-block').forEach(b => {
+    currentDates.push(b.querySelector('[data-field="date"]')?.value || '');
+  });
+  document.getElementById('daysContainer').innerHTML = '';
+  dayCount = 0;
+  const count = wedding ? Math.max(currentDates.length, 1) : 1;
+  for (let i = 0; i < count; i++) {
+    addDay();
+    if (currentDates[i]) {
+      const block = document.getElementById(`day-${dayCount}`);
+      const dateInput = block.querySelector('[data-field="date"]');
+      if (dateInput) dateInput.value = currentDates[i];
+    }
+  }
+  recalcTotal();
+}
+document.getElementById('eventType').addEventListener('change', handleEventTypeChange);
+
 // ===== PRICING UI =====
 function updatePricingUI() {
   const model = document.getElementById('pricingModel').value;
@@ -612,7 +718,16 @@ function recalcTotal() {
     const dayBlocks = document.querySelectorAll('.day-block');
     let totalHours = 0;
     dayBlocks.forEach((block, i) => {
-      const hrs = parseFloat(block.querySelector('[data-field="hours"]').value) || 0;
+      const timeFrom = block.querySelector('[data-field="timeFrom"]');
+      const timeTo = block.querySelector('[data-field="timeTo"]');
+      let hrs;
+      if (timeFrom && timeTo) {
+        hrs = calcHoursFromTime(timeFrom.value, timeTo.value);
+        const hiddenHrs = block.querySelector('[data-field="hours"]');
+        if (hiddenHrs) hiddenHrs.value = hrs;
+      } else {
+        hrs = parseFloat(block.querySelector('[data-field="hours"]').value) || 0;
+      }
       const dateInput = block.querySelector('[data-field="date"]');
       const dateStr = dateInput.value ? formatDate(dateInput.value) : `Day ${i+1}`;
       totalHours += hrs;
@@ -664,16 +779,20 @@ function showToast(msg) {
 function resetForm() {
   if (!confirm('Start a new quote? Current data will be cleared.')) return;
   document.getElementById('clientName').value = '';
+  document.getElementById('clientEmail').value = '';
+  document.getElementById('clientPhone').value = '';
   document.getElementById('location').value = '';
   document.getElementById('quoteDate').valueAsDate = new Date();
+  document.getElementById('eventType').value = 'Wedding Photography';
   document.getElementById('daysContainer').innerHTML = '';
   dayCount = 0;
-  addDay(); // Add Day 1 back
+  addDay();
+  handleEventTypeChange();
   document.getElementById('editedCount').value = '200';
   document.getElementById('customNotes').value = '';
   document.getElementById('extraNotes').value = '';
   document.getElementById('termsCheck').checked = false;
-  
+
   // Reset checkboxes to defaults
   document.getElementById('delEdited').checked = true;
   document.getElementById('delRaw').checked = true;
@@ -799,6 +918,8 @@ async function generatePDF(action = 'download') {
 
   // ── Gather Data ──
   const clientName = document.getElementById('clientName').value || 'Client';
+  const clientEmail = document.getElementById('clientEmail').value || '';
+  const clientPhone = document.getElementById('clientPhone').value || '';
   const eventType = document.getElementById('eventType').value;
   const location = document.getElementById('location').value || 'TBD';
   const quoteDate = document.getElementById('quoteDate').value;
@@ -825,7 +946,9 @@ async function generatePDF(action = 'download') {
       const notes = ev.querySelector('[data-field="eventNotes"]').value;
       if (name) events.push({ name, dur, notes });
     });
-    days.push({ date, hours, events });
+    const timeFrom = block.querySelector('[data-field="timeFrom"]')?.value || '';
+    const timeTo = block.querySelector('[data-field="timeTo"]')?.value || '';
+    days.push({ date, hours, events, timeFrom, timeTo });
   });
 
   const totalHours = days.reduce((s, d) => s + (parseFloat(d.hours) || 0), 0);
@@ -894,8 +1017,13 @@ async function generatePDF(action = 'download') {
   const coverDetails = [
     ['Location', location],
   ];
+  if (clientEmail) coverDetails.push(['Email', clientEmail]);
+  if (clientPhone) coverDetails.push(['Phone', clientPhone]);
   if (days.length === 1) {
     coverDetails.push(['Date', days[0].date ? formatDate(days[0].date) : 'TBD']);
+    if (days[0].timeFrom && days[0].timeTo) {
+      coverDetails.push(['Time', formatTime12(days[0].timeFrom) + ' — ' + formatTime12(days[0].timeTo)]);
+    }
     coverDetails.push(['Duration', (days[0].hours || '0') + ' Hours of Coverage']);
   } else if (days.length > 1) {
     days.forEach((d, i) => {
@@ -934,12 +1062,13 @@ async function generatePDF(action = 'download') {
   y = 68;
   y = sectionLabel('EVENT SCHEDULE', y);
 
+  const isWedding = isWeddingEvent();
   days.forEach((day, di) => {
     // Day header
     doc.setFillColor(...WARM);
     doc.roundedRect(M, y - 10, W - 2*M, 22, 3, 3, 'F');
     doc.setFontSize(6); doc.setTextColor(...GOLD);
-    doc.text(`DAY ${di+1}`, M + 14, y + 3);
+    doc.text(isWedding ? `DAY ${di+1}` : 'EVENT', M + 14, y + 3);
     doc.setFontSize(7.5); doc.setTextColor(...CREAM);
     const dayDateStr = day.date ? formatDate(day.date) : 'Date TBD';
     doc.text(dayDateStr, W/2, y + 3, { align: 'center' });
@@ -947,27 +1076,37 @@ async function generatePDF(action = 'download') {
     doc.text((day.hours || '0') + ' Hours', W - M - 14, y + 3, { align: 'right' });
     y += 28;
 
-    // Events
-    day.events.forEach(ev => {
+    if (day.timeFrom && day.timeTo) {
+      // Non-wedding: show time range
       doc.setFillColor(...SURFACE);
       doc.roundedRect(M + 8, y - 10, W - 2*M - 16, 26, 3, 3, 'F');
-
-      // Gold dot indicator
       doc.setFillColor(...GOLD);
       doc.circle(M + 18, y + 1, 2, 'F');
-
       doc.setFontSize(9); doc.setTextColor(...CREAM);
-      doc.text(ev.name, M + 26, y + 1);
-      if (ev.notes) {
-        doc.setFontSize(6.5); doc.setTextColor(...MUTED);
-        doc.text(ev.notes, M + 26, y + 11);
-      }
-      if (ev.dur) {
-        doc.setFontSize(7.5); doc.setTextColor(...GOLD);
-        doc.text(ev.dur, W - M - 22, y + 1, { align: 'right' });
-      }
+      doc.text(eventType, M + 26, y + 1);
+      doc.setFontSize(7.5); doc.setTextColor(...GOLD);
+      doc.text(formatTime12(day.timeFrom) + '  —  ' + formatTime12(day.timeTo), W - M - 22, y + 1, { align: 'right' });
       y += 30;
-    });
+    } else {
+      // Wedding: show individual events
+      day.events.forEach(ev => {
+        doc.setFillColor(...SURFACE);
+        doc.roundedRect(M + 8, y - 10, W - 2*M - 16, 26, 3, 3, 'F');
+        doc.setFillColor(...GOLD);
+        doc.circle(M + 18, y + 1, 2, 'F');
+        doc.setFontSize(9); doc.setTextColor(...CREAM);
+        doc.text(ev.name, M + 26, y + 1);
+        if (ev.notes) {
+          doc.setFontSize(6.5); doc.setTextColor(...MUTED);
+          doc.text(ev.notes, M + 26, y + 11);
+        }
+        if (ev.dur) {
+          doc.setFontSize(7.5); doc.setTextColor(...GOLD);
+          doc.text(ev.dur, W - M - 22, y + 1, { align: 'right' });
+        }
+        y += 30;
+      });
+    }
     y += 6;
   });
 
@@ -1223,18 +1362,79 @@ async function generatePDF(action = 'download') {
   footerBar(false);
 
 
-  // ── Save ──
+  // ── Output ──
   const safeName = clientName.replace(/[^a-zA-Z0-9]/g, '_');
-  doc.save(`Aakaara_Studios_Quote_${safeName}.pdf`);
-  showToast('PDF generated & downloading!');
+  window._currentPdfDoc = doc;
+  window._currentPdfName = `Aakaara_Studios_Quote_${safeName}.pdf`;
+
+  if (action === 'preview') {
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    document.getElementById('previewFrame').src = url;
+    document.getElementById('previewModal').classList.add('show');
+    showToast('Preview ready!');
+  } else {
+    doc.save(window._currentPdfName);
+    showToast('PDF generated & downloading!');
+  }
  } catch(e) {
   console.error('PDF generation error:', e);
   alert('Error generating PDF: ' + e.message);
  }
 }
 
-// Init with one day
+function closePreviewModal() {
+  const modal = document.getElementById('previewModal');
+  modal.classList.remove('show');
+  const frame = document.getElementById('previewFrame');
+  if (frame.src) { URL.revokeObjectURL(frame.src); frame.src = ''; }
+}
+
+function downloadFromPreview() {
+  if (window._currentPdfDoc) {
+    window._currentPdfDoc.save(window._currentPdfName || 'Aakaara_Quote.pdf');
+    showToast('PDF downloaded!');
+  }
+}
+
+// ===== EMAILJS =====
+const EMAILJS_PUBLIC_KEY = '9JvEoBTlynbZjT45z';
+const EMAILJS_SERVICE_ID = 'service_x3ggfs3';
+const EMAILJS_TEMPLATE_ID = 'template_9r404u1';
+
+function sendToClient() {
+  const clientEmail = document.getElementById('clientEmail').value.trim();
+  const clientName = document.getElementById('clientName').value.trim() || 'Client';
+  const eventType = document.getElementById('eventType').value;
+
+  if (!clientEmail) {
+    alert('Please enter the client\'s email address before sending.');
+    return;
+  }
+
+  if (!window._currentPdfDoc) {
+    alert('Please generate a preview first.');
+    return;
+  }
+
+  // Download the PDF first
+  window._currentPdfDoc.save(window._currentPdfName || 'Aakaara_Quote.pdf');
+
+  // Build email content
+  const subject = encodeURIComponent(`Aakaara Studios — ${eventType} Proposal for ${clientName}`);
+  const body = encodeURIComponent(`Hi ${clientName.split(' ')[0]},\n\nThank you for considering Aakaara Studios for your upcoming ${eventType.replace(' Photography', '').toLowerCase()}. Please find your personalized proposal attached.\n\nWe would love to be part of your special day! Feel free to review the details and reach out with any questions.\n\nWith warmth,\nSudhakar Avula\nAakaara Studios\ninfo@aakaarastudiosnyc.com`);
+
+  // Open Gmail compose with pre-filled fields
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(clientEmail)}&su=${subject}&body=${body}`;
+  window.open(gmailUrl, '_blank');
+
+  showToast('PDF downloaded! Gmail compose opened — just attach the PDF and send.');
+  closePreviewModal();
+}
+
+// Init
 addDay();
+handleEventTypeChange();
 recalcTotal();
 
 // Listen for changes
