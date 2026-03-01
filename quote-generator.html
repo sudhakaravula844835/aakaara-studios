@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aakaara Studios — Quote Generator</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <link rel="stylesheet" href="https://use.typekit.net/uyl0arj.css">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500;600;700&display=swap');
@@ -293,6 +296,27 @@ body {
 .preview-body { flex: 1; width: 100%; height: 100%; overflow: hidden; }
 .preview-frame { width: 100%; height: 100%; border: none; }
 
+/* === CUSTOM TIME PICKER (Flatpickr) === */
+.flatpickr-calendar {
+  background: var(--surface2) !important;
+  border: 1px solid var(--gold-border) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+  font-family: var(--font-body) !important;
+  border-radius: 8px !important;
+}
+.flatpickr-time {
+  background: var(--surface2) !important;
+  border-top: 1px solid rgba(255,255,255,0.05) !important;
+}
+.flatpickr-time input {
+  color: var(--cream) !important;
+  font-family: var(--font-display) !important;
+  font-size: 1.1rem !important;
+}
+.flatpickr-time .flatpickr-am-pm { color: var(--gold) !important; }
+.numInputWrapper span.arrowUp:after { border-bottom-color: var(--gold) !important; }
+.numInputWrapper span.arrowDown:after { border-top-color: var(--gold) !important; }
+
 /* Responsive */
 @media (max-width: 600px) {
   .form-row { grid-template-columns: 1fr; }
@@ -312,7 +336,7 @@ body {
   <div class="login-box">
     <div class="logo-text">Aakaara Studios</div>
     <div class="logo-sub">QUOTE GENERATOR</div>
-    <input type="password" id="loginPass" placeholder="Enter access code">
+    <input type="password" id="loginPass" placeholder="Enter access code" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="btn btn-primary btn-small" onclick="doLogin()" style="margin-top:1rem;width:100%;">ENTER</button>
     <div class="login-error" id="loginError">Incorrect access code</div>
   </div>
@@ -612,11 +636,11 @@ function addDay() {
         </div>
         <div class="form-group">
           <label class="form-label">From</label>
-          <input class="form-input" type="time" data-field="timeFrom" value="14:00" oninput="recalcTotal()">
+          <input class="form-input time-picker" data-field="timeFrom" value="14:00">
         </div>
         <div class="form-group">
           <label class="form-label">To</label>
-          <input class="form-input" type="time" data-field="timeTo" value="17:00" oninput="recalcTotal()">
+          <input class="form-input time-picker" data-field="timeTo" value="17:00">
         </div>
       </div>
       <input type="hidden" data-field="hours">
@@ -624,6 +648,18 @@ function addDay() {
   }
 
   document.getElementById('daysContainer').appendChild(div);
+  
+  // Initialize Cinematic Time Picker
+  const times = div.querySelectorAll('.time-picker');
+  if (times.length) {
+    flatpickr(times, {
+      enableTime: true, noCalendar: true, dateFormat: "H:i", 
+      minuteIncrement: 15,
+      altInput: true, altFormat: "h:i K", // Shows "2:00 PM" but saves "14:00"
+      onChange: function() { recalcTotal(); }
+    });
+  }
+
   if (wedding) addEvent(dayNum);
   recalcTotal();
 }
@@ -761,7 +797,10 @@ function formatDate(dateStr) {
   return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
-const formatQuoteDate = formatDate;
+function formatQuoteDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
 
 // ===== TOAST =====
 function showToast(msg) {
@@ -1392,6 +1431,11 @@ function downloadFromPreview() {
     showToast('PDF downloaded!');
   }
 }
+
+// ===== EMAILJS =====
+const EMAILJS_PUBLIC_KEY = '9JvEoBTlynbZjT45z';
+const EMAILJS_SERVICE_ID = 'service_x3ggfs3';
+const EMAILJS_TEMPLATE_ID = 'template_9r404u1';
 
 function sendToClient() {
   const clientEmail = document.getElementById('clientEmail').value.trim();
