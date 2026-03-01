@@ -313,6 +313,7 @@ body {
     <div class="logo-text">Aakaara Studios</div>
     <div class="logo-sub">QUOTE GENERATOR</div>
     <input type="password" id="loginPass" placeholder="Enter access code" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn btn-primary btn-small" onclick="doLogin()" style="margin-top:1rem;width:100%;">ENTER</button>
     <div class="login-error" id="loginError">Incorrect access code</div>
   </div>
 </div>
@@ -507,7 +508,7 @@ body {
 const ACCESS_CODE = 'aakaara2026';
 
 function doLogin() {
-  const val = document.getElementById('loginPass').value;
+  const val = document.getElementById('loginPass').value.trim();
   if (val === ACCESS_CODE) {
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('app').classList.add('visible');
