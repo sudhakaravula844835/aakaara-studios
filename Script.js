@@ -359,12 +359,15 @@ document.querySelectorAll('.gallery-item').forEach(item => {
   function closeSwGallery() {
     if (!swIsOpen) return;
     gallery.classList.add('sw-gallery-exit');
-    gallery.addEventListener('animationend', function () {
-      gallery.classList.remove('sw-open', 'sw-gallery-exit', 'sw-static');
+    function cleanup() {
+      gallery.classList.remove('sw-open', 'sw-gallery-enter', 'sw-gallery-exit', 'sw-static');
       galleryImg.style.backgroundImage = '';
       if (galleryStrip) galleryStrip.innerHTML = '';
       swIsOpen = false;
-    }, { once: true });
+    }
+    gallery.addEventListener('animationend', cleanup, { once: true });
+    // Fallback if animationend never fires
+    setTimeout(cleanup, 600);
     document.body.style.overflow = '';
     stopParallax();
   }
@@ -1317,8 +1320,8 @@ class EtherealCarousel {
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
       // Skip if gallery viewer or video modal is open
-      const galleryOpen = document.getElementById('swGallery')?.classList.contains('open');
-      const modalOpen = document.getElementById('videoModal')?.classList.contains('active');
+      const galleryOpen = document.getElementById('swGallery')?.classList.contains('sw-open');
+      const modalOpen = document.getElementById('videoModal')?.classList.contains('vm-open');
       if (galleryOpen || modalOpen) return;
       // Only respond if this carousel is in viewport
       const rect = this.container.getBoundingClientRect();
