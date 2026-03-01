@@ -165,7 +165,6 @@ nav.scrolled {
 }
 .hero-mark { margin-bottom: 2.5rem; }
 .hero-mark svg { width: 90px; height: 90px; }
-@keyframes subtleSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .hero-mark .outer-ring { transform-origin: center; }
 /* ─── FIX 5: 3D Floating Title (CSS layer) ────────────────────────────────
    Wrapper handles the gentle vertical float via CSS keyframe.
@@ -272,11 +271,6 @@ nav.scrolled {
   background: transparent !important;
   box-shadow: none !important;
 }
-/* Audience filter highlight */
-.portfolio-filters .filter-audience {
-  border-color: rgba(201,149,107,0.18);
-  color: rgba(250,246,241,0.55);
-}
 /* Service card tags */
 .sov-tags {
   display: flex;
@@ -315,6 +309,10 @@ nav.scrolled {
 
 .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); }
 .reveal.visible { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { transition: none; opacity: 1; transform: none; }
+}
+
 @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ═══════════════════════════════════════════════════════════
@@ -447,8 +445,6 @@ nav.scrolled {
   z-index: 1;
 }
 .gallery-item:hover .gi-bg { transform: scale(1.05); filter: grayscale(0%) brightness(1) contrast(1); }
-.gallery-item .gi-color { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 1s var(--ease); z-index: 0; }
-.gallery-item:hover .gi-color { transform: scale(1.04); }
 /* ─── FIX 1: View Pill ─────────────────────────────────────────────────────
    Root cause of lag: setting top/left every rAF frame triggers layout reflow
    (browser must recalculate geometry for every pixel change). Also, CSS
@@ -504,13 +500,6 @@ nav.scrolled {
 .gi-count svg { width: 10px; height: 10px; }
 
 /* ─── Cinematic Story Reveal (Conceptual Cards) ─── */
-.gi-badge {
-  font-size: 0.45rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--rose);
-  margin-bottom: 0.4rem; opacity: 0; transform: translateY(-5px);
-  transition: all 0.6s var(--ease);
-}
-.gallery-item:hover .gi-badge { opacity: 1; transform: translateY(0); }
-
 .gi-story {
   font-family: var(--font-body); font-size: 0.72rem; line-height: 1.6;
   color: rgba(250,246,241,0.7); margin-top: 0;
@@ -1670,8 +1659,9 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .ec-nav { width: 38px; height: 38px; }
   .ec-prev { left: 0.5rem; }
   .ec-next { right: 0.5rem; }
+
+  .nav-links.show { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: rgba(9,8,11,0.95); backdrop-filter: blur(20px); padding: 2rem; gap: 1.5rem; max-height: 85vh; overflow-y: auto; }
 }
-.nav-links.show { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: rgba(9,8,11,0.95); backdrop-filter: blur(20px); padding: 2rem; gap: 1.5rem; max-height: 85vh; overflow-y: auto; }
 
 /* ═══════════════════════════════════════════════════════════
    FIX 4 — VIDEO WORKS SECTION
@@ -1930,11 +1920,16 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .ec-nav { width: 42px; height: 42px; opacity: 0.85; }
   .ec-nav:hover { transform: translateY(-50%); }
 }
+
+/* Testimonials — placed after responsive block so mobile override (768px) takes effect */
 .testimonials-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
   margin-top: 3rem;
+}
+@media (max-width: 768px) {
+  .testimonials-grid { grid-template-columns: 1fr; }
 }
 
 .testimonial-card {
