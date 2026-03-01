@@ -6,9 +6,8 @@
 <title>Aakaara Studios — Quote Generator</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="stylesheet" href="https://use.typekit.net/uyl0arj.css">
-<link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
 :root {
   --bg: #0a0a0a;
@@ -278,6 +277,22 @@ body {
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+/* Preview Modal */
+.preview-modal {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.95);
+  display: flex; flex-direction: column;
+  opacity: 0; visibility: hidden; transition: all 0.3s;
+}
+.preview-modal.show { opacity: 1; visibility: visible; }
+.preview-header {
+  padding: 1rem 2rem; background: var(--surface);
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.preview-body { flex: 1; width: 100%; height: 100%; overflow: hidden; }
+.preview-frame { width: 100%; height: 100%; border: none; }
+
 /* Responsive */
 @media (max-width: 600px) {
   .form-row { grid-template-columns: 1fr; }
@@ -327,6 +342,10 @@ body {
           <input class="form-input" id="clientName" placeholder="e.g. Asrita & Varun">
         </div>
         <div class="form-group">
+          <label class="form-label">Client Email</label>
+          <input class="form-input" type="email" id="clientEmail" placeholder="client@example.com">
+        </div>
+        <div class="form-group">
           <label class="form-label">Event Type</label>
           <select class="form-select" id="eventType">
             <option value="Wedding Photography">Wedding</option>
@@ -334,6 +353,7 @@ body {
             <option value="Gender Reveal Photography">Gender Reveal</option>
             <option value="Birthday Photography">Birthday</option>
             <option value="Baby Shower Photography">Baby Shower</option>
+            <option value="House Warming Photography">House Warming</option>
             <option value="Event Photography">Other Event</option>
           </select>
         </div>
@@ -472,8 +492,8 @@ body {
     </div>
     <div style="display:flex;gap:0.8rem;">
       <button class="btn btn-danger" onclick="resetForm()" style="font-size:0.85rem;padding:14px 20px;">Reset Form</button>
-      <button class="btn btn-primary" onclick="generatePDF()" style="font-size:0.85rem;padding:14px 32px;">
-        Generate PDF Quote
+      <button class="btn btn-primary" onclick="generatePDF('preview')" style="font-size:0.85rem;padding:14px 32px;">
+        Preview Quote
       </button>
     </div>
   </div>
@@ -481,6 +501,18 @@ body {
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- PREVIEW MODAL -->
+<div class="preview-modal" id="previewModal">
+  <div class="preview-header">
+    <div style="color:var(--gold);font-family:var(--font-display);letter-spacing:0.1em;">QUOTE PREVIEW</div>
+    <div style="display:flex;gap:1rem;">
+      <button class="btn btn-ghost btn-small" onclick="closePreview()">Close</button>
+      <button class="btn btn-primary btn-small" onclick="sendQuoteEmail()">Confirm & Send Email</button>
+    </div>
+  </div>
+  <div class="preview-body"><iframe id="previewFrame" class="preview-frame"></iframe></div>
+</div>
 
 <script>
 // ===== LOGIN =====
@@ -643,29 +675,34 @@ function showToast(msg) {
 function resetForm() {
   if (!confirm('Start a new quote? Current data will be cleared.')) return;
   document.getElementById('clientName').value = '';
+  document.getElementById('clientEmail').value = '';
   document.getElementById('location').value = '';
   document.getElementById('quoteDate').valueAsDate = new Date();
   document.getElementById('daysContainer').innerHTML = '';
   dayCount = 0;
+  addDay(); // Add Day 1 back
   document.getElementById('editedCount').value = '200';
   document.getElementById('customNotes').value = '';
   document.getElementById('extraNotes').value = '';
+  
+  // Reset checkboxes to defaults
+  document.getElementById('delEdited').checked = true;
+  document.getElementById('delRaw').checked = true;
+  document.getElementById('delGallery').checked = true;
+  const optional = ['delSneakPeek', 'delTeaser', 'delDoc', 'delTraditional', 'delHighlight', 'delDrone', 'delLive', 'delSecondShooter'];
+  optional.forEach(id => { if(document.getElementById(id)) document.getElementById(id).checked = false; });
+
   recalcTotal();
   showToast('Form reset');
 }
 
 // ===== PDF GENERATION =====
-async function generatePDF() {
-  // Pre-load all custom fonts
-  const needed = ['cofo-raffine', 'Pinyon Script', 'Playfair Display', 'Cormorant Garamond'];
-  const toLoad = [];
-  document.fonts.forEach(f => { if (needed.includes(f.family)) toLoad.push(f); });
-  await Promise.all(toLoad.map(f => f.load().catch(() => {})));
-
+function generatePDF(action = 'download') {
+ try {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'pt', 'letter');
   const W = 612, H = 792;
-  const M = 60;
+  const M = 55;
 
   // Colors
   const GOLD = [201, 149, 107];
@@ -674,99 +711,26 @@ async function generatePDF() {
   const MUTED = [138, 133, 128];
   const DARK_BG = [10, 10, 10];
   const SURFACE = [17, 17, 17];
-  const SURFACE2 = [22, 20, 18];
-  const WARM = [30, 26, 22];
 
-  // ── Helpers ──
-  function pageBg() {
-    doc.setFillColor(...DARK_BG);
-    doc.rect(0, 0, W, H, 'F');
-  }
-
-  function watermark() {
-    const cvs = document.createElement('canvas');
-    const s = 2;
-    cvs.width = W * s;
-    cvs.height = 60 * s;
-    const ctx = cvs.getContext('2d');
-    ctx.clearRect(0, 0, cvs.width, cvs.height);
-    ctx.font = '500 ' + (48 * s) + 'px "cofo-raffine", sans-serif';
-    ctx.fillStyle = 'rgba(201, 149, 107, 0.025)';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('AAKAARA', cvs.width / 2, cvs.height / 2);
-    const img = cvs.toDataURL('image/png');
-    doc.addImage(img, 'PNG', 0, H / 2 - 30, W, 60);
-  }
-
-  // Render web-font text via canvas → PDF image
-  function fancyText(text, family, weight, sizePt, color, x, y, align, style) {
-    const s = 3;
-    const px = Math.round(sizePt * 1.333);
-    const cFont = (style === 'italic' ? 'italic ' : '') + weight + ' ' + (px * s) + 'px "' + family + '", serif';
-    const tmp = document.createElement('canvas').getContext('2d');
-    tmp.font = cFont;
-    const tw = tmp.measureText(text).width;
-    const pad = 8 * s;
-    const cvs = document.createElement('canvas');
-    cvs.width = Math.ceil(tw + pad * 2);
-    cvs.height = Math.ceil(px * s * 1.7);
-    const ctx = cvs.getContext('2d');
-    ctx.font = cFont;
-    ctx.fillStyle = 'rgb(' + color.join(',') + ')';
-    ctx.textBaseline = 'alphabetic';
-    ctx.textAlign = 'center';
-    ctx.fillText(text, cvs.width / 2, cvs.height * 0.62);
-    const pW = cvs.width / s, pH = cvs.height / s;
-    const img = cvs.toDataURL('image/png');
-    let dx = x;
-    if (align === 'center') dx = x - pW / 2;
-    else if (align === 'right') dx = x - pW;
-    doc.addImage(img, 'PNG', dx, y - pH * 0.62, pW, pH);
-  }
-
-  function goldLine(x1, y, x2) {
+  // Helpers
+  function pageBg() { doc.setFillColor(...DARK_BG); doc.rect(0, 0, W, H, 'F'); }
+  function goldLine(x1, y, x2, alpha) {
     doc.setDrawColor(...GOLD); doc.setLineWidth(0.5);
     doc.line(x1, y, x2, y);
   }
-
-  function thinGoldLine(x1, y, x2) {
-    doc.setDrawColor(...GOLD_DIM); doc.setLineWidth(0.3);
-    doc.line(x1, y, x2, y);
+  function footerBar() {
+    goldLine(M, H - 70, W - M);
+    doc.setFontSize(6); doc.setTextColor(...MUTED);
+    doc.text('aakaarastudiosnyc.com  |  avala.sudhakar@gmail.com  |  +1 (475) 332-2020', W/2, H - 52, { align: 'center' });
   }
-
-  function centeredGoldLine(y, halfWidth) {
-    doc.setDrawColor(...GOLD); doc.setLineWidth(0.4);
-    doc.line(W/2 - halfWidth, y, W/2 + halfWidth, y);
-  }
-
-  function footerBar(showTagline) {
-    thinGoldLine(M, H - 75, W - M);
-    if (showTagline) {
-      doc.setFontSize(7); doc.setTextColor(...GOLD_DIM);
-      doc.text('Every story deserves its own canvas.', W/2, H - 58, { align: 'center' });
-    }
-    doc.setFontSize(5.5); doc.setTextColor(...MUTED);
-    doc.text('aakaarastudiosnyc.com   |   avala.sudhakar@gmail.com   |   +1 (475) 332-2020', W/2, H - 42, { align: 'center' });
-  }
-
   function headerBar(page, total) {
-    doc.setFontSize(5.5); doc.setTextColor(...GOLD);
-    doc.text('A A K A A R A   S T U D I O S', M, 35);
-    doc.setTextColor(...MUTED);
-    doc.text(`${String(page).padStart(2,'0')} / ${String(total).padStart(2,'0')}`, W - M, 35, { align: 'right' });
-    thinGoldLine(M, 44, W - M);
+    doc.setFontSize(6); doc.setTextColor(...GOLD);
+    doc.text('A A K A A R A   S T U D I O S', M, 38);
+    doc.text(`${String(page).padStart(2,'0')} / ${String(total).padStart(2,'0')}`, W - M, 38, { align: 'right' });
+    goldLine(M, 48, W - M);
   }
 
-  function sectionLabel(text, yPos) {
-    doc.setFontSize(5.5); doc.setTextColor(...GOLD);
-    doc.text(text, M, yPos);
-    const tw = doc.getTextWidth(text);
-    thinGoldLine(M + tw + 8, yPos - 2, W - M);
-    return yPos + 20;
-  }
-
-  // ── Gather Data ──
+  // Gather data
   const clientName = document.getElementById('clientName').value || 'Client';
   const eventType = document.getElementById('eventType').value;
   const location = document.getElementById('location').value || 'TBD';
@@ -783,6 +747,7 @@ async function generatePDF() {
   const deposit = document.getElementById('deposit').value;
   const validity = document.getElementById('validity').value || '30 days';
 
+  // Gather days
   const days = [];
   document.querySelectorAll('.day-block').forEach((block, i) => {
     const date = block.querySelector('[data-field="date"]').value;
@@ -800,72 +765,64 @@ async function generatePDF() {
   const totalHours = days.reduce((s, d) => s + (parseFloat(d.hours) || 0), 0);
   const totalPages = 4;
 
-  // Deliverable items
-  const delItems = [];
-  if (document.getElementById('delEdited').checked) delItems.push(['Edited Photos', editedCount + ' professionally graded images']);
-  if (document.getElementById('delRaw').checked) delItems.push(['Raw Images', 'Complete gallery delivered']);
-  if (document.getElementById('delGallery').checked) delItems.push(['Online Gallery', 'Private link for viewing & downloads']);
-  if (document.getElementById('delSneakPeek').checked) delItems.push(['Sneak Peek Reels', 'Same-day delivery (within 24hrs)']);
-  if (document.getElementById('delTeaser').checked) delItems.push(['Wedding Teaser', '2-3 minute cinematic highlight reel']);
-  if (document.getElementById('delDoc').checked) delItems.push(['Documentary Film', '10 min with couple & family interviews']);
-  if (document.getElementById('delTraditional').checked) delItems.push(['Traditional Video', 'Full-length ceremony coverage']);
-  if (document.getElementById('delHighlight').checked) delItems.push(['Highlight Video', '2-3 minute cinematic edit']);
-  if (document.getElementById('delDrone').checked) delItems.push(['Drone Footage', 'Aerial coverage where permitted']);
-  if (document.getElementById('delLive').checked) delItems.push(['Live Coverage', 'Ceremony livestream (venue internet required)']);
-  if (document.getElementById('delSecondShooter').checked) delItems.push(['Second Photographer', 'Full dual-perspective coverage']);
+  // Deliverables
+  const dels = [];
+  if (document.getElementById('delEdited').checked) dels.push('Edited photos with professional color grading');
+  if (document.getElementById('delRaw').checked) dels.push('All raw images delivered');
+  if (document.getElementById('delGallery').checked) dels.push('Online gallery for viewing and downloads');
+  if (document.getElementById('delSneakPeek').checked) dels.push('Same-day sneak peek reels (24hr delivery)');
+  if (document.getElementById('delTeaser').checked) dels.push('Wedding Teaser (2-3 minutes) — all event highlights');
+  if (document.getElementById('delDoc').checked) dels.push('Documentary Film (10 min) — interviews with couple, parents & friends');
+  if (document.getElementById('delTraditional').checked) dels.push('Traditional Video Coverage (Full length)');
+  if (document.getElementById('delHighlight').checked) dels.push('Highlight Video (2-3 minutes)');
+  if (document.getElementById('delDrone').checked) dels.push('Drone Footage — included where permitted');
+  if (document.getElementById('delLive').checked) dels.push('Live Wedding Coverage (venue must provide internet)');
+  if (document.getElementById('delSecondShooter').checked) dels.push('Second Photographer (Full Coverage)');
 
-  const firstName = clientName.split('&')[0].split(' ')[0].trim();
-
-
-  // ═══════════════════════════════════════════════════════
-  //  PAGE 1 — COVER
-  // ═══════════════════════════════════════════════════════
+  // ===== PAGE 1 — COVER =====
   pageBg();
-  watermark();
+  goldLine(M, 45, W - M);
 
-  // Top gold accent line
-  goldLine(M, 50, W - M);
+  // Logo text
+  doc.setFontSize(8); doc.setTextColor(...GOLD);
+  doc.text('A A K A A R A   S T U D I O S', W/2, 145, { align: 'center' });
+  doc.setFontSize(6); doc.setTextColor(...MUTED);
+  doc.text('N E W   Y O R K   C I T Y', W/2, 158, { align: 'center' });
 
-  // Brand mark area
+  // Title
+  const titleWords = eventType.replace(' Photography', '').split(' ');
+  doc.setFont('times', 'normal');
+  doc.setFontSize(32); doc.setTextColor(...CREAM);
+  doc.text(titleWords.join(' '), W/2, 240, { align: 'center' });
+  doc.text('Photography', W/2, 275, { align: 'center' });
+
+  doc.setFont('helvetica', 'normal');
   doc.setFontSize(9); doc.setTextColor(...GOLD);
-  doc.text('A A K A A R A', W/2, 130, { align: 'center' });
-  doc.setFontSize(5.5); doc.setTextColor(...MUTED);
-  doc.text('S T U D I O S   ·   N E W   Y O R K   C I T Y', W/2, 144, { align: 'center' });
+  doc.text('— Professional Coverage Proposal —', W/2, 303, { align: 'center' });
+  goldLine(W/2 - 55, 322, W/2 + 55);
 
-  // Tagline
-  doc.setFontSize(7.5); doc.setTextColor(...GOLD_DIM);
-  doc.text('Every story deserves its own canvas.', W/2, 168, { align: 'center' });
+  // Prepared For
+  doc.setFont('times', 'italic');
+  doc.setFontSize(10); doc.setTextColor(...CREAM);
+  doc.text('Prepared for', W/2, 350, { align: 'center' });
+  doc.setFont('times', 'normal');
+  doc.setFontSize(22); doc.setTextColor(...GOLD);
+  doc.text(clientName, W/2, 380, { align: 'center' });
 
-  centeredGoldLine(185, 40);
-
-  // Main title — cofo-raffine
-  const titleText = eventType.replace(' Photography', '');
-  fancyText(titleText, 'cofo-raffine', 500, 36, CREAM, W/2, 240, 'center');
-  fancyText('Photography', 'cofo-raffine', 400, 14, GOLD, W/2, 264, 'center');
-
-  // Subtitle
-  doc.setFontSize(8); doc.setTextColor(...MUTED);
-  doc.text('Coverage Proposal', W/2, 286, { align: 'center' });
-
-  centeredGoldLine(302, 30);
-
-  // Personal greeting — Pinyon Script cursive + Playfair Display
-  fancyText('Prepared for', 'Pinyon Script', 400, 11, CREAM, W/2, 332, 'center');
-  fancyText(clientName, 'Playfair Display', 400, 22, GOLD, W/2, 360, 'center');
-
-  // Warm personal note — Cormorant Garamond italic
-  fancyText('We are truly excited to be a part of your special day.', 'Cormorant Garamond', 300, 8.5, MUTED, W/2, 388, 'center', 'italic');
-
-  // Event details box
+  // Event details on cover
   let y = 420;
-  y = sectionLabel('EVENT DETAILS', y);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6); doc.setTextColor(...GOLD);
+  doc.text('EVENT DETAILS', M, y);
+  y += 22;
 
   const coverDetails = [
+    ['Client', clientName],
     ['Location', location],
   ];
   if (days.length === 1) {
     coverDetails.push(['Date', days[0].date ? formatDate(days[0].date) : 'TBD']);
-    coverDetails.push(['Duration', (days[0].hours || '0') + ' Hours of Coverage']);
+    coverDetails.push(['Duration', (days[0].hours || '0') + ' Hours']);
   } else if (days.length > 1) {
     days.forEach((d, i) => {
       coverDetails.push([`Day ${i+1}`, (d.date ? formatDate(d.date) : 'TBD') + '  —  ' + (d.hours || '0') + ' Hours']);
@@ -874,268 +831,225 @@ async function generatePDF() {
   }
 
   coverDetails.forEach(([label, value]) => {
-    doc.setFillColor(...SURFACE);
-    doc.roundedRect(M, y - 10, W - 2*M, 22, 3, 3, 'F');
-    doc.setFontSize(6.5); doc.setTextColor(...MUTED);
-    doc.text(label.toUpperCase(), M + 14, y + 2);
-    doc.setFontSize(8.5); doc.setTextColor(...CREAM);
-    doc.text(value, W - M - 14, y + 2, { align: 'right' });
-    y += 28;
+    doc.setFillColor(17, 17, 17);
+    doc.roundedRect(M, y - 10, W - 2*M, 20, 3, 3, 'F');
+    doc.setFontSize(7); doc.setTextColor(...MUTED);
+    doc.text(label, M + 12, y + 2);
+    doc.setFontSize(8); doc.setTextColor(...CREAM);
+    doc.text(value, W - M - 12, y + 2, { align: 'right' });
+    y += 26;
   });
 
-  // Quote date
   doc.setFontSize(6); doc.setTextColor(...MUTED);
-  doc.text('Proposal Date: ' + quoteDateFormatted, W/2, y + 14, { align: 'center' });
+  doc.text('Quote Date: ' + quoteDateFormatted, W/2, y + 12, { align: 'center' });
 
-  // Bottom gold line
-  goldLine(M, H - 85, W - M);
-  footerBar(false);
+  footerBar();
 
-
-  // ═══════════════════════════════════════════════════════
-  //  PAGE 2 — EVENT SCHEDULE
-  // ═══════════════════════════════════════════════════════
+  // ===== PAGE 2 — SCHEDULE + SCOPE =====
   doc.addPage();
   pageBg();
-  watermark();
   headerBar(2, totalPages);
 
-  y = 68;
-  y = sectionLabel('EVENT SCHEDULE', y);
+  y = 78;
 
+  // Day-by-day schedule
   days.forEach((day, di) => {
-    // Day header
-    doc.setFillColor(...WARM);
-    doc.roundedRect(M, y - 10, W - 2*M, 22, 3, 3, 'F');
     doc.setFontSize(6); doc.setTextColor(...GOLD);
-    doc.text(`DAY ${di+1}`, M + 14, y + 3);
-    doc.setFontSize(7.5); doc.setTextColor(...CREAM);
-    const dayDateStr = day.date ? formatDate(day.date) : 'Date TBD';
-    doc.text(dayDateStr, W/2, y + 3, { align: 'center' });
-    doc.setFontSize(7); doc.setTextColor(...GOLD);
-    doc.text((day.hours || '0') + ' Hours', W - M - 14, y + 3, { align: 'right' });
-    y += 28;
+    doc.text(`DAY ${di+1}  —  ${day.date ? formatDate(day.date).toUpperCase() : 'TBD'}`, M, y);
+    y += 18;
 
-    // Events
     day.events.forEach(ev => {
-      doc.setFillColor(...SURFACE);
-      doc.roundedRect(M + 8, y - 10, W - 2*M - 16, 26, 3, 3, 'F');
-
-      // Gold dot indicator
-      doc.setFillColor(...GOLD);
-      doc.circle(M + 18, y + 1, 2, 'F');
-
+      doc.setFillColor(17, 17, 17);
+      doc.roundedRect(M, y - 10, W - 2*M, 28, 3, 3, 'F');
       doc.setFontSize(9); doc.setTextColor(...CREAM);
-      doc.text(ev.name, M + 26, y + 1);
+      doc.text(ev.name, M + 12, y + 2);
       if (ev.notes) {
         doc.setFontSize(6.5); doc.setTextColor(...MUTED);
-        doc.text(ev.notes, M + 26, y + 11);
+        doc.text(ev.notes, M + 12, y + 12);
       }
       if (ev.dur) {
         doc.setFontSize(7.5); doc.setTextColor(...GOLD);
-        doc.text(ev.dur, W - M - 22, y + 1, { align: 'right' });
+        doc.text(ev.dur, W - M - 12, y + 2, { align: 'right' });
       }
-      y += 30;
+      y += 34;
     });
-    y += 6;
+
+    // Day total
+    doc.setFillColor(30, 26, 22);
+    doc.roundedRect(M, y - 10, W - 2*M, 20, 3, 3, 'F');
+    doc.setFontSize(7.5); doc.setTextColor(...GOLD);
+    doc.text(`Day ${di+1} Total`, M + 12, y + 2);
+    doc.text((day.hours || '0') + ' Hours', W - M - 12, y + 2, { align: 'right' });
+    y += 35;
   });
 
-  // Total coverage summary
-  y += 2;
-  doc.setFillColor(...WARM);
-  doc.roundedRect(M, y - 8, W - 2*M, 24, 4, 4, 'F');
-  doc.setDrawColor(...GOLD); doc.setLineWidth(0.4);
-  doc.roundedRect(M, y - 8, W - 2*M, 24, 4, 4, 'S');
-  doc.setFontSize(7); doc.setTextColor(...CREAM);
-  doc.text('TOTAL COVERAGE', M + 14, y + 5);
-  doc.setFontSize(9); doc.setTextColor(...GOLD);
-  doc.text(totalHours + ' Hours  ·  ' + days.length + (days.length === 1 ? ' Day' : ' Days'), W - M - 14, y + 5, { align: 'right' });
-
-  footerBar(true);
-
-
-  // ═══════════════════════════════════════════════════════
-  //  PAGE 3 — DELIVERABLES + SCOPE
-  // ═══════════════════════════════════════════════════════
-  doc.addPage();
-  pageBg();
-  watermark();
-  headerBar(3, totalPages);
-
-  y = 68;
-  y = sectionLabel('WHAT YOU RECEIVE', y);
-
-  // Table header
-  doc.setFillColor(...WARM);
-  doc.roundedRect(M, y - 8, W - 2*M, 18, 3, 3, 'F');
-  doc.setFontSize(5.5); doc.setTextColor(...GOLD);
-  doc.text('DELIVERABLE', M + 14, y + 2);
-  doc.text('DETAILS', W - M - 14, y + 2, { align: 'right' });
-  y += 24;
-
-  // Alternating rows
-  delItems.forEach(([item, detail], idx) => {
-    if (idx % 2 === 0) {
-      doc.setFillColor(14, 14, 14);
-      doc.roundedRect(M, y - 10, W - 2*M, 18, 2, 2, 'F');
-    }
-    // Gold bullet
-    doc.setFillColor(...GOLD);
-    doc.circle(M + 10, y - 1, 1.2, 'F');
-
-    doc.setFontSize(8); doc.setTextColor(...CREAM);
-    doc.text(item, M + 18, y);
-    doc.setFontSize(7.5); doc.setTextColor(...MUTED);
-    doc.text(detail, W - M - 14, y, { align: 'right' });
-    y += 19;
-  });
-
-  // Delivery timeline
+  // Scope
   y += 8;
-  doc.setFillColor(...SURFACE);
-  doc.roundedRect(M, y - 8, W - 2*M, 22, 3, 3, 'F');
-  doc.setFontSize(6.5); doc.setTextColor(...MUTED);
-  doc.text('DELIVERY TIMELINE', M + 14, y + 4);
-  doc.setFontSize(8); doc.setTextColor(...CREAM);
-  doc.text('Final deliverables within ' + timeline, W - M - 14, y + 4, { align: 'right' });
+  doc.setFontSize(6); doc.setTextColor(...GOLD);
+  doc.text('SCOPE OF COVERAGE', M, y);
+  y += 20;
 
-  // Live wedding highlight box
+  dels.forEach(item => {
+    doc.setFillColor(...GOLD);
+    doc.circle(M + 7, y - 1, 1.5, 'F');
+    doc.setFontSize(7.5); doc.setTextColor(...CREAM);
+    doc.text(item, M + 16, y);
+    y += 16;
+  });
+
+  // Live wedding highlight if checked
   if (document.getElementById('delLive').checked) {
-    y += 28;
-    doc.setFillColor(...WARM);
-    doc.roundedRect(M, y - 8, W - 2*M, 28, 4, 4, 'F');
-    doc.setDrawColor(...GOLD); doc.setLineWidth(0.6);
-    doc.roundedRect(M, y - 8, W - 2*M, 28, 4, 4, 'S');
+    y += 5;
+    doc.setFillColor(30, 26, 22);
+    doc.roundedRect(M, y - 10, W - 2*M, 35, 4, 4, 'F');
+    doc.setDrawColor(...GOLD); doc.setLineWidth(0.8);
+    doc.roundedRect(M, y - 10, W - 2*M, 35, 4, 4, 'S');
     doc.setFontSize(5.5); doc.setTextColor(...GOLD);
-    doc.text('HIGHLIGHTED', M + 14, y + 1);
+    doc.text('★  HIGHLIGHTED', M + 12, y + 2);
     doc.setFontSize(9); doc.setTextColor(...CREAM);
-    doc.text('Live Wedding Coverage', M + 14, y + 12);
-    doc.setFontSize(6.5); doc.setTextColor(...MUTED);
-    doc.text('Ceremony livestream included (venue must provide internet)', M + 130, y + 12);
+    doc.text('Live Wedding Coverage', M + 12, y + 14);
+    doc.setFontSize(7); doc.setTextColor(...MUTED);
+    doc.text('Included for the wedding ceremony (venue must provide internet)', M + 155, y + 14);
   }
 
-  // Approach note
-  y += 30;
-  centeredGoldLine(y, 30);
-  y += 16;
-  doc.setFontSize(7.5); doc.setTextColor(...MUTED);
-  doc.text('Our approach blends cinematic storytelling with candid emotion.', W/2, y, { align: 'center' });
-  doc.text('Every frame is crafted to feel timeless, not trendy.', W/2, y + 14, { align: 'center' });
+  footerBar();
 
-  footerBar(true);
-
-
-  // ═══════════════════════════════════════════════════════
-  //  PAGE 4 — INVESTMENT + CLOSING
-  // ═══════════════════════════════════════════════════════
+  // ===== PAGE 3 — DELIVERABLES + INVESTMENT =====
   doc.addPage();
   pageBg();
-  watermark();
-  headerBar(4, totalPages);
+  headerBar(3, totalPages);
 
-  y = 68;
-  y = sectionLabel('YOUR INVESTMENT', y);
+  y = 78;
 
-  // Investment box
-  const boxH = model === 'hourly' ? 85 : 65;
-  doc.setFillColor(...SURFACE);
-  doc.roundedRect(M, y - 8, W - 2*M, boxH, 5, 5, 'F');
-  doc.setDrawColor(...GOLD); doc.setLineWidth(0.5);
-  doc.roundedRect(M, y - 8, W - 2*M, boxH, 5, 5, 'S');
+  // Photo deliverables
+  doc.setFontSize(6); doc.setTextColor(...GOLD);
+  doc.text('DELIVERABLES SUMMARY', M, y);
+  y += 20;
+
+  doc.setFillColor(21, 21, 21);
+  doc.roundedRect(M, y - 8, W - 2*M, 18, 3, 3, 'F');
+  doc.setFontSize(6); doc.setTextColor(...GOLD);
+  doc.text('ITEM', M + 12, y + 2);
+  doc.text('DETAILS', W - M - 12, y + 2, { align: 'right' });
+  y += 22;
+
+  const delItems = [];
+  if (document.getElementById('delEdited').checked) delItems.push(['Edited Photos', editedCount + ' photos']);
+  if (document.getElementById('delRaw').checked) delItems.push(['Raw Images', 'Full gallery delivered']);
+  if (document.getElementById('delGallery').checked) delItems.push(['Online Gallery', 'Private link for viewing & downloads']);
+  if (document.getElementById('delSneakPeek').checked) delItems.push(['Sneak Peek Reels', '24-hour delivery']);
+  if (document.getElementById('delTeaser').checked) delItems.push(['Wedding Teaser', '2-3 minute highlight reel']);
+  if (document.getElementById('delDoc').checked) delItems.push(['Documentary Film', '10 min with interviews']);
+  if (document.getElementById('delTraditional').checked) delItems.push(['Traditional Video', 'Full length coverage']);
+  if (document.getElementById('delHighlight').checked) delItems.push(['Highlight Video', '2-3 minute cinematic edit']);
+  if (document.getElementById('delDrone').checked) delItems.push(['Drone Footage', 'Where permitted']);
+  if (document.getElementById('delLive').checked) delItems.push(['Live Coverage', 'Venue internet required']);
+  if (document.getElementById('delSecondShooter').checked) delItems.push(['Second Shooter', 'Full coverage']);
+
+  delItems.forEach(([item, detail]) => {
+    doc.setFontSize(8); doc.setTextColor(...CREAM);
+    doc.text(item, M + 12, y);
+    doc.setFontSize(7.5); doc.setTextColor(...MUTED);
+    doc.text(detail, W - M - 12, y, { align: 'right' });
+    y += 20;
+  });
+
+  // Investment
+  y += 15;
+  doc.setFontSize(6); doc.setTextColor(...GOLD);
+  doc.text('INVESTMENT', M, y);
+  y += 20;
+
+  // Price box
+  const boxH = 72;
+  doc.setFillColor(17, 17, 17);
+  doc.roundedRect(M, y - 8, W - 2*M, boxH, 4, 4, 'F');
+  doc.setDrawColor(...GOLD); doc.setLineWidth(0.4);
+  doc.roundedRect(M, y - 8, W - 2*M, boxH, 4, 4, 'S');
 
   if (showIntro) {
-    doc.setFillColor(...WARM);
-    doc.roundedRect(M + 15, y - 2, 110, 14, 7, 7, 'F');
+    doc.setFillColor(30, 26, 22);
+    doc.roundedRect(M + 15, y - 2, 100, 13, 6, 6, 'F');
     doc.setFontSize(5.5); doc.setTextColor(...GOLD);
-    doc.text('INTRODUCTORY RATE', M + 70, y + 8, { align: 'center' });
+    doc.text('INTRODUCTORY RATE', M + 65, y + 7, { align: 'center' });
   }
 
   if (model === 'hourly') {
-    const rateY = showIntro ? 22 : 10;
-    doc.setFontSize(5.5); doc.setTextColor(...MUTED);
-    doc.text('RATE', M + 18, y + rateY);
-    doc.setFontSize(30); doc.setTextColor(...CREAM);
-    doc.text('$' + hourlyRate, M + 18, y + rateY + 28);
+    doc.setFontSize(6); doc.setTextColor(...MUTED);
+    doc.text('HOURLY RATE', M + 15, y + (showIntro ? 20 : 8));
+    doc.setFontSize(32); doc.setTextColor(...CREAM);
+    doc.text('$' + hourlyRate, M + 15, y + (showIntro ? 46 : 36));
     doc.setFontSize(9); doc.setTextColor(...MUTED);
-    doc.text('/ hour', M + 85, y + rateY + 24);
+    doc.text('/ hour', M + 90, y + (showIntro ? 42 : 32));
 
-    // Breakdown
-    doc.setFontSize(5.5); doc.setTextColor(...MUTED);
-    doc.text('BREAKDOWN', W/2 + 15, y + rateY);
-    let by = y + rateY + 14;
+    // Breakdown on right
+    doc.setFontSize(6); doc.setTextColor(...MUTED);
+    doc.text('BREAKDOWN', W/2 + 10, y + (showIntro ? 20 : 8));
+    let by = y + (showIntro ? 32 : 20);
     let baseTotal = 0;
     days.forEach((d, i) => {
       const hrs = parseFloat(d.hours) || 0;
       const amt = hrs * hourlyRate;
       baseTotal += amt;
       doc.setFontSize(7.5); doc.setTextColor(...CREAM);
-      doc.text('Day ' + (i+1) + ':  ' + hrs + ' hrs  ×  $' + hourlyRate, W/2 + 15, by);
+      doc.text(`Day ${i+1}: ${hrs} hrs × $${hourlyRate}`, W/2 + 10, by);
       doc.setTextColor(...GOLD);
-      doc.text('$' + amt.toLocaleString(), W - M - 18, by, { align: 'right' });
+      doc.text('$' + amt.toLocaleString(), W - M - 15, by, { align: 'right' });
       by += 14;
     });
-    thinGoldLine(W/2 + 15, by - 3, W - M - 18);
+    goldLine(W/2 + 10, by - 4, W - M - 15);
     doc.setFontSize(9); doc.setTextColor(...CREAM);
-    doc.text('Base Total', W/2 + 15, by + 8);
-    doc.setFontSize(10); doc.setTextColor(...GOLD);
-    doc.text('$' + baseTotal.toLocaleString(), W - M - 18, by + 8, { align: 'right' });
+    doc.text('Base Total', W/2 + 10, by + 6);
+    doc.setTextColor(...GOLD);
+    doc.text('$' + baseTotal.toLocaleString(), W - M - 15, by + 6, { align: 'right' });
   } else {
-    const rateY = showIntro ? 22 : 10;
-    doc.setFontSize(5.5); doc.setTextColor(...MUTED);
-    doc.text('PACKAGE PRICE', M + 18, y + rateY);
-    doc.setFontSize(30); doc.setTextColor(...CREAM);
-    doc.text('$' + flatRate.toLocaleString(), M + 18, y + rateY + 28);
+    doc.setFontSize(6); doc.setTextColor(...MUTED);
+    doc.text('PACKAGE PRICE', M + 15, y + (showIntro ? 20 : 8));
+    doc.setFontSize(32); doc.setTextColor(...CREAM);
+    doc.text('$' + flatRate.toLocaleString(), M + 15, y + (showIntro ? 46 : 36));
     doc.setFontSize(8); doc.setTextColor(...MUTED);
-    doc.text('All-inclusive coverage package', W/2 + 15, y + rateY + 14);
+    doc.text('All-inclusive package', W/2 + 10, y + (showIntro ? 30 : 20));
   }
 
   if (showIntro && standardRate) {
     doc.setFontSize(6.5); doc.setTextColor(...MUTED);
     const srText = 'Standard rate: ' + standardRate;
-    doc.text(srText, M + 18, y + boxH - 14);
+    doc.text(srText, M + 15, y + boxH - 10);
     const srWidth = doc.getTextWidth(srText);
     doc.setDrawColor(...MUTED); doc.setLineWidth(0.4);
-    doc.line(M + 18, y + boxH - 17, M + 18 + srWidth, y + boxH - 17);
+    doc.line(M + 15, y + boxH - 13, M + 15 + srWidth, y + boxH - 13);
   }
 
-  y += boxH + 14;
+  y += boxH + 10;
 
   // Travel
   if (travelType === 'separate') {
-    doc.setFillColor(...SURFACE);
-    doc.roundedRect(M, y - 6, W - 2*M, 22, 3, 3, 'F');
-    doc.setFontSize(6.5); doc.setTextColor(...MUTED);
-    doc.text('TRAVEL & ACCOMMODATION', M + 14, y + 6);
+    doc.setFillColor(17, 17, 17);
+    doc.roundedRect(M, y - 4, W - 2*M, 22, 3, 3, 'F');
+    doc.setFontSize(7); doc.setTextColor(...MUTED);
+    doc.text('TRAVEL & ACCOMMODATION', M + 12, y + 8);
     doc.setFontSize(8); doc.setTextColor(...CREAM);
-    doc.text('Calculated separately', W - M - 14, y + 6, { align: 'right' });
+    doc.text('Calculated separately', W - M - 12, y + 8, { align: 'right' });
     y += 30;
   } else if (travelType === 'fixed') {
     const tAmt = parseFloat(document.getElementById('travelAmount').value) || 0;
-    doc.setFillColor(...SURFACE);
-    doc.roundedRect(M, y - 6, W - 2*M, 22, 3, 3, 'F');
-    doc.setFontSize(6.5); doc.setTextColor(...MUTED);
-    doc.text('TRAVEL & ACCOMMODATION', M + 14, y + 6);
+    doc.setFillColor(17, 17, 17);
+    doc.roundedRect(M, y - 4, W - 2*M, 22, 3, 3, 'F');
+    doc.setFontSize(7); doc.setTextColor(...MUTED);
+    doc.text('TRAVEL & ACCOMMODATION', M + 12, y + 8);
     doc.setFontSize(8); doc.setTextColor(...GOLD);
-    doc.text('$' + tAmt.toLocaleString(), W - M - 14, y + 6, { align: 'right' });
-    y += 30;
-  } else if (travelType === 'included') {
-    doc.setFillColor(...SURFACE);
-    doc.roundedRect(M, y - 6, W - 2*M, 22, 3, 3, 'F');
-    doc.setFontSize(6.5); doc.setTextColor(...MUTED);
-    doc.text('TRAVEL & ACCOMMODATION', M + 14, y + 6);
-    doc.setFontSize(8); doc.setTextColor(...GOLD);
-    doc.text('Included', W - M - 14, y + 6, { align: 'right' });
+    doc.text('$' + tAmt.toLocaleString(), W - M - 12, y + 8, { align: 'right' });
     y += 30;
   }
 
-  // Terms section
-  y += 5;
-  y = sectionLabel('TERMS', y);
+  // Additional info
+  doc.setFontSize(6); doc.setTextColor(...GOLD);
+  doc.text('ADDITIONAL INFORMATION', M, y);
+  y += 15;
 
   const addInfo = [
     ['Deposit', deposit],
-    ['Delivery', 'Final deliverables within ' + timeline],
-    ['Validity', 'This proposal is valid for ' + validity],
+    ['Timeline', 'Final deliverables within ' + timeline],
   ];
   const extraNotes = document.getElementById('extraNotes').value;
   if (extraNotes) {
@@ -1154,48 +1068,104 @@ async function generatePDF() {
   addInfo.forEach(([label, detail]) => {
     doc.setFontSize(7); doc.setTextColor(...CREAM);
     doc.text(label, M + 8, y);
-    doc.setFontSize(7); doc.setTextColor(...MUTED);
-    doc.text(detail, M + 100, y);
-    y += 16;
+    doc.setTextColor(...MUTED);
+    doc.text(detail, M + 110, y);
+    y += 13;
   });
 
-  // ── Cinematic Closing ──
-  y += 25;
-  centeredGoldLine(y, 50);
-  y += 30;
+  // Validity
+  y += 8;
+  doc.setFillColor(30, 26, 22);
+  doc.roundedRect(M, y - 6, W - 2*M, 18, 3, 3, 'F');
+  doc.setFontSize(7); doc.setTextColor(...CREAM);
+  doc.text('This quote is valid for ' + validity + ' from the date above.', W/2, y + 4, { align: 'center' });
 
-  // Thank you — Cormorant Garamond light
-  fancyText(firstName + ', thank you for trusting us with your story.', 'Cormorant Garamond', 300, 11, CREAM, W/2, y, 'center');
+  footerBar();
+
+  // ===== PAGE 4 — CLOSING =====
+  doc.addPage();
+  pageBg();
+  headerBar(4, totalPages);
+
+  y = 220;
+  const firstName = clientName.split('&')[0].split(' ')[0].trim().replace(/,/g, '');
+  
+  doc.setFont('times', 'normal');
+  doc.setFontSize(12); doc.setTextColor(...CREAM);
+  doc.text(`${firstName}, thank you for trusting us with your story.`, W/2, y, { align: 'center' });
   y += 24;
-  // Emotional quotes — Cormorant Garamond italic
-  fancyText('We don\u2019t just photograph moments \u2014 we preserve the emotions within them.', 'Cormorant Garamond', 300, 8.5, MUTED, W/2, y, 'center', 'italic');
-  y += 15;
-  fancyText('It would be an honor to be part of your celebration.', 'Cormorant Garamond', 300, 8.5, MUTED, W/2, y, 'center', 'italic');
+  doc.setFontSize(10); doc.setTextColor(...MUTED);
+  doc.text("We don't just photograph moments — we preserve the emotions within them.", W/2, y, { align: 'center' });
+  y += 16;
+  doc.text("It would be an honor to be part of your celebration.", W/2, y, { align: 'center' });
 
-  y += 32;
-  // "With warmth," — Pinyon Script cursive
-  fancyText('With warmth,', 'Pinyon Script', 400, 12, GOLD, W/2, y, 'center');
-  y += 18;
-  // Signature — Playfair Display bold
-  fancyText('Sudhakar Avula', 'Playfair Display', 700, 12, CREAM, W/2, y, 'center');
-  y += 13;
-  doc.setFontSize(6.5); doc.setTextColor(...MUTED);
-  doc.text('Founder & Lead Photographer, Aakaara Studios', W/2, y, { align: 'center' });
-
-  // Bottom accent
-  y += 24;
-  centeredGoldLine(y, 25);
+  y += 40;
+  doc.setFont('times', 'italic');
+  doc.setFontSize(11); doc.setTextColor(...GOLD);
+  doc.text("With warmth,", W/2, y, { align: 'center' });
+  y += 20;
+  doc.setFont('times', 'normal');
+  doc.setFontSize(14); doc.setTextColor(...CREAM);
+  doc.text("Sudhakar Avula", W/2, y, { align: 'center' });
   y += 14;
-  // Tagline — Cormorant Garamond italic
-  fancyText('Every story deserves its own canvas.', 'Cormorant Garamond', 300, 8, GOLD_DIM, W/2, y, 'center', 'italic');
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7); doc.setTextColor(...MUTED);
+  doc.text("Founder & Lead Photographer, Aakaara Studios", W/2, y, { align: 'center' });
 
-  footerBar(false);
+  y = H - 100;
+  doc.setFont('times', 'italic');
+  doc.setFontSize(9); doc.setTextColor(...GOLD_DIM);
+  doc.text("Every story deserves its own canvas.", W/2, y, { align: 'center' });
 
+  footerBar();
 
-  // ── Save ──
+  // Save
   const safeName = clientName.replace(/[^a-zA-Z0-9]/g, '_');
-  doc.save(`Aakaara_Studios_Quote_${safeName}.pdf`);
-  showToast('PDF generated & downloading!');
+  
+  if (action === 'preview') {
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    document.getElementById('previewFrame').src = url;
+    document.getElementById('previewModal').classList.add('show');
+  } else {
+    doc.save(`Aakaara_Studios_Quote_${safeName}.pdf`);
+    showToast('PDF generated & downloading!');
+  }
+ } catch (err) {
+   console.error(err);
+   alert('Error generating PDF: ' + err.message);
+ }
+}
+
+function closePreview() {
+  document.getElementById('previewModal').classList.remove('show');
+}
+
+function sendQuoteEmail() {
+  const email = document.getElementById('clientEmail').value;
+  const name = document.getElementById('clientName').value;
+  
+  if (!email) {
+    alert('Please enter a Client Email address in the form first.');
+    closePreview();
+    document.getElementById('clientEmail').focus();
+    return;
+  }
+
+  // 1. Download the PDF so the user has it to attach
+  generatePDF('download');
+
+  // 2. Construct email
+  const subject = `Photography Quote: ${name} — Aakaara Studios`;
+  const body = `Hi ${name.split(' ')[0]},\n\nIt was wonderful connecting with you. Please find the attached quote for your photography coverage.\n\nWe've customized this based on our discussion. Let us know if you have any questions!\n\nBest,\nSudhakar Avula\nAakaara Studios NYC`;
+  
+  // 3. Open Gmail Compose (Forces Google Workspace/Gmail)
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  
+  setTimeout(() => {
+    window.open(gmailUrl, '_blank');
+    showToast('Quote downloaded. Please attach it to the Gmail tab!');
+  }, 800);
 }
 
 // Init with one day

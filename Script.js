@@ -1182,17 +1182,19 @@ class EtherealCarousel {
     const filtered = this.filteredItems;
     const ci = this.currentIndex;
 
-    // Use cached card width (updated on resize) — avoids getComputedStyle every render
-    if (!this._cachedCardW) {
-      const sampleCard = filtered[0] || allItems[0];
-      this._cachedCardW = sampleCard ? sampleCard.offsetWidth : 380;
-    }
-    const cardW = this._cachedCardW;
+    // Determine width of the ACTIVE card to calculate spacing dynamically
+    const activeItem = filtered[ci];
+    const activeW = activeItem ? activeItem.offsetWidth : 380;
+
     const isMobile = window.innerWidth <= 768;
     const isTablet = window.innerWidth <= 1024;
-    let offsetPx = cardW * 0.9;
-    if (isMobile) offsetPx = cardW * 0.72;
-    else if (isTablet) offsetPx = cardW * 0.87;
+    
+    // Adjust offset based on active card width (Wide cards need different spacing factor)
+    let offsetPx = activeW * 0.9; 
+    if (activeW > 600) offsetPx = activeW * 0.65; // Wide card (760px) needs more absolute space
+    
+    if (isMobile) offsetPx = activeW * 0.72;
+    else if (isTablet) offsetPx = activeW * 0.87;
 
     // 3D depth values — reduced on mobile for cleaner look inside overflow:hidden
     const sideZ    = isMobile ? -60  : -120;
