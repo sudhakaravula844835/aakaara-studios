@@ -385,13 +385,45 @@ document.querySelectorAll('.gallery-item').forEach(item => {
     if (e.key === 'ArrowLeft')  swNav(-1);
   });
 
-  // Touch / Swipe Support
-  let swTouchX = 0;
-  gallery.addEventListener('touchstart', (e) => { swTouchX = e.changedTouches[0].screenX; }, { passive: true });
-  gallery.addEventListener('touchend', (e) => {
-    const diff = swTouchX - e.changedTouches[0].screenX;
-    if (Math.abs(diff) > 50) swNav(diff > 0 ? 1 : -1);
+  // Touch / Swipe Support — finger-following, prevents browser back gesture
+  let swTouchStartX = 0, swTouchStartY = 0, swTouchDX = 0, swIsHorizontal = null;
+
+  gallery.addEventListener('touchstart', (e) => {
+    if (!swIsOpen) return;
+    swTouchStartX = e.touches[0].clientX;
+    swTouchStartY = e.touches[0].clientY;
+    swTouchDX = 0;
+    swIsHorizontal = null;
+    galleryImg.style.transition = 'none';
   }, { passive: true });
+
+  gallery.addEventListener('touchmove', (e) => {
+    if (!swIsOpen) return;
+    const dx = e.touches[0].clientX - swTouchStartX;
+    const dy = e.touches[0].clientY - swTouchStartY;
+    if (swIsHorizontal === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+      swIsHorizontal = Math.abs(dx) > Math.abs(dy);
+    }
+    if (swIsHorizontal) {
+      e.preventDefault();
+      swTouchDX = dx;
+      const fade = 1 - Math.min(Math.abs(dx) / 350, 0.35);
+      galleryImg.style.transform = `translateX(${dx}px)`;
+      galleryImg.style.opacity = fade;
+    }
+  }, { passive: false });
+
+  gallery.addEventListener('touchend', () => {
+    if (!swIsOpen) return;
+    galleryImg.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+    if (Math.abs(swTouchDX) > 50) {
+      swNav(swTouchDX < 0 ? 1 : -1);
+    }
+    galleryImg.style.transform = '';
+    galleryImg.style.opacity = '';
+    swTouchDX = 0;
+    swIsHorizontal = null;
+  });
 
   // Parallax
   let pMouseX = 0, pMouseY = 0;
@@ -1296,20 +1328,39 @@ class EtherealCarousel {
       this.navigate(e.key === 'ArrowLeft' ? -1 : 1);
     });
 
-    // Touch swipe
-    let touchStartX = 0;
-    let touchStartY = 0;
+    // Touch swipe — finger-following, prevents browser back gesture
+    let touchStartX = 0, touchStartY = 0, touchDX = 0, touchIsHorizontal = null;
+
     this.container.addEventListener('touchstart', (e) => {
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
+      touchDX = 0;
+      touchIsHorizontal = null;
+      this.track.style.transition = 'none';
     }, { passive: true });
-    this.container.addEventListener('touchend', (e) => {
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      const dy = e.changedTouches[0].clientY - touchStartY;
-      if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy)) {
-        this.navigate(dx < 0 ? 1 : -1);
+
+    this.container.addEventListener('touchmove', (e) => {
+      const dx = e.touches[0].clientX - touchStartX;
+      const dy = e.touches[0].clientY - touchStartY;
+      if (touchIsHorizontal === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+        touchIsHorizontal = Math.abs(dx) > Math.abs(dy);
       }
-    }, { passive: true });
+      if (touchIsHorizontal) {
+        e.preventDefault();
+        touchDX = dx;
+        this.track.style.transform = `translateX(${dx * 0.35}px)`;
+      }
+    }, { passive: false });
+
+    this.container.addEventListener('touchend', () => {
+      this.track.style.transition = 'transform 0.3s ease';
+      this.track.style.transform = '';
+      if (Math.abs(touchDX) > 30) {
+        this.navigate(touchDX < 0 ? 1 : -1);
+      }
+      touchDX = 0;
+      touchIsHorizontal = null;
+    });
 
     // Mouse drag swipe (trackpad / click-and-drag)
     let mouseDown = false, mouseStartX = 0, mouseMoved = false;
