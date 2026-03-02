@@ -56,10 +56,10 @@ def optimize_images(folder_path, watermark_path=None, max_width=1920, quality=80
                                 alpha = alpha.point(lambda p: p * 0.50)
                                 wm_resized.putalpha(alpha)
                                 
-                                # Position: Top Left with 5% padding
+                                # Position: Bottom Right with 5% padding
                                 pad = int(img.width * 0.05)
-                                x = pad
-                                y = pad
+                                x = img.width - wm_w - pad
+                                y = img.height - wm_h - pad
                                 
                                 img.alpha_composite(wm_resized, (x, y))
 

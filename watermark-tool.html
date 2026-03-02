@@ -78,13 +78,14 @@
   <div class="slider-group" style="margin-left:0">
     <label style="min-width:auto;margin-right:0.5rem">Position:</label>
     <select id="wmPosition" class="control-select" onchange="reprocessAll()">
-      <option value="tl" selected>Top Left</option>
+      <option value="tl">Top Left</option>
       <option value="tr">Top Right</option>
       <option value="bl">Bottom Left</option>
-      <option value="br">Bottom Right</option>
+      <option value="br" selected>Bottom Right</option>
       <option value="c">Center</option>
     </select>
   </div>
+  <button class="btn btn-ghost btn-small" onclick="resetSettings()" style="margin-left:auto;padding:8px 16px;font-size:0.75rem;margin-right:0.5rem;">Reset</button>
   <button class="btn btn-ghost btn-small" onclick="clearAll()" style="margin-left:auto;padding:8px 16px;font-size:0.75rem;">Clear All</button>
 </div>
 
@@ -129,6 +130,14 @@
     downloadBtn.textContent = 'Download All (ZIP)';
   }
 
+  function resetSettings() {
+    document.getElementById('wmSize').value = 30;
+    document.getElementById('wmOpacity').value = 50;
+    document.getElementById('wmPosition').value = 'br';
+    updateLabels();
+    reprocessAll();
+  }
+
   function updateLabels() {
     document.getElementById('opacityVal').textContent = document.getElementById('wmOpacity').value + '%';
     document.getElementById('sizeVal').textContent = document.getElementById('wmSize').value + '%';
@@ -146,7 +155,13 @@
     const pos = document.getElementById('wmPosition').value;
     const wmImg = new Image();
     wmImg.src = WM_URLS[color];
-    await new Promise(r => wmImg.onload = r);
+    try {
+      await new Promise((resolve, reject) => { wmImg.onload = resolve; wmImg.onerror = reject; });
+    } catch (e) {
+      alert("Error: Watermark image not found on server.\n\nPlease wait for the 'Optimize Images' GitHub Action to finish generating it, then refresh this page.");
+      downloadBtn.textContent = 'Error loading watermark';
+      return;
+    }
 
     for (const file of currentFiles) {
       const card = document.createElement('div');
@@ -171,7 +186,7 @@
     }
   }
 
-  function processImage(file, wmImg, opacity = 0.5, sizePct = 0.3, position = 'tl') {
+  function processImage(file, wmImg, opacity = 0.5, sizePct = 0.3, position = 'br') {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
