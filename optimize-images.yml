@@ -1,0 +1,37 @@
+name: Optimize Images
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'images/**'
+      - 'optimize_images.py'
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install Pillow
+
+      - name: Run optimization
+        run: python optimize_images.py
+
+      - name: Commit and push
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add images/
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "Auto-optimize images [skip ci]"
+            git push
+          fi
