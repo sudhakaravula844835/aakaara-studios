@@ -191,6 +191,7 @@ const galleryObserver = new IntersectionObserver((entries, observer) => {
         const bg = item.querySelector('.gi-bg');
         if (bg) {
           const img = new Image();
+          img.decoding = 'async';
           img.onload = function() {
             bg.style.backgroundImage = `url('${coverSrc}')`;
             if (item.dataset.bgSize) bg.style.backgroundSize = item.dataset.bgSize;
@@ -1430,6 +1431,7 @@ function lazyLoadGalleryItem(item) {
   const coverSrc = item.dataset.cover || (folder ? `${folder}/1.${ext}` : null);
   if (coverSrc) {
     const img = new Image();
+    img.decoding = 'async';
     img.onload = function() {
       bg.style.backgroundImage = `url('${coverSrc}')`;
       if (item.dataset.bgSize) bg.style.backgroundSize = item.dataset.bgSize;
