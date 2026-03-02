@@ -497,8 +497,8 @@ document.querySelectorAll('.gallery-item').forEach(item => {
   var counterEl  = document.getElementById('csCounterCurrent');
   var scrollHint = document.getElementById('csScrollHint');
   var muteBtn    = document.getElementById('csMuteToggle');
+  var counterWrapper = document.getElementById('csCounter');
 
-  var introHeight  = window.innerHeight * 0.8;
   var wrapTop      = 0;
   var rafPending   = false;
   var lastScrollY  = -1;
@@ -510,7 +510,6 @@ document.querySelectorAll('.gallery-item').forEach(item => {
   function cacheLayout() {
     var scrollTop = window.scrollY || document.documentElement.scrollTop;
     wrapTop     = wrapper.getBoundingClientRect().top + scrollTop;
-    introHeight = window.innerHeight * 0.8;
   }
   cacheLayout();
   window.addEventListener('load', cacheLayout);
@@ -648,22 +647,22 @@ document.querySelectorAll('.gallery-item').forEach(item => {
     if (scrollY === lastScrollY) return;
     lastScrollY = scrollY;
 
-    var scrollInto = scrollY - wrapTop - introHeight;
+    var scrollInto = scrollY - wrapTop;
     var panelH     = window.innerHeight;
 
-    if (scrollInto > 80 && !hintDismissed) {
+    if (scrollInto > panelH * 0.5 && !hintDismissed) { // Dismiss hint after scrolling 50% of first panel
       hintDismissed = true;
       scrollHint.classList.remove('visible');
     }
 
     /* Before sticky zone — reset */
     if (scrollInto < 0) {
+      if (counterWrapper) counterWrapper.style.opacity = '0';
       panels.forEach(function(panel, i) {
         panel.style.transform  = i === 0 ? 'translateY(0%)' : 'translateY(100%)';
         panel.style.zIndex     = '0';
-        bgs[i].style.transform = 'scale(1.04)';
       });
-      counterEl.textContent = '01';
+      if (counterEl) counterEl.textContent = '00';
       dots.forEach(function(d, i) { d.classList.toggle('active', i === 0); });
       showSlide(0);
       syncVideos(0);
@@ -674,12 +673,19 @@ document.querySelectorAll('.gallery-item').forEach(item => {
     var activeIdx = Math.max(0, Math.min(PANEL_COUNT - 1, Math.floor(rawPanel)));
     var progress  = rawPanel - activeIdx;
 
-    var newCount = String(activeIdx + 1).padStart(2, '0');
-    if (counterEl.textContent !== newCount) counterEl.textContent = newCount;
+    // Handle counter visibility and text
+    if (counterWrapper) {
+      counterWrapper.style.opacity = activeIdx === 0 ? '0' : '1';
+      counterWrapper.style.transition = 'opacity 0.4s ease';
+    }
+    if (counterEl && activeIdx > 0) {
+      var newCount = String(activeIdx).padStart(2, '0');
+      if (counterEl.textContent !== newCount) counterEl.textContent = newCount;
+    }
+
     dots.forEach(function(d, i) { d.classList.toggle('active', i === activeIdx); });
 
-    /* Switch text early — when incoming panel is ~35% up the screen */
-    var slideIdx = (progress > 0.35 && activeIdx < PANEL_COUNT - 1) ? activeIdx + 1 : activeIdx;
+    var slideIdx = (progress > 0.4 && activeIdx < PANEL_COUNT - 1) ? activeIdx + 1 : activeIdx;
     showSlide(slideIdx);
     
     /* Play both the base panel (being covered) and the incoming panel (covering) */
@@ -697,19 +703,15 @@ document.querySelectorAll('.gallery-item').forEach(item => {
       if (i < activeIdx) {
         yPct = -100;
         panel.style.zIndex     = '0';
-        bgs[i].style.transform = 'scale(1.04)';
       } else if (i === activeIdx) {
         yPct = 0;
         panel.style.zIndex     = '1';
-        bgs[i].style.transform = 'translateY(' + (-progress * 4) + '%) scale(1.04)';
       } else if (i === activeIdx + 1) {
         yPct = (1 - progress) * 100;
         panel.style.zIndex     = '2';
-        bgs[i].style.transform = 'translateY(' + ((1 - progress) * 3) + '%) scale(1.04)';
       } else {
         yPct = 100;
         panel.style.zIndex     = '0';
-        bgs[i].style.transform = 'scale(1.04)';
       }
       panel.style.transform = 'translateY(' + yPct + '%)';
     });
