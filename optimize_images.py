@@ -51,15 +51,15 @@ def optimize_images(folder_path, watermark_path=None, max_width=1920, quality=80
                             if wm_w > 10 and wm_h > 10:
                                 wm_resized = wm_img.resize((wm_w, wm_h), Image.Resampling.LANCZOS)
                                 
-                                # Reduce opacity to 30% for a subtle look
+                                # Reduce opacity to 50%
                                 alpha = wm_resized.split()[3]
-                                alpha = alpha.point(lambda p: p * 0.30)
+                                alpha = alpha.point(lambda p: p * 0.50)
                                 wm_resized.putalpha(alpha)
                                 
-                                # Position: Bottom Right with 5% padding
+                                # Position: Top Left with 5% padding
                                 pad = int(img.width * 0.05)
-                                x = img.width - wm_w - pad
-                                y = img.height - wm_h - pad
+                                x = pad
+                                y = pad
                                 
                                 img.alpha_composite(wm_resized, (x, y))
 
