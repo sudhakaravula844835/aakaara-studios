@@ -423,21 +423,6 @@ nav.scrolled {
   transition: filter 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── AUTOMATIC WATERMARK OVERLAY ── */
-.gallery-item .gi-bg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  /* Assumes you ran watermark/generate.py to create this file */
-  background-image: url('watermark/aakaara-watermark-white.png');
-  background-position: bottom 1.5rem right 1.5rem;
-  background-repeat: no-repeat;
-  background-size: 30%; /* Adjust size relative to card */
-  opacity: 0.25;        /* Subtle visibility */
-  pointer-events: none;
-  z-index: 2;
-}
-
 .sw-gallery-img {
   position: absolute;
   /* Reduced size to create a "frame" effect */
