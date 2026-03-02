@@ -1038,8 +1038,9 @@ nav.scrolled {
   position: relative;
 }
 /* ─── FIX 3: Maternity removed → 5 panels → height reduced by 1 viewport ── */
+/* Now 6 panels (intro + 5 services) */
 .cs-wrapper {
-  height: calc(5 * 100vh + 80vh);
+  height: calc(7 * 100vh);
   position: relative;
 }
 .cs-stage {
@@ -1065,9 +1066,10 @@ nav.scrolled {
 }
 .cs-bg {
   position: absolute;
-  inset: -6%;
-  background-size: cover;
+  inset: 0;
+  background-size: contain;
   background-position: center;
+  background-repeat: no-repeat;
   transform-origin: center;
   will-change: transform;
   z-index: 0;
@@ -1078,7 +1080,7 @@ nav.scrolled {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   opacity: 0;
   transition: opacity 0.8s ease;
   pointer-events: none;
@@ -1263,39 +1265,36 @@ nav.scrolled {
 .cs-link:hover { color: var(--rose); border-bottom-color: var(--rose); gap: 1.2rem; }
 .cs-link svg { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0.7; }
 .cs-link:hover svg { transform: translateX(5px); opacity: 1; }
-.cs-intro {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 80vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+
+/* Styles for the new intro text slide */
+.cs-text-slide[data-slide="0"] {
   text-align: center;
-  background: linear-gradient(170deg, #0e0c10, #1e1a16 50%, #0e0c10);
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
 }
-.cs-intro-inner { position: relative; z-index: 2; }
-.cs-intro .section-tag { margin-bottom: 1rem; }
-.cs-intro-title {
+.cs-text-slide[data-slide="0"] .section-tag {
+  justify-content: center;
+}
+.cs-text-slide[data-slide="0"] .cs-title {
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: clamp(2.5rem, 6vw, 5rem);
-  color: var(--ivory);
-  letter-spacing: 0.12em;
-  line-height: 1.1;
-  margin-bottom: 1rem;
+  /* Cinematic title styling */
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  letter-spacing: 0.3em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
-.cs-intro-sub {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 1rem;
-  color: rgba(224,164,88,0.7);
+.cs-text-slide[data-slide="0"] .cs-desc {
+  font-family: var(--font-body);
+  font-style: normal;
+  font-size: 0.55rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(224,164,88,0.5);
+  max-width: none;
+  margin: 0 auto;
 }
+
+/* Rule from old intro, now used in first text slide */
 .cs-intro-rule {
   display: flex;
   align-items: center;
@@ -1305,6 +1304,7 @@ nav.scrolled {
 }
 .cs-intro-rule span { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,149,107,0.3), transparent); }
 .cs-intro-rule i { width: 5px; height: 5px; border: 1px solid rgba(201,149,107,0.5); transform: rotate(45deg); display: block; flex-shrink: 0; }
+
 .cs-sticky-zone {
   position: sticky;
   top: 0;
@@ -1344,11 +1344,13 @@ nav.scrolled {
 .cs-scroll-hint span { font-size: 0.44rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(250,246,241,0.2); }
 .cs-scroll-line { width: 1px; height: 28px; position: relative; overflow: hidden; background: rgba(201,149,107,0.08); }
 .cs-scroll-line::after { content: ''; position: absolute; top: -100%; left: 0; width: 1px; height: 100%; background: var(--rose); animation: scrollPulse 2.2s ease-in-out infinite; }
+.cs-bg-intro { background: linear-gradient(170deg, #0e0c10, #1e1a16 50%, #0e0c10); }
 .cs-bg-1 { background: linear-gradient(145deg, #2a1f1a, #7a3b4e, #c9956b, #dbb08a); }
 .cs-bg-2 { background: linear-gradient(145deg, #0e0d10, #1e1a16, #9b7082, #dbb08a); }
 .cs-bg-3 { background: linear-gradient(145deg, #1a1520, #7a4060, #c9956b, #f0ebe4); }
 .cs-bg-4 { background: linear-gradient(145deg, #121a10, #4a6741, #8a9a7e, #c9956b); }
 .cs-bg-5 { background: linear-gradient(145deg, #09080b, #1e1a16, #4a3a30, #c9956b); }
+.cs-bg-7 { background: linear-gradient(145deg, #3a3540, #1e1a16, #7a3b4e, #c9956b); }
 
 /* ═══════════════════════════════════════════════════════════
    TESTIMONIALS

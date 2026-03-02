@@ -895,35 +895,27 @@
 
 <!-- ════════════════════ SERVICES — CINEMATIC SCROLL STACK ════════════════════ -->
 <section id="services">
-  <div class="cs-wrapper">
-
-    <!-- Section intro — scrolls up to reveal the sticky stack -->
-    <div class="cs-intro" id="csIntro">
-      <div class="cs-intro-inner reveal">
-        <div class="section-tag">What We Offer</div>
-        <div class="cs-intro-title">Every Story<br>Deserves Its Own<br>Canvas</div>
-        <div class="cs-intro-rule"><span></span><i></i><span></span></div>
-        <div class="cs-intro-sub">Scroll to explore our services</div>
-      </div>
-    </div>
+  <div class="cs-wrapper"> <!-- Height will be adjusted in CSS -->
 
     <!-- Sticky viewport stage -->
     <div class="cs-sticky-zone" id="csStickyZone">
 
       <!-- Counter -->
       <div class="cs-counter" id="csCounter">
-        <div class="cs-counter-current" id="csCounterCurrent">01</div>
+        <div class="cs-counter-current" id="csCounterCurrent">00</div>
         <div class="cs-counter-divider"></div>
-        <div class="cs-counter-total">05</div>
+        <div class="cs-counter-total">06</div>
       </div>
 
-      <!-- Progress dots — 5 panels after removing Maternity -->
+      <!-- Progress dots — 6 panels now (Intro + 5 services) -->
       <div class="cs-dots" id="csDots">
         <div class="cs-dot active" data-panel="0"></div>
         <div class="cs-dot" data-panel="1"></div>
         <div class="cs-dot" data-panel="2"></div>
         <div class="cs-dot" data-panel="3"></div>
         <div class="cs-dot" data-panel="4"></div>
+        <div class="cs-dot" data-panel="5"></div>
+        <div class="cs-dot" data-panel="6"></div>
       </div>
 
       <!-- Scroll hint -->
@@ -938,38 +930,58 @@
         <svg class="cs-icon-unmuted" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
       </button>
 
-      <div class="cs-panel cs-active" data-video="https://res.cloudinary.com/db6ywmo4w/video/upload/v1772225006/0224_av1ud4.mov" data-bg="" data-bg-fallback="cs-bg-1">
-        <div class="cs-bg cs-bg-1" id="csBg0">
+      <!-- Panel 0: Intro -->
+      <div class="cs-panel cs-active" data-video="https://vz-757250d0-999.b-cdn.net/9b822881-dbe7-4a9b-8c4b-d2e821547fd3/playlist.m3u8" data-bg="" data-bg-fallback="cs-bg-intro">
+        <div class="cs-bg cs-bg-intro" id="csBg0">
           <video class="cs-video" id="csVid0" muted loop playsinline preload="auto"></video>
         </div>
         <div class="cs-vignette"></div>
       </div>
 
-      <div class="cs-panel" data-video="https://res.cloudinary.com/db6ywmo4w/video/upload/v1772231068/sample_pragna_a3sx2l.mov" data-bg="" data-bg-fallback="cs-bg-2">
-        <div class="cs-bg cs-bg-2" id="csBg1">
+      <!-- Panel 1: Weddings -->
+      <div class="cs-panel" data-video="https://res.cloudinary.com/db6ywmo4w/video/upload/v1772225006/0224_av1ud4.mov" data-bg="" data-bg-fallback="cs-bg-1">
+        <div class="cs-bg cs-bg-1" id="csBg1">
           <video class="cs-video" id="csVid1" muted loop playsinline preload="auto"></video>
         </div>
         <div class="cs-vignette"></div>
       </div>
 
-      <!-- FIX 3: Maternity panel removed. Panels: 0=Weddings 1=Couples 2=Celebrations 3=Commercial 4=Conceptual -->
-      <div class="cs-panel" data-video="" data-bg="" data-bg-fallback="cs-bg-4">
-        <div class="cs-bg cs-bg-4" id="csBg2">
+      <!-- Panel 2: Couple Portraits -->
+      <div class="cs-panel" data-video="https://res.cloudinary.com/db6ywmo4w/video/upload/v1772231068/sample_pragna_a3sx2l.mov" data-bg="" data-bg-fallback="cs-bg-2">
+        <div class="cs-bg cs-bg-2" id="csBg2">
           <video class="cs-video" id="csVid2" muted loop playsinline preload="auto"></video>
         </div>
         <div class="cs-vignette"></div>
       </div>
 
-      <div class="cs-panel" data-video="" data-bg="" data-bg-fallback="cs-bg-5">
-        <div class="cs-bg cs-bg-5" id="csBg3">
+      <!-- Panel 3: Celebrations -->
+      <div class="cs-panel" data-video="" data-bg="" data-bg-fallback="cs-bg-4">
+        <div class="cs-bg cs-bg-4" id="csBg3">
           <video class="cs-video" id="csVid3" muted loop playsinline preload="auto"></video>
         </div>
         <div class="cs-vignette"></div>
       </div>
 
-      <div class="cs-panel" data-video="" data-bg="" data-bg-fallback="cs-bg-6">
-        <div class="cs-bg cs-bg-6" id="csBg4">
+      <!-- Panel 4: Commercial -->
+      <div class="cs-panel" data-video="" data-bg="" data-bg-fallback="cs-bg-5">
+        <div class="cs-bg cs-bg-5" id="csBg4">
           <video class="cs-video" id="csVid4" muted loop playsinline preload="auto"></video>
+        </div>
+        <div class="cs-vignette"></div>
+      </div>
+
+      <!-- Panel 5: Conceptual -->
+      <div class="cs-panel" data-video="" data-bg="" data-bg-fallback="cs-bg-6">
+        <div class="cs-bg cs-bg-6" id="csBg5">
+          <video class="cs-video" id="csVid5" muted loop playsinline preload="auto"></video>
+        </div>
+        <div class="cs-vignette"></div>
+      </div>
+
+      <!-- Panel 6: Behind the Scenes -->
+      <div class="cs-panel" data-video="" data-bg="" data-bg-fallback="cs-bg-7">
+        <div class="cs-bg cs-bg-7" id="csBg6">
+          <video class="cs-video" id="csVid6" muted loop playsinline preload="auto"></video>
         </div>
         <div class="cs-vignette"></div>
       </div>
@@ -977,33 +989,45 @@
       <!-- SHARED TEXT OVERLAY — floats above ALL panels, never covered -->
       <div class="cs-text-overlay" id="csTextOverlay">
         <div class="cs-text-slide" data-slide="0">
+          <div class="section-tag">What We Offer</div>
+          <h2 class="cs-title">Every Story<br>Deserves Its Own<br>Canvas</h2>
+          <div class="cs-intro-rule"><span></span><i></i><span></span></div>
+          <p class="cs-desc">Scroll to explore our services</p>
+        </div>
+        <div class="cs-text-slide" data-slide="1">
           <div class="cs-label">01 · Weddings</div>
           <h2 class="cs-title">Where Two Souls Become One Story</h2>
           <p class="cs-desc">Full-day coverage from getting-ready moments to the final dance. Second photographer and online gallery included.</p>
           <a href="#contact" class="cs-link">Book a Session <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
-        <div class="cs-text-slide" data-slide="1">
+        <div class="cs-text-slide" data-slide="2">
           <div class="cs-label">02 · Couple Portraits</div>
           <h2 class="cs-title">Love, Caught Mid-Breath</h2>
           <p class="cs-desc">Engagement sessions, pre-wedding shoots, or simply celebrating your love story in iconic NYC locations.</p>
           <a href="#contact" class="cs-link">Book a Session <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
-        <div class="cs-text-slide" data-slide="2">
+        <div class="cs-text-slide" data-slide="3">
           <div class="cs-label">03 · Celebrations</div>
           <h2 class="cs-title">Moments That Make Life Extraordinary</h2>
           <p class="cs-desc">Baby showers, housewarmings, first birthdays — every milestone deserves to be captured with joy and artistry.</p>
           <a href="#contact" class="cs-link">Book a Session <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
-        <div class="cs-text-slide" data-slide="3">
+        <div class="cs-text-slide" data-slide="4">
           <div class="cs-label">04 · Commercial</div>
           <h2 class="cs-title">Your Brand, Elevated</h2>
           <p class="cs-desc">Product photography, brand campaigns, and editorial content for businesses and creators who refuse to be ordinary.</p>
           <a href="#contact" class="cs-link">Book a Session <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
-        <div class="cs-text-slide" data-slide="4">
+        <div class="cs-text-slide" data-slide="5">
           <div class="cs-label">05 · Conceptual</div>
           <h2 class="cs-title">Art That Defies the Frame</h2>
           <p class="cs-desc">Surreal, editorial, and experimental visual storytelling — for those who see photography as pure art.</p>
+          <a href="#contact" class="cs-link">Book a Session <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+        <div class="cs-text-slide" data-slide="6">
+          <div class="cs-label">06 · Behind the Scenes</div>
+          <h2 class="cs-title">The Art of the Unseen</h2>
+          <p class="cs-desc">A glimpse into our process — the energy, the collaboration, and the quiet moments that lead to the final frame.</p>
           <a href="#contact" class="cs-link">Book a Session <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
       </div>
@@ -1037,7 +1061,7 @@
         <p>Whether you're planning a grand wedding or an intimate portrait session, we'd love to hear your story.</p>
         <div class="contact-details">
           <div class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><h5>New York City</h5><p>Available for travel worldwide</p></div></div>
-          <a href="mailto:avala.sudhakar@gmail.com" class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div><h5>avala.sudhakar@gmail.com</h5><p>We respond within 24 hours</p></div></a>
+          <a href="mailto:info@aakaarastudiosnyc.com" class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div><h5>info@aakaarastudiosnyc.com</h5><p>We respond within 24 hours</p></div></a>
           <a href="tel:+14753322020" class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg></div><div><h5>+1 (475) 332-2020</h5><p>Mon–Sat, 10am–7pm EST</p></div></a>
           <a href="https://www.instagram.com/sudhakar_3697?igsh=MWxodHZrOWlhcmpzOA%3D%3D&utm_source=qr" target="_blank" class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="var(--rose)" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke="var(--rose)" stroke-width="1.5"/><circle cx="17.5" cy="6.5" r="1.5" fill="var(--rose)"/></svg></div><div><h5>@sudhakar_3697</h5><p>Follow us on Instagram</p></div></a>
         </div>
@@ -1078,7 +1102,7 @@
       </div>
       <div class="footer-col"><h5>Navigate</h5><a href="#home">Home</a><a href="#portfolio">Portfolio</a><a href="#video-works">Films</a><a href="couple-portraits.html">Couple Portraits</a><a href="#about">About</a><a href="#services">Services</a><a href="#contact">Contact</a></div>
       <div class="footer-col"><h5>Services</h5><a href="#services">Weddings</a><a href="#services">Couples</a><a href="#services">Maternity</a><a href="#services">Celebrations</a><a href="#services">Commercial</a><a href="#services">Conceptual</a></div>
-      <div class="footer-col"><h5>Connect</h5><a href="https://www.instagram.com/sudhakar_3697?igsh=MWxodHZrOWlhcmpzOA%3D%3D&utm_source=qr" target="_blank">Instagram</a><a href="mailto:avala.sudhakar@gmail.com">Email Us</a><a href="tel:+14753322020">Call Us</a></div>
+      <div class="footer-col"><h5>Connect</h5><a href="https://www.instagram.com/sudhakar_3697?igsh=MWxodHZrOWlhcmpzOA%3D%3D&utm_source=qr" target="_blank">Instagram</a><a href="mailto:info@aakaarastudiosnyc.com">Email Us</a><a href="tel:+14753322020">Call Us</a></div>
     </div>
     <div class="footer-bottom">
       <p>© 2026 Aakaara Studios NYC · Crafting Love Into Art</p>
