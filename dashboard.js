@@ -10,11 +10,11 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         // Fallback to mock data if nothing is stored, then save it.
         quotes = [
-            { id: 1, clientName: 'Priya & Rohan', eventDate: '2024-09-14', eventDateTo: '2024-09-15', status: 'sent', quotedPrice: 4500, confirmedPrice: null },
-            { id: 2, clientName: 'Ananya Sharma', eventDate: '2024-10-05', eventDateTo: '2024-10-05', status: 'confirmed', quotedPrice: 2200, confirmedPrice: 2200 },
-            { id: 3, clientName: 'Vikram Singh', eventDate: '2024-09-21', eventDateTo: '2024-09-21', status: 'sent', quotedPrice: 3000, confirmedPrice: null },
-            { id: 4, clientName: 'Meera Desai', eventDate: '2024-11-02', eventDateTo: '2024-11-02', status: 'rejected', quotedPrice: 1800, confirmedPrice: null },
-            { id: 5, clientName: 'Arjun & Diya', eventDate: '2024-10-06', eventDateTo: '2024-10-06', status: 'confirmed', quotedPrice: 7500, confirmedPrice: 7000 },
+            { id: 1, clientName: 'Priya & Rohan', clientEmail: 'priya.r@example.com', eventDate: '2024-09-14', eventDateTo: '2024-09-15', status: 'sent', quotedPrice: 4500, confirmedPrice: null },
+            { id: 2, clientName: 'Ananya Sharma', clientEmail: 'ananya.s@example.com', eventDate: '2024-10-05', eventDateTo: '2024-10-05', status: 'confirmed', quotedPrice: 2200, confirmedPrice: 2200 },
+            { id: 3, clientName: 'Vikram Singh', clientEmail: 'vikram.singh@example.com', eventDate: '2024-09-21', eventDateTo: '2024-09-21', status: 'sent', quotedPrice: 3000, confirmedPrice: null },
+            { id: 4, clientName: 'Meera Desai', clientEmail: 'meera.d@example.com', eventDate: '2024-11-02', eventDateTo: '2024-11-02', status: 'rejected', quotedPrice: 1800, confirmedPrice: null },
+            { id: 5, clientName: 'Arjun & Diya', clientEmail: 'arjun.d@example.com', eventDate: '2024-10-06', eventDateTo: '2024-10-06', status: 'confirmed', quotedPrice: 7500, confirmedPrice: 7000 },
         ];
         localStorage.setItem('aakaaraQuotes', JSON.stringify(quotes));
     }
@@ -64,6 +64,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 </td>
                 <td>$${quote.quotedPrice.toLocaleString()}</td>
                 <td>${confirmedPriceInput}</td>
+                <td>
+                    <button class="btn-copy" data-email="${quote.clientEmail || ''}" title="Copy Email">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                </td>
             `;
 
             // Apply styling based on status
@@ -176,6 +181,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     quote.confirmedPrice = newPrice;
                     saveQuotes(); // Save changes to localStorage
                 }
+            });
+        });
+
+        // Copy email button
+        document.querySelectorAll('.btn-copy').forEach(button => {
+            button.addEventListener('click', () => {
+                const email = button.dataset.email;
+                if (!email) return;
+
+                navigator.clipboard.writeText(email).then(() => {
+                    const originalContent = button.innerHTML;
+                    button.textContent = 'Copied!';
+                    button.classList.add('copied');
+                    setTimeout(() => {
+                        button.innerHTML = originalContent;
+                        button.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy email: ', err);
+                });
             });
         });
     }

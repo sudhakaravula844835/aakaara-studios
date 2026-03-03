@@ -37,8 +37,8 @@ body {
     align-items: flex-start;
 }
 .section {
-    background: rgba(30,26,22,0.2);
-    border: 1px solid rgba(201,149,107,0.08);
+    background: transparent; /* Remove solid background to blend with body gradient */
+    border: 1px solid rgba(201,149,107,0.15); /* Slightly more visible border for definition */
     border-radius: 8px;
 }
 .section-header {
@@ -84,6 +84,29 @@ body {
     background: rgba(0,0,0,0.2); border: 1px solid rgba(250,246,241,0.1);
     color: var(--ivory); padding: 0.3rem 0.5rem; border-radius: 4px;
     font-family: inherit; font-size: inherit; width: 80px;
+}
+
+/* Action Buttons */
+.btn-copy {
+    background: none;
+    border: 1px solid rgba(250,246,241,0.1);
+    color: rgba(250,246,241,0.4);
+    border-radius: 4px;
+    padding: 0.4rem 0.6rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-copy:hover {
+    border-color: var(--rose);
+    color: var(--rose);
+}
+.btn-copy.copied {
+    border-color: var(--sage);
+    color: var(--sage);
+    font-size: 0.7rem;
 }
 
 /* Calendar */

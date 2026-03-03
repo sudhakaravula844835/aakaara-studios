@@ -13,6 +13,38 @@ from optimize_images import optimize_images
 SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 DIST_DIR = os.path.join(SRC_DIR, 'dist')
 SITE_URL = 'https://www.aakaarastudiosnyc.com' # Your production domain
+GA_MEASUREMENT_ID = 'G-XXXXXXXXXX' # <-- REPLACE WITH YOUR GOOGLE ANALYTICS ID
+
+# --- Analytics Injection Function ---
+def inject_analytics(html_content, measurement_id):
+    """
+    Injects a performance-optimized, delayed Google Analytics snippet.
+    """
+    if not measurement_id or measurement_id == 'G-XXXXXXXXXX':
+        return html_content # Don't inject if the placeholder ID is still there
+
+    # This script delays loading GA until the first user interaction or a timeout.
+    analytics_snippet = f"""
+<script>
+  function loadAnalytics() {{
+    if (window.gaLoaded) return;
+    window.gaLoaded = true;
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://www.googletagmanager.com/gtag/js?id={measurement_id}';
+    document.head.appendChild(script);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){{dataLayer.push(arguments);}}
+    gtag('js', new Date());
+    gtag('config', '{measurement_id}');
+    ['scroll', 'mousemove', 'touchstart'].forEach(e => window.removeEventListener(e, loadAnalytics));
+  }}
+  setTimeout(loadAnalytics, 3000);
+  ['scroll', 'mousemove', 'touchstart'].forEach(e => window.addEventListener(e, loadAnalytics, {{ once: true, passive: true }}));
+</script>
+"""
+    # Insert the snippet right before the closing </body> tag
+    return html_content.replace('</body>', f'{analytics_snippet}</body>')
 
 # --- Sitemap Generation Function ---
 def generate_sitemap(dist_dir, site_url):
@@ -139,6 +171,9 @@ def build():
                 if content != original_content:
                     content = re.sub(r'<script\s+src="include\.js"></script>', '<script src="Script.js"></script>', content)
                     print(f"📦 Inlined partials for: {name}")
+
+                # Inject analytics into the final HTML content
+                content = inject_analytics(content, GA_MEASUREMENT_ID)
                 
                 with open(dest_path, 'w', encoding='utf-8') as f:
                     f.write(content)
