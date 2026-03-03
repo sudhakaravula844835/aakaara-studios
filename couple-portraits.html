@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Couple Portraits — Aakaara Studios NYC</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Outfit:wght@200;300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Outfit:wght@200;300;400;500;600&family=Noto+Sans+Telugu:wght@300;400&family=Noto+Sans+Devanagari:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <style>
         /* Immersive Showcase Styling */
-        body { background: #09080b; color: #fbfbfb; font-family: 'Outfit', sans-serif; overflow-x: hidden; margin: 0; }
+        body {
+            background: var(--noir);
+            color: var(--ivory);
+        }
 
         .showcase-header {
             padding: 8rem 2rem 4rem;
@@ -17,18 +21,19 @@
         }
 
         .showcase-header h1 {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: var(--font-display);
             font-size: clamp(3rem, 8vw, 5rem);
             font-weight: 300;
             letter-spacing: 0.1em;
             margin-bottom: 1rem;
+            color: var(--ivory);
         }
 
         .showcase-header p {
             font-size: 0.7rem;
             letter-spacing: 0.4em;
             text-transform: uppercase;
-            color: #c9956b;
+            color: var(--rose);
         }
 
         .masonry-grid {
@@ -43,7 +48,7 @@
         .work-item {
             position: relative;
             overflow: hidden;
-            background: #1a1a1a;
+            background: var(--surface2);
             border-radius: 2px;
             transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             aspect-ratio: 4/5;
@@ -56,35 +61,6 @@
             filter: grayscale(20%) contrast(1.1);
             transition: all 1.2s ease;
         }
-
-        .work-item:hover img {
-            transform: scale(1.05);
-            filter: grayscale(0%) contrast(1);
-        }
-
-        .back-btn {
-            position: fixed;
-            top: 2rem;
-            left: 2rem;
-            z-index: 100;
-            font-size: 0.6rem;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-            color: #fbfbfb;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .back-btn span {
-            width: 30px;
-            height: 1px;
-            background: #c9956b;
-            transition: width 0.4s;
-        }
-
-        .back-btn:hover span { width: 50px; }
 
         #backToTop {
             position: fixed;
@@ -101,41 +77,19 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            border: 1px solid #c9956b;
+            border: 1px solid var(--rose);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .gallery-footer {
-            text-align: center;
-            padding: 3rem 2rem 4rem;
-            border-top: 1px solid rgba(201,149,107,0.15);
-        }
-        .gallery-footer p {
-            font-size: 0.65rem;
-            letter-spacing: 0.4em;
-            text-transform: uppercase;
-            color: rgba(251,251,251,0.35);
-            margin-bottom: 1.5rem;
-        }
-        .footer-cta {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.2rem;
-            font-style: italic;
-            color: #c9956b;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        .footer-cta:hover { color: #dbb08a; }
-        
         .work-caption {
             position: absolute;
             bottom: 0; left: 0; right: 0;
             padding: 1.5rem 1rem 1rem;
             background: linear-gradient(to top, rgba(9,8,11,0.9), transparent);
-            color: #fbfbfb;
-            font-family: 'Cormorant Garamond', serif;
+            color: var(--ivory);
+            font-family: var(--font-display);
             font-size: 1.1rem;
             text-align: center;
             opacity: 0;
@@ -154,10 +108,10 @@
         }
         .filter-btn {
             background: transparent;
-            border: 1px solid rgba(201,149,107,0.2);
-            color: rgba(251,251,251,0.6);
+            border: 1px solid var(--gold-border);
+            color: rgba(250,246,241,0.6);
             padding: 0.5rem 1.5rem;
-            font-family: 'Outfit', sans-serif;
+            font-family: var(--font-body);
             font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.15em;
@@ -165,8 +119,8 @@
             transition: all 0.3s ease;
         }
         .filter-btn:hover, .filter-btn.active {
-            border-color: #c9956b;
-            color: #c9956b;
+            border-color: var(--rose);
+            color: var(--rose);
         }
 
         /* Ensure images fill their card */
@@ -207,38 +161,24 @@
             font-size: 0.6rem;
             letter-spacing: 0.35em;
             text-transform: uppercase;
-            color: #c9956b;
+            color: var(--rose);
             margin-bottom: 0.8rem;
         }
         .lg-title {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: var(--font-display);
             font-size: clamp(1.6rem, 4vw, 2.4rem);
             font-weight: 300;
-            color: #faf6f1;
+            color: var(--ivory);
             letter-spacing: 0.04em;
             margin-bottom: 0.8rem;
         }
         .lg-desc {
             font-size: 0.72rem;
             letter-spacing: 0.08em;
-            color: rgba(250,246,241,0.4);
+            color: var(--muted);
             max-width: 500px;
             margin: 0 auto;
         }
-        .nyc-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: stretch; }
-        .nyc-list { display: flex; flex-direction: column; }
-        .nyc-loc { padding: 1rem 0; border-bottom: 1px solid rgba(201,149,107,0.05); cursor: pointer; transition: all 0.4s; display: flex; align-items: center; justify-content: space-between; }
-        .nyc-loc:hover { padding-left: 1rem; }
-        .nyc-loc-left { display: flex; align-items: center; gap: 1.2rem; }
-        .nyc-loc .num { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; color: #c9956b; opacity: 0.15; min-width: 36px; transition: opacity 0.4s; }
-        .nyc-loc:hover .num { opacity: 0.5; }
-        .nyc-loc h4 { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 1.2rem; color: #faf6f1; letter-spacing: 0.03em; transition: color 0.3s; margin: 0; }
-        .nyc-loc:hover h4 { color: #c9956b; }
-        .nyc-loc .nyc-sub-text { font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(250,246,241,0.15); margin-top: 0.1rem; }
-        .nyc-loc .nyc-arrow { opacity: 0; transform: translateX(-8px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .nyc-loc:hover .nyc-arrow { opacity: 0.4; transform: translateX(0); }
-        .nyc-preview { position: relative; border-radius: 6px; overflow: hidden; background: rgba(30,26,22,0.4); border: 1px solid rgba(201,149,107,0.2); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .nyc-preview-img { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, visibility 0.8s; }
         .nyc-preview {
             height: auto !important; /* Override fixed height from styles.css */
             min-height: 380px; /* Fallback height before JS loads */
@@ -256,10 +196,10 @@
         }
         .nyc-preview-img.active .preview-bg { transform: scale(1); }
         .nyc-preview-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 3rem 2.5rem; z-index: 5; background: linear-gradient(to top, rgba(9,8,11,0.95) 0%, transparent 100%); pointer-events: none; }
-        .nyc-preview-info h5 { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 1.3rem; color: #faf6f1; margin: 0 0 0.3rem; }
+        .nyc-preview-info h5 { font-family: var(--font-display); font-weight: 300; font-size: 1.3rem; color: var(--ivory); margin: 0 0 0.3rem; }
         .nyc-preview-info .tag-line { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(250,246,241,0.4); margin-bottom: 0.8rem; }
-        .nyc-maps-link { pointer-events: auto; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.6rem; color: #faf6f1; border: 1px solid rgba(250,246,241,0.2); padding: 0.5rem 1rem; transition: all 0.3s; text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; }
-        .nyc-maps-link:hover { border-color: #c9956b; background: rgba(201,149,107,0.1); }
+        .nyc-maps-link { pointer-events: auto; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.6rem; color: var(--ivory); border: 1px solid rgba(250,246,241,0.2); padding: 0.5rem 1rem; transition: all 0.3s; text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; }
+        .nyc-maps-link:hover { border-color: var(--rose); background: rgba(201,149,107,0.1); }
 
         @media (max-width: 1024px) {
             .nyc-layout { grid-template-columns: 1fr; }
@@ -273,12 +213,11 @@
 </head>
 <body>
 
-    <a href="index.html" class="back-btn" onclick="event.preventDefault(); sessionStorage.setItem('skipIntro','1'); window.location.href='index.html';"><span></span> Back to Studio</a>
-
+    <div id="header-placeholder"></div>
     <header class="showcase-header">
         <p>Gallery One</p>
         <h1>Couple Portraits</h1>
-        <div style="width: 60px; height: 1px; background: #c9956b; margin: 2rem auto;"></div>
+        <div style="width: 60px; height: 1px; background: var(--rose); margin: 2rem auto;"></div>
     </header>
 
     <!-- Location Guide -->
@@ -290,12 +229,12 @@
       </div>
       <div class="nyc-layout">
         <div class="nyc-list">
-          <div class="nyc-loc" data-loc="cp" data-maps-url="https://maps.google.com/?q=Central+Park+New+York"><div class="nyc-loc-left"><span class="num">01</span><div><h4>Central Park</h4><div class="nyc-sub-text">Timeless Romance · Bow Bridge · Bethesda</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9956b" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
-          <div class="nyc-loc" data-loc="dumbo" data-maps-url="https://maps.google.com/?q=DUMBO+Brooklyn"><div class="nyc-loc-left"><span class="num">02</span><div><h4>DUMBO</h4><div class="nyc-sub-text">Urban Poetry · Cobblestone Streets</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9956b" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
-          <div class="nyc-loc" data-loc="bb" data-maps-url="https://maps.google.com/?q=Brooklyn+Bridge"><div class="nyc-loc-left"><span class="num">03</span><div><h4>Brooklyn Bridge</h4><div class="nyc-sub-text">Iconic Grandeur · Gothic Arches</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9956b" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
-          <div class="nyc-loc" data-loc="subway" data-maps-url="https://maps.google.com/?q=Grand+Central+Station+NYC"><div class="nyc-loc-left"><span class="num">04</span><div><h4>NYC Subway</h4><div class="nyc-sub-text">Raw &amp; Real · Underground Soul</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9956b" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
-          <div class="nyc-loc" data-loc="lib" data-maps-url="https://maps.google.com/?q=New+York+Public+Library"><div class="nyc-loc-left"><span class="num">05</span><div><h4>NYC Public Library</h4><div class="nyc-sub-text">Literary Elegance · Beaux-Arts</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9956b" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
-          <div class="nyc-loc" data-loc="st" data-maps-url="https://maps.google.com/?q=Times+Square+NYC"><div class="nyc-loc-left"><span class="num">06</span><div><h4>NYC Streets</h4><div class="nyc-sub-text">City as Canvas · Neon &amp; Steam</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9956b" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+          <div class="nyc-loc" data-loc="cp" data-maps-url="https://maps.google.com/?q=Central+Park+New+York"><div class="nyc-loc-left"><span class="num">01</span><div><h4>Central Park</h4><div class="nyc-sub-text">Timeless Romance · Bow Bridge · Bethesda</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+          <div class="nyc-loc" data-loc="dumbo" data-maps-url="https://maps.google.com/?q=DUMBO+Brooklyn"><div class="nyc-loc-left"><span class="num">02</span><div><h4>DUMBO</h4><div class="nyc-sub-text">Urban Poetry · Cobblestone Streets</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+          <div class="nyc-loc" data-loc="bb" data-maps-url="https://maps.google.com/?q=Brooklyn+Bridge"><div class="nyc-loc-left"><span class="num">03</span><div><h4>Brooklyn Bridge</h4><div class="nyc-sub-text">Iconic Grandeur · Gothic Arches</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+          <div class="nyc-loc" data-loc="subway" data-maps-url="https://maps.google.com/?q=Grand+Central+Station+NYC"><div class="nyc-loc-left"><span class="num">04</span><div><h4>NYC Subway</h4><div class="nyc-sub-text">Raw &amp; Real · Underground Soul</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+          <div class="nyc-loc" data-loc="lib" data-maps-url="https://maps.google.com/?q=New+York+Public+Library"><div class="nyc-loc-left"><span class="num">05</span><div><h4>NYC Public Library</h4><div class="nyc-sub-text">Literary Elegance · Beaux-Arts</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+          <div class="nyc-loc" data-loc="st" data-maps-url="https://maps.google.com/?q=Times+Square+NYC"><div class="nyc-loc-left"><span class="num">06</span><div><h4>NYC Streets</h4><div class="nyc-sub-text">City as Canvas · Neon &amp; Steam</div></div></div><svg class="nyc-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
         </div>
         <div class="nyc-preview">
           <div class="nyc-preview-img active nyc-cp">
@@ -560,116 +499,15 @@
 
     <div id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
         <div class="btn-circle">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9956b" stroke-width="1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5">
                 <path d="M18 15l-6-6-6 6"/>
             </svg>
         </div>
     </div>
 
-    <footer class="gallery-footer">
-        <p>End of Gallery</p>
-        <a href="index.html#contact" class="footer-cta">Ready to start your story?</a>
-    </footer>
+    <div id="footer-placeholder"></div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const nycPreviewContainer = document.querySelector('.nyc-preview');
-            const nycPreviewImages = document.querySelectorAll('.nyc-preview-img');
-            const imageAspectRatios = {};
-            let imagesToLoad = 0;
-
-            function setPreviewAspectRatio(loc) {
-                if (!nycPreviewContainer || !imageAspectRatios[loc]) return;
-                const containerWidth = nycPreviewContainer.offsetWidth;
-                if (containerWidth > 0) {
-                    const newHeight = containerWidth * imageAspectRatios[loc];
-                    nycPreviewContainer.style.height = `${newHeight}px`;
-                }
-            }
-
-            function showNYC(loc) {
-                document.querySelectorAll('.nyc-preview-img').forEach(el => el.classList.remove('active'));
-                const targetPreview = document.querySelector(`.nyc-preview-img.nyc-${loc}`);
-                if (targetPreview) {
-                    targetPreview.classList.add('active');
-                    setPreviewAspectRatio(loc);
-                }
-            }
-
-            if (nycPreviewContainer && nycPreviewImages.length > 0) {
-                // Preload images to get their aspect ratios
-                nycPreviewImages.forEach(previewImg => {
-                    const locMatch = previewImg.className.match(/nyc-([a-z]+)/);
-                    if (!locMatch) return;
-                    const loc = locMatch[1];
-                    
-                    const bgDiv = previewImg.querySelector('.preview-bg');
-                    const urlMatch = bgDiv?.style.backgroundImage.match(/url\("?(.+?)"?\)/);
-
-                    if (urlMatch && urlMatch[1]) {
-                        imagesToLoad++;
-                        const img = new Image();
-                        img.onload = () => {
-                            if (img.naturalWidth > 0) {
-                                imageAspectRatios[loc] = img.naturalHeight / img.naturalWidth;
-                            }
-                            imagesToLoad--;
-                            if (imagesToLoad === 0) {
-                                // All images loaded, set initial aspect ratio
-                                const initialLocMatch = document.querySelector('.nyc-preview-img.active')?.className.match(/nyc-([a-z]+)/);
-                                if (initialLocMatch) setPreviewAspectRatio(initialLocMatch[1]);
-                            }
-                        };
-                        img.src = urlMatch[1];
-                    }
-                });
-            }
-
-            const nycList = document.querySelector('.nyc-list');
-            if (nycList) {
-                nycList.addEventListener('mouseover', function(event) {
-                    const locItem = event.target.closest('.nyc-loc');
-                    if (locItem && locItem.dataset.loc) {
-                        showNYC(locItem.dataset.loc);
-                    }
-                });
-                nycList.addEventListener('click', function(event) {
-                    const locItem = event.target.closest('.nyc-loc');
-                    if (locItem && locItem.dataset.mapsUrl) {
-                        window.open(locItem.dataset.mapsUrl, '_blank');
-                    }
-                });
-            }
-
-            // --- Gallery Filter Interaction ---
-            const filterBar = document.querySelector('.filter-bar');
-            if (filterBar) {
-                filterBar.addEventListener('click', function(event) {
-                    const btn = event.target.closest('.filter-btn');
-                    if (btn && btn.dataset.filter) {
-                        const category = btn.dataset.filter;
-                        filterBar.querySelector('.active').classList.remove('active');
-                        btn.classList.add('active');
-                        document.querySelectorAll('.work-item').forEach(item => {
-                            const isVisible = (category === 'all' || item.dataset.location === category);
-                            item.style.display = isVisible ? '' : 'none';
-                        });
-                    }
-                });
-            }
-
-            // --- Responsive Aspect Ratio on Resize ---
-            let resizeTimeout;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                    const activeLocMatch = document.querySelector('.nyc-preview-img.active')?.className.match(/nyc-([a-z]+)/);
-                    if (activeLocMatch) {
-                        setPreviewAspectRatio(activeLocMatch[1]);
-                    }
-                }, 100);
-            });
-        });
-    </script>
+    <script src="include.js"></script>
+    <script src="couple-portraits.js"></script>
 </body>
 </html>
