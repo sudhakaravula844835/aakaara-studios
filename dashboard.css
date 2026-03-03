@@ -1,9 +1,12 @@
 /* This file inherits variables from styles.css */
 
+html, body {
+    background: #000 !important; /* Force pure black background */
+}
 body {
-    background: var(--noir); color: var(--ivory);
     font-family: var(--font-body); font-weight: 300;
     margin: 0; -webkit-font-smoothing: antialiased;
+    color: var(--ivory);
 }
 .dashboard-header {
     padding: 1.5rem 2rem;
@@ -37,8 +40,8 @@ body {
     align-items: flex-start;
 }
 .section {
-    background: transparent; /* Remove solid background to blend with body gradient */
-    border: 1px solid rgba(201,149,107,0.15); /* Slightly more visible border for definition */
+    background: #111; /* Dark charcoal for subtle depth */
+    border: 1px solid rgba(201,149,107,0.1);
     border-radius: 8px;
 }
 .section-header {
