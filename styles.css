@@ -86,13 +86,26 @@ nav {
 }
 nav.visible { opacity: 1; transform: translateY(0); }
 nav.scrolled {
-  background: rgba(9,8,11,0.92); backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
+  /* Replaced semi-transparent black with the requested gradient */
+  background: linear-gradient(135deg, #1a1612 0%, #0a0a0f 50%, #1a2020 100%);
+  
+  /* Note: backdrop-filter has no effect on an opaque background like this gradient.
+     It's commented out but can be re-enabled if you switch to a semi-transparent background. */
+  /* backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); */
+  
   padding: 0.7rem 3.5rem;
   box-shadow: 0 1px 40px rgba(0,0,0,0.3);
 }
 .nav-logo { display: flex; align-items: center; gap: 0.9rem; }
 .nav-logo svg { height: 30px; width: auto; }
+.nav-logo .petal-group {
+  /* The initial transform is set in the SVG, but we define it here for the transition to work on mouse-out */
+  transform: translate(30px, 30px) rotate(0deg);
+  transition: transform 0.8s var(--ease);
+}
+.nav-logo:hover .petal-group {
+  transform: translate(30px, 30px) rotate(60deg);
+}
 .nav-logo-text {
   font-family: var(--font-display); font-weight: 300;
   font-size: 1.3rem; color: var(--ivory); letter-spacing: 0.06em;
@@ -117,6 +130,8 @@ nav.scrolled {
   background: var(--rose); transition: width 0.5s var(--ease);
 }
 .nav-links a:hover { color: var(--rose); }
+.nav-links a.active { color: var(--rose); }
+.nav-links a.active::after,
 .nav-links a:hover::after { width: 100%; }
 .nav-cta {
   font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase;
@@ -1314,6 +1329,8 @@ nav.scrolled {
   contain: layout style;
   /* Force GPU layer for the whole sticky zone — all children compose on GPU */
   transform: translateZ(0);
+  /* Add perspective to enable 3D transforms on child panels */
+  perspective: 1500px;
 }
 .cs-scroll-hint {
   position: absolute;
@@ -1526,28 +1543,39 @@ nav.scrolled {
 footer { background: var(--noir); color: var(--ivory); padding: 4.5rem 3.5rem 2rem; position: relative; }
 footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,149,107,0.1), transparent); }
 .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3.5rem; }
-.footer-brand svg { width: 40px; margin-bottom: 1rem; }
 .footer-brand p { font-size: 0.75rem; color: rgba(250,246,241,0.25); line-height: 1.7; max-width: 260px; }
+.footer-logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.2rem;
+}
+.footer-logo-container svg {
+  height: 30px;
+  width: auto;
+}
 .footer-logo-text {
   font-family: var(--font-display);
   font-weight: 300;
   font-size: 1.1rem;
   letter-spacing: 0.3em;
   color: var(--ivory);
-  margin-bottom: 1.2rem; /* Increased margin to give space for dots */
+  margin-bottom: 0;
   position: relative;
   display: inline-block;
 }
 .footer-logo-dots {
   position: absolute;
-  top: -10px;
+  top: -8px; /* Adjusted for smaller dots */
   /* Positioned to be centered over the 4th letter 'a' */
-  left: 2.7em; 
+  /* The 2nd 'a' in Aakaara */
+  left: 3.0em; /* Nudged to the right for perfect centering */
   display: flex;
-  gap: 6px;
+  gap: 4px; /* Reduced gap */
 }
 .footer-logo-dots span {
-  width: 6px; height: 6px; border-radius: 50%;
+  width: 3.5px; height: 3.5px; /* Reduced size */
+  border-radius: 50%;
   background: var(--rose); opacity: 0.85;
 }
 .footer-col h5 { font-size: 0.5rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--rose); margin-bottom: 1rem; font-weight: 400; }

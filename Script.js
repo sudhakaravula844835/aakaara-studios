@@ -1,3 +1,33 @@
+// ═══════ SMART NAVIGATION (HEADER COMPONENT LOGIC) ═══════
+(function() {
+  // This script runs immediately when Script.js is loaded.
+  // By this point, include.js has already fetched and injected the header.
+  const nav = document.getElementById('navbar');
+  if (!nav) return;
+
+  const navLinks = nav.querySelector('#navLinks');
+  const logoLink = nav.querySelector('.nav-logo');
+  const pathname = window.location.pathname;
+  
+  // A more robust check for the index page, works for both local and deployed paths
+  const isIndex = ['', '/', '/index.html'].some(p => pathname.endsWith(p));
+
+  // 1. Fix anchor links on sub-pages
+  if (!isIndex) {
+    if (logoLink) logoLink.href = 'index.html';
+    if (navLinks) {
+      navLinks.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.href = `index.html${a.getAttribute('href')}`;
+      });
+    }
+  }
+
+  // 2. Set active class for the current page's link
+  const currentPageLink = Array.from(navLinks.querySelectorAll('a')).find(a => a.href === window.location.href);
+  if (currentPageLink) {
+    currentPageLink.classList.add('active');
+  }
+})();
 // ═══════ CINEMATIC INTRO ANIMATION ═══════
 (function() {
   const intro = document.getElementById('intro');
@@ -661,6 +691,7 @@ document.querySelectorAll('.gallery-item').forEach(item => {
       panels.forEach(function(panel, i) {
         panel.style.transform  = i === 0 ? 'translateY(0%)' : 'translateY(100%)';
         panel.style.zIndex     = '0';
+        panel.style.filter     = 'brightness(1)';
       });
       if (counterEl) counterEl.textContent = '00';
       dots.forEach(function(d, i) { d.classList.toggle('active', i === 0); });
@@ -700,20 +731,31 @@ document.querySelectorAll('.gallery-item').forEach(item => {
        Text overlay is z=100, totally independent — never covered */
     panels.forEach(function(panel, i) {
       var yPct;
+      var transform;
+
       if (i < activeIdx) {
         yPct = -100;
         panel.style.zIndex     = '0';
+        transform = `translateY(${yPct}%)`;
       } else if (i === activeIdx) {
         yPct = 0;
         panel.style.zIndex     = '1';
+        const scale = 1 - (progress * 0.1);
+        const zPos = -progress * 250;
+        transform = `translateY(${yPct}%) scale(${scale}) translateZ(${zPos}px)`;
+        panel.style.filter = `brightness(${1 - progress * 0.4})`;
       } else if (i === activeIdx + 1) {
         yPct = (1 - progress) * 100;
         panel.style.zIndex     = '2';
+        transform = `translateY(${yPct}%)`;
+        panel.style.filter = 'brightness(1)';
       } else {
         yPct = 100;
         panel.style.zIndex     = '0';
+        transform = `translateY(${yPct}%)`;
+        panel.style.filter = 'brightness(1)';
       }
-      panel.style.transform = 'translateY(' + yPct + '%)';
+      panel.style.transform = transform;
     });
   }
 
