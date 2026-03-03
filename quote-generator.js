@@ -652,6 +652,7 @@ function sendQuoteEmail() {
     const newQuote = {
       id: Date.now(),
       clientName: name,
+      clientEmail: email,
       eventDate: eventDateFrom,
       eventDateTo: eventDateTo,
       status: 'sent',

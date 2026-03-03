@@ -1395,12 +1395,17 @@ nav.scrolled {
 .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
 .date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
 .form-group label { font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(30,26,22,0.3); font-weight: 400; }
-.form-group input, .form-group select, .form-group textarea { font-family: var(--font-body); font-weight: 300; font-size: 0.82rem; padding: 0.8rem 1rem; border: 1px solid rgba(30,26,22,0.05); border-radius: 3px; background: rgba(250,246,241,0.35); color: var(--umber); transition: border-color 0.3s; outline: none; }
+.form-group input, .form-group select, .form-group textarea {
+  font-family: var(--font-body); font-weight: 300; font-size: 0.82rem;
+  padding: 0.8rem 1rem; border: 1px solid rgba(201,149,107,0.2);
+  border-radius: 3px; background: var(--noir);
+  color: var(--ivory); transition: border-color 0.3s; outline: none;
+}
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--rose); }
 .form-group textarea { resize: vertical; min-height: 100px; }
 /* Style the placeholder text to match the theme */
 .form-group input::placeholder, .form-group textarea::placeholder {
-  color: rgba(30, 26, 22, 0.4); opacity: 1;
+  color: rgba(250, 246, 241, 0.3); opacity: 1;
 }
 .form-submit { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ivory); background: var(--umber); padding: 0.9rem 2rem; border-radius: 3px; font-weight: 400; transition: all 0.4s; align-self: flex-start; }
 .form-submit:hover { background: var(--rose); transform: translateY(-2px); }
