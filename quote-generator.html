@@ -329,6 +329,7 @@ body {
     </div>
     <div class="topbar-actions">
       <button class="btn btn-ghost btn-small" onclick="resetForm()">New Quote</button>
+      <a href="dashboard.html" class="btn btn-ghost btn-small" style="text-decoration: none;">Dashboard</a>
     </div>
   </div>
 
@@ -1145,12 +1146,45 @@ function closePreview() {
 function sendQuoteEmail() {
   const email = document.getElementById('clientEmail').value;
   const name = document.getElementById('clientName').value;
-  
-  if (!email) {
-    alert('Please enter a Client Email address in the form first.');
+
+  if (!email || !name) {
+    alert('Please enter a Client Name and Email address first.');
     closePreview();
-    document.getElementById('clientEmail').focus();
+    document.getElementById('clientName').focus();
     return;
+  }
+
+  // --- NEW: Save quote data to localStorage for the dashboard ---
+  try {
+    let quotes = JSON.parse(localStorage.getItem('aakaaraQuotes')) || [];
+    const totalText = document.getElementById('totalDisplay').textContent;
+    const total = parseFloat(totalText.replace(/[^0-9.-]+/g, ""));
+
+    const dayDates = Array.from(document.querySelectorAll('.day-block [data-field="date"]'))
+                          .map(input => input.value)
+                          .filter(date => date) // Filter out empty dates
+                          .sort(); // Sort chronologically
+
+    const eventDateFrom = dayDates.length > 0 ? dayDates[0] : new Date().toISOString().split('T')[0];
+    const eventDateTo = dayDates.length > 0 ? dayDates[dayDates.length - 1] : eventDateFrom;
+
+    const newQuote = {
+      id: Date.now(),
+      clientName: name,
+      eventDate: eventDateFrom,
+      eventDateTo: eventDateTo,
+      status: 'sent',
+      quotedPrice: total,
+      confirmedPrice: null
+    };
+
+    quotes.unshift(newQuote); // Add to the top of the list
+    localStorage.setItem('aakaaraQuotes', JSON.stringify(quotes));
+    showToast('Quote saved to dashboard!');
+
+  } catch (e) {
+    console.error("Failed to save quote to localStorage", e);
+    alert("Could not save quote to dashboard. Please check browser permissions.");
   }
 
   // 1. Download the PDF so the user has it to attach
@@ -1159,13 +1193,9 @@ function sendQuoteEmail() {
   // 2. Construct email
   const subject = `Photography Quote: ${name} — Aakaara Studios`;
   const body = `Hi ${name.split(' ')[0]},\n\nIt was wonderful connecting with you. Please find the attached quote for your photography coverage.\n\nWe've customized this based on our discussion. Let us know if you have any questions!\n\nBest,\nSudhakar Avula\nAakaara Studios NYC`;
-  
-  // 3. Open Gmail Compose (Forces Google Workspace/Gmail)
   const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  
   setTimeout(() => {
     window.open(gmailUrl, '_blank');
-    showToast('Quote downloaded. Please attach it to the Gmail tab!');
   }, 800);
 }
 
