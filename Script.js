@@ -567,9 +567,6 @@ document.querySelectorAll('.gallery-item').forEach(item => {
         vid.play().catch(function(){});
       }, { once: true });
 
-      /* Hard fallback — force-show after 2s regardless */
-      setTimeout(function() { showVideo(); }, 2000);
-
       if (videoSrc.indexOf('.m3u8') !== -1 && typeof Hls !== 'undefined' && Hls.isSupported()) {
         var hls = new Hls();
         hls.loadSource(videoSrc);
