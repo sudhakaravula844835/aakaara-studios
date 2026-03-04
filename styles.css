@@ -941,11 +941,43 @@ nav.scrolled {
 .about-image { aspect-ratio: 3/4; border-radius: 6px; max-height: 650px; background: linear-gradient(145deg, var(--rose), var(--wine), var(--umber)); position: relative; overflow: hidden; }
 .about-image::after { content: ''; position: absolute; inset: 8px; border: 1px solid rgba(250,246,241,0.06); border-radius: 3px; }
 .about-text .section-title { margin-bottom: 1.5rem; }
-.about-text p { font-size: 0.85rem; line-height: 1.95; color: rgba(30,26,22,0.45); margin-bottom: 1rem; }
+.about-text p { font-size: 0.85rem; line-height: 1.95; color: rgba(30,26,22,0.7); margin-bottom: 1rem; }
+.about-quote {
+  font-style: italic;
+  color: rgba(30,26,22,0.6) !important; /* Increased opacity for visibility */
+  font-size: 0.82rem;
+  line-height: 1.9;
+  border-left: 2px solid rgba(201,149,107,0.3);
+  padding-left: 1.2rem;
+  margin-top: 1.5rem !important;
+}
 .about-sanskrit { font-size: 1.1rem; margin-top: 2rem; letter-spacing: 0.04em; line-height: 2.2; }
-.about-sanskrit .telugu { font-family: 'Noto Sans Telugu', sans-serif; color: var(--saffron); font-weight: 400; font-size: 1.3em; }
-.about-sanskrit .devnag { font-family: 'Noto Sans Devanagari', sans-serif; color: var(--wine); font-weight: 400; font-size: 1.15em; }
+.about-sanskrit .telugu { font-family: 'p22-mackinac-pro', 'Noto Sans Telugu', sans-serif; color: var(--saffron); font-weight: 400; font-size: 1.3em; }
+.about-sanskrit .devnag { font-family: 'p22-mackinac-pro', 'Noto Sans Devanagari', sans-serif; color: var(--wine); font-weight: 400; font-size: 1.15em; }
 .about-sanskrit .english { font-family: var(--font-display); font-style: italic; color: var(--rose); font-weight: 400; }
+.about-symbolism {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(30,26,22,0.05);
+}
+.symbol-title {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--rose);
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+.symbol-dots { display: flex; flex-direction: column; gap: 4px; }
+.symbol-dots span { width: 4px; height: 4px; border-radius: 50%; background: var(--rose); opacity: 0.6; }
+.symbol-desc {
+  font-size: 0.85rem;
+  line-height: 1.9;
+  color: rgba(30,26,22,0.45);
+  padding-left: calc(4px + 0.8rem); /* Align with text, not dots */
+}
 .about-stats { display: flex; gap: 3rem; margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid rgba(30,26,22,0.05); }
 .about-stats .stat h4 { font-family: var(--font-display); font-weight: 300; font-size: 2rem; color: var(--rose); line-height: 1; }
 .about-stats .stat p { font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(30,26,22,0.25); margin-top: 0.3rem; }
@@ -1383,7 +1415,12 @@ nav.scrolled {
    ═══════════════════════════════════════════════════════════ */
 .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
 .contact-info h3 { font-family: var(--font-display); font-weight: 300; font-size: 1.6rem; margin-bottom: 1.5rem; }
-.contact-info > p { font-size: 0.82rem; color: rgba(30,26,22,0.4); line-height: 1.85; margin-bottom: 2rem; }
+.contact-info > p {
+  font-size: 0.95rem; /* Increased size for better readability */
+  color: rgba(30,26,22,0.5); /* Slightly darker for better contrast */
+  line-height: 1.9;
+  margin-bottom: 2rem;
+}
 .contact-details { display: flex; flex-direction: column; gap: 0.9rem; }
 .contact-detail { display: flex; align-items: center; gap: 0.9rem; }
 .cd-icon { width: 36px; height: 36px; border: 1px solid rgba(201,149,107,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -1397,15 +1434,15 @@ nav.scrolled {
 .form-group label { font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(30,26,22,0.3); font-weight: 400; }
 .form-group input, .form-group select, .form-group textarea {
   font-family: var(--font-body); font-weight: 300; font-size: 0.82rem;
-  padding: 0.8rem 1rem; border: 1px solid rgba(201,149,107,0.2);
-  border-radius: 3px; background: var(--noir);
-  color: var(--ivory); transition: border-color 0.3s; outline: none;
+  padding: 0.8rem 1rem; border: 1px solid rgba(125, 63, 5, 0.08);
+  border-radius: 3px; background: var(--champagne);
+  color: var(--umber); transition: border-color 0.3s; outline: none;
 }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--rose); }
 .form-group textarea { resize: vertical; min-height: 100px; }
 /* Style the placeholder text to match the theme */
 .form-group input::placeholder, .form-group textarea::placeholder {
-  color: rgba(250, 246, 241, 0.3); opacity: 1;
+  color: rgba(30, 26, 22, 0.4); opacity: 1;
 }
 .form-submit { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ivory); background: var(--umber); padding: 0.9rem 2rem; border-radius: 3px; font-weight: 400; transition: all 0.4s; align-self: flex-start; }
 .form-submit:hover { background: var(--rose); transform: translateY(-2px); }
@@ -2077,4 +2114,28 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 }
 .gallery-item[data-cat="wedding"][data-title="Abhinav & Megha"]:hover .gi-bg {
   filter: grayscale(0%) brightness(1.03) contrast(1) blur(0px);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SUBTITLE FONT OVERRIDE
+   ═══════════════════════════════════════════════════════════ */
+#about .about-text > p,
+#contact .contact-info > p {
+  font-family: 'p22-mackinac-pro', var(--font-display);
+}
+#portfolio .section-desc,
+#video-works .section-desc {
+  font-family: 'p22-mackinac-pro', var(--font-display);
+  font-size: 1.1rem; /* Increased size for more prominence */
+  color: rgba(250,246,241,0.5); /* Slightly increased opacity for better contrast */
+  line-height: 1.8;
+  max-width: none; /* Allow text to span a single line */
+}
+#services-overview .section-desc {
+  max-width: none; /* Allow text to span a single line */
+  font-family: 'p22-mackinac-pro', var(--font-display);
+  font-size: 1.1rem; /* Increased size for more prominence */
+  color: rgba(250,246,241,0.5); /* Consistent with other subtitles */
+  margin: 0 auto;
+  text-align: center;
 }
