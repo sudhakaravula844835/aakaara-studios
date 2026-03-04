@@ -1065,15 +1065,9 @@ nav.scrolled {
   left: 0.6rem;
   width: 72px;
   height: 72px;
-  opacity: 0;
-  transition: opacity 0.8s var(--ease-smooth), transform 0.8s var(--ease);
-  transform: scale(0.88);
+  opacity: 1;
   pointer-events: none;
   z-index: 1;
-}
-.sov-card:hover .sov-stamp {
-  opacity: 1;
-  transform: scale(1);
 }
 .sov-stamp svg {
   width: 100%;
@@ -1081,28 +1075,22 @@ nav.scrolled {
 }
 
 /* Weddings — film frame, warm rose */
-.sov-stamp--wedding { color: var(--rose); transform: rotate(-3deg) scale(0.88); }
-.sov-card:hover .sov-stamp--wedding { transform: rotate(0deg) scale(1); }
+.sov-stamp--wedding { color: var(--saffron); transform: rotate(-3deg) scale(1); }
 
 /* Couple — infinity film loop, soft blush */
-.sov-stamp--couple { color: var(--blush); transform: rotate(0deg) scale(0.85); }
-.sov-card:hover .sov-stamp--couple { transform: rotate(0deg) scale(1.02); }
+.sov-stamp--couple { color: var(--blush); transform: rotate(2deg) scale(1.02); }
 
 /* Maternity — crescent moon & star, gentle sage */
-.sov-stamp--maternity { color: var(--sage); transform: rotate(-4deg) scale(0.85); }
-.sov-card:hover .sov-stamp--maternity { transform: rotate(0deg) scale(1.04); }
+.sov-stamp--maternity { color: var(--blush); transform: rotate(-4deg) scale(1.04); }
 
 /* Celebrations — clapperboard, warm saffron */
-.sov-stamp--celebration { color: var(--saffron); transform: rotate(-2deg) scale(0.88); }
-.sov-card:hover .sov-stamp--celebration { transform: rotate(1deg) scale(1); }
+.sov-stamp--celebration { color: var(--saffron); transform: rotate(-2deg) scale(1); }
 
 /* Commercial — aperture iris, cool mauve */
-.sov-stamp--commercial { color: var(--mauve); transform: rotate(0deg) scale(0.85); }
-.sov-card:hover .sov-stamp--commercial { transform: rotate(15deg) scale(1); }
+.sov-stamp--commercial { color: var(--mauve); transform: rotate(15deg) scale(1); }
 
 /* Conceptual — golden spiral, deep wine */
-.sov-stamp--conceptual { color: var(--wine); transform: rotate(0deg) scale(0.88); }
-.sov-card:hover .sov-stamp--conceptual { transform: rotate(0deg) scale(1); }
+.sov-stamp--conceptual { color: var(--mauve); transform: rotate(0deg) scale(1); }
 .sov-cta {
   display: inline-flex;
   align-items: center;
