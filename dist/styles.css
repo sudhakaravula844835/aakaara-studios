@@ -87,7 +87,9 @@ nav {
 nav.visible { opacity: 1; transform: translateY(0); }
 nav.scrolled {
   /* Replaced semi-transparent black with the requested gradient */
-  background: linear-gradient(135deg, #1a1612 0%, #0a0a0f 50%, #1a2020 100%);
+  background: linear-gradient(160deg, #09080b 0%, #1e1a16 40%, #2a2520 70%, #0e0c10 100%);
+  background-size: 180% 180%;
+  animation: heroAtmosphere 25s ease infinite alternate;
   
   /* Note: backdrop-filter has no effect on an opaque background like this gradient.
      It's commented out but can be re-enabled if you switch to a semi-transparent background. */
@@ -142,6 +144,11 @@ nav.scrolled {
 .nav-toggle { display: none; flex-direction: column; gap: 5px; padding: 4px; }
 .nav-toggle span { width: 22px; height: 1.5px; background: var(--ivory); transition: all 0.3s; }
 
+@keyframes heroAtmosphere {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
 /* ═══════════════════════════════════════════════════════════
    HERO
    ═══════════════════════════════════════════════════════════ */
@@ -149,9 +156,7 @@ nav.scrolled {
   min-height: 100vh; position: relative; overflow: hidden;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   text-align: center; padding: 2rem;
-  background: linear-gradient(160deg, #09080b 0%, #1e1a16 40%, #2a2520 70%, #0e0c10 100%);
-  background-size: 180% 180%;
-  animation: heroAtmosphere 25s ease infinite alternate;
+  background: linear-gradient(135deg, #1a1612 0%, #0a0a0f 50%, #1a2020 100%);
 }
 .hero::after {
   content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 55%;
@@ -1379,9 +1384,19 @@ nav.scrolled {
 /* ═══════════════════════════════════════════════════════════
    CONTACT
    ═══════════════════════════════════════════════════════════ */
+#contact .section-tag {
+  font-size: 0.65rem; /* Increased from default 0.55rem for emphasis */
+}
+
 .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
 .contact-info h3 { font-family: var(--font-display); font-weight: 300; font-size: 1.6rem; margin-bottom: 1.5rem; }
-.contact-info > p { font-size: 0.82rem; color: rgba(30,26,22,0.4); line-height: 1.85; margin-bottom: 2rem; }
+.contact-info > p {
+  font-size: 1.05rem; /* Increased size for visibility */
+  color: rgba(30,26,22,0.75); /* Darker for better contrast */
+  font-weight: 400;
+  line-height: 1.8;
+  margin-bottom: 2rem;
+}
 .contact-details { display: flex; flex-direction: column; gap: 0.9rem; }
 .contact-detail { display: flex; align-items: center; gap: 0.9rem; }
 .cd-icon { width: 36px; height: 36px; border: 1px solid rgba(201,149,107,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -1540,7 +1555,7 @@ nav.scrolled {
    ═══════════════════════════════════════════════════════════ */
 footer { background: var(--noir); color: var(--ivory); padding: 4.5rem 3.5rem 2rem; position: relative; }
 footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,149,107,0.1), transparent); }
-.footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3.5rem; }
+.footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 4rem; margin-bottom: 3.5rem; }
 .footer-brand p { font-size: 0.75rem; color: rgba(250,246,241,0.25); line-height: 1.7; max-width: 260px; }
 .footer-logo-container {
   display: flex;
@@ -1555,7 +1570,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .footer-logo-text {
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   letter-spacing: 0.3em;
   color: var(--ivory);
   margin-bottom: 0;
@@ -1577,7 +1592,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   background: var(--rose); opacity: 0.85;
 }
 .footer-col h5 { font-size: 0.5rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--rose); margin-bottom: 1rem; font-weight: 400; }
-.footer-col a { display: block; font-size: 0.75rem; color: rgba(250,246,241,0.3); margin-bottom: 0.5rem; transition: color 0.3s; }
+.footer-col a { display: block; font-size: 0.8rem; color: rgba(250,246,241,0.3); margin-bottom: 0.5rem; transition: color 0.3s; }
 .footer-col a:hover { color: var(--rose); }
 .footer-bottom { border-top: 1px solid rgba(250,246,241,0.025); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
 .footer-bottom p { font-size: 0.6rem; color: rgba(250,246,241,0.12); letter-spacing: 0.06em; }
