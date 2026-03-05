@@ -2,16 +2,17 @@ import os
 import shutil
 import re
 from datetime import datetime
+from pathlib import Path
 
 import csscompressor
 import jsmin
 
 # Import the image optimization function from the other script
-from optimize_images import optimize_images
+from optimize_images import optimize_images # Assuming this script exists
 
 # --- Configuration ---
-SRC_DIR = os.path.dirname(os.path.abspath(__file__))
-DIST_DIR = os.path.join(SRC_DIR, 'dist')
+SRC_DIR = Path(__file__).parent
+DIST_DIR = SRC_DIR / 'dist'
 SITE_URL = 'https://www.aakaarastudiosnyc.com' # Your production domain
 GA_MEASUREMENT_ID = 'G-XXXXXXXXXX' # <-- REPLACE WITH YOUR GOOGLE ANALYTICS ID
 
@@ -52,15 +53,16 @@ def generate_sitemap(dist_dir, site_url):
     Generates a sitemap.xml file from the .html files in the dist directory.
     """
     pages = []
-    for root, _, files in os.walk(dist_dir):
-        for name in files:
-            if name.endswith('.html'):
-                # Create a relative path from the dist_dir
-                page_path = os.path.relpath(os.path.join(root, name), dist_dir)
-                # Handle index.html for the root URL
-                if name == 'index.html':
-                    page_path = ''
-                pages.append(page_path.replace('\\', '/'))
+    for html_file in Path(dist_dir).rglob('*.html'):
+        # Get path relative to the dist directory
+        page_path = html_file.relative_to(dist_dir).as_posix()
+
+        # If it's an index file, represent it as its directory URL
+        # e.g., 'about/index.html' -> 'about/', and 'index.html' -> ''
+        if html_file.name == 'index.html':
+            page_path = page_path[:-10]
+
+        pages.append(page_path)
 
     # Get current date for lastmod
     lastmod_date = datetime.now().strftime('%Y-%m-%d')
@@ -69,7 +71,7 @@ def generate_sitemap(dist_dir, site_url):
     xml_content += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
 
     for page in sorted(pages):
-        priority = '1.0' if page == '' else '0.8'
+        priority = '1.0' if page == '' else '0.8' # Root page gets highest priority
         xml_content += '  <url>\n'
         xml_content += f'    <loc>{site_url}/{page}</loc>\n'
         xml_content += f'    <lastmod>{lastmod_date}</lastmod>\n'
@@ -78,7 +80,7 @@ def generate_sitemap(dist_dir, site_url):
 
     xml_content += '</urlset>'
 
-    with open(os.path.join(dist_dir, 'sitemap.xml'), 'w', encoding='utf-8') as f:
+    with open(dist_dir / 'sitemap.xml', 'w', encoding='utf-8') as f:
         f.write(xml_content)
     print(f"✅ Generated sitemap.xml with {len(pages)} pages.")
 
@@ -95,7 +97,7 @@ def generate_robots_txt(dist_dir, site_url):
         "Allow: /\n\n"
         f"Sitemap: {site_url}/sitemap.xml\n"
     )
-    with open(os.path.join(dist_dir, 'robots.txt'), 'w', encoding='utf-8') as f:
+    with open(dist_dir / 'robots.txt', 'w', encoding='utf-8') as f:
         f.write(content)
     print("✅ Generated robots.txt")
 
@@ -107,12 +109,12 @@ def create_archive(dist_dir, src_dir):
     now = datetime.now().strftime('%Y-%m-%d')
     archive_name = f"aakaara-site-build-{now}"
     # Place the archive in the root project directory, not inside 'dist'
-    archive_path_base = os.path.join(src_dir, archive_name)
+    archive_path_base = src_dir / archive_name
     
     print(f"\n📦 Creating deployment archive...")
     try:
         final_archive_path = shutil.make_archive(archive_path_base, 'zip', root_dir=dist_dir)
-        print(f"✅ Archive created: {os.path.basename(final_archive_path)}")
+        print(f"✅ Archive created: {Path(final_archive_path).name}")
     except Exception as e:
         print(f"   - ⚠️  Could not create archive: {e}")
 
@@ -120,119 +122,105 @@ def create_archive(dist_dir, src_dir):
 def build():
     """
     Creates a production-ready build in the 'dist' directory.
-    - Optimizes images in the build output.
-    - Inlines header.html and footer.html into pages that use placeholders.
-    - Copies all other necessary assets.
+    - Inlines partials, minifies assets, optimizes images, and generates SEO files.
     """
     print("🚀 Starting production build...")
 
     # 1. Create/clean the dist directory
-    if os.path.exists(DIST_DIR):
+    if DIST_DIR.exists():
         shutil.rmtree(DIST_DIR)
-    os.makedirs(DIST_DIR)
+    DIST_DIR.mkdir()
     print(f"✅ Created clean build directory: {DIST_DIR}")
 
     # 2. Read HTML partials into memory
     try:
-        with open(os.path.join(SRC_DIR, 'header.html'), 'r', encoding='utf-8') as f:
-            header_content = f.read()
-        with open(os.path.join(SRC_DIR, 'footer.html'), 'r', encoding='utf-8') as f:
-            footer_content = f.read()
+        header_content = (SRC_DIR / 'header.html').read_text(encoding='utf-8')
+        footer_content = (SRC_DIR / 'footer.html').read_text(encoding='utf-8')
         print("✅ Read header and footer partials.")
     except FileNotFoundError:
         print("⚠️ Warning: header.html or footer.html not found. Skipping inlining.")
         header_content = None
         footer_content = None
 
-    # 3. Walk through the source directory and process/copy files
-    for root, dirs, files in os.walk(SRC_DIR):
-        # Skip the build directory itself and any hidden/system directories
-        dirs[:] = [d for d in dirs if d not in ['dist', '.git', '__pycache__', '.vscode']]
-        
-        for name in files:
-            src_path = os.path.join(root, name)
-            rel_path = os.path.relpath(src_path, SRC_DIR)
-            dest_path = os.path.join(DIST_DIR, rel_path)
-            
-            os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    # 3. Process and copy all source files in a single pass
+    print("\n🗜️  Processing, minifying, and copying assets...")
+    total_css_saved = 0
+    total_js_saved = 0
+    excluded_dirs = {'.git', '__pycache__', '.vscode', 'dist'}
+    excluded_files = {'build.py', 'optimize_images.py', 'header.html', 'footer.html', 'include.js', '.DS_Store'}
 
-            # --- HTML File Processing ---
-            if name.endswith('.html') and name not in ['header.html', 'footer.html']:
-                with open(src_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                
-                original_content = content
-                
-                if header_content and '<div id="header-placeholder"></div>' in content:
-                    content = content.replace('<div id="header-placeholder"></div>', header_content)
-                if footer_content and '<div id="footer-placeholder"></div>' in content:
-                    content = content.replace('<div id="footer-placeholder"></div>', footer_content)
-                
-                if content != original_content:
-                    content = re.sub(r'<script\s+src="include\.js"></script>', '<script src="Script.js"></script>', content)
-                    print(f"📦 Inlined partials for: {name}")
+    for src_path in SRC_DIR.rglob('*'):
+        if src_path.is_dir():
+            continue
+        if any(part in excluded_dirs for part in src_path.parts):
+            continue
+        if src_path.name in excluded_files:
+            continue
 
-                # Inject analytics into the final HTML content
-                content = inject_analytics(content, GA_MEASUREMENT_ID)
-                
-                with open(dest_path, 'w', encoding='utf-8') as f:
-                    f.write(content)
+        rel_path = src_path.relative_to(SRC_DIR)
+        dest_path = DIST_DIR / rel_path
+        dest_path.parent.mkdir(parents=True, exist_ok=True)
 
-            # --- Static File Copying ---
-            elif not name.endswith(('.py', '.pyc')) and name not in ['header.html', 'footer.html', 'include.js']:
-                shutil.copy2(src_path, dest_path)
+        # --- HTML File Processing ---
+        if src_path.suffix == '.html':
+            content = src_path.read_text(encoding='utf-8')
+            original_content = content
+
+            if header_content and '<div id="header-placeholder"></div>' in content:
+                content = content.replace('<div id="header-placeholder"></div>', header_content)
+            if footer_content and '<div id="footer-placeholder"></div>' in content:
+                content = content.replace('<div id="footer-placeholder"></div>', footer_content)
+
+            if content != original_content:
+                content = re.sub(r'<script\s+src="include\.js"></script>', '<script src="Script.js"></script>', content)
+                print(f"   - Inlined partials for: {src_path.name}")
+
+            content = inject_analytics(content, GA_MEASUREMENT_ID)
+            dest_path.write_text(content, encoding='utf-8')
+
+        # --- CSS Minification ---
+        elif src_path.suffix == '.css' and '.min.' not in src_path.name:
+            original_content = src_path.read_text(encoding='utf-8')
+            minified_content = csscompressor.compress(original_content)
+            dest_path.write_text(minified_content, encoding='utf-8')
+            saved = len(original_content) - len(minified_content)
+            total_css_saved += saved
+            print(f"   - Minified {src_path.name} (saved {saved/1024:.2f} KB)")
+
+        # --- JS Minification ---
+        elif src_path.suffix == '.js' and '.min.' not in src_path.name:
+            original_content = src_path.read_text(encoding='utf-8')
+            minified_content = jsmin.jsmin(original_content)
+            dest_path.write_text(minified_content, encoding='utf-8')
+            saved = len(original_content) - len(minified_content)
+            total_js_saved += saved
+            print(f"   - Minified {src_path.name} (saved {saved/1024:.2f} KB)")
+
+        # --- Static File Copying (images, fonts, etc.) ---
+        else:
+            shutil.copy2(src_path, dest_path)
+
+    print(f"   Total CSS space saved: {total_css_saved/1024:.2f} KB")
+    print(f"   Total JS space saved: {total_js_saved/1024:.2f} KB")
 
     # 4. Run image optimization on the copied images in the dist folder
-    dist_images_dir = os.path.join(DIST_DIR, 'images')
-    if os.path.exists(dist_images_dir):
+    dist_images_dir = DIST_DIR / 'images'
+    if dist_images_dir.exists():
         print("\n🖼️  Running image optimization on build output...")
         # This function is imported from optimize_images.py
         optimize_images(dist_images_dir)
     else:
         print("\n🟡 Image directory not found in build output, skipping optimization.")
 
-    # 5. Minify CSS and JS files in the dist folder
-    print("\n🗜️  Minifying CSS and JavaScript...")
-    total_css_saved = 0
-    total_js_saved = 0
-    for root, _, files in os.walk(DIST_DIR):
-        for name in files:
-            if not (name.endswith('.css') or name.endswith('.js')) or '.min.' in name:
-                continue
-
-            file_path = os.path.join(root, name)
-            try:
-                with open(file_path, 'r+', encoding='utf-8') as f:
-                    original_content = f.read()
-                    original_size = len(original_content)
-                    
-                    if name.endswith('.css'):
-                        minified_content = csscompressor.compress(original_content)
-                        total_css_saved += original_size - len(minified_content)
-                        print(f"   - Minified {name} (saved {(original_size - len(minified_content))/1024:.2f} KB)")
-                    elif name.endswith('.js'):
-                        minified_content = jsmin.jsmin(original_content)
-                        total_js_saved += original_size - len(minified_content)
-                        print(f"   - Minified {name} (saved {(original_size - len(minified_content))/1024:.2f} KB)")
-
-                    f.seek(0)
-                    f.write(minified_content)
-                    f.truncate()
-            except Exception as e:
-                print(f"   - ⚠️ Could not minify {name}: {e}")
-
-    print(f"   Total CSS space saved: {total_css_saved/1024:.2f} KB")
-    print(f"   Total JS space saved: {total_js_saved/1024:.2f} KB")
-
-    # 6. Generate sitemap.xml
+    # 5. Generate sitemap.xml
     print("\n🗺️  Generating sitemap...")
     generate_sitemap(DIST_DIR, SITE_URL)
 
-    # 7. Generate robots.txt
+    # 6. Generate robots.txt
     print("\n🤖 Generating robots.txt...")
     generate_robots_txt(DIST_DIR, SITE_URL)
 
-    # 8. Create a zip archive for deployment
+    # 7. Create a zip archive for deployment
     create_archive(DIST_DIR, SRC_DIR)
 
     print("\n🎉 Build complete!")

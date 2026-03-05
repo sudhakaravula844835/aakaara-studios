@@ -88,6 +88,28 @@
   });
 })();
 
+// ═══════ MOBILE NAVIGATION TOGGLE ═══════
+(function() {
+  const navToggle = document.querySelector('.nav-toggle');
+  const navLinks = document.getElementById('navLinks');
+
+  if (navToggle && navLinks) {
+    navToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('show');
+    });
+
+    // Good practice: close menu when a link is clicked on mobile
+    navLinks.addEventListener('click', (e) => {
+      // Check if the clicked element is a link inside the nav
+      if (e.target.tagName === 'A' && navLinks.classList.contains('show')) {
+        navLinks.classList.remove('show');
+      }
+    });
+  }
+})();
+
+
+
 // ═══════ SCROLL — Letter Spacing + Background logo ═══════
 (function() {
   const heroTitle = document.getElementById('heroTitle');
@@ -239,6 +261,23 @@ document.querySelectorAll('.gallery-item').forEach(item => {
   galleryObserver.observe(item);
 });
 
+// ═══════ LAZY LOAD BACKGROUND IMAGES ═══════
+const bgObserver = new IntersectionObserver((entries, observer) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      const bgSrc = el.dataset.bgSrc;
+      if (bgSrc) {
+        el.style.backgroundImage = `url('${bgSrc}')`;
+      }
+      observer.unobserve(el);
+    }
+  });
+}, { rootMargin: '200px 0px' });
+
+document.querySelectorAll('[data-bg-src]').forEach(el => {
+  bgObserver.observe(el);
+});
 // ═══════ CUSTOM CURSOR — FIX 1 ═══════
 // Root cause of lag: cursor.style.left/top triggers layout reflow every frame.
 // Fix: translate3d() is GPU-composited — zero layout impact. Scale is also
