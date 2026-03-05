@@ -47,12 +47,17 @@ def optimize_images(folder_path, max_width=1920, quality=80, watermark_path=None
                         #     base_image.paste(watermark_resized, (20, 20), watermark_resized)
                         #     img = base_image
  
-                        # 3. Save
+                        # 3. Save original format
                         if file.lower().endswith(('.jpg', '.jpeg')):
                             img = img.convert('RGB')
                             img.save(file_path, 'JPEG', quality=quality, optimize=True)
                         else:
                             img.save(file_path, 'PNG', optimize=True)
+
+                        # 4. Generate WebP version alongside original
+                        webp_path = os.path.splitext(file_path)[0] + '.webp'
+                        webp_img = img.convert('RGB') if img.mode == 'RGBA' else img
+                        webp_img.save(webp_path, 'WEBP', quality=quality, method=4)
                         
                         new_size = os.path.getsize(file_path)
                         saved = original_size - new_size

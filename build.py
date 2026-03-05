@@ -147,7 +147,7 @@ def build():
     total_css_saved = 0
     total_js_saved = 0
     excluded_dirs = {'.git', '__pycache__', '.vscode', 'dist'}
-    excluded_files = {'build.py', 'optimize_images.py', 'header.html', 'footer.html', 'include.js', '.DS_Store'}
+    excluded_files = {'build.py', 'optimize_images.py', 'header.html', 'footer.html', 'include.js', '.DS_Store', 'requirements.txt'}
 
     for src_path in SRC_DIR.rglob('*'):
         if src_path.is_dir():
@@ -172,7 +172,7 @@ def build():
                 content = content.replace('<div id="footer-placeholder"></div>', footer_content)
 
             if content != original_content:
-                content = re.sub(r'<script\s+src="include\.js"></script>', '<script src="Script.js"></script>', content)
+                content = re.sub(r'<script\s+src="include\.js"></script>', '<script src="script.js"></script>', content)
                 print(f"   - Inlined partials for: {src_path.name}")
 
             content = inject_analytics(content, GA_MEASUREMENT_ID)

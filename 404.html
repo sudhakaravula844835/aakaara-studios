@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found — Aakaara Studios NYC</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      color: var(--ivory);
+    }
+    .not-found {
+      max-width: 550px;
+      padding: 2rem;
+      opacity: 0;
+      animation: fadeIn 1.2s var(--ease) 0.3s forwards;
+    }
+    .not-found-logo {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 2rem;
+    }
+    .not-found-code {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: #c9956b;
+      margin-bottom: 1.5rem;
+    }
+    .not-found-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(2rem, 5vw, 2.8rem);
+      letter-spacing: 0.04em;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+    .not-found-message {
+      font-size: 0.9rem;
+      color: rgba(250,246,241,0.5);
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+    }
+    .not-found-link {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ivory);
+      border: 1px solid rgba(201,149,107,0.35);
+      padding: 0.8rem 1.8rem;
+      text-decoration: none;
+      transition: all 0.4s;
+    }
+    .not-found-link:hover {
+      background: var(--rose);
+      border-color: var(--rose);
+      color: var(--noir);
+    }
+  </style>
+</head>
+<body>
+  <div class="not-found">
+    <div class="not-found-logo">
+      <svg viewBox="0 0 60 60"><g class="petal-group" transform="translate(30,30)"><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.8"/><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.4" transform="rotate(60)"/><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.2" transform="rotate(120)"/><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.8" transform="rotate(180)"/><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.4" transform="rotate(240)"/><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.2" transform="rotate(300)"/><circle cx="0" cy="0" r="2.5" fill="#c9956b" opacity="0.85"/></g></svg>
+    </div>
+    <div class="not-found-code">404 — Page Not Found</div>
+    <h1 class="not-found-title">This page doesn't exist — but your story does.</h1>
+    <p class="not-found-message">The page you're looking for may have been moved or no longer exists. Let's get you back to where the stories live.</p>
+    <a href="index.html" class="not-found-link">Return Home</a>
+  </div>
+</body>
+</html>

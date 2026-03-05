@@ -3,3 +3,7 @@
 server.rb
 aakaara-portfolio-v2.html
 videos/
+dist/
+*.zip
+__pycache__/
+*.pyc
