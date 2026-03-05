@@ -25,7 +25,7 @@ def inject_head_tags(html_content, measurement_id):
         '<link rel="icon" href="/favicon.svg" type="image/svg+xml">'
     ]
 
-    if measurement_id and 'XXXXXXXXXX' not in measurement_id:
+    if measurement_id and 'XXXXXG-R0B8G15NCL' not in measurement_id:
         analytics_snippet = f"""
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id={measurement_id}"></script>
