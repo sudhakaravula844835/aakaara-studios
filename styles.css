@@ -1141,7 +1141,7 @@ nav.scrolled {
 }
 .sov-desc {
   font-size: 0.72rem;
-  color: rgba(250,246,241,0.28);
+  color: rgba(250,246,241,0.45);
   line-height: 1.7;
   flex: 1;
 }

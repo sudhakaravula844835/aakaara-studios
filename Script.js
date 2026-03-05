@@ -1591,3 +1591,47 @@ let portfolioCarousel, videoCarousel;
 
   portfolioObserver.observe(portfolioSection);
 })();
+
+// ═══════ COUPLE PORTRAITS PAGE - INTERACTIVITY ═══════
+(function() {
+  // Only run this logic if we are on the couple-portraits page
+  if (!document.querySelector('.showcase-header')) {
+    return;
+  }
+
+  // Location Guide hover effect
+  const nycLocations = document.querySelectorAll('.nyc-loc');
+  nycLocations.forEach(loc => {
+    loc.addEventListener('mouseenter', () => {
+      const locId = loc.dataset.locationId;
+      document.querySelectorAll('.nyc-preview-img').forEach(el => el.classList.remove('active'));
+      const targetPreview = document.querySelector('.nyc-' + locId);
+      if (targetPreview) {
+        targetPreview.classList.add('active');
+      }
+    });
+    loc.addEventListener('click', () => {
+      const url = loc.dataset.locationUrl;
+      if (url) {
+        window.open(url, '_blank');
+      }
+    });
+  });
+
+  // Masonry grid filter
+  const filterButtons = document.querySelectorAll('.filter-bar .filter-btn');
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const category = btn.dataset.filter;
+      
+      filterButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const items = document.querySelectorAll('.work-item');
+      items.forEach(item => {
+        const itemIsVisible = (category === 'all' || item.dataset.location === category);
+        item.style.display = itemIsVisible ? '' : 'none';
+      });
+    });
+  });
+})();

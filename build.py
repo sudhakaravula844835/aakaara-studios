@@ -17,37 +17,29 @@ DIST_DIR = SRC_DIR / 'dist'
 SITE_URL = 'https://www.aakaarastudiosnyc.com' # Your production domain
 GA_MEASUREMENT_ID = 'G-R0B8G15NCL' # <-- REPLACE WITH YOUR GOOGLE ANALYTICS ID
 
-def inject_head_tags(html_content):
+def inject_head_tags(html_content, measurement_id):
     """
-    Injects common tags like favicon into the <head>.
+    Injects common tags like favicon and Google Analytics into the <head>.
     """
-    favicon_tag = '<link rel="icon" href="/favicon.svg" type="image/svg+xml">'
-    # Insert the snippet right after the opening <head> tag.
-    # Using regex to handle potential attributes in the head tag.
-    return re.sub(r'(<head.*?>)', rf'\\1\n{favicon_tag}', html_content, count=1, flags=re.IGNORECASE)
+    tags_to_inject = [
+        '<link rel="icon" href="/favicon.svg" type="image/svg+xml">'
+    ]
 
-# --- Analytics Injection Function ---
-def inject_analytics(html_content, measurement_id):
-    """
-    Injects the standard Google Analytics snippet right after the <head> tag.
-    """
-    if not measurement_id or 'XXXXXXXXXX' in measurement_id:
-        return html_content # Don't inject if a placeholder ID is still there
-
-    analytics_snippet = f"""
+    if measurement_id and 'XXXXXXXXXX' not in measurement_id:
+        analytics_snippet = f"""
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id={measurement_id}"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){{dataLayer.push(arguments);}}
   gtag('js', new Date());
-
   gtag('config', '{measurement_id}');
 </script>
 """
-    # Insert the snippet right after the opening <head> tag.
-    # Using regex to handle potential attributes in the head tag.
-    return re.sub(r'(<head.*?>)', rf'\\1\n{analytics_snippet}', html_content, count=1, flags=re.IGNORECASE)
+        tags_to_inject.append(analytics_snippet)
+
+    all_tags = "\n".join(tags_to_inject)
+    return re.sub(r'(<head.*?>)', rf'\\1\n{all_tags}', html_content, count=1, flags=re.IGNORECASE)
 
 # --- Sitemap Generation Function ---
 def generate_sitemap(dist_dir, site_url):
@@ -177,8 +169,7 @@ def build():
                 content = re.sub(r'<script\s+src="include\.js"></script>', '<script src="script.js"></script>', content)
                 print(f"   - Inlined partials for: {src_path.name}")
 
-            content = inject_head_tags(content)
-            content = inject_analytics(content, GA_MEASUREMENT_ID)
+            content = inject_head_tags(content, GA_MEASUREMENT_ID)
             dest_path.write_text(content, encoding='utf-8')
 
         # --- CSS Minification ---
