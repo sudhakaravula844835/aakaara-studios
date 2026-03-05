@@ -108,6 +108,20 @@ nav.scrolled {
 .nav-logo:hover .petal-group {
   transform: translate(30px, 30px) rotate(60deg);
 }
+/* ─── Opacity Gradient for Header & Footer Logo Petals ─── */
+.nav-logo .petal-group > *:nth-child(1),
+.footer-logo-container .petal-group > *:nth-child(1) { opacity: 1; }
+.nav-logo .petal-group > *:nth-child(2),
+.footer-logo-container .petal-group > *:nth-child(2) { opacity: 0.7; }
+.nav-logo .petal-group > *:nth-child(3),
+.footer-logo-container .petal-group > *:nth-child(3) { opacity: 0.5; }
+.nav-logo .petal-group > *:nth-child(4),
+.footer-logo-container .petal-group > *:nth-child(4) { opacity: 0.3; }
+.nav-logo .petal-group > *:nth-child(5),
+.footer-logo-container .petal-group > *:nth-child(5) { opacity: 0.2; }
+.nav-logo .petal-group > *:nth-child(6),
+.footer-logo-container .petal-group > *:nth-child(6) { opacity: 0.1; }
+
 .nav-logo-text {
   font-family: var(--font-display); font-weight: 300;
   font-size: 1.3rem; color: var(--ivory); letter-spacing: 0.06em;
@@ -300,11 +314,23 @@ nav.scrolled {
   font-size: 0.47rem;
   letter-spacing: 0.13em;
   text-transform: uppercase;
-  color: rgba(201,149,107,0.5);
-  border: 1px solid rgba(201,149,107,0.15);
+  color: rgba(155, 112, 130, 0.6); /* Changed from --rose to --mauve */
+  border: 1px solid rgba(155, 112, 130, 0.2); /* Changed from --rose to --mauve */
   padding: 0.18rem 0.55rem;
   border-radius: 20px;
 }
+/* Card-specific tag colors to match stamps */
+.sov-card--couple .sov-tags span,
+.sov-card--maternity .sov-tags span {
+  color: rgba(232, 196, 168, 0.7); /* --blush */
+  border-color: rgba(232, 196, 168, 0.25); /* --blush */
+}
+.sov-card--celebrations .sov-tags span {
+  color: rgba(224, 164, 88, 0.7); /* --saffron */
+  border-color: rgba(224, 164, 88, 0.25); /* --saffron */
+}
+/* Commercial and Conceptual tags already use --mauve, which is the default. */
+
 /* Pricing anchor */
 .sov-price {
   font-size: 0.68rem;
@@ -357,6 +383,45 @@ nav.scrolled {
 .section-dark .section-desc { color: rgba(250,246,241,0.3); }
 
 /* ═══════════════════════════════════════════════════════════
+   PORTFOLIO - SECTION INTRO ANIMATION
+   ═══════════════════════════════════════════════════════════ */
+/* Hide containers initially to prevent FOUC before JS runs */
+#portfolio:not(.is-animated) .container > *:not(.ethereal-carousel) {
+  opacity: 0;
+}
+
+/* Title: Character-level animation */
+#portfolioTitle .char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(40px) rotateX(-90deg);
+  transform-origin: bottom center;
+  transition: transform 0.9s var(--ease-expo), opacity 0.7s var(--ease-smooth);
+}
+
+/* Description: Dissolve effect */
+#portfolioDesc {
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(10px);
+  transition: opacity 1.2s var(--ease-smooth), filter 1.2s var(--ease-smooth), transform 1.2s var(--ease-smooth);
+}
+
+/* When the section is animated by JS, apply final states */
+#portfolio.is-animated .section-tag {
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+
+#portfolio.is-animated #portfolioTitle .char,
+#portfolio.is-animated #portfolioDesc,
+#portfolio.is-animated .portfolio-filters button {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* ═══════════════════════════════════════════════════════════
    PORTFOLIO
    ═══════════════════════════════════════════════════════════ */
 .portfolio-tools {
@@ -366,13 +431,28 @@ nav.scrolled {
 .portfolio-filters { display: flex; gap: 0.3rem; flex-wrap: wrap; flex: 1; }
 .portfolio-filters button {
   font-size: 0.56rem; letter-spacing: 0.22em; text-transform: uppercase;
-  color: rgba(250,246,241,0.32); font-weight: 300;
-  padding: 0.5rem 1.3rem; border: 1px solid rgba(250,246,241,0.09);
-  border-radius: 0; background: transparent;
-  transition: color 0.45s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  color: rgba(250,246,241,0.4); font-weight: 300;
+  padding: 0.5rem 1.3rem;
+  border: 1px solid rgba(250,246,241,0.08);
+  border-radius: 30px; /* Pill shape */
+  background: rgba(250, 246, 241, 0.03); /* Subtle glass background */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  /* Initial state for cinematic intro */
+  opacity: 0;
+  transform: translateY(20px);
+  
+  /* Combined transitions for intro and hover effects */
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease), color 0.4s, background 0.4s, border-color 0.4s;
 }
 .portfolio-filters button:hover,
-.portfolio-filters button.active { color: var(--rose); background: transparent; border-color: rgba(201,149,107,0.5); }
+.portfolio-filters button.active { 
+  color: var(--rose); background: rgba(201, 149, 107, 0.1); border-color: rgba(201,149,107,0.4);
+}
+/* Apply transform lift only after the intro animation is complete to avoid conflicts */
+#portfolio.is-animated .portfolio-filters button:hover,
+#portfolio.is-animated .portfolio-filters button.active { transform: translateY(-1px); }
 .portfolio-actions { display: flex; gap: 1.5rem; align-items: center; }
 .portfolio-select { position: relative; min-width: 160px; }
 .portfolio-select select {
@@ -706,6 +786,12 @@ nav.scrolled {
   border-radius: 6px;
 }
 
+/* Fast transition for category spin animation */
+.ethereal-carousel.fast-transition .gallery-item,
+.ethereal-carousel.fast-transition .vw-card {
+  transition-duration: 0.1s;
+}
+
 /* Carousel cards: JS inline transforms override all stylesheet hover rules naturally.
    Only suppress box-shadow lift since glow is handled by data-ec-offset selectors. */
 .ethereal-carousel .gallery-item:hover,
@@ -941,7 +1027,13 @@ nav.scrolled {
    ABOUT
    ═══════════════════════════════════════════════════════════ */
 .about-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 4rem; align-items: center; }
-.about-image { aspect-ratio: 3/4; border-radius: 6px; max-height: 650px; background: linear-gradient(145deg, var(--rose), var(--wine), var(--umber)); position: relative; overflow: hidden; }
+.about-image {
+  aspect-ratio: 3/4; border-radius: 6px; max-height: 650px;
+  position: relative; overflow: hidden;
+  background: url('images/about/1.jpg') center/cover no-repeat;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+  filter: sepia(20%) contrast(1.1); /* Adds a cinematic film look */
+}
 .about-image::after { content: ''; position: absolute; inset: 8px; border: 1px solid rgba(250,246,241,0.06); border-radius: 3px; }
 .about-text .section-title { margin-bottom: 1.5rem; }
 .about-text p { font-size: 0.85rem; line-height: 1.95; color: rgba(30,26,22,0.45); margin-bottom: 1rem; }
@@ -1008,6 +1100,8 @@ nav.scrolled {
   font-size: 1.12rem;
   color: var(--ivory);
   letter-spacing: 0.04em;
+  /* Pushed down to clear the stamp */
+  margin-top: 4rem;
 }
 .sov-desc {
   font-size: 0.72rem;
@@ -1027,6 +1121,32 @@ nav.scrolled {
   transition: color 0.3s, gap 0.3s var(--ease);
 }
 .sov-link:hover { color: var(--rose); gap: 0.9rem; }
+.sov-stamp {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  width: 72px;
+  height: 72px;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 1;
+}
+.sov-stamp svg {
+  width: 100%;
+  height: 100%;
+}
+/* Weddings — film frame, warm rose */
+.sov-stamp--wedding { color: var(--saffron); transform: rotate(-3deg) scale(1); }
+/* Couple — infinity film loop, soft blush */
+.sov-stamp--couple { color: var(--blush); transform: rotate(2deg) scale(1.02); }
+/* Maternity — crescent moon & star, gentle sage */
+.sov-stamp--maternity { color: var(--blush); transform: rotate(-4deg) scale(1.04); }
+/* Celebrations — clapperboard, warm saffron */
+.sov-stamp--celebration { color: var(--saffron); transform: rotate(-2deg) scale(1); }
+/* Commercial — aperture iris, cool mauve */
+.sov-stamp--commercial { color: var(--mauve); transform: rotate(15deg) scale(1); }
+/* Conceptual — golden spiral, deep wine */
+.sov-stamp--conceptual { color: var(--mauve); transform: rotate(0deg) scale(1); }
 .sov-cta {
   display: inline-flex;
   align-items: center;
@@ -2028,11 +2148,6 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   text-transform: uppercase;
   font-size: 0.78rem;
   font-weight: 400;
-}
-.about-image {
-    background: url('images/about/1.JPG') center/cover no-repeat;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-    filter: sepia(20%) contrast(1.1); /* Adds a cinematic film look */
 }
 .sov-link-view {
     color: var(--ivory) !important;

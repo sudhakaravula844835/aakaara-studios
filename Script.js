@@ -1512,3 +1512,43 @@ let portfolioCarousel, videoCarousel;
     videoCarousel.rebuild();
   }
 })();
+
+// ═══════ PORTFOLIO SECTION - CINEMATIC INTRO ═══════
+(function() {
+  const portfolioSection = document.getElementById('portfolio');
+  if (!portfolioSection) return;
+
+  const title = document.getElementById('portfolioTitle');
+  const desc = document.getElementById('portfolioDesc');
+  const filters = document.querySelectorAll('.portfolio-filters button');
+
+  // Wrap title letters in spans for character-level animation
+  if (title && title.textContent.trim().length === title.innerHTML.trim().length) {
+    const text = title.textContent;
+    title.innerHTML = '';
+    text.split('').forEach(char => {
+      const span = document.createElement('span');
+      span.className = 'char';
+      span.textContent = char === ' ' ? '\u00A0' : char; // Use non-breaking space for spaces
+      title.appendChild(span);
+    });
+  }
+  const titleChars = title ? title.querySelectorAll('.char') : [];
+
+  const portfolioObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        portfolioSection.classList.add('is-animated');
+
+        // Stagger animations with delays
+        titleChars.forEach((char, i) => { char.style.transitionDelay = `${100 + i * 40}ms`; });
+        if (desc) desc.style.transitionDelay = '400ms';
+        filters.forEach((button, i) => { button.style.transitionDelay = `${600 + i * 70}ms`; });
+
+        portfolioObserver.unobserve(portfolioSection);
+      }
+    });
+  }, { threshold: 0.25 });
+
+  portfolioObserver.observe(portfolioSection);
+})();
