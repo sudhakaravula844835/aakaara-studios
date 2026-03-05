@@ -21,6 +21,8 @@ def optimize_images(folder_path, max_width=1920, quality=80, watermark_path=None
                 if "watermark" in file_path.lower():
                     continue
 
+                # Print progress on a single line
+                print(f"   - Processing: {file.ljust(40)}", end='\r')
                 try:
                     with Image.open(file_path) as img:
                         original_size = os.path.getsize(file_path)
@@ -61,8 +63,10 @@ def optimize_images(folder_path, max_width=1920, quality=80, watermark_path=None
                         count += 1
  
                 except Exception as e:
-                    print(f"Skipped {file}: {e}")
+                    # Print error on a new line to not interfere with progress line
+                    print(f"\n   - ⚠️  Skipped {file}: {e}")
 
+    print(" " * 80, end='\r') # Clear the progress line before printing final summary
     print(f"\nDone! Processed {count} images.")
     print(f"Total space saved: {saved_space/1024/1024:.2f} MB")
  

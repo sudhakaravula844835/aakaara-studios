@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import shutil
 import re
@@ -14,38 +15,30 @@ from optimize_images import optimize_images # Assuming this script exists
 SRC_DIR = Path(__file__).parent
 DIST_DIR = SRC_DIR / 'dist'
 SITE_URL = 'https://www.aakaarastudiosnyc.com' # Your production domain
-GA_MEASUREMENT_ID = 'G-XXXXXXXXXX' # <-- REPLACE WITH YOUR GOOGLE ANALYTICS ID
+GA_MEASUREMENT_ID = 'G-R0B8G15NCL' # <-- REPLACE WITH YOUR GOOGLE ANALYTICS ID
 
 # --- Analytics Injection Function ---
 def inject_analytics(html_content, measurement_id):
     """
-    Injects a performance-optimized, delayed Google Analytics snippet.
+    Injects the standard Google Analytics snippet right after the <head> tag.
     """
-    if not measurement_id or measurement_id == 'G-XXXXXXXXXX':
-        return html_content # Don't inject if the placeholder ID is still there
+    if not measurement_id or 'XXXXXXXXXX' in measurement_id:
+        return html_content # Don't inject if a placeholder ID is still there
 
-    # This script delays loading GA until the first user interaction or a timeout.
     analytics_snippet = f"""
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={measurement_id}"></script>
 <script>
-  function loadAnalytics() {{
-    if (window.gaLoaded) return;
-    window.gaLoaded = true;
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = 'https://www.googletagmanager.com/gtag/js?id={measurement_id}';
-    document.head.appendChild(script);
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){{dataLayer.push(arguments);}}
-    gtag('js', new Date());
-    gtag('config', '{measurement_id}');
-    ['scroll', 'mousemove', 'touchstart'].forEach(e => window.removeEventListener(e, loadAnalytics));
-  }}
-  setTimeout(loadAnalytics, 3000);
-  ['scroll', 'mousemove', 'touchstart'].forEach(e => window.addEventListener(e, loadAnalytics, {{ once: true, passive: true }}));
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){{dataLayer.push(arguments);}}
+  gtag('js', new Date());
+
+  gtag('config', '{measurement_id}');
 </script>
 """
-    # Insert the snippet right before the closing </body> tag
-    return html_content.replace('</body>', f'{analytics_snippet}</body>')
+    # Insert the snippet right after the opening <head> tag.
+    # Using regex to handle potential attributes in the head tag.
+    return re.sub(r'(<head.*?>)', rf'\\1\n{analytics_snippet}', html_content, count=1, flags=re.IGNORECASE)
 
 # --- Sitemap Generation Function ---
 def generate_sitemap(dist_dir, site_url):
