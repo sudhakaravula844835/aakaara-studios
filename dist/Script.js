@@ -1,3 +1,33 @@
+// ═══════ SMART NAVIGATION (HEADER COMPONENT LOGIC) ═══════
+(function() {
+  // This script runs immediately when Script.js is loaded.
+  // By this point, include.js has already fetched and injected the header.
+  const nav = document.getElementById('navbar');
+  if (!nav) return;
+
+  const navLinks = nav.querySelector('#navLinks');
+  const logoLink = nav.querySelector('.nav-logo');
+  const pathname = window.location.pathname;
+  
+  // A more robust check for the index page, works for both local and deployed paths
+  const isIndex = ['', '/', '/index.html'].some(p => pathname.endsWith(p));
+
+  // 1. Fix anchor links on sub-pages
+  if (!isIndex) {
+    if (logoLink) logoLink.href = 'index.html';
+    if (navLinks) {
+      navLinks.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.href = `index.html${a.getAttribute('href')}`;
+      });
+    }
+  }
+
+  // 2. Set active class for the current page's link
+  const currentPageLink = Array.from(navLinks.querySelectorAll('a')).find(a => a.href === window.location.href);
+  if (currentPageLink) {
+    currentPageLink.classList.add('active');
+  }
+})();
 // ═══════ CINEMATIC INTRO ANIMATION ═══════
 (function() {
   const intro = document.getElementById('intro');
@@ -536,9 +566,6 @@ document.querySelectorAll('.gallery-item').forEach(item => {
       vid.addEventListener('loadedmetadata', function() {
         vid.play().catch(function(){});
       }, { once: true });
-
-      /* Hard fallback — force-show after 2s regardless */
-      setTimeout(function() { showVideo(); }, 2000);
 
       if (videoSrc.indexOf('.m3u8') !== -1 && typeof Hls !== 'undefined' && Hls.isSupported()) {
         var hls = new Hls();
