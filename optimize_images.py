@@ -1,12 +1,19 @@
 import os
 import sys
+import shutil
+from pathlib import Path
 from PIL import Image
  
-def optimize_images(folder_path, max_width=1920, quality=80, watermark_path=None, watermark_opacity=0.15):
-    print(f"Optimizing images in {folder_path}...")
+def optimize_images(folder_path, backup_dir=None, max_width=1920, quality=75, webp_quality=80, watermark_path=None, watermark_opacity=0.15):
+    folder_path = Path(folder_path)
+    print(f"Optimizing images in {folder_path} (Max Width: {max_width}px, Quality: {quality}%)...")
  
+    if backup_dir:
+        backup_dir = Path(backup_dir)
+        print(f"✅ Backing up original images to: {backup_dir.name}")
+
     watermark = None
-    if watermark_path and os.path.exists(watermark_path):
+    if watermark_path and Path(watermark_path).exists():
         watermark = Image.open(watermark_path).convert("RGBA")
  
     count = 0
@@ -14,18 +21,18 @@ def optimize_images(folder_path, max_width=1920, quality=80, watermark_path=None
 
     for root, dirs, files in os.walk(folder_path):
         for file in files:
-            if file.lower().endswith(('.jpg', '.jpeg', '.png')):
-                file_path = os.path.join(root, file)
+            if file.lower().endswith(('.jpg', '.jpeg', '.png')) and not file.lower().startswith('._'):
+                file_path = Path(root) / file
  
                 # Avoid processing the watermark itself if it's in the images tree
-                if "watermark" in file_path.lower():
+                if "watermark" in str(file_path).lower():
                     continue
 
                 # Print progress on a single line
                 print(f"   - Processing: {file.ljust(40)}", end='\r')
                 try:
                     with Image.open(file_path) as img:
-                        original_size = os.path.getsize(file_path)
+                        original_size = file_path.stat().st_size
                         img = img.convert("RGBA") # Convert to RGBA to handle transparency
  
                         # 1. Resize if too big
@@ -52,11 +59,15 @@ def optimize_images(folder_path, max_width=1920, quality=80, watermark_path=None
                         # 3. Save
                         if file.lower().endswith(('.jpg', '.jpeg')):
                             img = img.convert('RGB')
-                            img.save(file_path, 'JPEG', quality=quality, optimize=True)
+                            img.save(file_path, 'JPEG', quality=quality, optimize=True, progressive=True)
+                            # Save WebP version
+                            img.save(file_path.with_suffix('.webp'), 'WEBP', quality=webp_quality)
                         else:
                             img.save(file_path, 'PNG', optimize=True)
+                            # Save WebP version for PNGs (maintains transparency)
+                            img.save(file_path.with_suffix('.webp'), 'WEBP', quality=webp_quality)
                         
-                        new_size = os.path.getsize(file_path)
+                        new_size = file_path.stat().st_size
                         saved = original_size - new_size
                         if saved > 0:
                             saved_space += saved
@@ -71,14 +82,25 @@ def optimize_images(folder_path, max_width=1920, quality=80, watermark_path=None
     print(f"Total space saved: {saved_space/1024/1024:.2f} MB")
  
 if __name__ == "__main__":
-    base_dir = os.getcwd()
-    images_dir = os.path.join(base_dir, "images")
-    # Optional: specify watermark path
-    # watermark_file = os.path.join(base_dir, "assets", "watermark.png")
-    watermark_file = None
+    SRC_DIR = Path(__file__).parent
+    images_dir = SRC_DIR / "images"
+    backup_dir = SRC_DIR / "images_original_backup"
  
-    if os.path.exists(images_dir):
-        # Pass the watermark path to the function
-        optimize_images(images_dir, watermark_path=watermark_file)
+    if images_dir.exists():
+        print("="*50)
+        print("⚠️  This script will PERMANENTLY optimize images in-place")
+        print(f"    within your source '{images_dir.name}' directory.")
+        print("    It will also generate .webp versions for each image.")
+        print("="*50)
+        
+        try:
+            confirm = input(f"A backup of your original files will be saved to '{backup_dir.name}'.\nDo you want to proceed? (y/n): ")
+            if confirm.lower().strip() == 'y':
+                optimize_images(images_dir, backup_dir=backup_dir)
+            else:
+                print("Operation cancelled by user.")
+        except KeyboardInterrupt:
+            print("\nOperation cancelled by user.")
+            sys.exit(0)
     else:
-        print(f"Images directory not found: {images_dir}")
+        print(f"Source images directory not found: {images_dir}")

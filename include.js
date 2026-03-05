@@ -25,6 +25,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Now that components are loaded, dynamically load the main script.
     const mainScript = document.createElement('script');
-    mainScript.src = 'Script.js';
+    mainScript.src = 'script.js';
     document.body.appendChild(mainScript);
 });

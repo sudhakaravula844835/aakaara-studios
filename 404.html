@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found — Aakaara Studios NYC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      color: var(--ivory);
+      background: var(--noir);
+    }
+    .not-found-container {
+      max-width: 550px;
+      padding: 2rem;
+      opacity: 0;
+      animation: fadeIn 1.2s var(--ease) 0.3s forwards;
+    }
+    .not-found-logo {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 2rem;
+      opacity: 0.5;
+    }
+    .not-found-title {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(1.2rem, 4vw, 1.5rem);
+      letter-spacing: 0.04em;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+      color: rgba(250,246,241,0.7);
+    }
+    .not-found-link {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ivory);
+      border: 1px solid rgba(201,149,107,0.35);
+      padding: 0.8rem 1.8rem;
+      transition: all 0.4s;
+    }
+    .not-found-link:hover {
+      background: var(--rose);
+      border-color: var(--rose);
+      color: var(--noir);
+    }
+  </style>
+</head>
+<body>
+  <div class="not-found-container">
+    <div class="not-found-logo"><svg viewBox="0 0 60 60"><g class="petal-group" transform="translate(30,30)"><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.8"/><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.4" transform="rotate(60)"/><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.2" transform="rotate(120)"/><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.8" transform="rotate(180)"/><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.4" transform="rotate(240)"/><path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.2" transform="rotate(300)"/><circle cx="0" cy="0" r="2.5" fill="#c9956b" opacity="0.85"/></g></svg></div>
+    <h1 class="not-found-title">This page doesn't exist — but your story does.</h1>
+    <a href="index.html" class="not-found-link">Return Home</a>
+  </div>
+</body>
+</html>

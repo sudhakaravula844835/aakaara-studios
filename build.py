@@ -17,6 +17,15 @@ DIST_DIR = SRC_DIR / 'dist'
 SITE_URL = 'https://www.aakaarastudiosnyc.com' # Your production domain
 GA_MEASUREMENT_ID = 'G-R0B8G15NCL' # <-- REPLACE WITH YOUR GOOGLE ANALYTICS ID
 
+def inject_head_tags(html_content):
+    """
+    Injects common tags like favicon into the <head>.
+    """
+    favicon_tag = '<link rel="icon" href="/favicon.svg" type="image/svg+xml">'
+    # Insert the snippet right after the opening <head> tag.
+    # Using regex to handle potential attributes in the head tag.
+    return re.sub(r'(<head.*?>)', rf'\\1\n{favicon_tag}', html_content, count=1, flags=re.IGNORECASE)
+
 # --- Analytics Injection Function ---
 def inject_analytics(html_content, measurement_id):
     """
@@ -165,9 +174,10 @@ def build():
                 content = content.replace('<div id="footer-placeholder"></div>', footer_content)
 
             if content != original_content:
-                content = re.sub(r'<script\s+src="include\.js"></script>', '<script src="Script.js"></script>', content)
+                content = re.sub(r'<script\s+src="include\.js"></script>', '<script src="script.js"></script>', content)
                 print(f"   - Inlined partials for: {src_path.name}")
 
+            content = inject_head_tags(content)
             content = inject_analytics(content, GA_MEASUREMENT_ID)
             dest_path.write_text(content, encoding='utf-8')
 
