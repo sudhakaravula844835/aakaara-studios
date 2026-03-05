@@ -1029,9 +1029,14 @@ nav.scrolled {
 .about-image {
   aspect-ratio: 3/4; border-radius: 6px; max-height: 650px;
   position: relative; overflow: hidden;
-  background: url('images/about/1.jpg') center/cover no-repeat;
+  /* Placeholder color while image lazy-loads */
+  background-color: #1e1a16;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   box-shadow: 0 30px 60px rgba(0,0,0,0.5);
   filter: sepia(20%) contrast(1.1); /* Adds a cinematic film look */
+  transition: background-image 0.8s var(--ease-smooth);
 }
 .about-image::after { content: ''; position: absolute; inset: 8px; border: 1px solid rgba(250,246,241,0.06); border-radius: 3px; }
 .about-text .section-title { margin-bottom: 1.5rem; }
