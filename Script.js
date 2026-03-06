@@ -95,7 +95,8 @@
 
   if (navToggle && navLinks) {
     navToggle.addEventListener('click', () => {
-      navLinks.classList.toggle('show');
+      const isOpen = navLinks.classList.toggle('show');
+      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     });
 
     // Good practice: close menu when a link is clicked on mobile
@@ -103,6 +104,7 @@
       // Check if the clicked element is a link inside the nav
       if (e.target.tagName === 'A' && navLinks.classList.contains('show')) {
         navLinks.classList.remove('show');
+        navToggle.setAttribute('aria-expanded', 'false');
       }
     });
   }
@@ -677,13 +679,13 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   dots.forEach(function(dot) {
     dot.addEventListener('click', function() {
       var target  = parseInt(dot.dataset.panel, 10);
-      var targetY = wrapTop + introHeight + target * window.innerHeight;
+      var targetY = wrapTop + target * window.innerHeight;
       window.scrollTo({ top: targetY, behavior: 'smooth' });
     });
   });
 
   setTimeout(function() {
-    if (!hintDismissed && window.scrollY < wrapTop + introHeight + 100)
+    if (!hintDismissed && window.scrollY < wrapTop + 100)
       scrollHint.classList.add('visible');
   }, 1200);
 
