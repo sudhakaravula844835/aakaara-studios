@@ -172,30 +172,18 @@ def build():
             content = inject_head_tags(content, GA_MEASUREMENT_ID)
             dest_path.write_text(content, encoding='utf-8')
 
-        # --- CSS Minification ---
-        elif src_path.suffix == '.css' and '.min.' not in src_path.name:
-            original_content = src_path.read_text(encoding='utf-8')
-            minified_content = csscompressor.compress(original_content)
-            dest_path.write_text(minified_content, encoding='utf-8')
-            saved = len(original_content) - len(minified_content)
-            total_css_saved += saved
-            print(f"   - Minified {src_path.name} (saved {saved/1024:.2f} KB)")
+        # --- CSS & JS Copying (Minification disabled for stability) ---
+        # The minifiers can sometimes break complex animations. Copying the files
+        # directly is safer and the performance impact is negligible.
+        elif src_path.suffix in ['.css', '.js'] and '.min.' not in src_path.name:
+            shutil.copy2(src_path, dest_path)
+            print(f"   - Copied {src_path.name}")
 
-        # --- JS Minification ---
-        elif src_path.suffix == '.js' and '.min.' not in src_path.name:
-            original_content = src_path.read_text(encoding='utf-8')
-            minified_content = jsmin.jsmin(original_content)
-            dest_path.write_text(minified_content, encoding='utf-8')
-            saved = len(original_content) - len(minified_content)
-            total_js_saved += saved
-            print(f"   - Minified {src_path.name} (saved {saved/1024:.2f} KB)")
-
-        # --- Static File Copying (images, fonts, etc.) ---
         else:
             shutil.copy2(src_path, dest_path)
 
-    print(f"   Total CSS space saved: {total_css_saved/1024:.2f} KB")
-    print(f"   Total JS space saved: {total_js_saved/1024:.2f} KB")
+    # print(f"   Total CSS space saved: {total_css_saved/1024:.2f} KB")
+    # print(f"   Total JS space saved: {total_js_saved/1024:.2f} KB")
 
     # 4. Run image optimization on the copied images in the dist folder
     dist_images_dir = DIST_DIR / 'images'
