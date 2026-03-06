@@ -150,7 +150,6 @@ function filterGallery(cat, btn) {
       const itemCat = item.dataset.cat;
       if (!shownCats.has(itemCat)) {
         item.style.display = '';
-        item.style.animation = 'fadeIn 0.5s ease both';
         shownCats.add(itemCat);
       } else {
         item.style.display = 'none';
@@ -158,12 +157,7 @@ function filterGallery(cat, btn) {
     });
   } else {
     document.querySelectorAll('.gallery-item').forEach(item => {
-      if (item.dataset.cat === cat) {
-        item.style.display = '';
-        item.style.animation = 'fadeIn 0.5s ease both';
-      } else {
-        item.style.display = 'none';
-      }
+      item.style.display = item.dataset.cat === cat ? '' : 'none';
     });
   }
   if (typeof portfolioCarousel !== 'undefined' && portfolioCarousel) { portfolioCarousel.currentIndex = 0; portfolioCarousel.rebuild(); }
@@ -184,7 +178,6 @@ if (searchInput) {
       const type = (item.dataset.type || '').toLowerCase();
       if (term === '' || title.includes(term) || type.includes(term)) {
         item.style.display = '';
-        if (term !== '') item.style.animation = 'fadeIn 0.5s ease both';
         visibleCount++;
       } else {
         item.style.display = 'none';
@@ -227,7 +220,6 @@ if (portfolioSelect) {
     document.querySelectorAll('.gallery-item').forEach(item => {
       const match = selected === '' || item.dataset.title === selected;
       item.style.display = match ? '' : 'none';
-      if (match && selected !== '') item.style.animation = 'fadeIn 0.5s ease both';
     });
     if (typeof portfolioCarousel !== 'undefined' && portfolioCarousel) { portfolioCarousel.currentIndex = 0; portfolioCarousel.rebuild(); }
   });
@@ -778,10 +770,8 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       } else if (i === activeIdx) {
         yPct = 0;
         panel.style.zIndex     = '1';
-        const scale = 1 - (progress * 0.1);
-        const zPos = -progress * 250;
-        transform = `translateY(${yPct}%) scale(${scale}) translateZ(${zPos}px)`;
-        panel.style.filter = `brightness(${1 - progress * 0.4})`;
+        transform = `translateY(0%)`;
+        panel.style.filter = 'brightness(1)';
       } else if (i === activeIdx + 1) {
         yPct = (1 - progress) * 100;
         panel.style.zIndex     = '2';
@@ -882,22 +872,28 @@ function filterVideos(cat, btn) {
   });
 })();
 
-// Hover muted preview — lazy-loaded on first hover, paused on leave
+// Hover muted preview — preloaded on viewport entry, plays instantly on hover
 (function() {
   document.querySelectorAll('.vw-card').forEach(card => {
     const src = card.dataset.video;
     if (!src) return;
     const poster = card.querySelector('.vw-poster');
-    let vid = null, hoverTimer = null;
+    let vid = null;
+
+    // Pre-create the video element when the card enters the viewport
+    // so it's ready to play instantly on hover
+    const preload = () => {
+      if (vid) return;
+      vid = document.createElement('video');
+      vid.muted = true; vid.loop = true;
+      vid.playsInline = true; vid.preload = 'auto';
+      vid.src = src;
+      vid.load();
+      poster.appendChild(vid);
+    };
 
     const play = () => {
-      if (!vid) {
-        vid = document.createElement('video');
-        vid.muted = true; vid.loop = true;
-        vid.playsInline = true; vid.preload = 'metadata';
-        vid.src = src;
-        poster.appendChild(vid);
-      }
+      if (!vid) preload();
       vid.play().catch(() => {});
       poster.classList.add('active');
     };
@@ -910,15 +906,20 @@ function filterVideos(cat, btn) {
       poster.classList.remove('active');
     };
 
-    // Desktop: Hover
+    // Preload video as soon as the card scrolls into view
+    const preloadObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { preload(); preloadObserver.disconnect(); } });
+    }, { threshold: 0.1 });
+    preloadObserver.observe(card);
+
+    // Desktop: Hover — play immediately, no delay
     card.addEventListener('mouseenter', () => {
       if (window.matchMedia('(hover: none)').matches) return;
-      hoverTimer = setTimeout(play, 250);
+      play();
     });
 
     card.addEventListener('mouseleave', () => {
       if (window.matchMedia('(hover: none)').matches) return;
-      clearTimeout(hoverTimer);
       pause(true);
     });
 
@@ -1563,28 +1564,32 @@ let portfolioCarousel, videoCarousel;
   const desc = document.getElementById('portfolioDesc');
   const filters = document.querySelectorAll('.portfolio-filters button');
 
-  // Wrap title letters in spans for character-level animation
-  if (title && title.textContent.trim().length === title.innerHTML.trim().length) {
-    const text = title.textContent;
+  // Wrap title words in mask containers for cinematic rise reveal
+  if (title && !title.querySelector('.word-mask')) {
+    const text = title.textContent.trim();
     title.innerHTML = '';
-    text.split('').forEach(char => {
-      const span = document.createElement('span');
-      span.className = 'char';
-      span.textContent = char === ' ' ? '\u00A0' : char; // Use non-breaking space for spaces
-      title.appendChild(span);
+    text.split(' ').forEach((word, i) => {
+      if (i > 0) title.appendChild(document.createTextNode('\u00A0'));
+      const mask = document.createElement('span');
+      mask.className = 'word-mask';
+      const inner = document.createElement('span');
+      inner.className = 'word-inner';
+      inner.textContent = word;
+      mask.appendChild(inner);
+      title.appendChild(mask);
     });
   }
-  const titleChars = title ? title.querySelectorAll('.char') : [];
+  const wordInners = title ? title.querySelectorAll('.word-inner') : [];
 
   const portfolioObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         portfolioSection.classList.add('is-animated');
 
-        // Stagger animations with delays
-        titleChars.forEach((char, i) => { char.style.transitionDelay = `${100 + i * 40}ms`; });
-        if (desc) desc.style.transitionDelay = '400ms';
-        filters.forEach((button, i) => { button.style.transitionDelay = `${600 + i * 70}ms`; });
+        // Stagger: accent line first, then words, then desc, then filters
+        wordInners.forEach((inner, i) => { inner.style.transitionDelay = `${300 + i * 180}ms`; });
+        if (desc) desc.style.transitionDelay = '750ms';
+        filters.forEach((button, i) => { button.style.transitionDelay = `${900 + i * 55}ms`; });
 
         portfolioObserver.unobserve(portfolioSection);
       }

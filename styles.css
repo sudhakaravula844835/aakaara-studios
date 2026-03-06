@@ -389,13 +389,35 @@ nav.scrolled {
   opacity: 0;
 }
 
-/* Title: Character-level animation */
-#portfolioTitle .char {
-  display: inline-block;
+/* Title: Cinematic word-mask reveal (film-title style) */
+#portfolioTitle {
+  overflow: visible; /* words clip themselves */
+}
+
+/* Thin accent rule that sweeps in before the words */
+#portfolioTitle::before {
+  content: '';
+  display: block;
+  width: 0;
+  height: 1px;
+  background: var(--rose);
+  margin-bottom: 0.75rem;
   opacity: 0;
-  transform: translateY(40px) rotateX(-90deg);
-  transform-origin: bottom center;
-  transition: transform 0.9s var(--ease-expo), opacity 0.7s var(--ease-smooth);
+  transition: width 0.65s var(--ease), opacity 0.35s ease;
+}
+
+/* Each word gets a mask wrapper — text rises from beneath it */
+#portfolioTitle .word-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  line-height: 1.25;
+}
+#portfolioTitle .word-inner {
+  display: inline-block;
+  transform: translateY(110%);
+  opacity: 0;
+  transition: transform 1s var(--ease), opacity 0.55s var(--ease-smooth);
 }
 
 /* Description: Dissolve effect */
@@ -409,10 +431,15 @@ nav.scrolled {
 /* When the section is animated by JS, apply final states */
 #portfolio.is-animated .section-tag {
   opacity: 1;
-  transition: opacity 1s ease;
+  transition: opacity 0.9s ease;
 }
 
-#portfolio.is-animated #portfolioTitle .char,
+#portfolio.is-animated #portfolioTitle::before {
+  width: 2.8rem;
+  opacity: 1;
+}
+
+#portfolio.is-animated #portfolioTitle .word-inner,
 #portfolio.is-animated #portfolioDesc,
 #portfolio.is-animated .portfolio-filters button {
   opacity: 1;
@@ -1248,7 +1275,7 @@ nav.scrolled {
 .cs-bg {
   position: absolute;
   inset: 0;
-  background-size: contain;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   transform-origin: center;
@@ -1261,7 +1288,7 @@ nav.scrolled {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   opacity: 0;
   transition: opacity 0.8s ease;
   pointer-events: none;
