@@ -547,16 +547,6 @@ nav.scrolled {
   transition: filter 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.sw-gallery-img {
-  position: absolute;
-  /* Reduced size to create a "frame" effect */
-  inset: 10% 5%; 
-  background-size: contain;   /* Respects original aspect ratio */
-  background-position: center;
-  background-repeat: no-repeat;
-  will-change: transform;
-  z-index: 5;
-}
 /* Subtle inner vignette blends image edges with ambient layer */
 .sw-gallery-stage::before {
   content: '';
@@ -1821,7 +1811,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .sw-gallery-close { display: flex; align-items: center; gap: 0.5rem; font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(250,246,241,0.4); cursor: pointer; transition: color 0.3s; background: none; border: none; font-family: var(--font-body); }
 .sw-gallery-close:hover { color: var(--rose); }
 .sw-gallery-stage { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.sw-gallery-img { position: absolute; inset: -5%; background-size: cover; background-position: center; will-change: transform; transition: background-image 0s; }
+.sw-gallery-img { position: absolute; inset: -5%; background-size: cover; background-position: center; background-repeat: no-repeat; will-change: transform; transition: background-image 0s; }
 .sw-gallery-img.sw-img-enter { animation: swImgIn 0.72s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .sw-gallery-img.sw-img-exit  { animation: swImgOut 0.3s cubic-bezier(0.87, 0, 0.13, 1) both; }
 @keyframes swImgIn  { from { opacity: 0; filter: blur(5px) brightness(0.65); transform: scale(1.05); } to { opacity: 1; filter: blur(0) brightness(1); transform: scale(1); } }
@@ -1929,6 +1919,16 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .ec-next { right: 0.5rem; }
 
   .nav-links.show { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: rgba(9,8,11,0.95); backdrop-filter: blur(20px); padding: 2rem; gap: 1.5rem; max-height: 85vh; overflow-y: auto; }
+}
+
+/* ── Small phones (≤480px) — prevent text overflow, tighten spacing ── */
+@media (max-width: 480px) {
+  .hero-title { font-size: clamp(2rem, 9vw, 3rem); }
+  .section-title { font-size: clamp(1.4rem, 6vw, 1.8rem); }
+  .section { padding: 3rem 1.2rem; }
+  .sw-strip-thumb { width: 44px; height: 34px; }
+  .sw-strip-thumb.active { width: 62px; }
+  .ethereal-carousel { height: 340px; }
 }
 
 /* ═══════════════════════════════════════════════════════════

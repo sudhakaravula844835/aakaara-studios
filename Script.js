@@ -332,6 +332,8 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   const stage = document.getElementById('swGalleryStage');
 
   let swImages = [], swIndex = 0, swIsOpen = false, swParafRAF = null;
+  let stripThumbCache = [];
+  let dockMouseMoveFn = null, dockMouseLeaveFn = null;
 
   function openSwGallery(work) {
     const folder = work.dataset.folder || 'images/default';
@@ -407,12 +409,13 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
 
   function renderSwStrip() {
     if (!galleryStrip) return;
-    galleryStrip.innerHTML = swImages.map((url, i) => 
+    galleryStrip.innerHTML = swImages.map((url, i) =>
       `<div class="sw-strip-thumb${i === swIndex ? ' active' : ''}" data-idx="${i}">
          <div class="sw-strip-thumb-img" style="background-image:url('${url}')"></div>
        </div>`
     ).join('');
-    galleryStrip.querySelectorAll('.sw-strip-thumb').forEach(thumb => {
+    stripThumbCache = Array.from(galleryStrip.querySelectorAll('.sw-strip-thumb'));
+    stripThumbCache.forEach(thumb => {
       thumb.addEventListener('click', () => {
         swIndex = parseInt(thumb.dataset.idx, 10);
         renderSwImage(swIndex, false);
@@ -426,7 +429,12 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     function cleanup() {
       gallery.classList.remove('sw-open', 'sw-gallery-enter', 'sw-gallery-exit', 'sw-static');
       galleryImg.style.backgroundImage = '';
-      if (galleryStrip) galleryStrip.innerHTML = '';
+      if (galleryStrip) {
+        galleryStrip.innerHTML = '';
+        if (dockMouseMoveFn)  { galleryStrip.removeEventListener('mousemove',  dockMouseMoveFn);  }
+        if (dockMouseLeaveFn) { galleryStrip.removeEventListener('mouseleave', dockMouseLeaveFn); }
+      }
+      stripThumbCache = [];
       swIsOpen = false;
     }
     gallery.addEventListener('animationend', cleanup, { once: true });
@@ -521,24 +529,23 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
 
   // Mac Dock Effect for Filmstrip — desktop/pointer only
   if (galleryStrip && !window.matchMedia('(hover: none)').matches) {
-    galleryStrip.addEventListener('mousemove', (e) => {
+    const RADIUS = 120, MAX_BOOST = 0.9;
+    dockMouseMoveFn = (e) => {
       const mx = e.clientX;
-      const thumbs = galleryStrip.querySelectorAll('.sw-strip-thumb');
-      thumbs.forEach(thumb => {
+      stripThumbCache.forEach(thumb => {
         const rect = thumb.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
         const dist = Math.abs(mx - cx);
         // Gaussian-style falloff: max scale 1.9, influence radius 120px
-        const RADIUS = 120, MAX_BOOST = 0.9;
         const scale = dist < RADIUS ? 1 + MAX_BOOST * Math.pow(1 - dist / RADIUS, 2) : 1;
         thumb.style.transform = `scale(${scale.toFixed(3)})`;
-        thumb.style.zIndex = Math.round(scale * 10);
       });
-    });
-    galleryStrip.addEventListener('mouseleave', () => {
-      const thumbs = galleryStrip.querySelectorAll('.sw-strip-thumb');
-      thumbs.forEach(thumb => { thumb.style.transform = ''; thumb.style.zIndex = ''; });
-    });
+    };
+    dockMouseLeaveFn = () => {
+      stripThumbCache.forEach(thumb => { thumb.style.transform = ''; });
+    };
+    galleryStrip.addEventListener('mousemove', dockMouseMoveFn);
+    galleryStrip.addEventListener('mouseleave', dockMouseLeaveFn);
   }
 
   window.openSwGallery = openSwGallery;
@@ -569,6 +576,8 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   var hintDismissed = false;
   var isMuted      = true;
   var isVisible    = false;
+
+  function pauseAllVideos() { videos.forEach(function(v) { if (v) v.pause(); }); }
 
   function cacheLayout() {
     var scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -636,7 +645,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     entries.forEach(function(entry) {
       isVisible = entry.isIntersecting;
       if (!isVisible) {
-        videos.forEach(function(v) { if(v) v.pause(); });
+        pauseAllVideos();
       } else {
         requestAnimationFrame(render);
       }
@@ -647,7 +656,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   /* Play active panel video(s), pause others */
   function syncVideos(idx1, idx2) {
     if (!isVisible) {
-      videos.forEach(function(vid) { if(vid) vid.pause(); });
+      pauseAllVideos();
       return;
     }
 
