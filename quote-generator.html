@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aakaara Studios — Quote Generator</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="quote-generator.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
@@ -15,8 +15,8 @@
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
     <div class="logo-text">Aakaara Studios</div>
-    <div class="logo-sub">QUOTE GENERATOR</div>
-    <input type="password" id="loginPass" placeholder="Enter access code" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="logo-sub">Quote Generator</div>
+    <input type="password" id="loginPass" placeholder="Enter access code">
     <div class="login-error" id="loginError">Incorrect access code</div>
   </div>
 </div>
@@ -40,8 +40,8 @@
 
     <!-- CLIENT INFO -->
     <div class="section">
-      <div class="section-label">Client Information</div>
-      <div class="form-row">
+      <div class="section-label">01 — Client Information</div>
+      <div class="form-row three">
         <div class="form-group">
           <label class="form-label">Client Name(s)</label>
           <input class="form-input" id="clientName" placeholder="e.g. Asrita & Varun">
@@ -77,14 +77,14 @@
 
     <!-- EVENT DAYS -->
     <div class="section">
-      <div class="section-label">Event Schedule</div>
+      <div class="section-label">02 — Event Schedule</div>
       <div id="daysContainer"></div>
       <button class="add-btn" id="addDayBtn" onclick="addDay()">+ Add Day</button>
     </div>
 
     <!-- DELIVERABLES -->
     <div class="section">
-      <div class="section-label">Deliverables</div>
+      <div class="section-label">03 — Deliverables</div>
       <div class="deliverables-grid">
         <label class="form-checkbox"><input type="checkbox" id="delEdited" checked><span>Edited Photos</span></label>
         <label class="form-checkbox"><input type="checkbox" id="delRaw" checked><span>Raw Images</span></label>
@@ -98,7 +98,7 @@
         <label class="form-checkbox"><input type="checkbox" id="delLive"><span>Live Wedding Coverage</span></label>
         <label class="form-checkbox"><input type="checkbox" id="delSecondShooter"><span>Second Shooter</span></label>
       </div>
-      <div class="form-row" style="margin-top:1rem;">
+      <div class="form-row" style="margin-top:12px;">
         <div class="form-group">
           <label class="form-label">Total Edited Photos</label>
           <input class="form-input" type="number" id="editedCount" placeholder="e.g. 500" value="200">
@@ -108,7 +108,7 @@
           <input class="form-input" id="timeline" placeholder="e.g. 6-8 weeks" value="6-8 weeks">
         </div>
       </div>
-      <div class="form-row single" style="margin-top:0.5rem;">
+      <div class="form-row single" style="margin-top:4px;">
         <div class="form-group">
           <label class="form-label">Custom Deliverable Notes (optional)</label>
           <textarea class="form-textarea" id="customNotes" placeholder="Any extra notes about deliverables..."></textarea>
@@ -118,7 +118,7 @@
 
     <!-- PRICING -->
     <div class="section">
-      <div class="section-label">Pricing</div>
+      <div class="section-label">04 — Pricing</div>
       <div class="form-row three">
         <div class="form-group">
           <label class="form-label">Pricing Model</label>
@@ -168,7 +168,7 @@
 
     <!-- ADDITIONAL NOTES -->
     <div class="section">
-      <div class="section-label">Additional Terms</div>
+      <div class="section-label">05 — Additional Terms</div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Deposit Requirement</label>
@@ -195,9 +195,9 @@
       <div class="total-label">Estimated Total</div>
       <div class="total-display" id="totalDisplay">$0</div>
     </div>
-    <div style="display:flex;gap:0.8rem;">
-      <button class="btn btn-danger" onclick="resetForm()" style="font-size:0.85rem;padding:14px 20px;">Reset Form</button>
-      <button class="btn btn-primary" onclick="generatePDF('preview')" style="font-size:0.85rem;padding:14px 32px;">
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-danger btn-small" onclick="resetForm()">Reset</button>
+      <button class="btn btn-primary" onclick="generatePDF('preview')">
         Preview Quote
       </button>
     </div>
@@ -210,10 +210,10 @@
 <!-- PREVIEW MODAL -->
 <div class="preview-modal" id="previewModal">
   <div class="preview-header">
-    <div style="color:var(--gold);font-family:var(--font-display);letter-spacing:0.1em;">QUOTE PREVIEW</div>
-    <div style="display:flex;gap:1rem;">
+    <div class="preview-title">Quote Preview</div>
+    <div style="display:flex;gap:10px;">
       <button class="btn btn-ghost btn-small" onclick="closePreview()">Close</button>
-      <button class="btn btn-primary btn-small" onclick="sendQuoteEmail()">Confirm & Send Email</button>
+      <button class="btn btn-primary btn-small" onclick="sendQuoteEmail()">Confirm & Send</button>
     </div>
   </div>
   <div class="preview-body"><iframe id="previewFrame" class="preview-frame"></iframe></div>

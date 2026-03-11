@@ -214,7 +214,7 @@
             max-width: 500px;
             margin: 0 auto;
         }
-        .nyc-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: stretch; }
+        .nyc-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
         .nyc-list { display: flex; flex-direction: column; }
         .nyc-loc { padding: 1rem 0; border-bottom: 1px solid rgba(201,149,107,0.05); cursor: pointer; transition: all 0.4s; display: flex; align-items: center; justify-content: space-between; }
         .nyc-loc:hover { padding-left: 1rem; }
@@ -226,11 +226,11 @@
         .nyc-loc .nyc-sub-text { font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(250,246,241,0.15); margin-top: 0.1rem; }
         .nyc-loc .nyc-arrow { opacity: 0; transform: translateX(-8px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .nyc-loc:hover .nyc-arrow { opacity: 0.4; transform: translateX(0); }
-        .nyc-preview { position: relative; border-radius: 6px; overflow: hidden; background: rgba(30,26,22,0.4); border: 1px solid rgba(201,149,107,0.2); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .nyc-preview { position: relative; border-radius: 6px; overflow: hidden; background: rgba(30,26,22,0.4); border: 1px solid rgba(201,149,107,0.2); box-shadow: 0 20px 50px rgba(0,0,0,0.5); aspect-ratio: 2/3; width: 100%; }
         .nyc-preview-img { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, visibility 0.8s; }
         .nyc-preview-img.active { opacity: 1; visibility: visible; }
-        .preview-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transform: scale(1.02); transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
-        .nyc-preview-img.active .preview-bg { transform: scale(1); }
+        .preview-bg { position: absolute; inset: 0; background-size: cover; background-position: center top; transition: opacity 0.8s ease; }
+        .nyc-preview-img.active .preview-bg { opacity: 1; }
         .nyc-preview-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 3rem 2.5rem; z-index: 5; background: linear-gradient(to top, rgba(9,8,11,0.95) 0%, transparent 100%); pointer-events: none; }
         .nyc-preview-info h5 { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 1.3rem; color: #faf6f1; margin: 0 0 0.3rem; }
         .nyc-preview-info .tag-line { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(250,246,241,0.4); margin-bottom: 0.8rem; }
@@ -457,5 +457,47 @@
     </footer>
 
     <script src="/Script.js"></script>
+    <script>
+      // Location guide hover — swap preview image on right side
+      (function() {
+        var locs     = document.querySelectorAll('.nyc-loc');
+        var previews = document.querySelectorAll('.nyc-preview-img');
+        if (!locs.length || !previews.length) return;
+
+        function showPreview(id) {
+          previews.forEach(function(p) {
+            p.classList.toggle('active', p.classList.contains('nyc-' + id));
+          });
+        }
+
+        locs.forEach(function(loc) {
+          loc.addEventListener('mouseenter', function() {
+            showPreview(loc.dataset.locationId);
+          });
+          loc.addEventListener('click', function() {
+            var url = loc.dataset.locationUrl;
+            if (url) window.open(url, '_blank', 'noopener');
+          });
+        });
+      })();
+
+      // Filter bar — show/hide gallery cards by location
+      (function() {
+        var filterBar = document.querySelector('.filter-bar');
+        var workItems = document.querySelectorAll('.work-item');
+        if (!filterBar || !workItems.length) return;
+
+        filterBar.addEventListener('click', function(e) {
+          var btn = e.target.closest('.filter-btn');
+          if (!btn) return;
+          filterBar.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          var filter = btn.dataset.filter;
+          workItems.forEach(function(item) {
+            item.style.display = (filter === 'all' || item.dataset.location === filter) ? '' : 'none';
+          });
+        });
+      })();
+    </script>
 </body>
 </html>

@@ -1622,3 +1622,50 @@ let portfolioCarousel, videoCarousel;
     });
   }
 })();
+
+// ═══════ COUPLE PORTRAITS PAGE — LOCATION GUIDE HOVER ═══════
+(function() {
+  const locs = document.querySelectorAll('.nyc-loc');
+  const previews = document.querySelectorAll('.nyc-preview-img');
+  if (!locs.length || !previews.length) return;
+
+  // Map data-location-id → preview class suffix (e.g. "cp" → ".nyc-cp")
+  function showPreview(id) {
+    previews.forEach(p => {
+      const matches = p.classList.contains('nyc-' + id);
+      p.classList.toggle('active', matches);
+    });
+  }
+
+  locs.forEach(loc => {
+    loc.addEventListener('mouseenter', () => {
+      showPreview(loc.dataset.locationId);
+    });
+
+    loc.addEventListener('click', () => {
+      const url = loc.dataset.locationUrl;
+      if (url) window.open(url, '_blank', 'noopener');
+    });
+  });
+})();
+
+// ═══════ COUPLE PORTRAITS PAGE — GALLERY FILTER BAR ═══════
+(function() {
+  const filterBar = document.querySelector('.filter-bar');
+  const workItems = document.querySelectorAll('.work-item');
+  if (!filterBar || !workItems.length) return;
+
+  filterBar.addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+
+    filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const filter = btn.dataset.filter;
+    workItems.forEach(item => {
+      const show = filter === 'all' || item.dataset.location === filter;
+      item.style.display = show ? '' : 'none';
+    });
+  });
+})();
