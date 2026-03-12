@@ -49,6 +49,7 @@
 
   const mark = document.getElementById('introMark');
   const petals = [document.getElementById('petal1'), document.getElementById('petal2'), document.getElementById('petal3'), document.getElementById('petal4')];
+  const outerRing = document.getElementById('outerRing');
   const centerDot = document.getElementById('centerDot');
   const letters = document.querySelectorAll('#introTitle .letter');
   const dots = document.getElementById('introDots');
@@ -57,6 +58,7 @@
   const t = (delay, fn) => setTimeout(fn, delay);
   t(300, () => { mark.style.transition = 'opacity 1s cubic-bezier(0.16,1,0.3,1), transform 1s cubic-bezier(0.16,1,0.3,1)'; mark.style.opacity = '1'; mark.style.transform = 'scale(1)'; });
   petals.forEach((p, i) => { t(500 + i * 280, () => { p.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.16,1,0.3,1)'; p.style.strokeDashoffset = '0'; }); });
+  t(1100, () => { if (outerRing) { outerRing.style.transition = 'opacity 0.8s cubic-bezier(0.16,1,0.3,1)'; outerRing.style.opacity = '0.18'; } });
   t(1200, () => { centerDot.style.transition = 'r 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.6s'; centerDot.setAttribute('r', '5'); centerDot.style.opacity = '0.85'; });
   letters.forEach((l, i) => { t(1800 + i * 90, () => { l.style.transition = 'opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1), filter 0.9s cubic-bezier(0.25,0.46,0.45,0.94)'; l.style.opacity = '1'; l.style.transform = 'translateY(0) scale(1)'; l.style.filter = 'blur(0px)'; }); });
   t(2600, () => { dots.style.transition = 'opacity 0.5s'; dots.style.opacity = '1'; });

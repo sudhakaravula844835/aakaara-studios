@@ -53,7 +53,28 @@ function addDay() {
 function removeDay(num) {
   const el = document.getElementById(`day-${num}`);
   if (el) el.remove();
+  renumberDays();
   recalcTotal();
+}
+
+function renumberDays() {
+  const blocks = document.querySelectorAll('#daysContainer .day-block');
+  blocks.forEach((block, i) => {
+    const n = i + 1;
+    block.id = `day-${n}`;
+    const title = block.querySelector('.day-title');
+    if (title) title.textContent = `Day ${n}`;
+    const removeBtn = block.querySelector('.day-remove');
+    if (removeBtn) removeBtn.setAttribute('onclick', `removeDay(${n})`);
+    const eventsList = block.querySelector('.events-list');
+    if (eventsList) eventsList.id = `events-${n}`;
+    const addBtn = block.querySelector('.add-btn');
+    if (addBtn) {
+      addBtn.setAttribute('onclick', `addEvent(${n})`);
+      addBtn.textContent = `+ Add Event to Day ${n}`;
+    }
+  });
+  dayCount = blocks.length;
 }
 
 function addEvent(dayNum) {

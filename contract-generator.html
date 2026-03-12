@@ -880,8 +880,13 @@ function removeDay(n) {
 function renumberDays() {
   const blocks = document.querySelectorAll('#dayBlocks .day-block');
   blocks.forEach((block, i) => {
-    block.dataset.day = `Day ${i + 1}`;
+    const n = i + 1;
+    block.dataset.day = `Day ${n}`;
+    block.id = `day-${n}`;
+    const removeBtn = block.querySelector('.btn-remove');
+    if (removeBtn) removeBtn.setAttribute('onclick', `removeDay(${n})`);
   });
+  dayCounter = blocks.length;
 }
 
 // ── DELIVERABLES ──
