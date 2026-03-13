@@ -856,9 +856,14 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
 function filterVideos(cat, btn) {
   document.querySelectorAll('.vw-filters button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+
+  // Disable transitions so category switch feels instant
+  const allCards = document.querySelectorAll('.vw-card');
+  allCards.forEach(c => { c.style.transition = 'none'; });
+
   if (cat === 'all') {
     const shownCats = new Set();
-    document.querySelectorAll('.vw-card').forEach(card => {
+    allCards.forEach(card => {
       const vCat = card.dataset.vcat;
       if (!shownCats.has(vCat)) {
         card.style.display = '';
@@ -869,7 +874,7 @@ function filterVideos(cat, btn) {
       }
     });
   } else {
-    document.querySelectorAll('.vw-card').forEach(card => {
+    allCards.forEach(card => {
       if (card.dataset.vcat === cat) {
         card.style.display = '';
         card.style.animation = 'fadeIn 0.45s ease both';
@@ -879,6 +884,13 @@ function filterVideos(cat, btn) {
     });
   }
   if (typeof videoCarousel !== 'undefined' && videoCarousel) { videoCarousel.currentIndex = 0; videoCarousel.rebuild(); }
+
+  // Re-enable transitions after a frame so hover/nav still animate
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      allCards.forEach(c => { c.style.transition = ''; });
+    });
+  });
 }
 
 // Auto-load video poster/cover images from data-poster attribute
@@ -1571,11 +1583,17 @@ let portfolioCarousel, videoCarousel;
   }
 
   const videoEl = document.getElementById('videoCarousel');
-  if (videoEl) {
+  const isMobileReels = window.matchMedia('(max-width: 768px)').matches;
+
+  if (videoEl && !isMobileReels) {
+    // Desktop: 3D Ethereal Carousel
     videoCarousel = new EtherealCarousel(videoEl, {
       itemSelector: '.vw-card',
     });
     videoCarousel.rebuild();
+  } else if (videoEl && isMobileReels) {
+    // Mobile: Insta Reels vertical snap-scroll layout
+    videoEl.classList.add('reels-mode');
   }
 })();
 
