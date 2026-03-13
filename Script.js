@@ -146,9 +146,14 @@ function filterGallery(cat, btn) {
   if (noResults) noResults.style.display = 'none';
   document.querySelectorAll('.portfolio-filters button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+
+  // Disable gallery-item transitions so category switch feels instant
+  const allItems = document.querySelectorAll('.gallery-item');
+  allItems.forEach(item => { item.style.transition = 'none'; });
+
   if (cat === 'all') {
     const shownCats = new Set();
-    document.querySelectorAll('.gallery-item').forEach(item => {
+    allItems.forEach(item => {
       const itemCat = item.dataset.cat;
       if (!shownCats.has(itemCat)) {
         item.style.display = '';
@@ -158,11 +163,18 @@ function filterGallery(cat, btn) {
       }
     });
   } else {
-    document.querySelectorAll('.gallery-item').forEach(item => {
+    allItems.forEach(item => {
       item.style.display = item.dataset.cat === cat ? '' : 'none';
     });
   }
   if (typeof portfolioCarousel !== 'undefined' && portfolioCarousel) { portfolioCarousel.currentIndex = 0; portfolioCarousel.rebuild(); }
+
+  // Re-enable transitions after a frame so next interactions (hover, nav) animate smoothly
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      allItems.forEach(item => { item.style.transition = ''; });
+    });
+  });
 }
 
 // ═══════ PORTFOLIO SEARCH ═══════
@@ -288,10 +300,11 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
 
   (function animateCursor() {
-    const ease = 0.18;   // slightly snappier than 0.15 for immediate feel
-    curX    += (mouseX      - curX)      * ease;
-    curY    += (mouseY      - curY)      * ease;
-    curScale += (targetScale - curScale) * ease;
+    const posEase   = 0.18;  // smooth trailing for position
+    const scaleEase = 0.38;  // snappy pop for scale — appears fast on hover
+    curX    += (mouseX      - curX)      * posEase;
+    curY    += (mouseY      - curY)      * posEase;
+    curScale += (targetScale - curScale) * scaleEase;
     // translate3d forces GPU compositing — no layout reflow, zero jank
     cursor.style.transform = `translate3d(${curX - OX}px, ${curY - OY}px, 0) scale(${curScale})`;
     requestAnimationFrame(animateCursor);

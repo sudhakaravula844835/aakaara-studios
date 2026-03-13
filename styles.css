@@ -470,7 +470,7 @@ nav.scrolled {
   transform: translateY(20px);
   
   /* Combined transitions for intro and hover effects */
-  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease), color 0.4s, background 0.4s, border-color 0.4s;
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease), color 0.1s, background 0.1s, border-color 0.1s;
 }
 .portfolio-filters button:hover,
 .portfolio-filters button.active { 
@@ -585,7 +585,7 @@ nav.scrolled {
   will-change: transform, opacity;
   opacity: 0;
   /* Only transition opacity — transform is fully driven by rAF for zero-jank tracking */
-  transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .cursor-follow.active { opacity: 1; }
 .gallery-item .gi-overlay {
