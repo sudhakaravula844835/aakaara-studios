@@ -1893,6 +1893,84 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .cs-counter { top: 1.5rem; right: 1.5rem; }
   .cs-dots { right: 1rem; }
   .cs-intro-title { font-size: clamp(2rem, 10vw, 3.5rem); }
+
+  /* ── Services Scroll Stack: Insta Reels layout on mobile ── */
+  .cs-wrapper.cs-reels-mode {
+    height: auto;
+  }
+  .cs-wrapper.cs-reels-mode .cs-sticky-zone {
+    position: relative;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    perspective: none;
+    contain: unset;
+    /* Hide scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .cs-wrapper.cs-reels-mode .cs-sticky-zone::-webkit-scrollbar { display: none; }
+
+  .cs-wrapper.cs-reels-mode .cs-panel {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 60px);
+    transform: none !important;
+    z-index: auto !important;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+  .cs-wrapper.cs-reels-mode .cs-panel:first-child {
+    transform: none !important;
+  }
+
+  /* Text slides moved INTO each panel by JS — position them at the bottom */
+  .cs-wrapper.cs-reels-mode .cs-text-slide,
+  .cs-wrapper.cs-reels-mode .cs-text-slide.cs-slide-active {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    z-index: 10;
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    transform-style: flat;
+    pointer-events: auto;
+  }
+  .cs-wrapper.cs-reels-mode .cs-text-slide .cs-title {
+    font-size: clamp(1.3rem, 5.5vw, 2rem);
+  }
+  .cs-wrapper.cs-reels-mode .cs-text-slide .cs-desc {
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  /* Hide the now-empty shared text overlay container */
+  .cs-wrapper.cs-reels-mode .cs-text-overlay:empty,
+  .cs-wrapper.cs-reels-mode > .cs-sticky-zone > .cs-text-overlay {
+    display: none;
+  }
+
+  /* Hide counter, dots, scroll hint, mute in reels mode */
+  .cs-wrapper.cs-reels-mode .cs-counter,
+  .cs-wrapper.cs-reels-mode .cs-dots,
+  .cs-wrapper.cs-reels-mode .cs-scroll-hint,
+  .cs-wrapper.cs-reels-mode .cs-mute-toggle {
+    display: none;
+  }
+
+  /* Vignette — stronger at bottom for text readability */
+  .cs-wrapper.cs-reels-mode .cs-vignette {
+    background: linear-gradient(to top, rgba(9,8,11,0.95) 0%, rgba(9,8,11,0.5) 30%, rgba(9,8,11,0.05) 55%, transparent 100%);
+  }
   .sw-gallery-bar { padding: 1.2rem 1.5rem; }
   .sw-gallery-prev { left: 0.8rem; }
   .sw-gallery-next { right: 0.8rem; }
@@ -2159,75 +2237,6 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .vw-grid { grid-template-columns: 1fr; }
   .vw-card.wide { grid-column: span 1; aspect-ratio: 4/5; }
   .vm-player { width: 95vw; }
-
-  /* ── Video Works: Insta Reels snap-scroll on mobile ── */
-  #videoCarousel.reels-mode {
-    height: 75vh;
-    perspective: none;
-    overflow-y: auto;
-    overflow-x: hidden;
-    scroll-snap-type: y mandatory;
-    -webkit-overflow-scrolling: touch;
-    display: block;
-    scroll-behavior: smooth;
-    /* Hide scrollbar for a cleaner Reels look */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  #videoCarousel.reels-mode::-webkit-scrollbar { display: none; }
-
-  #videoCarousel.reels-mode .ec-track {
-    display: flex !important;
-    flex-direction: column;
-    gap: 0.75rem;
-    position: relative;
-    width: 100%;
-    height: auto;
-    transform-style: flat;
-  }
-
-  #videoCarousel.reels-mode .vw-card,
-  #videoCarousel.reels-mode .vw-card.wide {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    width: 100% !important;
-    aspect-ratio: 9/16;
-    transform: none !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    scroll-snap-align: start;
-    border-radius: 12px;
-    border: 1px solid rgba(201,149,107,0.12);
-    margin: 0;
-  }
-
-  /* Hide carousel arrows + counter in reels mode */
-  #videoCarousel.reels-mode .ec-nav,
-  #videoCarousel.reels-mode .ec-counter {
-    display: none !important;
-  }
-
-  /* Always show overlay info, duration, play button (no hover on touch) */
-  #videoCarousel.reels-mode .vw-card .vw-overlay {
-    opacity: 1;
-    background: linear-gradient(to top, rgba(9,8,11,0.92) 0%, rgba(9,8,11,0.15) 50%, transparent 100%);
-  }
-  #videoCarousel.reels-mode .vw-card .vw-overlay > * { transform: translateY(0); }
-  #videoCarousel.reels-mode .vw-card .vw-duration { opacity: 1; }
-
-  /* Larger play button for reels cards */
-  #videoCarousel.reels-mode .vw-play-icon {
-    width: 62px; height: 62px;
-  }
-  #videoCarousel.reels-mode .vw-play-icon svg {
-    width: 22px; height: 22px;
-  }
-
-  /* Poster fills the tall reels card */
-  #videoCarousel.reels-mode .vw-poster {
-    filter: grayscale(0%) brightness(0.85);
-  }
 }
 
 @media (hover: none) {

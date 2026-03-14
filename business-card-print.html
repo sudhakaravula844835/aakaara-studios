@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aakaara — Print-Ready Export</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<!-- html2canvas for high-res export -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<!-- QR code library -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<style>
+  /* ── Reset & Page ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --noir:       #09080b;
+    --umber:      #1e1a16;
+    --ivory:      #faf6f1;
+    --champagne:  #f2e6d9;
+    --rose:       #c9956b;
+    --rose-light: #dbb08a;
+    --blush:      #e8c4a8;
+    --saffron:    #e0a458;
+
+    /*
+      Print-ready dimensions at 300 DPI:
+      Standard card:  3.5" x 2"   = 1050 x 600 px
+      With 0.125" bleed each side: 3.75" x 2.25" = 1125 x 675 px
+
+      We render at SCREEN SCALE (larger for clarity), then html2canvas
+      captures at a high pixel-ratio to produce 300+ DPI output.
+
+      Screen render size (matches preview card proportions):
+    */
+    --card-w: 700px;    /* 3.5" at 200 ppi screen render */
+    --card-h: 400px;    /* 2" at 200 ppi screen render */
+    --bleed:  25px;     /* 0.125" bleed at screen scale */
+    --safe:   30px;     /* 0.15" safe zone */
+  }
+
+  body {
+    background: #111;
+    font-family: 'Outfit', 'Helvetica Neue', sans-serif;
+    color: var(--ivory);
+    padding: 2rem;
+  }
+
+  /* ── Page Header ── */
+  .export-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .export-header h1 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 300;
+    font-size: 1.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 0.5rem;
+  }
+  .export-header p {
+    font-weight: 300;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    color: var(--champagne);
+    opacity: 0.5;
+    line-height: 1.6;
+  }
+
+  /* ── Export Sections ── */
+  .export-section {
+    max-width: 900px;
+    margin: 0 auto 3rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--rose);
+    opacity: 0.7;
+  }
+
+  /* ── Download Buttons ── */
+  .btn-group {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border: 1px solid rgba(201,149,107,0.3);
+    border-radius: 6px;
+    background: rgba(201,149,107,0.08);
+    color: var(--champagne);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .btn-download:hover {
+    background: rgba(201,149,107,0.15);
+    border-color: rgba(201,149,107,0.5);
+    color: var(--ivory);
+  }
+  .btn-download:disabled {
+    opacity: 0.4;
+    cursor: wait;
+  }
+  .btn-download svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+
+  /* ── Card Render Area ── */
+  .card-render-wrap {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Bleed boundary container — this gets captured */
+  .card-bleed {
+    width: calc(var(--card-w) + var(--bleed) * 2);
+    height: calc(var(--card-h) + var(--bleed) * 2);
+    position: relative;
+    overflow: hidden;
+    /* The bleed area extends the card design outward */
+  }
+
+  /* Actual card within bleed */
+  .card {
+    position: absolute;
+    top: var(--bleed);
+    left: var(--bleed);
+    width: var(--card-w);
+    height: var(--card-h);
+    overflow: hidden;
+  }
+
+  /* ── Guides overlay (not captured in export) ── */
+  .guides-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  /* Trim line (where the card gets cut) */
+  .trim-line {
+    position: absolute;
+    top: var(--bleed);
+    left: var(--bleed);
+    width: var(--card-w);
+    height: var(--card-h);
+    border: 1px dashed rgba(255,255,255,0.25);
+  }
+
+  /* Safe zone (keep all important content inside) */
+  .safe-zone {
+    position: absolute;
+    top: calc(var(--bleed) + var(--safe));
+    left: calc(var(--bleed) + var(--safe));
+    width: calc(var(--card-w) - var(--safe) * 2);
+    height: calc(var(--card-h) - var(--safe) * 2);
+    border: 1px dotted rgba(0, 200, 150, 0.2);
+  }
+
+  /* Corner crop marks */
+  .crop-mark {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+  }
+  .crop-mark::before, .crop-mark::after {
+    content: '';
+    position: absolute;
+    background: rgba(255,255,255,0.35);
+  }
+  /* Top-left */
+  .crop-tl { top: var(--bleed); left: 0; }
+  .crop-tl::before { top: 0; left: 0; width: calc(var(--bleed) - 4px); height: 1px; }
+  .crop-tl::after  { top: calc(-1 * var(--bleed) + 4px); left: var(--bleed); width: 1px; height: calc(var(--bleed) - 4px); }
+  /* Top-right */
+  .crop-tr { top: var(--bleed); right: 0; }
+  .crop-tr::before { top: 0; right: 0; width: calc(var(--bleed) - 4px); height: 1px; }
+  .crop-tr::after  { top: calc(-1 * var(--bleed) + 4px); right: var(--bleed); width: 1px; height: calc(var(--bleed) - 4px); }
+  /* Bottom-left */
+  .crop-bl { bottom: var(--bleed); left: 0; }
+  .crop-bl::before { bottom: 0; left: 0; width: calc(var(--bleed) - 4px); height: 1px; }
+  .crop-bl::after  { bottom: calc(-1 * var(--bleed) + 4px); left: var(--bleed); width: 1px; height: calc(var(--bleed) - 4px); }
+  /* Bottom-right */
+  .crop-br { bottom: var(--bleed); right: 0; }
+  .crop-br::before { bottom: 0; right: 0; width: calc(var(--bleed) - 4px); height: 1px; }
+  .crop-br::after  { bottom: calc(-1 * var(--bleed) + 4px); right: var(--bleed); width: 1px; height: calc(var(--bleed) - 4px); }
+
+  /* ── Guide Legend ── */
+  .guide-legend {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    color: var(--champagne);
+    opacity: 0.35;
+  }
+  .legend-swatch {
+    width: 18px;
+    height: 2px;
+  }
+  .legend-swatch.bleed { background: rgba(255,100,100,0.5); border: none; }
+  .legend-swatch.trim { border-top: 1px dashed rgba(255,255,255,0.4); }
+  .legend-swatch.safe { border-top: 1px dotted rgba(0,200,150,0.35); }
+
+
+  /* ══════════════════════════════
+     FRONT SIDE — Card Design
+  ══════════════════════════════ */
+  .card-front-bleed {
+    background:
+      radial-gradient(
+        ellipse at 85% 15%,
+        rgba(201,149,107,0.08) 0%,
+        rgba(201,149,107,0.02) 35%,
+        transparent 65%
+      ),
+      radial-gradient(
+        ellipse at 50% 50%,
+        transparent 30%,
+        rgba(9,8,11,0.4) 100%
+      ),
+      linear-gradient(
+        155deg,
+        #0e0c10 0%,
+        #151210 25%,
+        #1c1712 50%,
+        #12100e 75%,
+        #0a090c 100%
+      );
+  }
+
+  .card-front {
+    background:
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
+      radial-gradient(
+        ellipse at 85% 15%,
+        rgba(201,149,107,0.08) 0%,
+        rgba(201,149,107,0.02) 35%,
+        transparent 65%
+      ),
+      radial-gradient(
+        ellipse at 50% 50%,
+        transparent 30%,
+        rgba(9,8,11,0.4) 100%
+      ),
+      linear-gradient(
+        155deg,
+        #0e0c10 0%,
+        #151210 25%,
+        #1c1712 50%,
+        #12100e 75%,
+        #0a090c 100%
+      );
+  }
+
+  /* Gold line at top */
+  .card-front::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 15%; right: 15%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--rose) 20%,
+      var(--rose-light) 50%,
+      var(--rose) 80%,
+      transparent
+    );
+    opacity: 0.6;
+  }
+
+  /* Corner accent glow */
+  .card-front::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 160px; height: 160px;
+    background: radial-gradient(
+      ellipse at bottom right,
+      rgba(201,149,107,0.06) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  .front-content {
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    padding: 2rem 2.5rem;
+    gap: 0.15rem;
+  }
+
+  /* Logo */
+  .logo-mark {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .logo-icon {
+    width: 42px;
+    height: 42px;
+    position: relative;
+  }
+  .logo-icon svg { width: 100%; height: 100%; }
+
+  .logo-text {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: 2.4rem;
+    letter-spacing: 0.08em;
+    color: var(--ivory);
+    line-height: 1;
+  }
+
+  /* Visarga dots */
+  .logo-text-wrap {
+    position: relative;
+    display: inline-block;
+  }
+  .logo-dots {
+    position: absolute;
+    top: 0.06em;
+    left: 0.85em;
+    display: flex;
+    gap: 0.1em;
+  }
+  .logo-dots span {
+    width: 0.12em;
+    height: 0.12em;
+    border-radius: 50%;
+    background: var(--rose);
+    opacity: 0.85;
+  }
+
+  /* Tagline */
+  .tagline {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    font-size: 0.55rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--rose);
+    opacity: 0.6;
+    margin-bottom: 0.7rem;
+  }
+
+  /* Divider */
+  .divider {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--rose), transparent);
+    opacity: 0.5;
+    margin-bottom: 0.7rem;
+  }
+
+  /* Person name */
+  .person-name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 400;
+    font-size: 0.95rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ivory);
+    text-align: center;
+  }
+
+  /* Role */
+  .person-role {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    font-size: 0.52rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--champagne);
+    opacity: 0.5;
+    text-align: center;
+  }
+
+
+  /* ══════════════════════════════
+     BACK SIDE
+  ══════════════════════════════ */
+  .card-back-bleed {
+    background:
+      linear-gradient(
+        160deg,
+        #0e0c10 0%,
+        #12100e 40%,
+        #1a1612 70%,
+        #0e0c10 100%
+      );
+  }
+
+  .card-back {
+    background:
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E"),
+      linear-gradient(
+        160deg,
+        #0e0c10 0%,
+        #12100e 40%,
+        #1a1612 70%,
+        #0e0c10 100%
+      );
+  }
+
+  .card-back::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--rose) 20%,
+      var(--rose-light) 50%,
+      var(--rose) 80%,
+      transparent
+    );
+    opacity: 0.5;
+  }
+
+  .card-back::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 140px; height: 140px;
+    background: radial-gradient(
+      ellipse at top left,
+      rgba(201,149,107,0.05) 0%,
+      transparent 70%
+    );
+  }
+
+  .back-content {
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    padding: 2rem 2.5rem;
+    gap: 2.5rem;
+  }
+
+  /* QR Code */
+  .qr-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .qr-frame {
+    width: 120px;
+    height: 120px;
+    background: var(--ivory);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    position: relative;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+  .qr-code {
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .qr-code canvas { width: 100% !important; height: 100% !important; }
+  .qr-code img { width: 100% !important; height: 100% !important; }
+
+  .qr-hint {
+    font-size: 0.52rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rose);
+    opacity: 0.5;
+  }
+
+  /* Contact */
+  .contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+  .contact-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .contact-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    opacity: 0.5;
+    color: var(--rose);
+  }
+  .contact-text {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    color: var(--champagne);
+    opacity: 0.8;
+  }
+  .contact-text a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Small logo on back */
+  .back-logo {
+    position: absolute;
+    top: 1.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    opacity: 0.3;
+    z-index: 2;
+  }
+  .back-logo-text {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    color: var(--rose);
+  }
+  .back-logo-wrap { position: relative; display: inline-block; }
+  .back-logo-dots {
+    position: absolute;
+    top: 0.06em;
+    left: 0.85em;
+    display: flex;
+    gap: 0.1em;
+  }
+  .back-logo-dots span {
+    width: 0.12em;
+    height: 0.12em;
+    border-radius: 50%;
+    background: var(--rose);
+    opacity: 0.85;
+  }
+
+
+  /* ── Print Specs Info ── */
+  .specs-table {
+    max-width: 600px;
+    margin: 2rem auto;
+    border: 1px solid rgba(201,149,107,0.12);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .specs-table-title {
+    background: rgba(201,149,107,0.06);
+    padding: 0.7rem 1.2rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rose);
+    opacity: 0.7;
+    border-bottom: 1px solid rgba(201,149,107,0.08);
+  }
+  .specs-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.55rem 1.2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  .specs-row:last-child { border-bottom: none; }
+  .specs-key {
+    font-size: 0.68rem;
+    color: var(--champagne);
+    opacity: 0.4;
+    font-weight: 300;
+  }
+  .specs-val {
+    font-size: 0.68rem;
+    color: var(--champagne);
+    opacity: 0.7;
+    font-weight: 400;
+  }
+
+  /* ── Status / progress ── */
+  .export-status {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.72rem;
+    color: var(--rose);
+    opacity: 0;
+    transition: opacity 0.3s;
+    min-height: 1.5em;
+  }
+  .export-status.visible { opacity: 0.8; }
+
+  /* ── Instructions ── */
+  .instructions {
+    max-width: 650px;
+    margin: 2.5rem auto;
+    padding: 1.5rem 2rem;
+    border: 1px solid rgba(201,149,107,0.1);
+    border-radius: 10px;
+    background: rgba(201,149,107,0.03);
+  }
+  .instructions h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+    color: var(--rose);
+    margin-bottom: 1rem;
+  }
+  .instructions ol {
+    list-style: none;
+    counter-reset: steps;
+  }
+  .instructions li {
+    counter-increment: steps;
+    font-size: 0.75rem;
+    font-weight: 300;
+    color: var(--champagne);
+    opacity: 0.65;
+    line-height: 1.8;
+    padding-left: 1.8rem;
+    position: relative;
+  }
+  .instructions li::before {
+    content: counter(steps);
+    position: absolute;
+    left: 0;
+    color: var(--rose);
+    opacity: 0.5;
+    font-size: 0.7rem;
+    font-weight: 500;
+    width: 1.2rem;
+    text-align: center;
+  }
+  .instructions .note {
+    margin-top: 1rem;
+    font-size: 0.65rem;
+    color: var(--rose);
+    opacity: 0.4;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <div class="export-header">
+    <h1>Aakaara — Print Export</h1>
+    <p>300 DPI &middot; 3.5" &times; 2" with 0.125" bleed &middot; PNG format</p>
+  </div>
+
+
+  <!-- ══════════════════════════════
+       FRONT SIDE
+  ══════════════════════════════ -->
+  <div class="export-section">
+    <div class="section-header">
+      <span class="section-label">Front Side</span>
+      <div class="btn-group">
+        <button class="btn-download" id="btnFrontPNG" onclick="exportCard('front')">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Download PNG (300 DPI)
+        </button>
+        <button class="btn-download" id="btnFrontPDF" onclick="exportCardPDF('front')">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Download PDF
+        </button>
+      </div>
+    </div>
+
+    <div class="card-render-wrap">
+      <div class="card-bleed card-front-bleed" id="frontBleed">
+        <div class="card card-front" id="frontCard">
+          <div class="front-content">
+            <div class="logo-mark">
+              <div class="logo-icon">
+                <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g transform="translate(30,30)">
+                    <path d="M0,-16 C4.4,-16 8,-11 6.5,-3 C5,4.4 -2.2,6.5 -6.5,3 C-11,-0.7 -8,-11.6 -3,-15.3 C-2.2,-15.8 -0.7,-16 0,-16Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="1"/>
+                    <path d="M0,-16 C4.4,-16 8,-11 6.5,-3 C5,4.4 -2.2,6.5 -6.5,3 C-11,-0.7 -8,-11.6 -3,-15.3 C-2.2,-15.8 -0.7,-16 0,-16Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.7" transform="rotate(90)"/>
+                    <path d="M0,-16 C4.4,-16 8,-11 6.5,-3 C5,4.4 -2.2,6.5 -6.5,3 C-11,-0.7 -8,-11.6 -3,-15.3 C-2.2,-15.8 -0.7,-16 0,-16Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.45" transform="rotate(180)"/>
+                    <path d="M0,-16 C4.4,-16 8,-11 6.5,-3 C5,4.4 -2.2,6.5 -6.5,3 C-11,-0.7 -8,-11.6 -3,-15.3 C-2.2,-15.8 -0.7,-16 0,-16Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.2" transform="rotate(270)"/>
+                    <circle cx="0" cy="0" r="2.5" fill="#c9956b" opacity="0.85"/>
+                  </g>
+                </svg>
+              </div>
+              <span class="logo-text logo-text-wrap">
+                <span class="logo-dots"><span></span><span></span></span>
+                Aakaara
+              </span>
+            </div>
+            <div class="tagline">Cinematic Visual Storytelling</div>
+            <div class="divider"></div>
+            <div class="person-name">Sudhakar Avula</div>
+            <div class="person-role">Founder &amp; Lead Photographer</div>
+          </div>
+        </div>
+
+        <!-- Guides (visual only — excluded from export) -->
+        <div class="guides-overlay" data-guide>
+          <div class="trim-line"></div>
+          <div class="safe-zone"></div>
+          <div class="crop-mark crop-tl"></div>
+          <div class="crop-mark crop-tr"></div>
+          <div class="crop-mark crop-bl"></div>
+          <div class="crop-mark crop-br"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-legend">
+      <span class="legend-item"><span class="legend-swatch trim"></span>Trim line (cut here)</span>
+      <span class="legend-item"><span class="legend-swatch safe"></span>Safe zone (keep text inside)</span>
+    </div>
+
+    <div class="export-status" id="frontStatus"></div>
+  </div>
+
+
+  <!-- ══════════════════════════════
+       BACK SIDE
+  ══════════════════════════════ -->
+  <div class="export-section">
+    <div class="section-header">
+      <span class="section-label">Back Side</span>
+      <div class="btn-group">
+        <button class="btn-download" id="btnBackPNG" onclick="exportCard('back')">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Download PNG (300 DPI)
+        </button>
+        <button class="btn-download" id="btnBackPDF" onclick="exportCardPDF('back')">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Download PDF
+        </button>
+      </div>
+    </div>
+
+    <div class="card-render-wrap">
+      <div class="card-bleed card-back-bleed" id="backBleed">
+        <div class="card card-back" id="backCard">
+          <div class="back-logo">
+            <span class="back-logo-text back-logo-wrap">
+              <span class="back-logo-dots"><span></span><span></span></span>
+              Aakaara
+            </span>
+          </div>
+          <div class="back-content">
+            <div class="qr-section">
+              <div class="qr-frame">
+                <div class="qr-code" id="qrTarget"></div>
+              </div>
+              <span class="qr-hint">Scan to explore</span>
+            </div>
+            <div class="contact-info">
+              <div class="contact-row">
+                <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                  <path d="M2 12h20M12 2c2.5 2.5 4 6 4 10s-1.5 7.5-4 10c-2.5-2.5-4-6-4-10s1.5-7.5 4-10z"/>
+                </svg>
+                <span class="contact-text">www.aakaarastudiosnyc.com</span>
+              </div>
+              <div class="contact-row">
+                <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="2" y="4" width="20" height="16" rx="2"/>
+                  <path d="M22 4L12 13 2 4"/>
+                </svg>
+                <span class="contact-text">info@aakaarastudiosnyc.com</span>
+              </div>
+              <div class="contact-row">
+                <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.13.81.36 1.6.68 2.35a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.75.32 1.54.55 2.35.68a2 2 0 011.72 2.03z"/>
+                </svg>
+                <span class="contact-text">+1 (475) 332-2020</span>
+              </div>
+              <div class="contact-row">
+                <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="2" y="2" width="20" height="20" rx="5"/>
+                  <circle cx="12" cy="12" r="5"/>
+                  <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/>
+                </svg>
+                <span class="contact-text">@aakaarastudiosnyc</span>
+              </div>
+              <div class="contact-row">
+                <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1118 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span class="contact-text">New York City, NY</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guides -->
+        <div class="guides-overlay" data-guide>
+          <div class="trim-line"></div>
+          <div class="safe-zone"></div>
+          <div class="crop-mark crop-tl"></div>
+          <div class="crop-mark crop-tr"></div>
+          <div class="crop-mark crop-bl"></div>
+          <div class="crop-mark crop-br"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-legend">
+      <span class="legend-item"><span class="legend-swatch trim"></span>Trim line (cut here)</span>
+      <span class="legend-item"><span class="legend-swatch safe"></span>Safe zone (keep text inside)</span>
+    </div>
+
+    <div class="export-status" id="backStatus"></div>
+  </div>
+
+
+  <!-- ── Print Specifications ── -->
+  <div class="specs-table">
+    <div class="specs-table-title">Print Specifications for Staples / Print Shop</div>
+    <div class="specs-row"><span class="specs-key">Trim Size</span><span class="specs-val">3.5" &times; 2" (standard US business card)</span></div>
+    <div class="specs-row"><span class="specs-key">Bleed</span><span class="specs-val">0.125" on all sides</span></div>
+    <div class="specs-row"><span class="specs-key">Resolution</span><span class="specs-val">300 DPI (1125 &times; 675 px with bleed)</span></div>
+    <div class="specs-row"><span class="specs-key">Color Mode</span><span class="specs-val">RGB (converted to CMYK by printer)</span></div>
+    <div class="specs-row"><span class="specs-key">File Format</span><span class="specs-val">PNG (lossless) or PDF</span></div>
+    <div class="specs-row"><span class="specs-key">Recommended Stock</span><span class="specs-val">16pt matte or soft-touch laminate</span></div>
+    <div class="specs-row"><span class="specs-key">Optional Finish</span><span class="specs-val">Spot UV on logo &amp; name (if available)</span></div>
+  </div>
+
+
+  <!-- ── Instructions ── -->
+  <div class="instructions">
+    <h3>How to Print at Staples</h3>
+    <ol>
+      <li>Click the <strong>Download PNG</strong> buttons above to save both front and back images.</li>
+      <li>Go to <strong>staples.com/print</strong> or visit your local Staples print center.</li>
+      <li>Select <strong>Business Cards</strong> &rarr; <strong>Upload Your Design</strong>.</li>
+      <li>Upload the <strong>front PNG</strong> as Side 1 and <strong>back PNG</strong> as Side 2.</li>
+      <li>Choose paper: <strong>16pt Matte</strong> or <strong>Premium Glossy</strong> (ask for soft-touch laminate if available).</li>
+      <li>Select quantity and checkout. Standard turnaround is same-day to 3 business days.</li>
+    </ol>
+    <p class="note">Tip: The PNG files include 0.125" bleed. Tell the print shop your trim size is 3.5" &times; 2" so they cut correctly. The PDF option auto-sets the page size.</p>
+  </div>
+
+
+  <script>
+  // ── Generate QR code ──
+  (function() {
+    var target = document.getElementById('qrTarget');
+    if (!target) return;
+    new QRCode(target, {
+      text: 'https://www.aakaarastudiosnyc.com',
+      width: 200,
+      height: 200,
+      colorDark: '#09080b',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  })();
+
+
+  // ══════════════════════════════
+  //  HIGH-RES PNG EXPORT (300 DPI)
+  // ══════════════════════════════
+
+  /*
+    Target output at 300 DPI:
+    - With bleed: 3.75" x 2.25" = 1125 x 675 px
+    - Screen render: 750 x 450 px (card-bleed element)
+    - Scale factor: 1125 / 750 = 1.5x
+
+    We use html2canvas with scale = 1.5 to render at 300 DPI.
+    (750 screen px * 1.5 = 1125 output px = 3.75" at 300 DPI)
+  */
+
+  function exportCard(side) {
+    var bleedEl  = document.getElementById(side === 'front' ? 'frontBleed' : 'backBleed');
+    var btn      = document.getElementById(side === 'front' ? 'btnFrontPNG' : 'btnBackPNG');
+    var statusEl = document.getElementById(side === 'front' ? 'frontStatus' : 'backStatus');
+
+    btn.disabled = true;
+    statusEl.textContent = 'Rendering at 300 DPI...';
+    statusEl.classList.add('visible');
+
+    // Hide guide overlays for capture
+    var guides = bleedEl.querySelectorAll('[data-guide]');
+    guides.forEach(function(g) { g.style.display = 'none'; });
+
+    // Calculate scale for 300 DPI output
+    // Bleed element is 750 x 450 on screen
+    // Target: 1125 x 675 (3.75" x 2.25" at 300 DPI)
+    var screenW = bleedEl.offsetWidth;
+    var targetW = 1125; // 3.75 inches * 300 DPI
+    var scale = targetW / screenW;
+
+    html2canvas(bleedEl, {
+      scale: scale,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null,
+      logging: false,
+      // Ensure fonts are rendered
+      onclone: function(clonedDoc) {
+        // Force font rendering in clone
+        var clonedEl = clonedDoc.getElementById(side === 'front' ? 'frontBleed' : 'backBleed');
+        if (clonedEl) {
+          var guidesCl = clonedEl.querySelectorAll('[data-guide]');
+          guidesCl.forEach(function(g) { g.style.display = 'none'; });
+        }
+      }
+    }).then(function(canvas) {
+      // Restore guides
+      guides.forEach(function(g) { g.style.display = ''; });
+
+      // Create download link
+      var link = document.createElement('a');
+      link.download = 'aakaara-card-' + side + '-300dpi.png';
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      statusEl.textContent = 'Downloaded! (' + canvas.width + ' x ' + canvas.height + ' px)';
+      btn.disabled = false;
+
+      setTimeout(function() { statusEl.classList.remove('visible'); }, 3000);
+    }).catch(function(err) {
+      guides.forEach(function(g) { g.style.display = ''; });
+      statusEl.textContent = 'Export failed: ' + err.message;
+      btn.disabled = false;
+    });
+  }
+
+
+  // ══════════════════════════════
+  //  PDF EXPORT (uses canvas → PDF via jsPDF)
+  // ══════════════════════════════
+
+  function exportCardPDF(side) {
+    var bleedEl  = document.getElementById(side === 'front' ? 'frontBleed' : 'backBleed');
+    var btn      = document.getElementById(side === 'front' ? 'btnFrontPDF' : 'btnBackPDF');
+    var statusEl = document.getElementById(side === 'front' ? 'frontStatus' : 'backStatus');
+
+    btn.disabled = true;
+    statusEl.textContent = 'Generating PDF...';
+    statusEl.classList.add('visible');
+
+    // Hide guides
+    var guides = bleedEl.querySelectorAll('[data-guide]');
+    guides.forEach(function(g) { g.style.display = 'none'; });
+
+    var screenW = bleedEl.offsetWidth;
+    var targetW = 1125;
+    var scale = targetW / screenW;
+
+    html2canvas(bleedEl, {
+      scale: scale,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null,
+      logging: false,
+      onclone: function(clonedDoc) {
+        var clonedEl = clonedDoc.getElementById(side === 'front' ? 'frontBleed' : 'backBleed');
+        if (clonedEl) {
+          var guidesCl = clonedEl.querySelectorAll('[data-guide]');
+          guidesCl.forEach(function(g) { g.style.display = 'none'; });
+        }
+      }
+    }).then(function(canvas) {
+      guides.forEach(function(g) { g.style.display = ''; });
+
+      // Load jsPDF dynamically
+      if (typeof jspdf === 'undefined' && typeof window.jspdf === 'undefined') {
+        var script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
+        script.onload = function() { generatePDF(canvas, side, btn, statusEl); };
+        document.head.appendChild(script);
+      } else {
+        generatePDF(canvas, side, btn, statusEl);
+      }
+    }).catch(function(err) {
+      guides.forEach(function(g) { g.style.display = ''; });
+      statusEl.textContent = 'Export failed: ' + err.message;
+      btn.disabled = false;
+    });
+  }
+
+  function generatePDF(canvas, side, btn, statusEl) {
+    var jsPDF = window.jspdf.jsPDF;
+    // Card with bleed: 3.75" x 2.25"
+    var pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'in',
+      format: [2.25, 3.75]
+    });
+
+    var imgData = canvas.toDataURL('image/png');
+    pdf.addImage(imgData, 'PNG', 0, 0, 3.75, 2.25);
+    pdf.save('aakaara-card-' + side + '-print.pdf');
+
+    statusEl.textContent = 'PDF downloaded! (3.75" x 2.25" with bleed)';
+    btn.disabled = false;
+    setTimeout(function() { statusEl.classList.remove('visible'); }, 3000);
+  }
+  </script>
+
+</body>
+</html>
