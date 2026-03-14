@@ -1,3 +1,0 @@
-csscompressor
-jsmin
-Pillow

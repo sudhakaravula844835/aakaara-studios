@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Aakaara Studios — Contract Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --black:      #0a0a0a;
+    --charcoal:   #121210;
+    --surface:    #191917;
+    --card:       #1e1c1a;
+    --card2:      #232118;
+    --gold:       #c9a84c;
+    --gold-light: #e8c96a;
+    --gold-dim:   #7a6330;
+    --gold-subtle:#211d12;
+    --gold-glow:  rgba(201,168,76,0.12);
+    --off-white:  #ede8dc;
+    --warm-grey:  #7a7568;
+    --divider:    #2a2820;
+    --input-bg:   #161614;
+    --border:     #2e2b22;
+    --red:        #c94c4c;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  ::selection { background: var(--gold-dim); color: var(--off-white); }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--black);
+    color: var(--off-white);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.4;
+  }
+  /* ── GOLD SIDE BAR ── */
+  body::after {
+    content: '';
+    position: fixed; left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, transparent 0%, var(--gold) 20%, var(--gold) 80%, transparent 100%);
+    z-index: 100;
+  }
+
+  /* ── LOGIN SCREEN ── */
+  .login-screen {
+    position: fixed; inset: 0; z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--black);
+    transition: opacity 0.6s ease, visibility 0.6s;
+  }
+  .login-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+  .login-box { text-align: center; width: 320px; }
+  .login-box .logo-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(24px, 4vw, 36px);
+    letter-spacing: 8px;
+    color: var(--off-white);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .login-box .logo-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 5px;
+    color: var(--warm-grey);
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+  .login-box input {
+    width: 100%; padding: 14px 18px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    color: var(--off-white);
+    font-family: 'Jost', sans-serif;
+    font-size: 13.5px;
+    font-weight: 300;
+    outline: none;
+    text-align: center;
+    letter-spacing: 4px;
+    transition: border-color 0.3s;
+    border-radius: 0;
+    -webkit-appearance: none;
+  }
+  .login-box input:focus { border-color: var(--gold-dim); box-shadow: 0 0 0 1px var(--gold-subtle); }
+  .login-box input::placeholder { color: var(--warm-grey); opacity: 0.5; letter-spacing: 2px; }
+  .login-error {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--red);
+    margin-top: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    text-transform: uppercase;
+  }
+  .login-error.show { opacity: 1; }
+
+  /* ── MAIN APP ── */
+  .app { display: none; }
+  .app.visible { display: block; }
+
+  .page-wrap {
+    position: relative; z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 32px 80px;
+  }
+  /* ── HEADER ── */
+  header {
+    padding: 52px 0 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--divider);
+    margin-bottom: 48px;
+    position: relative;
+  }
+  .brand-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.1s;
+  }
+  .brand-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(32px, 5vw, 48px);
+    color: var(--off-white);
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: 4px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.2s;
+  }
+  .brand-city {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 6px;
+    color: var(--warm-grey);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.3s;
+  }
+  .gold-rule-double {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.4s;
+  }
+  .gold-rule-double span:first-child {
+    display: block; width: 120px; height: 0.5px; background: var(--gold);
+  }
+  .gold-rule-double span:last-child {
+    display: block; width: 60px; height: 0.5px; background: var(--gold-dim);
+  }
+  .page-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: clamp(13px, 2vw, 15px);
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.5s;
+  }
+  /* ── SECTIONS ── */
+  .form-section {
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards;
+  }
+  .form-section:nth-child(1) { animation-delay: 0.5s; }
+  .form-section:nth-child(2) { animation-delay: 0.6s; }
+  .form-section:nth-child(3) { animation-delay: 0.7s; }
+  .form-section:nth-child(4) { animation-delay: 0.8s; }
+  .form-section:nth-child(5) { animation-delay: 0.9s; }
+  .form-section:nth-child(6) { animation-delay: 1.0s; }
+  .form-section:nth-child(n+7) { animation-delay: 1.1s; }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: linear-gradient(to right, var(--gold-dim), transparent);
+  }
+  /* ── GRID ── */
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .field-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .field-grid.cols-1 { grid-template-columns: 1fr; }
+  @media(max-width: 580px) {
+    .field-grid, .field-grid.cols-3 { grid-template-columns: 1fr; }
+  }
+  /* ── FIELD ── */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .field.span-2 { grid-column: span 2; }
+  @media(max-width: 580px) { .field.span-2 { grid-column: span 1; } }
+  label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--warm-grey);
+    text-transform: uppercase;
+  }
+  input, select, textarea {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    color: var(--off-white);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    font-size: 13.5px;
+    padding: 11px 14px;
+    border-radius: 0;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    -webkit-appearance: none;
+  }
+  input::placeholder, textarea::placeholder { color: var(--warm-grey); opacity: 0.5; }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--gold-dim);
+    box-shadow: 0 0 0 1px var(--gold-subtle), inset 0 0 20px var(--gold-glow);
+    background: #141410;
+  }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+  select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c9a84c' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+  select option { background: var(--charcoal); }
+  /* ── CHECKBOX ROW ── */
+  .checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+  }
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    user-select: none;
+  }
+  .check-item:hover { border-color: var(--gold-dim); background: var(--card2); }
+  .check-item input[type="checkbox"] {
+    width: 14px; height: 14px; padding: 0;
+    accent-color: var(--gold);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .check-item span {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--off-white);
+    opacity: 0.85;
+  }
+  .check-item:has(input:checked) {
+    border-color: var(--gold);
+    background: var(--gold-subtle);
+  }
+  .check-item:has(input:checked) span { opacity: 1; color: var(--gold-light); }
+  /* ── DAY ROWS ── */
+  .day-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .day-block::before {
+    content: attr(data-day);
+    position: absolute;
+    top: -1px; left: -1px;
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 2px;
+    background: var(--gold);
+    color: var(--black);
+    padding: 3px 8px;
+    text-transform: uppercase;
+  }
+  .day-block .field-grid { margin-top: 18px; }
+  /* ── ADD DAY BUTTON ── */
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 11px 24px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    width: 100%;
+    margin-top: 8px;
+  }
+  .btn-ghost:hover { background: var(--gold-subtle); border-color: var(--gold); }
+  .btn-remove {
+    background: transparent;
+    border: none;
+    color: var(--red);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 4px 0;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    position: absolute;
+    top: 8px; right: 14px;
+  }
+  .btn-remove:hover { opacity: 1; }
+  /* ── DELIVERABLES TABLE ── */
+  .deliverable-row {
+    display: grid;
+    grid-template-columns: 1fr 100px 28px;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .deliverable-row button {
+    background: transparent;
+    border: 1px solid #3a2020;
+    color: var(--red);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    height: 40px;
+    opacity: 0.6;
+    transition: opacity 0.2s, border-color 0.2s;
+  }
+  .deliverable-row button:hover { opacity: 1; border-color: var(--red); }
+  /* ── PRICE CARD ── */
+  .price-card {
+    background: var(--gold-subtle);
+    border: 1px solid var(--gold-dim);
+    padding: 20px 22px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media(max-width: 480px) { .price-card { grid-template-columns: 1fr; } }
+  /* ── GENERATE BUTTONS ── */
+  .generate-wrap {
+    margin-top: 48px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 1.1s;
+  }
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn-generate {
+    background: var(--gold);
+    border: none;
+    color: var(--black);
+    font-family: 'Jost', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    padding: 18px 52px;
+    cursor: pointer;
+    transition: background 0.25s, box-shadow 0.25s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-generate::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.15);
+    transform: translateX(-100%) skewX(-15deg);
+    transition: transform 0.4s;
+  }
+  .btn-generate:hover::before { transform: translateX(120%) skewX(-15deg); }
+  .btn-generate:hover {
+    background: var(--gold-light);
+    box-shadow: 0 0 40px rgba(201,168,76,0.35);
+  }
+  .btn-generate:active { transform: scale(0.98); }
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    font-family: 'Jost', sans-serif;
+    font-weight: 400;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 14px 36px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .btn-secondary:hover { background: var(--gold-subtle); border-color: var(--gold); }
+  /* ── PREVIEW MODAL ── */
+  .preview-modal {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(0,0,0,0.95);
+    display: flex; flex-direction: column;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+  }
+  .preview-modal.show { opacity: 1; visibility: visible; }
+  .preview-header {
+    padding: 16px 24px;
+    background: var(--charcoal);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--divider);
+  }
+  .preview-header-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  .preview-actions { display: flex; gap: 10px; }
+  .preview-actions button {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    cursor: pointer;
+    border: 1px solid var(--gold-dim);
+    background: transparent;
+    color: var(--gold);
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .preview-actions button:hover { background: var(--gold-subtle); border-color: var(--gold); }
+  .preview-actions .btn-primary-sm {
+    background: var(--gold);
+    color: var(--black);
+    border-color: var(--gold);
+  }
+  .preview-actions .btn-primary-sm:hover { background: var(--gold-light); }
+  .preview-body { flex: 1; width: 100%; height: 100%; overflow: hidden; }
+  .preview-frame { width: 100%; height: 100%; border: none; }
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 32px; right: 32px;
+    background: var(--gold);
+    color: var(--black);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 24px;
+    z-index: 3000;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--divider);
+    margin-top: 60px;
+    padding-top: 24px;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--warm-grey);
+    opacity: 0.6;
+  }
+  /* ── REQUIRED STAR ── */
+  .req { color: var(--gold); margin-left: 2px; }
+  /* ── INFO NOTE ── */
+  .note {
+    font-size: 11px;
+    color: var(--warm-grey);
+    margin-top: 4px;
+    font-style: italic;
+  }
+  /* Payment display */
+  .payment-calc {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 14px 18px;
+    margin-top: 10px;
+  }
+  .pay-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--divider);
+  }
+  .pay-row:last-child { border-bottom: none; font-weight: 500; color: var(--gold); }
+  .pay-row span:first-child { color: var(--warm-grey); }
+  /* ── TOPBAR ── */
+  .topbar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 0;
+    gap: 10px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.6s;
+  }
+  .topbar button {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--warm-grey);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .topbar button:hover { border-color: var(--gold-dim); color: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="logo-text">Aakaara Studios</div>
+    <div class="logo-sub">Contract Generator</div>
+    <input type="password" id="loginPass" placeholder="Enter access code"/>
+    <div class="login-error" id="loginError">Incorrect access code</div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app" id="app">
+<div class="page-wrap">
+  <!-- HEADER -->
+  <header>
+    <div class="brand-eyebrow">Contract Generator</div>
+    <div class="brand-name">Aakaara Studios</div>
+    <div class="brand-city">New York City</div>
+    <div class="gold-rule-double"><span></span><span></span></div>
+    <div class="page-title">Photography &amp; Videography — Service Agreement Builder</div>
+  </header>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <button onclick="resetForm()">New Contract</button>
+  </div>
+
+  <!-- FORM -->
+  <form id="contractForm" onsubmit="return false;">
+    <!-- 1. CLIENT DETAILS -->
+    <div class="form-section">
+      <div class="section-label">01 — Client Details</div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" id="clientName" placeholder="e.g. Priya & Karthik Sharma" required/>
+        </div>
+        <div class="field">
+          <label>Email Address <span class="req">*</span></label>
+          <input type="email" id="clientEmail" placeholder="client@email.com" required/>
+        </div>
+        <div class="field">
+          <label>Phone Number</label>
+          <input type="text" id="clientPhone" placeholder="+1 (000) 000-0000"/>
+        </div>
+        <div class="field">
+          <label>City / State</label>
+          <input type="text" id="clientAddress" placeholder="e.g. San Antonio, Texas"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. EVENT DETAILS -->
+    <div class="form-section">
+      <div class="section-label">02 — Event Details</div>
+      <div class="field-grid cols-1" style="margin-bottom:12px;">
+        <div class="field">
+          <label>Event Type <span class="req">*</span></label>
+          <select id="eventType">
+            <option value="">-- Select event type --</option>
+            <option>Telugu Hindu Wedding</option>
+            <option>Tamil Hindu Wedding</option>
+            <option>North Indian Wedding</option>
+            <option>Muslim Wedding (Nikah)</option>
+            <option>Christian Wedding</option>
+            <option>South Asian Wedding</option>
+            <option>Engagement Ceremony</option>
+            <option>Birthday Celebration</option>
+            <option>Baby Shower / Seemantham</option>
+            <option>Corporate Event</option>
+            <option>Cultural Event</option>
+            <option>Custom</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-grid" style="margin-bottom:12px;">
+        <div class="field">
+          <label>Event Location (City, State) <span class="req">*</span></label>
+          <input type="text" id="eventLocation" placeholder="e.g. San Antonio, Texas"/>
+        </div>
+        <div class="field">
+          <label>Contract Date</label>
+          <input type="date" id="quoteDate"/>
+        </div>
+      </div>
+      <!-- DAY BLOCKS -->
+      <div id="dayBlocks"></div>
+      <button type="button" class="btn-ghost" onclick="addDay()">+ Add Event Day</button>
+    </div>
+
+    <!-- 3. SERVICES -->
+    <div class="form-section">
+      <div class="section-label">03 — Services Included</div>
+      <div class="checkbox-grid">
+        <label class="check-item">
+          <input type="checkbox" id="svcPhoto" checked/>
+          <span>Photography</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" id="svcVideo" checked/>
+          <span>Videography</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" id="svcTeaser" checked/>
+          <span>Wedding Teaser Film</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" id="svcDocfilm" checked/>
+          <span>Documentary Film</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" id="svcRaw" checked/>
+          <span>Raw Files Delivery</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" id="svcGallery" checked/>
+          <span>Online Gallery</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" id="svcNYC"/>
+          <span>NYC Post-Wedding Shoot</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" id="svcStream"/>
+          <span>Live Streaming</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" id="svcSameday"/>
+          <span>Same-Day Edit</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" id="svcDrone"/>
+          <span>Drone Coverage</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 4. DELIVERABLES -->
+    <div class="form-section">
+      <div class="section-label">04 — Edited Photo Deliverables</div>
+      <div id="delRows"></div>
+      <button type="button" class="btn-ghost" onclick="addDeliverable()">+ Add Event / Deliverable</button>
+      <p class="note">List each sub-event with its edited photo count.</p>
+    </div>
+
+    <!-- 5. PRICING -->
+    <div class="form-section">
+      <div class="section-label">05 — Pricing</div>
+      <div class="price-card">
+        <div class="field">
+          <label>Pricing Mode</label>
+          <select id="pricingMode" onchange="updatePayCalc()">
+            <option value="flat">Flat Rate</option>
+            <option value="hourly">Hourly Rate</option>
+          </select>
+        </div>
+        <div class="field" id="flatField">
+          <label>Total Contract Value (USD) <span class="req">*</span></label>
+          <input type="number" id="totalValue" placeholder="e.g. 3300" min="0" oninput="updatePayCalc()"/>
+        </div>
+        <div class="field" id="hourlyRateField" style="display:none;">
+          <label>Hourly Rate (USD/hr)</label>
+          <input type="number" id="hourlyRate" placeholder="e.g. 300" min="0" oninput="updatePayCalc()"/>
+        </div>
+        <div class="field" id="hourlyHoursField" style="display:none;">
+          <label>Estimated Total Hours</label>
+          <input type="number" id="hourlyHours" placeholder="Auto from days" min="0" oninput="updatePayCalc()"/>
+        </div>
+        <div class="field">
+          <label>Travel &amp; Accommodation</label>
+          <select id="travelMode">
+            <option value="separate">Invoiced separately</option>
+            <option value="included">Included in total</option>
+            <option value="na">Not applicable</option>
+          </select>
+        </div>
+      </div>
+      <div class="payment-calc" id="payCalc" style="display:none;">
+        <div class="pay-row">
+          <span>50% — Initial Deposit (Non-Refundable)</span>
+          <span id="pay1">--</span>
+        </div>
+        <div class="pay-row">
+          <span>30% — After Wedding Day</span>
+          <span id="pay2">--</span>
+        </div>
+        <div class="pay-row">
+          <span>20% — Upon Raw Data Delivery</span>
+          <span id="pay3">--</span>
+        </div>
+        <div class="pay-row">
+          <span>Total</span>
+          <span id="payTotal">--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. NOTES -->
+    <div class="form-section">
+      <div class="section-label">06 — Additional Notes / Special Instructions</div>
+      <div class="field">
+        <label>Any custom clauses or notes for this project</label>
+        <textarea id="extraNotes" placeholder="e.g. Client requested Punjabi song for teaser. Venue is outdoor rooftop. Extra hour may be needed for mehndi coverage."></textarea>
+      </div>
+    </div>
+
+    <!-- GENERATE -->
+    <div class="generate-wrap">
+      <button type="button" class="btn-generate" onclick="generateContract('preview')">
+        Preview Contract
+      </button>
+      <div class="btn-row">
+        <button type="button" class="btn-secondary" onclick="generateContract('download')">
+          Download PDF
+        </button>
+        <button type="button" class="btn-secondary" onclick="sendToClient()">
+          Send to Client
+        </button>
+      </div>
+      <p class="note" style="margin-top:8px; text-align:center;">
+        Preview generates a multi-page PDF contract. Send opens Gmail with a pre-filled email.
+      </p>
+    </div>
+  </form>
+
+  <footer>
+    aakaarastudiosnyc.com &nbsp;&middot;&nbsp; avala.sudhakar@gmail.com &nbsp;&middot;&nbsp; +1 (475) 332-2020
+  </footer>
+</div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="preview-modal" id="previewModal">
+  <div class="preview-header">
+    <div class="preview-header-title">Contract Preview</div>
+    <div class="preview-actions">
+      <button onclick="closePreview()">Close</button>
+      <button onclick="downloadFromPreview()">Download PDF</button>
+      <button class="btn-primary-sm" onclick="sendToClient()">Send to Client</button>
+    </div>
+  </div>
+  <div class="preview-body">
+    <iframe id="previewFrame" class="preview-frame"></iframe>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── LOGIN ──
+const ACCESS_CODE = 'aakaara2026';
+
+function doLogin() {
+  if (document.getElementById('loginPass').value === ACCESS_CODE) {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('app').classList.add('visible');
+  } else {
+    document.getElementById('loginError').classList.add('show');
+    setTimeout(() => document.getElementById('loginError').classList.remove('show'), 2000);
+  }
+}
+document.getElementById('loginPass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// ── DAY BLOCKS ──
+let dayCounter = 0; // monotonic counter for unique IDs
+function addDay() {
+  dayCounter++;
+  const n = dayCounter;
+  const div = document.createElement('div');
+  div.className = 'day-block';
+  div.id = `day-${n}`;
+  div.innerHTML = `
+    <button type="button" class="btn-remove" onclick="removeDay(${n})">Remove</button>
+    <div class="field-grid">
+      <div class="field">
+        <label>Date</label>
+        <input type="date" class="day-date"/>
+      </div>
+      <div class="field">
+        <label>Coverage Hours</label>
+        <input type="number" class="day-hours" placeholder="e.g. 6" min="1" max="24" oninput="syncHourlyHours()"/>
+      </div>
+      <div class="field span-2">
+        <label>Events / Description</label>
+        <input type="text" class="day-desc" placeholder="e.g. Wedding Ceremony & Reception"/>
+      </div>
+    </div>`;
+  document.getElementById('dayBlocks').appendChild(div);
+  renumberDays();
+}
+
+function removeDay(n) {
+  const el = document.getElementById(`day-${n}`);
+  if (el) el.remove();
+  renumberDays();
+  syncHourlyHours();
+}
+
+function renumberDays() {
+  const blocks = document.querySelectorAll('#dayBlocks .day-block');
+  blocks.forEach((block, i) => {
+    const n = i + 1;
+    block.dataset.day = `Day ${n}`;
+    block.id = `day-${n}`;
+    const removeBtn = block.querySelector('.btn-remove');
+    if (removeBtn) removeBtn.setAttribute('onclick', `removeDay(${n})`);
+  });
+  dayCounter = blocks.length;
+}
+
+// ── DELIVERABLES ──
+let delCounter = 0;
+function addDeliverable() {
+  delCounter++;
+  const n = delCounter;
+  const div = document.createElement('div');
+  div.className = 'deliverable-row';
+  div.id = `del-${n}`;
+  div.innerHTML = `
+    <input type="text" class="del-name" placeholder="Event name (e.g. Pellikoduku)"/>
+    <input type="number" class="del-count" placeholder="Photos" min="0"/>
+    <button type="button" onclick="removeDel(${n})">&times;</button>`;
+  document.getElementById('delRows').appendChild(div);
+}
+function removeDel(n) {
+  const el = document.getElementById(`del-${n}`);
+  if (el) el.remove();
+}
+
+// ── PAYMENT CALC ──
+function syncHourlyHours() {
+  if (document.getElementById('pricingMode').value !== 'hourly') return;
+  let total = 0;
+  document.querySelectorAll('#dayBlocks .day-hours').forEach(inp => {
+    total += parseFloat(inp.value) || 0;
+  });
+  if (total > 0) document.getElementById('hourlyHours').value = total;
+  updatePayCalc();
+}
+
+function updatePayCalc() {
+  const mode = document.getElementById('pricingMode').value;
+  document.getElementById('flatField').style.display = mode === 'flat' ? '' : 'none';
+  document.getElementById('hourlyRateField').style.display = mode === 'hourly' ? '' : 'none';
+  document.getElementById('hourlyHoursField').style.display = mode === 'hourly' ? '' : 'none';
+
+  let total = 0;
+  if (mode === 'flat') {
+    total = parseFloat(document.getElementById('totalValue').value) || 0;
+  } else {
+    const rate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+    const hrs = parseFloat(document.getElementById('hourlyHours').value) || 0;
+    total = rate * hrs;
+    // Sync to totalValue so PDF can read it
+    if (total > 0) document.getElementById('totalValue').value = total;
+  }
+
+  const calc = document.getElementById('payCalc');
+  if (total > 0) {
+    calc.style.display = 'block';
+    document.getElementById('pay1').textContent = '$' + (total * 0.5).toFixed(2);
+    document.getElementById('pay2').textContent = '$' + (total * 0.3).toFixed(2);
+    document.getElementById('pay3').textContent = '$' + (total * 0.2).toFixed(2);
+    document.getElementById('payTotal').textContent = '$' + total.toFixed(2);
+  } else {
+    calc.style.display = 'none';
+  }
+}
+
+// ── HELPERS ──
+function fmtDate(val) {
+  if (!val) return '';
+  const d = new Date(val + 'T12:00:00');
+  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+function chk(id) { return document.getElementById(id).checked; }
+function val(id) { return (document.getElementById(id)?.value || '').trim(); }
+
+// ── COLLECT FORM DATA ──
+function collectData() {
+  const clientName  = val('clientName');
+  const clientEmail = val('clientEmail');
+  const clientPhone = val('clientPhone');
+  const clientAddr  = val('clientAddress');
+  const eventType   = val('eventType');
+  const eventLoc    = val('eventLocation');
+  const quoteDate   = val('quoteDate');
+  const totalVal    = parseFloat(val('totalValue')) || 0;
+  const travelMode  = val('travelMode');
+  const extraNotes  = val('extraNotes');
+
+  if (!clientName || !clientEmail || !eventType || !eventLoc || !totalVal) {
+    showToast('Fill in required fields first', true);
+    return null;
+  }
+
+  // Days
+  const days = [];
+  let totalHours = 0;
+  document.querySelectorAll('#dayBlocks .day-block').forEach((block, i) => {
+    const date = block.querySelector('.day-date')?.value || '';
+    const hrs  = parseFloat(block.querySelector('.day-hours')?.value) || 0;
+    const desc = block.querySelector('.day-desc')?.value || '';
+    totalHours += hrs;
+    days.push({ num: i + 1, date, hrs, desc });
+  });
+
+  // Services
+  const services = [];
+  if (chk('svcPhoto'))   services.push('Photography');
+  if (chk('svcVideo'))   services.push('Videography');
+  if (chk('svcTeaser'))  services.push('Wedding Teaser Film (2-3 minutes)');
+  if (chk('svcDocfilm')) services.push('Documentary Film (~10 minutes with interviews)');
+  if (chk('svcRaw'))     services.push('Raw Files Delivery');
+  if (chk('svcGallery')) services.push('Online Gallery');
+  if (chk('svcNYC'))     services.push('NYC Post-Wedding Shoot');
+  if (chk('svcStream'))  services.push('Live Streaming');
+  if (chk('svcSameday')) services.push('Same-Day Edit');
+  if (chk('svcDrone'))   services.push('Drone Coverage');
+
+  // Deliverables
+  const deliverables = [];
+  let delTotal = 0;
+  document.querySelectorAll('#delRows .deliverable-row').forEach(row => {
+    const name  = row.querySelector('.del-name')?.value?.trim() || '';
+    const count = parseInt(row.querySelector('.del-count')?.value) || 0;
+    if (name) { deliverables.push({ name, count }); delTotal += count; }
+  });
+
+  const hasNYC = chk('svcNYC');
+
+  return {
+    clientName, clientEmail, clientPhone, clientAddr,
+    eventType, eventLoc, quoteDate,
+    totalVal, travelMode, extraNotes,
+    days, totalHours, services, deliverables, delTotal, hasNYC
+  };
+}
+
+// ══════════════════════════════════════════════════════════
+// ── PDF GENERATION (jsPDF) ──
+// ══════════════════════════════════════════════════════════
+function generateContract(action) {
+  const data = collectData();
+  if (!data) return;
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+    const W = doc.internal.pageSize.getWidth();
+    const H = doc.internal.pageSize.getHeight();
+    const M = 56; // margin
+    const CW = W - 2 * M; // content width
+
+    // Colors
+    const BG       = [22, 22, 22];
+    const GOLD     = [201, 168, 76];
+    const GOLD_DIM = [122, 99, 48];
+    const WHITE    = [237, 232, 220];
+    const MUTED    = [122, 117, 104];
+    const CARD_BG  = [30, 28, 26];
+
+    // Helpers
+    function pageBg() {
+      doc.setFillColor(...BG);
+      doc.rect(0, 0, W, H, 'F');
+    }
+    function goldLine(x1, y, x2) {
+      doc.setDrawColor(...GOLD);
+      doc.setLineWidth(0.5);
+      doc.line(x1, y, x2, y);
+    }
+    function goldLineDim(x1, y, x2) {
+      doc.setDrawColor(...GOLD_DIM);
+      doc.setLineWidth(0.5);
+      doc.line(x1, y, x2, y);
+    }
+    function footerBar() {
+      goldLine(M, H - 70, W - M);
+      doc.setFontSize(6); doc.setTextColor(...MUTED);
+      doc.text('aakaarastudiosnyc.com  |  avala.sudhakar@gmail.com  |  +1 (475) 332-2020', W / 2, H - 52, { align: 'center' });
+    }
+    function headerBar(page, total) {
+      doc.setFontSize(6); doc.setTextColor(...GOLD);
+      doc.text('A A K A A R A   S T U D I O S', M, 38);
+      doc.text(`${String(page).padStart(2, '0')} / ${String(total).padStart(2, '0')}`, W - M, 38, { align: 'right' });
+      goldLineDim(M, 46, W - M);
+    }
+    function sectionHeading(y, text) {
+      doc.setFontSize(8); doc.setTextColor(...GOLD);
+      doc.text(text.toUpperCase(), M, y);
+      goldLineDim(M, y + 8, W - M);
+      return y + 24;
+    }
+    function bodyText(y, text, opts) {
+      doc.setFontSize(opts?.size || 9);
+      doc.setTextColor(...(opts?.color || WHITE));
+      const lines = doc.splitTextToSize(text, opts?.width || CW);
+      doc.text(lines, opts?.x || M, y);
+      return y + lines.length * (opts?.lineHeight || 13);
+    }
+    function labelVal(y, label, value) {
+      doc.setFontSize(7); doc.setTextColor(...MUTED);
+      doc.text(label.toUpperCase(), M, y);
+      doc.setFontSize(9); doc.setTextColor(...WHITE);
+      doc.text(value || '--', M + 130, y);
+      return y + 16;
+    }
+    function needNewPage(y, needed) {
+      if (y + needed > H - 90) {
+        doc.addPage();
+        pageBg();
+        return 70;
+      }
+      return y;
+    }
+
+    const totalPages = 5 + (data.hasNYC ? 0 : 0); // we'll update page numbers at the end
+
+    // ════════════════════════════════════════════
+    // PAGE 1 — COVER
+    // ════════════════════════════════════════════
+    pageBg();
+
+    // Gold corner accents
+    doc.setDrawColor(...GOLD); doc.setLineWidth(1.5);
+    doc.line(M - 10, 80, M - 10, 130); doc.line(M - 10, 80, M + 40, 80);
+    doc.line(W - M + 10, 80, W - M + 10, 130); doc.line(W - M + 10, 80, W - M - 40, 80);
+    doc.line(M - 10, H - 120, M - 10, H - 170); doc.line(M - 10, H - 120, M + 40, H - 120);
+    doc.line(W - M + 10, H - 120, W - M + 10, H - 170); doc.line(W - M + 10, H - 120, W - M - 40, H - 120);
+
+    // Studio name
+    doc.setFontSize(8); doc.setTextColor(...GOLD);
+    doc.text('A A K A A R A   S T U D I O S', W / 2, 160, { align: 'center' });
+    doc.setFontSize(6); doc.setTextColor(...MUTED);
+    doc.text('N E W   Y O R K   C I T Y', W / 2, 175, { align: 'center' });
+
+    goldLine(W / 2 - 50, 195, W / 2 + 50);
+
+    // Title
+    doc.setFontSize(22); doc.setTextColor(...WHITE);
+    doc.text('SERVICE AGREEMENT', W / 2, 240, { align: 'center' });
+    doc.setFontSize(9); doc.setTextColor(...GOLD_DIM);
+    doc.text('Photography & Videography', W / 2, 260, { align: 'center' });
+
+    // Event summary card
+    const cardY = 300;
+    const cardH = 170;
+    doc.setFillColor(...CARD_BG);
+    doc.rect(M + 30, cardY, CW - 60, cardH, 'F');
+    doc.setDrawColor(...GOLD_DIM); doc.setLineWidth(0.5);
+    doc.rect(M + 30, cardY, CW - 60, cardH, 'S');
+
+    let cy = cardY + 28;
+    const cx = M + 50;
+    doc.setFontSize(7); doc.setTextColor(...GOLD);
+    doc.text('CLIENT', cx, cy);
+    doc.setFontSize(11); doc.setTextColor(...WHITE);
+    doc.text(data.clientName, cx, cy + 14);
+    cy += 36;
+
+    doc.setFontSize(7); doc.setTextColor(...GOLD);
+    doc.text('EVENT', cx, cy);
+    doc.setFontSize(9); doc.setTextColor(...WHITE);
+    doc.text(data.eventType, cx, cy + 13);
+    cy += 30;
+
+    doc.setFontSize(7); doc.setTextColor(...GOLD);
+    doc.text('LOCATION', cx, cy);
+    doc.setFontSize(9); doc.setTextColor(...WHITE);
+    doc.text(data.eventLoc, cx, cy + 13);
+    cy += 30;
+
+    doc.setFontSize(7); doc.setTextColor(...GOLD);
+    doc.text('DATE', cx, cy);
+    doc.setFontSize(9); doc.setTextColor(...WHITE);
+    const firstDate = data.days.length > 0 && data.days[0].date ? fmtDate(data.days[0].date) : 'TBD';
+    doc.text(firstDate, cx, cy + 13);
+
+    // Contract value on the right
+    const rvx = W - M - 80;
+    doc.setFontSize(7); doc.setTextColor(...GOLD);
+    doc.text('CONTRACT VALUE', rvx, cardY + 28, { align: 'center' });
+    doc.setFontSize(18); doc.setTextColor(...GOLD);
+    doc.text('$' + data.totalVal.toLocaleString('en-US', { minimumFractionDigits: 2 }), rvx, cardY + 50, { align: 'center' });
+
+    // Contract date
+    doc.setFontSize(7); doc.setTextColor(...MUTED);
+    doc.text(fmtDate(data.quoteDate) || 'Date: TBD', W / 2, cardY + cardH + 30, { align: 'center' });
+
+    footerBar();
+
+    // ════════════════════════════════════════════
+    // PAGE 2 — CLIENT & EVENT DETAILS + SERVICES
+    // ════════════════════════════════════════════
+    doc.addPage(); pageBg(); headerBar(2, 5);
+    let y = 70;
+
+    y = sectionHeading(y, 'Section 1 — Parties to this Agreement');
+    // Provider
+    doc.setFontSize(8); doc.setTextColor(...GOLD_DIM);
+    doc.text('SERVICE PROVIDER', M, y); y += 14;
+    y = bodyText(y, 'Aakaara Studios NYC'); y += 2;
+    y = bodyText(y, 'New York City, New York', { color: MUTED, size: 8 }); y += 2;
+    y = bodyText(y, 'avala.sudhakar@gmail.com  |  +1 (475) 332-2020', { color: MUTED, size: 8 }); y += 2;
+    y = bodyText(y, 'aakaarastudiosnyc.com', { color: MUTED, size: 8 });
+    y += 16;
+
+    // Client
+    doc.setFontSize(8); doc.setTextColor(...GOLD_DIM);
+    doc.text('CLIENT', M, y); y += 14;
+    y = bodyText(y, data.clientName);
+    if (data.clientEmail) y = bodyText(y, data.clientEmail, { color: MUTED, size: 8 });
+    if (data.clientPhone) y = bodyText(y, data.clientPhone, { color: MUTED, size: 8 });
+    if (data.clientAddr)  y = bodyText(y, data.clientAddr, { color: MUTED, size: 8 });
+    y += 20;
+
+    y = sectionHeading(y, 'Section 2 — Event Schedule');
+    if (data.days.length > 0) {
+      // Table header
+      doc.setFillColor(35, 33, 24);
+      doc.rect(M, y, CW, 18, 'F');
+      doc.setFontSize(7); doc.setTextColor(...GOLD);
+      doc.text('DAY', M + 8, y + 12);
+      doc.text('DATE', M + 60, y + 12);
+      doc.text('HOURS', M + 220, y + 12);
+      doc.text('EVENTS / DESCRIPTION', M + 290, y + 12);
+      y += 22;
+
+      data.days.forEach((day, i) => {
+        y = needNewPage(y, 20);
+        if (i % 2 === 0) {
+          doc.setFillColor(26, 26, 24);
+          doc.rect(M, y - 4, CW, 18, 'F');
+        }
+        doc.setFontSize(8); doc.setTextColor(...WHITE);
+        doc.text(`Day ${day.num}`, M + 8, y + 8);
+        doc.text(fmtDate(day.date) || 'TBD', M + 60, y + 8);
+        doc.text(day.hrs > 0 ? day.hrs + ' hrs' : '--', M + 220, y + 8);
+        const descLines = doc.splitTextToSize(day.desc || '--', CW - 290);
+        doc.text(descLines, M + 290, y + 8);
+        y += Math.max(18, descLines.length * 12);
+      });
+
+      y += 4;
+      doc.setFontSize(8); doc.setTextColor(...GOLD);
+      doc.text(`Total Coverage: ${data.totalHours} Hours`, M, y + 8);
+      y += 24;
+    }
+
+    y = needNewPage(y, 120);
+    y = sectionHeading(y, 'Section 3 — Services Included');
+    data.services.forEach(svc => {
+      y = needNewPage(y, 16);
+      doc.setFontSize(8); doc.setTextColor(...GOLD_DIM);
+      doc.text('\u2022', M + 4, y);
+      doc.setTextColor(...WHITE);
+      doc.text(svc, M + 16, y);
+      y += 14;
+    });
+    y += 10;
+
+    // Deliverables
+    if (data.deliverables.length > 0) {
+      y = needNewPage(y, 80);
+      y = sectionHeading(y, 'Section 4 — Edited Photo Deliverables');
+      doc.setFillColor(35, 33, 24);
+      doc.rect(M, y, CW, 18, 'F');
+      doc.setFontSize(7); doc.setTextColor(...GOLD);
+      doc.text('EVENT', M + 8, y + 12);
+      doc.text('EDITED PHOTOS', W - M - 8, y + 12, { align: 'right' });
+      y += 22;
+
+      data.deliverables.forEach((del, i) => {
+        y = needNewPage(y, 18);
+        if (i % 2 === 0) {
+          doc.setFillColor(26, 26, 24);
+          doc.rect(M, y - 4, CW, 18, 'F');
+        }
+        doc.setFontSize(8); doc.setTextColor(...WHITE);
+        doc.text(del.name, M + 8, y + 8);
+        doc.text(String(del.count), W - M - 8, y + 8, { align: 'right' });
+        y += 18;
+      });
+
+      // Total row
+      doc.setFillColor(...CARD_BG);
+      doc.rect(M, y - 2, CW, 20, 'F');
+      doc.setFontSize(8); doc.setTextColor(...GOLD);
+      doc.text('TOTAL', M + 8, y + 10);
+      doc.text(String(data.delTotal) + ' edited photos', W - M - 8, y + 10, { align: 'right' });
+      y += 28;
+    }
+
+    footerBar();
+
+    // ════════════════════════════════════════════
+    // PAGE 3 — PRICING & PAYMENT + CLAUSES
+    // ════════════════════════════════════════════
+    doc.addPage(); pageBg(); headerBar(3, 5);
+    y = 70;
+
+    y = sectionHeading(y, 'Section 5 — Financial Terms & Payment Schedule');
+    const travelLine = data.travelMode === 'separate' ? 'Invoiced separately (flights, hotel, local transport)'
+      : data.travelMode === 'included' ? 'Included in total contract value'
+      : 'Not applicable';
+
+    y = labelVal(y, 'Total Contract Value', '$' + data.totalVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    y = labelVal(y, 'Travel & Accomm.', travelLine);
+    y += 8;
+
+    // Payment schedule table
+    doc.setFontSize(7); doc.setTextColor(...GOLD);
+    doc.text('PAYMENT SCHEDULE (50 / 30 / 20)', M, y); y += 14;
+
+    const payments = [
+      ['50% — Initial Deposit (Non-Refundable)', '$' + (data.totalVal * 0.5).toFixed(2), 'Due upon signing'],
+      ['30% — Second Payment', '$' + (data.totalVal * 0.3).toFixed(2), 'Within 48 hrs after final event day'],
+      ['20% — Final Payment', '$' + (data.totalVal * 0.2).toFixed(2), 'Upon raw data delivery to Client']
+    ];
+
+    payments.forEach((row, i) => {
+      if (i % 2 === 0) {
+        doc.setFillColor(26, 26, 24);
+        doc.rect(M, y - 4, CW, 18, 'F');
+      }
+      doc.setFontSize(8); doc.setTextColor(...WHITE);
+      doc.text(row[0], M + 8, y + 8);
+      doc.setTextColor(...GOLD);
+      doc.text(row[1], M + 300, y + 8);
+      doc.setTextColor(...MUTED);
+      doc.text(row[2], M + 370, y + 8);
+      y += 18;
+    });
+
+    y += 4;
+    doc.setFontSize(7); doc.setTextColor(...MUTED);
+    y = bodyText(y, 'Late payments incur a 1.5% weekly fee after 5 business days past due date.', { color: MUTED, size: 7 });
+    y += 16;
+
+    // Clauses
+    const clauses = [
+      {
+        title: 'Photo Selection & Editing Timeline',
+        items: [
+          'Client selects photos within 14 calendar days of raw gallery access.',
+          '6-8 week editing timeline begins from Client\'s confirmed selection date.',
+          'Client delay extends delivery by equivalent days; Service Provider not liable.',
+          'After 30 days with no response, Service Provider proceeds with default curated edit.'
+        ]
+      },
+      {
+        title: 'Wedding Film — Music Selection & Lock Policy',
+        items: [
+          'Songs submitted in writing 14 days before expected preview delivery.',
+          'Music locked once confirmed in writing by both parties.',
+          'No music changes permitted after preview film is delivered.',
+          'Post-preview changes subject to revision fee at Service Provider\'s sole discretion.',
+          'Client is responsible for all music copyright and licensing.'
+        ]
+      },
+      {
+        title: 'Raw Data Delivery',
+        items: [
+          'All raw files delivered within 7 calendar days of final event.',
+          'Cloud delivery at no extra charge; physical SSD at additional cost.',
+          'Client designates delivery address in writing by event day.',
+          'Final 20% payment must be received before raw data is released.',
+          'Service Provider retains backups for 60 days post-delivery only.'
+        ]
+      }
+    ];
+
+    clauses.forEach(clause => {
+      y = needNewPage(y, 80);
+      y = sectionHeading(y, clause.title);
+      clause.items.forEach(item => {
+        y = needNewPage(y, 16);
+        doc.setFontSize(8); doc.setTextColor(...GOLD_DIM);
+        doc.text('\u2022', M + 4, y);
+        doc.setTextColor(...WHITE);
+        const lines = doc.splitTextToSize(item, CW - 20);
+        doc.text(lines, M + 16, y);
+        y += lines.length * 12 + 2;
+      });
+      y += 6;
+    });
+
+    footerBar();
+
+    // ════════════════════════════════════════════
+    // PAGE 4 — MORE CLAUSES
+    // ════════════════════════════════════════════
+    doc.addPage(); pageBg(); headerBar(4, 5);
+    y = 70;
+
+    // Live Streaming
+    if (chk('svcStream')) {
+      y = sectionHeading(y, 'Live Streaming Services');
+      const streamItems = [
+        'Conditional service — requires stable Wi-Fi at venue (minimum 10 Mbps upload).',
+        'Sole responsibility of Client to arrange and confirm Wi-Fi availability.',
+        'If internet is unavailable, live streaming will not be possible — no refund, no price adjustment.',
+        'Streaming platform details due in writing 5 days before event.'
+      ];
+      streamItems.forEach(item => {
+        doc.setFontSize(8); doc.setTextColor(...GOLD_DIM);
+        doc.text('\u2022', M + 4, y);
+        doc.setTextColor(...WHITE);
+        const lines = doc.splitTextToSize(item, CW - 20);
+        doc.text(lines, M + 16, y);
+        y += lines.length * 12 + 2;
+      });
+      y += 12;
+    }
+
+    // Digital Rights
+    y = needNewPage(y, 80);
+    y = sectionHeading(y, 'Digital Rights, Licensing & Usage');
+    const rightsItems = [
+      'Client grants Aakaara Studios NYC a non-exclusive, royalty-free, perpetual, worldwide license to use content for website, social media, competitions, advertising, and marketing.',
+      'Client may use content for personal non-commercial use; credit encouraged.',
+      'No commercial use by Client without prior written consent from Service Provider.'
+    ];
+    rightsItems.forEach(item => {
+      y = needNewPage(y, 20);
+      doc.setFontSize(8); doc.setTextColor(...GOLD_DIM);
+      doc.text('\u2022', M + 4, y);
+      doc.setTextColor(...WHITE);
+      const lines = doc.splitTextToSize(item, CW - 20);
+      doc.text(lines, M + 16, y);
+      y += lines.length * 12 + 2;
+    });
+    y += 12;
+
+    // Cancellation
+    y = needNewPage(y, 100);
+    y = sectionHeading(y, 'Cancellation & Rescheduling');
+    const cancelItems = [
+      'Any cancellation: 50% deposit is fully non-refundable.',
+      'Cancellation within 30 days of event: all payments non-refundable.',
+      'Cancellation within 7 days of event: full contract value due and payable.',
+      'Rescheduling: 30+ days written notice required; subject to availability.',
+      'Service Provider cancellation: refund of all received payments less costs incurred.'
+    ];
+    cancelItems.forEach(item => {
+      y = needNewPage(y, 16);
+      doc.setFontSize(8); doc.setTextColor(...GOLD_DIM);
+      doc.text('\u2022', M + 4, y);
+      doc.setTextColor(...WHITE);
+      const lines = doc.splitTextToSize(item, CW - 20);
+      doc.text(lines, M + 16, y);
+      y += lines.length * 12 + 2;
+    });
+    y += 12;
+
+    // NYC Post-Wedding (conditional)
+    if (data.hasNYC) {
+      y = needNewPage(y, 80);
+      y = sectionHeading(y, 'NYC Post-Wedding Shoot Add-On');
+      const nycItems = [
+        'Client must confirm shoot date in writing at least 15 calendar days in advance.',
+        'Date is fixed and final once confirmed — no changes under any circumstances.',
+        'Cancellation forfeits shoot; NO refund, NO price adjustment, NO rescheduling.',
+        'Full contract value remains due and payable.'
+      ];
+      nycItems.forEach(item => {
+        y = needNewPage(y, 16);
+        doc.setFontSize(8); doc.setTextColor(...GOLD_DIM);
+        doc.text('\u2022', M + 4, y);
+        doc.setTextColor(...WHITE);
+        const lines = doc.splitTextToSize(item, CW - 20);
+        doc.text(lines, M + 16, y);
+        y += lines.length * 12 + 2;
+      });
+      y += 12;
+    }
+
+    // General Provisions
+    y = needNewPage(y, 80);
+    y = sectionHeading(y, 'General Provisions');
+    const genItems = [
+      'Governing Law: State of New York.',
+      'Dispute Resolution: good-faith negotiation, then binding arbitration (AAA, New York City).',
+      'This Agreement constitutes the entire agreement between the parties.',
+      'Force Majeure: neither party liable for failure due to circumstances beyond reasonable control.',
+      'Amendments must be in writing and signed by both parties.',
+      'If any provision is held invalid, the remaining provisions remain in full force.'
+    ];
+    genItems.forEach(item => {
+      y = needNewPage(y, 16);
+      doc.setFontSize(8); doc.setTextColor(...GOLD_DIM);
+      doc.text('\u2022', M + 4, y);
+      doc.setTextColor(...WHITE);
+      const lines = doc.splitTextToSize(item, CW - 20);
+      doc.text(lines, M + 16, y);
+      y += lines.length * 12 + 2;
+    });
+
+    // Extra notes
+    if (data.extraNotes) {
+      y += 12;
+      y = needNewPage(y, 60);
+      y = sectionHeading(y, 'Additional Notes');
+      y = bodyText(y, data.extraNotes, { size: 8, color: WHITE });
+    }
+
+    footerBar();
+
+    // ════════════════════════════════════════════
+    // PAGE 5 — SIGNATURE PAGE
+    // ════════════════════════════════════════════
+    doc.addPage(); pageBg();
+    y = 100;
+
+    doc.setFontSize(8); doc.setTextColor(...GOLD);
+    doc.text('A A K A A R A   S T U D I O S', W / 2, y, { align: 'center' });
+    y += 12;
+    doc.setFontSize(6); doc.setTextColor(...MUTED);
+    doc.text('N E W   Y O R K   C I T Y', W / 2, y, { align: 'center' });
+    y += 30;
+
+    goldLine(W / 2 - 40, y, W / 2 + 40);
+    y += 30;
+
+    doc.setFontSize(16); doc.setTextColor(...WHITE);
+    doc.text('AGREEMENT & EXECUTION', W / 2, y, { align: 'center' });
+    y += 30;
+
+    doc.setFontSize(8); doc.setTextColor(...MUTED);
+    const ackText = 'By signing below, both parties acknowledge that they have read, understood, and agree to be bound by all terms and conditions set forth in this Service Agreement.';
+    const ackLines = doc.splitTextToSize(ackText, CW - 40);
+    doc.text(ackLines, W / 2, y, { align: 'center' });
+    y += ackLines.length * 12 + 40;
+
+    // Two-column signature blocks
+    const leftX = M + 20;
+    const rightX = W / 2 + 20;
+    const sigW = CW / 2 - 40;
+
+    // Service Provider
+    doc.setFontSize(7); doc.setTextColor(...GOLD);
+    doc.text('SERVICE PROVIDER', leftX, y);
+    doc.text('CLIENT', rightX, y);
+    y += 30;
+
+    goldLineDim(leftX, y, leftX + sigW);
+    goldLineDim(rightX, y, rightX + sigW);
+    y += 14;
+
+    doc.setFontSize(8); doc.setTextColor(...WHITE);
+    doc.text('Sudhakar Avula', leftX, y);
+    doc.text(data.clientName, rightX, y);
+    y += 12;
+    doc.setFontSize(7); doc.setTextColor(...MUTED);
+    doc.text('Aakaara Studios NYC', leftX, y);
+    y += 24;
+
+    // Date lines
+    doc.setFontSize(7); doc.setTextColor(...GOLD_DIM);
+    doc.text('DATE', leftX, y);
+    doc.text('DATE', rightX, y);
+    y += 16;
+    goldLineDim(leftX, y, leftX + sigW);
+    goldLineDim(rightX, y, rightX + sigW);
+    y += 40;
+
+    // Witness (optional)
+    doc.setFontSize(7); doc.setTextColor(...GOLD_DIM);
+    doc.text('WITNESS (OPTIONAL)', leftX, y);
+    y += 24;
+    goldLineDim(leftX, y, leftX + sigW);
+    y += 14;
+    doc.setFontSize(7); doc.setTextColor(...MUTED);
+    doc.text('Signature', leftX, y);
+    y += 14;
+    goldLineDim(leftX, y, leftX + sigW);
+    y += 14;
+    doc.setFontSize(7); doc.setTextColor(...MUTED);
+    doc.text('Printed Name & Date', leftX, y);
+
+    // Footer
+    goldLine(M, H - 80, W - M);
+    doc.setFontSize(7); doc.setTextColor(...MUTED);
+    doc.text('Aakaara Studios NYC  |  aakaarastudiosnyc.com', W / 2, H - 60, { align: 'center' });
+    doc.setFontSize(6); doc.setTextColor(...GOLD_DIM);
+    doc.text('Every story deserves its own canvas.', W / 2, H - 46, { align: 'center' });
+
+    // ── OUTPUT ──
+    const safeName = data.clientName.replace(/[^a-zA-Z0-9]/g, '_');
+    const fileName = `Aakaara_Studios_Contract_${safeName}.pdf`;
+
+    if (action === 'preview') {
+      const blob = doc.output('blob');
+      const url = URL.createObjectURL(blob);
+      document.getElementById('previewFrame').src = url;
+      document.getElementById('previewModal').classList.add('show');
+      window._currentPdfDoc = doc;
+      window._currentPdfName = fileName;
+    } else {
+      doc.save(fileName);
+      showToast('Contract PDF downloaded');
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert('Error generating PDF: ' + err.message);
+  }
+}
+
+// ── PREVIEW MODAL ──
+function closePreview() {
+  document.getElementById('previewModal').classList.remove('show');
+}
+
+function downloadFromPreview() {
+  if (window._currentPdfDoc) {
+    window._currentPdfDoc.save(window._currentPdfName || 'Aakaara_Contract.pdf');
+    showToast('Contract PDF downloaded');
+  }
+}
+
+// ── SEND TO CLIENT (Gmail Compose) ──
+function sendToClient() {
+  const data = collectData();
+  if (!data) return;
+
+  // Generate + download PDF
+  generateContract('download');
+
+  // Open Gmail compose
+  const firstName = data.clientName.split(' ')[0];
+  const subject = encodeURIComponent(`Aakaara Studios — ${data.eventType} Agreement for ${data.clientName}`);
+  const body = encodeURIComponent(
+    `Hi ${firstName},\n\n` +
+    `Thank you for reaching out to Aakaara Studios. Please find the service agreement attached with all the pricing details for your upcoming ${data.eventType.toLowerCase()}.\n\n` +
+    `We are excited to be part of your special day! Feel free to review the agreement and reach out with any questions.\n\n` +
+    `With warmth,\nSudhakar Avula\nAakaara Studios\ninfo@aakaarastudiosnyc.com`
+  );
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(data.clientEmail)}&su=${subject}&body=${body}`;
+
+  setTimeout(() => { window.open(gmailUrl, '_blank'); }, 600);
+  showToast('PDF downloaded. Gmail compose opened — attach the PDF and send.');
+}
+
+// ── TOAST ──
+function showToast(msg, warn) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = warn ? 'var(--red)' : 'var(--gold)';
+  t.style.color = warn ? '#fff' : 'var(--black)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── RESET ──
+function resetForm() {
+  document.getElementById('contractForm').reset();
+  document.getElementById('dayBlocks').innerHTML = '';
+  document.getElementById('delRows').innerHTML = '';
+  document.getElementById('payCalc').style.display = 'none';
+  dayCounter = 0;
+  delCounter = 0;
+  document.getElementById('quoteDate').value = new Date().toISOString().split('T')[0];
+  addDay();
+  addDay();
+  addDeliverable();
+  addDeliverable();
+  addDeliverable();
+  updatePayCalc();
+  showToast('Form reset');
+}
+
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('quoteDate').value = new Date().toISOString().split('T')[0];
+  addDay();
+  addDay();
+  addDeliverable();
+  addDeliverable();
+  addDeliverable();
+});
+</script>
+</body>
+</html>

@@ -1101,6 +1101,15 @@ function filterVideos(cat, btn) {
     vmVideo.src = '';
     vmStage.classList.remove('vm-has-video');
     document.body.style.overflow = '';
+
+    // Pause any hover-preview videos that may still be playing on .vw-card elements
+    document.querySelectorAll('.vw-poster video').forEach(function(v) {
+      v.pause();
+      v.currentTime = 0;
+    });
+    document.querySelectorAll('.vw-poster.active').forEach(function(p) {
+      p.classList.remove('active');
+    });
   }
 
   function formatTime(s) {
