@@ -65,9 +65,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>$${quote.quotedPrice.toLocaleString()}</td>
                 <td>${confirmedPriceInput}</td>
                 <td>
-                    <button class="btn-copy" data-email="${quote.clientEmail || ''}" title="Copy Email">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                    </button>
+                    <div class="action-buttons">
+                        <button class="btn-copy" data-email="${quote.clientEmail || ''}" title="Copy Email">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        </button>
+                        <button class="btn-delete" data-id="${quote.id}" title="Delete Quote">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                        </button>
+                    </div>
                 </td>
             `;
 
@@ -180,6 +185,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (quote && !isNaN(newPrice)) {
                     quote.confirmedPrice = newPrice;
                     saveQuotes(); // Save changes to localStorage
+                }
+            });
+        });
+
+        // Delete quote button
+        document.querySelectorAll('.btn-delete').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const quoteId = parseInt(button.dataset.id);
+                const quote = quotes.find(q => q.id === quoteId);
+                if (!quote) return;
+
+                // Show inline confirm — swap button to "Sure?" text
+                if (!button.classList.contains('confirm-state')) {
+                    button.classList.add('confirm-state');
+                    button.innerHTML = 'Sure?';
+                    // Auto-revert after 3 seconds if not clicked again
+                    button._revertTimeout = setTimeout(() => {
+                        button.classList.remove('confirm-state');
+                        button.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>';
+                    }, 5000);
+                } else {
+                    // Second click — actually delete
+                    clearTimeout(button._revertTimeout);
+                    quotes = quotes.filter(q => q.id !== quoteId);
+                    saveQuotes();
+                    renderQuotes();
                 }
             });
         });

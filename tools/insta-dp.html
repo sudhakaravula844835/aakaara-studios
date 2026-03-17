@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aakaara — Instagram DP Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Outfit:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #111;
+    color: #faf6f1;
+    font-family: 'Outfit', sans-serif;
+    padding: 3rem 2rem;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .page-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 1.4rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(250,246,241,0.4);
+    margin-bottom: 0.4rem;
+  }
+  .page-header p {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: rgba(201,149,107,0.4);
+  }
+
+  /* Grid of options */
+  .dp-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .dp-option {
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+  .dp-option:hover { transform: scale(1.03); }
+
+  .dp-option .label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(250,246,241,0.3);
+    margin-bottom: 0.8rem;
+  }
+
+  /* The DP preview — 240px circle */
+  .dp-circle {
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 1rem;
+    position: relative;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+  }
+
+  .dp-canvas {
+    width: 240px;
+    height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* Download button per option */
+  .dp-download {
+    background: none;
+    border: 1px solid rgba(201,149,107,0.2);
+    color: rgba(201,149,107,0.6);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.5rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 2px;
+  }
+  .dp-download:hover {
+    border-color: #c9956b;
+    color: #c9956b;
+    background: rgba(201,149,107,0.05);
+  }
+
+  /* ═══════════════════════════════════════
+     VARIANT STYLES
+     ═══════════════════════════════════════ */
+
+  /* 1. Black + Ivory wordmark (Apple-style clean) */
+  .v-dark-wordmark .dp-canvas {
+    background: #0a0a0a;
+  }
+  .v-dark-wordmark .dp-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 38px;
+    letter-spacing: 0.04em;
+    color: #faf6f1;
+    position: relative;
+  }
+  .v-dark-wordmark .dots {
+    position: absolute;
+    top: -8px;
+    left: 31px;
+    display: flex;
+    gap: 4px;
+  }
+  .v-dark-wordmark .dots span {
+    width: 4px;
+    height: 4px;
+    background: #c9956b;
+    border-radius: 50%;
+  }
+
+  /* 2. Ivory + Dark wordmark (inverted) */
+  .v-light-wordmark .dp-canvas {
+    background: #f5f0e8;
+  }
+  .v-light-wordmark .dp-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 38px;
+    letter-spacing: 0.04em;
+    color: #1a1510;
+    position: relative;
+  }
+  .v-light-wordmark .dots {
+    position: absolute;
+    top: -8px;
+    left: 31px;
+    display: flex;
+    gap: 4px;
+  }
+  .v-light-wordmark .dots span {
+    width: 4px;
+    height: 4px;
+    background: #c9956b;
+    border-radius: 50%;
+  }
+
+  /* 3. Dark + Monogram "A" */
+  .v-dark-mono .dp-canvas {
+    background: #0a0a0a;
+  }
+  .v-dark-mono .dp-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 100px;
+    color: #faf6f1;
+    line-height: 1;
+    position: relative;
+  }
+  .v-dark-mono .dots {
+    position: absolute;
+    top: -10px;
+    left: 28px;
+    display: flex;
+    gap: 5px;
+  }
+  .v-dark-mono .dots span {
+    width: 5px;
+    height: 5px;
+    background: #c9956b;
+    border-radius: 50%;
+  }
+
+  /* 4. Light + Monogram "A" */
+  .v-light-mono .dp-canvas {
+    background: #f5f0e8;
+  }
+  .v-light-mono .dp-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 100px;
+    color: #1a1510;
+    line-height: 1;
+    position: relative;
+  }
+  .v-light-mono .dots {
+    position: absolute;
+    top: -10px;
+    left: 28px;
+    display: flex;
+    gap: 5px;
+  }
+  .v-light-mono .dots span {
+    width: 5px;
+    height: 5px;
+    background: #c9956b;
+    border-radius: 50%;
+  }
+
+  /* 5. Warm dark + wordmark (site-matched) */
+  .v-warm-wordmark .dp-canvas {
+    background: #1a1510;
+  }
+  .v-warm-wordmark .dp-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 38px;
+    letter-spacing: 0.04em;
+    color: #faf6f1;
+    position: relative;
+  }
+  .v-warm-wordmark .dots {
+    position: absolute;
+    top: -8px;
+    left: 31px;
+    display: flex;
+    gap: 4px;
+  }
+  .v-warm-wordmark .dots span {
+    width: 4px;
+    height: 4px;
+    background: #c9956b;
+    border-radius: 50%;
+  }
+
+  /* 6. Gold accent monogram on dark */
+  .v-gold-mono .dp-canvas {
+    background: #0a0a0a;
+  }
+  .v-gold-mono .dp-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 100px;
+    color: #c9956b;
+    line-height: 1;
+    position: relative;
+  }
+  .v-gold-mono .dots {
+    position: absolute;
+    top: -10px;
+    left: 28px;
+    display: flex;
+    gap: 5px;
+  }
+  .v-gold-mono .dots span {
+    width: 5px;
+    height: 5px;
+    background: #c9956b;
+    border-radius: 50%;
+  }
+
+  /* 7. Warm dark + Gold wordmark + tagline + studios */
+  .v-warm-gold .dp-canvas {
+    background: #1a1510;
+    gap: 0;
+  }
+  .v-warm-gold .dp-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 38px;
+    letter-spacing: 0.04em;
+    color: #c9956b;
+    position: relative;
+  }
+  .v-warm-gold .dots {
+    position: absolute;
+    top: -8px;
+    left: 31px;
+    display: flex;
+    gap: 4px;
+  }
+  .v-warm-gold .dots span {
+    width: 4px;
+    height: 4px;
+    background: #c9956b;
+    border-radius: 50%;
+  }
+  .v-warm-gold .dp-studios {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    font-size: 7.5px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: rgba(201,149,107,0.5);
+    margin-top: 4px;
+  }
+  .v-warm-gold .dp-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    color: rgba(250,246,241,0.25);
+    margin-top: 10px;
+  }
+
+  /* 8. Petal icon only on dark */
+  .v-icon-dark .dp-canvas {
+    background: #0a0a0a;
+  }
+  .v-icon-dark svg {
+    width: 100px;
+    height: 100px;
+  }
+
+  /* ═══ SIZE REFERENCE ═══ */
+  .size-ref {
+    max-width: 1100px;
+    margin: 3rem auto 0;
+    text-align: center;
+  }
+  .size-ref h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(250,246,241,0.25);
+    margin-bottom: 1.5rem;
+  }
+  .size-row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 2.5rem;
+  }
+  .size-item { text-align: center; }
+  .size-item .mini {
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 0.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+  .size-item .size-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    color: rgba(250,246,241,0.2);
+  }
+
+  /* Hidden full-size canvases for export */
+  .export-area {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+  }
+  .export-canvas {
+    width: 1080px;
+    height: 1080px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  /* Export sizes */
+  .export-canvas .ex-text-word {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 170px;
+    letter-spacing: 0.04em;
+    position: relative;
+  }
+  .export-canvas .ex-dots-word {
+    position: absolute;
+    top: -34px;
+    left: 140px;
+    display: flex;
+    gap: 18px;
+  }
+  .export-canvas .ex-dots-word span {
+    width: 18px;
+    height: 18px;
+    background: #c9956b;
+    border-radius: 50%;
+  }
+  .export-canvas .ex-text-mono {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 440px;
+    line-height: 1;
+    position: relative;
+  }
+  .export-canvas .ex-dots-mono {
+    position: absolute;
+    top: -44px;
+    left: 120px;
+    display: flex;
+    gap: 22px;
+  }
+  .export-canvas .ex-dots-mono span {
+    width: 22px;
+    height: 22px;
+    background: #c9956b;
+    border-radius: 50%;
+  }
+  .export-canvas svg.ex-icon {
+    width: 440px;
+    height: 440px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Instagram DP</h1>
+  <p>1080 &times; 1080 px &middot; pick your favorite &middot; click to download</p>
+</div>
+
+<div class="dp-grid">
+
+  <!-- 1. Dark + Ivory Wordmark -->
+  <div class="dp-option v-dark-wordmark">
+    <div class="label">Dark + Ivory</div>
+    <div class="dp-circle">
+      <div class="dp-canvas">
+        <div class="dp-text">
+          <div class="dots"><span></span><span></span></div>
+          Aakaara
+        </div>
+      </div>
+    </div>
+    <button class="dp-download" onclick="exportDP('dark-word','#0a0a0a','#faf6f1','word')">Download</button>
+  </div>
+
+  <!-- 2. Ivory + Dark Wordmark -->
+  <div class="dp-option v-light-wordmark">
+    <div class="label">Ivory + Dark</div>
+    <div class="dp-circle">
+      <div class="dp-canvas">
+        <div class="dp-text">
+          <div class="dots"><span></span><span></span></div>
+          Aakaara
+        </div>
+      </div>
+    </div>
+    <button class="dp-download" onclick="exportDP('light-word','#f5f0e8','#1a1510','word')">Download</button>
+  </div>
+
+  <!-- 3. Dark + Monogram -->
+  <div class="dp-option v-dark-mono">
+    <div class="label">Dark + Mono</div>
+    <div class="dp-circle">
+      <div class="dp-canvas">
+        <div class="dp-text">
+          <div class="dots"><span></span><span></span></div>
+          A
+        </div>
+      </div>
+    </div>
+    <button class="dp-download" onclick="exportDP('dark-mono','#0a0a0a','#faf6f1','mono')">Download</button>
+  </div>
+
+  <!-- 4. Light + Monogram -->
+  <div class="dp-option v-light-mono">
+    <div class="label">Ivory + Mono</div>
+    <div class="dp-circle">
+      <div class="dp-canvas">
+        <div class="dp-text">
+          <div class="dots"><span></span><span></span></div>
+          A
+        </div>
+      </div>
+    </div>
+    <button class="dp-download" onclick="exportDP('light-mono','#f5f0e8','#1a1510','mono')">Download</button>
+  </div>
+
+  <!-- 5. Warm + Ivory Wordmark -->
+  <div class="dp-option v-warm-wordmark">
+    <div class="label">Warm + Ivory</div>
+    <div class="dp-circle">
+      <div class="dp-canvas">
+        <div class="dp-text">
+          <div class="dots"><span></span><span></span></div>
+          Aakaara
+        </div>
+      </div>
+    </div>
+    <button class="dp-download" onclick="exportDP('warm-word','#1a1510','#faf6f1','word')">Download</button>
+  </div>
+
+  <!-- 6. Gold Monogram on Dark -->
+  <div class="dp-option v-gold-mono">
+    <div class="label">Dark + Gold</div>
+    <div class="dp-circle">
+      <div class="dp-canvas">
+        <div class="dp-text">
+          <div class="dots"><span></span><span></span></div>
+          A
+        </div>
+      </div>
+    </div>
+    <button class="dp-download" onclick="exportDP('gold-mono','#0a0a0a','#c9956b','mono')">Download</button>
+  </div>
+
+  <!-- 7. Warm + Gold Wordmark + Tagline + Studios -->
+  <div class="dp-option v-warm-gold">
+    <div class="label">Warm + Gold</div>
+    <div class="dp-circle">
+      <div class="dp-canvas">
+        <div class="dp-text">
+          <div class="dots"><span></span><span></span></div>
+          Aakaara
+        </div>
+        <div class="dp-studios">Studios · New York City</div>
+        <div class="dp-tagline">Every story deserves its own canvas.</div>
+      </div>
+    </div>
+    <button class="dp-download" onclick="exportDP('warm-gold','#1a1510','#c9956b','word-full')">Download</button>
+  </div>
+
+  <!-- 8. Petal Icon on Dark -->
+  <div class="dp-option v-icon-dark">
+    <div class="label">Icon Only</div>
+    <div class="dp-circle">
+      <div class="dp-canvas">
+        <svg viewBox="0 0 140 140">
+          <g transform="translate(70,70)">
+            <path d="M0,-42 C12,-42 22,-28 18,-8 C14,12 -6,18 -18,8 C-30,-2 -22,-30 -8,-40 C-5,-41.5 -2.5,-42 0,-42Z" fill="none" stroke="#c9956b" stroke-width="1.8" opacity="0.9"/>
+            <path d="M0,-42 C12,-42 22,-28 18,-8 C14,12 -6,18 -18,8 C-30,-2 -22,-30 -8,-40 C-5,-41.5 -2.5,-42 0,-42Z" fill="none" stroke="#c9956b" stroke-width="1.8" opacity="0.5" transform="rotate(60)"/>
+            <path d="M0,-42 C12,-42 22,-28 18,-8 C14,12 -6,18 -18,8 C-30,-2 -22,-30 -8,-40 C-5,-41.5 -2.5,-42 0,-42Z" fill="none" stroke="#c9956b" stroke-width="1.8" opacity="0.25" transform="rotate(120)"/>
+            <path d="M0,-42 C12,-42 22,-28 18,-8 C14,12 -6,18 -18,8 C-30,-2 -22,-30 -8,-40 C-5,-41.5 -2.5,-42 0,-42Z" fill="none" stroke="#c9956b" stroke-width="1.8" opacity="0.9" transform="rotate(180)"/>
+            <path d="M0,-42 C12,-42 22,-28 18,-8 C14,12 -6,18 -18,8 C-30,-2 -22,-30 -8,-40 C-5,-41.5 -2.5,-42 0,-42Z" fill="none" stroke="#c9956b" stroke-width="1.8" opacity="0.5" transform="rotate(240)"/>
+            <path d="M0,-42 C12,-42 22,-28 18,-8 C14,12 -6,18 -18,8 C-30,-2 -22,-30 -8,-40 C-5,-41.5 -2.5,-42 0,-42Z" fill="none" stroke="#c9956b" stroke-width="1.8" opacity="0.25" transform="rotate(300)"/>
+            <circle cx="0" cy="0" r="5" fill="#c9956b" opacity="0.9"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <button class="dp-download" onclick="exportDP('icon','#0a0a0a','#c9956b','icon')">Download</button>
+  </div>
+
+</div>
+
+<!-- Size reference -->
+<div class="size-ref">
+  <h2>How it looks at actual sizes</h2>
+  <div class="size-row" id="sizeRow">
+    <div class="size-item">
+      <div class="mini" id="mini110" style="width:110px;height:110px;"></div>
+      <div class="size-label">110px · Mobile</div>
+    </div>
+    <div class="size-item">
+      <div class="mini" id="mini150" style="width:150px;height:150px;"></div>
+      <div class="size-label">150px · Desktop</div>
+    </div>
+    <div class="size-item">
+      <div class="mini" id="mini40" style="width:40px;height:40px;"></div>
+      <div class="size-label">40px · Feed</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Render mini size previews from first option
+window.addEventListener('DOMContentLoaded', () => {
+  const first = document.querySelector('.v-dark-wordmark .dp-canvas');
+  if (!first) return;
+  [['mini110',110],['mini150',150],['mini40',40]].forEach(([id, size]) => {
+    const el = document.getElementById(id);
+    const clone = first.cloneNode(true);
+    clone.style.width = size + 'px';
+    clone.style.height = size + 'px';
+    clone.style.transform = `scale(${size/240})`;
+    clone.style.transformOrigin = 'top left';
+    el.appendChild(clone);
+  });
+});
+
+// Export at 1080x1080
+async function exportDP(name, bg, fg, type) {
+  // Create off-screen canvas
+  const c = document.createElement('canvas');
+  c.width = 1080;
+  c.height = 1080;
+  const ctx = c.getContext('2d');
+
+  // Background
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, 1080, 1080);
+
+  if (type === 'word') {
+    // Draw dots
+    ctx.fillStyle = '#c9956b';
+    ctx.beginPath();
+    ctx.arc(480, 498, 9, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(504, 498, 9, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw text
+    ctx.fillStyle = fg;
+    ctx.font = '400 170px "Cormorant Garamond", serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.letterSpacing = '7px';
+    ctx.fillText('Aakaara', 540, 550);
+
+  } else if (type === 'word-full') {
+    const cx = 540;
+    const wordY = 465;
+
+    // Measure to position dots precisely above the first "A"
+    ctx.font = '400 170px "Cormorant Garamond", serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.letterSpacing = '7px';
+    const fullW = ctx.measureText('Aakaara').width;
+    const leftEdge = cx - fullW / 2;
+    const aWidth = ctx.measureText('A').width;
+    const dotCenterX = leftEdge + aWidth * 0.52;
+
+    // Draw dots — wider gap, centered above "A"
+    ctx.fillStyle = '#c9956b';
+    ctx.beginPath();
+    ctx.arc(dotCenterX - 1, wordY - 102, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(dotCenterX + 25, wordY - 102, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw "Aakaara" wordmark
+    ctx.fillStyle = fg;
+    ctx.font = '400 170px "Cormorant Garamond", serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.letterSpacing = '7px';
+    ctx.fillText('Aakaara', cx, wordY);
+
+    // Draw "Studios · New York City"
+    ctx.fillStyle = 'rgba(201,149,107,0.45)';
+    ctx.font = '300 30px "Outfit", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.letterSpacing = '11px';
+    ctx.fillText('STUDIOS · NEW YORK CITY', cx + 6, wordY + 112);
+
+    // Draw tagline
+    ctx.fillStyle = 'rgba(250,246,241,0.22)';
+    ctx.font = 'italic 300 38px "Cormorant Garamond", serif';
+    ctx.letterSpacing = '2px';
+    ctx.fillText('Every story deserves its own canvas.', cx + 2, wordY + 172);
+
+  } else if (type === 'mono') {
+    // Draw dots
+    ctx.fillStyle = '#c9956b';
+    ctx.beginPath();
+    ctx.arc(510, 370, 11, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(540, 370, 11, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw monogram
+    ctx.fillStyle = fg;
+    ctx.font = '400 440px "Cormorant Garamond", serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('A', 540, 560);
+
+  } else if (type === 'icon') {
+    // Draw petal icon via SVG to canvas
+    const svgStr = document.querySelector('.v-icon-dark svg').outerHTML;
+    const blob = new Blob([svgStr], {type: 'image/svg+xml'});
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, 290, 290, 500, 500);
+      URL.revokeObjectURL(url);
+      downloadCanvas(c, name);
+    };
+    img.src = url;
+    return;
+  }
+
+  downloadCanvas(c, name);
+}
+
+function downloadCanvas(canvas, name) {
+  const link = document.createElement('a');
+  link.download = `aakaara-dp-${name}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+</script>
+</body>
+</html>

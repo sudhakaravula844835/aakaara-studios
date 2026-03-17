@@ -112,6 +112,44 @@ body {
     font-size: 0.7rem;
 }
 
+/* Action Buttons Group */
+.action-buttons {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+/* Delete Button */
+.btn-delete {
+    background: none;
+    border: 1px solid rgba(250,246,241,0.1);
+    color: rgba(250,246,241,0.25);
+    border-radius: 4px;
+    padding: 0.4rem 0.6rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+}
+.btn-delete:hover {
+    border-color: #c28ca0;
+    color: #c28ca0;
+}
+.btn-delete.confirm-state {
+    border-color: #c28ca0;
+    color: #c28ca0;
+    background: rgba(194,140,160,0.15);
+    padding: 0.35rem 0.7rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    min-width: 42px;
+}
+
 /* Calendar */
 .calendar-header {
     display: flex; justify-content: space-between; align-items: center;
