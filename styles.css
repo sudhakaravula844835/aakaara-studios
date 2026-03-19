@@ -1894,33 +1894,24 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .cs-dots { right: 1rem; }
   .cs-intro-title { font-size: clamp(2rem, 10vw, 3.5rem); }
 
-  /* ── Services Scroll Stack: Insta Reels layout on mobile ── */
+  /* ── Services Scroll Stack: Reels layout on mobile ── */
   .cs-wrapper.cs-reels-mode {
     height: auto;
   }
   .cs-wrapper.cs-reels-mode .cs-sticky-zone {
     position: relative;
-    height: calc(100vh - 60px);
-    overflow-y: auto;
-    overflow-x: hidden;
-    scroll-snap-type: y mandatory;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
+    height: auto;
+    overflow: visible;
     perspective: none;
     contain: unset;
-    /* Hide scrollbar */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
   }
-  .cs-wrapper.cs-reels-mode .cs-sticky-zone::-webkit-scrollbar { display: none; }
 
   .cs-wrapper.cs-reels-mode .cs-panel {
     position: relative;
     width: 100%;
-    height: calc(100vh - 60px);
+    height: 85vh;
     transform: none !important;
     z-index: auto !important;
-    scroll-snap-align: start;
     flex-shrink: 0;
     border-radius: 12px;
     overflow: hidden;
@@ -2256,6 +2247,15 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .cursor-follow { display: none !important; }
   .gallery-item { cursor: pointer; }
   .gallery-item, .portfolio-filters button, .nyc-loc, .hero-cta, .nav-cta { touch-action: manipulation; }
+  /* Video card touch overrides */
+  .vw-card:hover { transform: none; box-shadow: none; }
+  .vw-card:active { transform: translateY(-3px); }
+  .vw-card .vw-overlay { opacity: 1; background: linear-gradient(to top, rgba(9,8,11,0.88) 0%, rgba(9,8,11,0.22) 48%, transparent 100%); }
+  .vw-card .vw-overlay > * { transform: translateY(0); }
+  .vw-card .vw-duration { opacity: 1; }
+  .vw-card .vw-play-wrap { transform: translate(-50%, -50%) scale(1); }
+  .vw-card .vw-play-ring { transform: scale(1); opacity: 0.25; }
+  .vw-card .vw-poster { filter: grayscale(0%) brightness(0.85); }
   /* Carousel touch overrides */
   .ethereal-carousel .gallery-item[data-ec-offset="0"] .gi-overlay { opacity: 1; }
   .ethereal-carousel .gallery-item[data-ec-offset="0"] .gi-overlay > div { transform: translateY(0); }

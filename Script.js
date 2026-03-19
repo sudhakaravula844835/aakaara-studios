@@ -642,7 +642,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
           vid.pause();
         }
       });
-    }, { threshold: 0.5, root: stickyZone });
+    }, { threshold: 0.5, root: null });
 
     panels.forEach(function(p) { reelsObserver.observe(p); });
 
