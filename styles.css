@@ -440,11 +440,30 @@ nav.scrolled {
 }
 
 #portfolio.is-animated #portfolioTitle .word-inner,
-#portfolio.is-animated #portfolioDesc,
-#portfolio.is-animated .portfolio-filters button {
+#portfolio.is-animated #portfolioDesc {
   opacity: 1;
   transform: translateY(0);
   filter: blur(0);
+}
+#portfolio.is-animated .portfolio-filters button {
+  animation: filterPillIn 0.5s var(--ease) forwards;
+}
+#portfolio.is-animated .portfolio-filters button:nth-child(1)  { animation-delay: 0.05s; }
+#portfolio.is-animated .portfolio-filters button:nth-child(2)  { animation-delay: 0.1s; }
+#portfolio.is-animated .portfolio-filters button:nth-child(3)  { animation-delay: 0.15s; }
+#portfolio.is-animated .portfolio-filters button:nth-child(4)  { animation-delay: 0.2s; }
+#portfolio.is-animated .portfolio-filters button:nth-child(5)  { animation-delay: 0.25s; }
+#portfolio.is-animated .portfolio-filters button:nth-child(6)  { animation-delay: 0.3s; }
+#portfolio.is-animated .portfolio-filters button:nth-child(7)  { animation-delay: 0.35s; }
+#portfolio.is-animated .portfolio-filters button:nth-child(8)  { animation-delay: 0.4s; }
+#portfolio.is-animated .portfolio-filters button:nth-child(9)  { animation-delay: 0.45s; }
+#portfolio.is-animated .portfolio-filters button:nth-child(10) { animation-delay: 0.5s; }
+#portfolio.is-animated .portfolio-filters button:nth-child(11) { animation-delay: 0.55s; }
+#portfolio.is-animated .portfolio-filters button:nth-child(12) { animation-delay: 0.6s; }
+
+@keyframes filterPillIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -460,17 +479,17 @@ nav.scrolled {
   color: rgba(250,246,241,0.4); font-weight: 300;
   padding: 0.5rem 1.3rem;
   border: 1px solid rgba(250,246,241,0.08);
-  border-radius: 30px; /* Pill shape */
-  background: rgba(250, 246, 241, 0.03); /* Subtle glass background */
+  border-radius: 30px;
+  background: rgba(250, 246, 241, 0.03);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 
-  /* Initial state for cinematic intro */
+  /* Hidden until intro animation fires */
   opacity: 0;
   transform: translateY(20px);
-  
-  /* Combined transitions for intro and hover effects */
-  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease), color 0.1s, background 0.1s, border-color 0.1s;
+
+  /* Snappy transitions for user interactions (click/hover) */
+  transition: color 0.15s, background 0.15s, border-color 0.15s, transform 0.15s;
 }
 .portfolio-filters button:hover,
 .portfolio-filters button.active { 
@@ -1784,7 +1803,9 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   background: var(--rose); opacity: 0.85;
 }
 .footer-col h5 { font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--rose); margin-bottom: 1rem; font-weight: 400; }
-.footer-col a { display: block; font-size: 0.85rem; color: rgba(250,246,241,0.3); margin-bottom: 0.5rem; transition: color 0.3s; }
+.footer-col a { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: rgba(250,246,241,0.3); margin-bottom: 0.5rem; transition: color 0.3s; }
+.footer-col a svg { flex-shrink: 0; opacity: 0.5; transition: opacity 0.3s; }
+.footer-col a:hover svg { opacity: 1; }
 .footer-col a:hover { color: var(--rose); }
 .footer-bottom { border-top: 1px solid rgba(250,246,241,0.025); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
 .footer-bottom p { font-size: 0.7rem; color: rgba(250,246,241,0.12); letter-spacing: 0.06em; }
@@ -1894,74 +1915,27 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .cs-dots { right: 1rem; }
   .cs-intro-title { font-size: clamp(2rem, 10vw, 3.5rem); }
 
-  /* ── Services Scroll Stack: Reels layout on mobile ── */
-  .cs-wrapper.cs-reels-mode {
-    height: auto;
-  }
-  .cs-wrapper.cs-reels-mode .cs-sticky-zone {
-    position: relative;
-    height: auto;
-    overflow: visible;
-    perspective: none;
-    contain: unset;
-  }
+  /* Services scroll-stack: same slide-over effect on mobile as desktop */
 
-  .cs-wrapper.cs-reels-mode .cs-panel {
-    position: relative;
-    width: 100%;
-    height: 85vh;
-    transform: none !important;
-    z-index: auto !important;
+  /* ── Filter pills: horizontal scroll strip on mobile ── */
+  .portfolio-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.5rem;
+    gap: 0.4rem;
+    max-width: 100%;
+  }
+  .portfolio-filters::-webkit-scrollbar { display: none; }
+  .portfolio-filters button {
     flex-shrink: 0;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 0.75rem;
-  }
-  .cs-wrapper.cs-reels-mode .cs-panel:first-child {
-    transform: none !important;
+    font-size: 0.52rem;
+    padding: 0.45rem 0.9rem;
+    white-space: nowrap;
   }
 
-  /* Text slides moved INTO each panel by JS — position them at the bottom */
-  .cs-wrapper.cs-reels-mode .cs-text-slide,
-  .cs-wrapper.cs-reels-mode .cs-text-slide.cs-slide-active {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 1.5rem;
-    z-index: 10;
-    opacity: 1 !important;
-    transform: none !important;
-    animation: none !important;
-    transform-style: flat;
-    pointer-events: auto;
-  }
-  .cs-wrapper.cs-reels-mode .cs-text-slide .cs-title {
-    font-size: clamp(1.3rem, 5.5vw, 2rem);
-  }
-  .cs-wrapper.cs-reels-mode .cs-text-slide .cs-desc {
-    font-size: 0.78rem;
-    line-height: 1.5;
-  }
-
-  /* Hide the now-empty shared text overlay container */
-  .cs-wrapper.cs-reels-mode .cs-text-overlay:empty,
-  .cs-wrapper.cs-reels-mode > .cs-sticky-zone > .cs-text-overlay {
-    display: none;
-  }
-
-  /* Hide counter, dots, scroll hint, mute in reels mode */
-  .cs-wrapper.cs-reels-mode .cs-counter,
-  .cs-wrapper.cs-reels-mode .cs-dots,
-  .cs-wrapper.cs-reels-mode .cs-scroll-hint,
-  .cs-wrapper.cs-reels-mode .cs-mute-toggle {
-    display: none;
-  }
-
-  /* Vignette — stronger at bottom for text readability */
-  .cs-wrapper.cs-reels-mode .cs-vignette {
-    background: linear-gradient(to top, rgba(9,8,11,0.95) 0%, rgba(9,8,11,0.5) 30%, rgba(9,8,11,0.05) 55%, transparent 100%);
-  }
   .sw-gallery-bar { padding: 1.2rem 1.5rem; }
   .sw-gallery-prev { left: 0.8rem; }
   .sw-gallery-next { right: 0.8rem; }
@@ -2228,6 +2202,23 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .vw-grid { grid-template-columns: 1fr; }
   .vw-card.wide { grid-column: span 1; aspect-ratio: 4/5; }
   .vm-player { width: 95vw; }
+  .vw-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.5rem;
+    gap: 0.4rem;
+    max-width: 100%;
+  }
+  .vw-filters::-webkit-scrollbar { display: none; }
+  .vw-filters button {
+    flex-shrink: 0;
+    font-size: 0.52rem;
+    padding: 0.45rem 0.9rem;
+    white-space: nowrap;
+  }
 }
 
 @media (hover: none) {

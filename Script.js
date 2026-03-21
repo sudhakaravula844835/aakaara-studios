@@ -584,71 +584,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   var muteBtn    = document.getElementById('csMuteToggle');
   var counterWrapper = document.getElementById('csCounter');
 
-  /* ── Mobile Reels Mode: vertical snap-scroll instead of sticky scroll stack ── */
-  var isMobileReels = window.matchMedia('(max-width: 768px)').matches;
-  if (isMobileReels) {
-    wrapper.classList.add('cs-reels-mode');
-    var stickyZone = document.getElementById('csStickyZone');
-
-    // Move each text-slide INTO its respective panel so text overlays each reel card
-    slides.forEach(function(slide, i) {
-      if (panels[i]) {
-        slide.classList.add('cs-slide-active'); // always visible in reels mode
-        panels[i].appendChild(slide);
-      }
-    });
-
-    // Load videos the same way (reuse existing video loading logic below),
-    // but use IntersectionObserver for play/pause instead of scroll position
-    var videos = panels.map(function(p) { return p.querySelector('.cs-video'); });
-
-    // Video loading — same logic as desktop
-    panels.forEach(function(panel, i) {
-      var videoSrc = panel.dataset.video;
-      var vid      = videos[i];
-      var bg       = bgs[i];
-
-      if (videoSrc && videoSrc !== '' && vid) {
-        function showVid() {
-          bg.className = bg.className.replace(/cs-bg-\d/, '').trim();
-          vid.classList.add('cs-vid-ready');
-        }
-        vid.addEventListener('loadeddata', showVid, { once: true });
-        vid.addEventListener('canplay', showVid, { once: true });
-        vid.addEventListener('loadedmetadata', function() { vid.play().catch(function(){}); }, { once: true });
-
-        if (videoSrc.indexOf('.m3u8') !== -1 && typeof Hls !== 'undefined' && Hls.isSupported()) {
-          var hls = new Hls();
-          hls.loadSource(videoSrc);
-          hls.attachMedia(vid);
-          hls.on(Hls.Events.MANIFEST_PARSED, function() { vid.play().catch(function(){}); });
-        } else {
-          vid.setAttribute('src', videoSrc);
-          vid.load();
-        }
-      }
-    });
-
-    // IntersectionObserver: auto-play video when panel is 50% visible
-    var reelsObserver = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        var idx = panels.indexOf(entry.target);
-        var vid = videos[idx];
-        if (!vid || !vid.getAttribute('src')) return;
-        vid.muted = true;
-        if (entry.isIntersecting) {
-          vid.play().catch(function(){});
-        } else {
-          vid.pause();
-        }
-      });
-    }, { threshold: 0.5, root: null });
-
-    panels.forEach(function(p) { reelsObserver.observe(p); });
-
-    return; // Skip all desktop scroll-stack logic
-  }
-  /* ── End Mobile Reels Mode ── */
+  /* Mobile reels mode disabled — scroll-stack slide-over effect runs on all sizes */
 
   var wrapTop      = 0;
   var rafPending   = false;
