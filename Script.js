@@ -989,6 +989,10 @@ function filterVideos(cat, btn) {
   const vmTrack  = document.getElementById('vmProgressTrack');
   const vmFill   = document.getElementById('vmProgressFill');
   const vmTime   = document.getElementById('vmTimeDisplay');
+  const vmSkipBackBtn = document.getElementById('vmSkipBackBtn');
+  const vmSkipFwdBtn  = document.getElementById('vmSkipFwdBtn');
+  const vmSkipBackOvl = document.getElementById('vmSkipBack');
+  const vmSkipFwdOvl  = document.getElementById('vmSkipFwd');
   if (!modal) return;
 
   var activeHls = null; // Track active HLS instance for cleanup
@@ -1118,6 +1122,29 @@ function filterVideos(cat, btn) {
       vmVideo.currentTime = pos * vmVideo.duration;
     });
   }
+
+  // 5-second skip with on-screen overlay animation
+  function triggerSkip(seconds) {
+    if (!vmVideo || !vmVideo.duration) return;
+    vmVideo.currentTime = Math.max(0, Math.min(vmVideo.duration, vmVideo.currentTime + seconds));
+    const overlay = seconds < 0 ? vmSkipBackOvl : vmSkipFwdOvl;
+    if (overlay) {
+      overlay.classList.remove('vm-skip-active');
+      void overlay.offsetWidth; // force reflow to restart animation
+      overlay.classList.add('vm-skip-active');
+      overlay.addEventListener('animationend', () => overlay.classList.remove('vm-skip-active'), { once: true });
+    }
+  }
+
+  if (vmSkipBackBtn) vmSkipBackBtn.addEventListener('click', () => triggerSkip(-5));
+  if (vmSkipFwdBtn) vmSkipFwdBtn.addEventListener('click', () => triggerSkip(5));
+
+  // Arrow key support when modal is open
+  document.addEventListener('keydown', (e) => {
+    if (!modal.classList.contains('vm-open')) return;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); triggerSkip(-5); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); triggerSkip(5); }
+  });
 
   document.querySelectorAll('.vw-card').forEach(c => c.addEventListener('click', () => openModal(c)));
   vmClose.addEventListener('click', closeModal);

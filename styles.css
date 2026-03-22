@@ -105,31 +105,20 @@ nav.scrolled {
 .nav-logo:hover .petal-group {
   transform: translate(30px, 30px) rotate(60deg);
 }
-/* ─── Opacity Gradient for Header & Footer Logo Petals ─── */
-.nav-logo .petal-group > *:nth-child(1),
-.footer-logo-container .petal-group > *:nth-child(1) { opacity: 1; }
-.nav-logo .petal-group > *:nth-child(2),
-.footer-logo-container .petal-group > *:nth-child(2) { opacity: 0.7; }
-.nav-logo .petal-group > *:nth-child(3),
-.footer-logo-container .petal-group > *:nth-child(3) { opacity: 0.5; }
-.nav-logo .petal-group > *:nth-child(4),
-.footer-logo-container .petal-group > *:nth-child(4) { opacity: 0.3; }
-.nav-logo .petal-group > *:nth-child(5),
-.footer-logo-container .petal-group > *:nth-child(5) { opacity: 0.2; }
-.nav-logo .petal-group > *:nth-child(6),
-.footer-logo-container .petal-group > *:nth-child(6) { opacity: 0.1; }
-
 .nav-logo-text {
   font-family: var(--font-display); font-weight: 300;
-  font-size: 1.3rem; color: var(--ivory); letter-spacing: 0.06em;
+  font-size: 1.5rem; color: var(--ivory); letter-spacing: 0.12em;
   position: relative;
 }
 .nav-logo-text .nav-logo-dots {
-  position: absolute; top: -7px; left: 2px;
-  display: flex; gap: 4px;
+  position: absolute;
+  top: 0.4em;
+  left: 0.75em;
+  display: flex;
+  gap: 0.16em;
 }
 .nav-logo-dots span {
-  width: 3.5px; height: 3.5px; border-radius: 50%;
+  width: 0.12em; height: 0.12em; border-radius: 50%;
   background: var(--rose); opacity: 0.85;
 }
 .nav-links { display: flex; gap: 2.2rem; align-items: center; }
@@ -1781,7 +1770,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .footer-logo-text {
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   letter-spacing: 0.3em;
   color: var(--ivory);
   margin-bottom: 0;
@@ -1790,15 +1779,13 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 }
 .footer-logo-dots {
   position: absolute;
-  top: -8px; /* Adjusted for smaller dots */
-  /* Positioned to be centered over the 4th letter 'a' */
-  /* The 2nd 'a' in Aakaara */
-  left: 3.0em; /* Nudged to the right for perfect centering */
+  top: 0.32em;
+  left: 1.0em;
   display: flex;
-  gap: 4px; /* Reduced gap */
+  gap: 0.16em;
 }
 .footer-logo-dots span {
-  width: 3.5px; height: 3.5px; /* Reduced size */
+  width: 0.12em; height: 0.12em;
   border-radius: 50%;
   background: var(--rose); opacity: 0.85;
 }
@@ -2182,6 +2169,39 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .vm-stage:hover .vm-controls { opacity: 1; }
 .vm-ctrl-btn { color: var(--ivory); opacity: 0.8; transition: opacity 0.3s; display: flex; align-items: center; }
 .vm-ctrl-btn:hover { opacity: 1; color: var(--rose); }
+
+/* Skip overlays — YouTube-style on-screen indicators */
+.vm-skip-overlay {
+  position: absolute; top: 0; bottom: 0; width: 35%;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; opacity: 0; z-index: 5;
+  transition: opacity 0.15s;
+}
+.vm-skip-back { left: 0; border-radius: 0 50% 50% 0; }
+.vm-skip-fwd { right: 0; border-radius: 50% 0 0 50%; }
+.vm-skip-overlay.vm-skip-active {
+  opacity: 1;
+  animation: vmSkipFlash 0.6s ease forwards;
+}
+.vm-skip-overlay svg { color: var(--ivory); filter: drop-shadow(0 0 8px rgba(0,0,0,0.5)); }
+.vm-skip-ripple {
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.12), transparent 70%);
+  opacity: 0;
+}
+.vm-skip-overlay.vm-skip-active .vm-skip-ripple {
+  animation: vmSkipRipple 0.6s ease forwards;
+}
+@keyframes vmSkipFlash {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes vmSkipRipple {
+  0% { opacity: 0; transform: scale(0.6); }
+  30% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.1); }
+}
 .vm-progress-track {
   flex: 1; height: 3px; background: rgba(255,255,255,0.2);
   cursor: pointer; position: relative; border-radius: 2px;
