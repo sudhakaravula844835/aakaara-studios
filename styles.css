@@ -1948,7 +1948,24 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .ec-prev { left: 0.5rem; }
   .ec-next { right: 0.5rem; }
 
-  .nav-links.show { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: rgba(9,8,11,0.95); backdrop-filter: blur(20px); padding: 2rem; gap: 1.5rem; max-height: 85vh; overflow-y: auto; }
+  .nav-links.show { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: rgba(9,8,11,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 2rem; gap: 1.5rem; max-height: 85vh; overflow-y: auto; }
+
+  /* Disable custom cursor on touch devices */
+  .gallery-item { cursor: pointer; }
+  .vw-card { cursor: pointer; }
+
+  /* Video filter pills: horizontal scroll strip (matches portfolio filters) */
+  .vw-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.5rem;
+  }
+  .vw-filters::-webkit-scrollbar { display: none; }
+  .vw-filters button { flex-shrink: 0; white-space: nowrap; }
+
 }
 
 /* ── Small phones (≤480px) — prevent text overflow, tighten spacing ── */
@@ -2023,6 +2040,9 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .vw-gi-3 { background-image: linear-gradient(135deg, #121a10, #4a6741, #8a9a7e, #c9956b); }
 .vw-gi-4 { background-image: linear-gradient(135deg, #1a1520, #7a4060, #c9956b, #e8c4a8); }
 .vw-gi-5 { background-image: linear-gradient(145deg, #09080b, #1e1a16, #3a3530, #c9956b); }
+.vw-gi-6 { background-image: linear-gradient(135deg, #1a1012, #4a2030, #9b7082, #c9956b); }
+.vw-gi-7 { background-image: linear-gradient(135deg, #0e1010, #1e2a20, #8a9a7e, #dbb08a); }
+.vw-gi-8 { background-image: linear-gradient(135deg, #1a1612, #3a2a1e, #c9956b, #e8c4a8); }
 
 /* ── Cinematic Play button ── */
 .vw-play-wrap {

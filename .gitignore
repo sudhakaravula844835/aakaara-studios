@@ -6,3 +6,9 @@ __pycache__/
 *.zip
 .venv/
 videos/
+node_modules/
+package-lock.json
+package.json
+tools/generate-card-pdf.py
+tools/render-card-pdf.mjs
+tools/aakaara-business-card-print.pdf

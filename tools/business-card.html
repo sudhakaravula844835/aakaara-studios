@@ -172,21 +172,32 @@
     justify-content: center;
     position: relative;
     z-index: 1;
-    padding: 2rem 2.5rem;
+    padding: 1.8rem 2.5rem 1.6rem;
     gap: 0.15rem;
+  }
+
+  /* Watermark petal — large background element */
+  .front-watermark {
+    position: absolute;
+    top: 50%; right: -20px;
+    transform: translateY(-50%) rotate(25deg);
+    width: 280px; height: 280px;
+    opacity: 0.02;
+    z-index: 0;
+    pointer-events: none;
   }
 
   /* ── Logo ── */
   .logo-mark {
     display: flex;
     align-items: center;
-    gap: 0.7rem;
+    gap: 1rem;
     margin-bottom: 0.5rem;
   }
 
   .logo-icon {
-    width: 42px;
-    height: 42px;
+    width: 56px;
+    height: 56px;
     position: relative;
   }
   .logo-icon svg {
@@ -197,8 +208,8 @@
   .logo-text {
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-weight: 400;
-    font-size: 2.4rem;
-    letter-spacing: 0.08em;
+    font-size: 2.8rem;
+    letter-spacing: 0.18em;
     color: var(--ivory);
     line-height: 1;
   }
@@ -213,7 +224,7 @@
     top: 0.06em;
     left: 0.85em;
     display: flex;
-    gap: 0.1em;
+    gap: 0.18em;
   }
   .logo-dots span {
     width: 0.12em;
@@ -223,48 +234,84 @@
     opacity: 0.85;
   }
 
+  /* Studios NYC subtitle — aligned start-A to end-a of Aakaara */
+  .studios-nyc {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    font-size: 0.48rem;
+    letter-spacing: 0.68em;
+    text-transform: uppercase;
+    color: var(--champagne);
+    opacity: 0.6;
+    margin-top: 0.15rem;
+    margin-bottom: 0.25rem;
+    margin-left: 60px; /* offset for larger logo icon + gap */
+  }
+
   /* Tagline */
   .tagline {
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-weight: 300;
     font-style: italic;
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
+    font-size: 1.05rem;
+    letter-spacing: 0.06em;
     color: var(--rose);
-    opacity: 0.65;
-    margin-bottom: 0.7rem;
-  }
-
-  /* Divider */
-  .divider {
-    width: 40px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--rose), transparent);
-    opacity: 0.5;
-    margin-bottom: 0.7rem;
-  }
-
-  /* Person name */
-  .person-name {
-    font-family: 'Outfit', sans-serif;
-    font-weight: 400;
-    font-size: 0.95rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--ivory);
+    opacity: 0.8;
+    margin-bottom: 0;
+    margin-left: 60px;
+    white-space: nowrap;
     text-align: center;
   }
 
-  /* Role */
+  /* Visarga dots separator — replaces generic divider line */
+  .visarga-sep {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0.5rem 0 0;
+  }
+  .visarga-sep span {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--rose);
+    opacity: 0.45;
+  }
+  .visarga-sep .sep-line {
+    width: 20px;
+    height: 1px;
+    border-radius: 0;
+    background: linear-gradient(90deg, transparent, var(--rose), transparent);
+    opacity: 0.3;
+  }
+
+  /* Person name — bottom-left editorial placement */
+  .person-block {
+    position: absolute;
+    bottom: 1.4rem;
+    left: 2.5rem;
+    z-index: 1;
+  }
+  .person-name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    font-size: 0.58rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--champagne);
+    opacity: 0.55;
+    text-align: left;
+  }
   .person-role {
     font-family: 'Outfit', sans-serif;
     font-weight: 300;
-    font-size: 0.52rem;
+    font-size: 0.4rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--champagne);
-    opacity: 0.5;
-    text-align: center;
+    opacity: 0.3;
+    text-align: left;
+    margin-top: 0.15rem;
   }
 
   /* ══════════════════════════════
@@ -463,10 +510,11 @@
       --card-h: calc(92vw * 0.5714); /* maintain 3.5:2 ratio */
     }
     .cards-row { gap: 2rem; }
-    .logo-text { font-size: clamp(1.8rem, 6vw, 2.4rem); }
-    .logo-icon { width: 36px; height: 36px; }
+    .logo-text { font-size: clamp(2rem, 7vw, 2.8rem); }
+    .logo-icon { width: 38px; height: 38px; }
     .tagline { font-size: 0.48rem; letter-spacing: 0.25em; }
-    .person-name { font-size: 0.82rem; }
+    .studios-nyc { font-size: 0.45rem; }
+    .person-name { font-size: 0.55rem; }
     .back-content { gap: 1.5rem; padding: 1.5rem; }
     .qr-frame { width: 90px; height: 90px; }
     .contact-text { font-size: 0.58rem; }
@@ -486,9 +534,19 @@
     <div class="card-wrapper">
       <div class="card-label">Front</div>
       <div class="card card-front">
+        <!-- Watermark petal in background -->
+        <div class="front-watermark">
+          <svg viewBox="0 0 60 60" fill="none"><g transform="translate(30,30)">
+            <path d="M0,-18 C5.1,-18 9.4,-12 7.7,-3.4 C6,5.1 -2.6,7.7 -7.7,3.4 C-12.9,-0.9 -9.4,-12.9 -3.4,-17.1 C-2.1,-17.8 -1.1,-18 0,-18Z" fill="none" stroke="#c9956b" stroke-width="0.4" opacity="1"/>
+            <path d="M0,-18 C5.1,-18 9.4,-12 7.7,-3.4 C6,5.1 -2.6,7.7 -7.7,3.4 C-12.9,-0.9 -9.4,-12.9 -3.4,-17.1 C-2.1,-17.8 -1.1,-18 0,-18Z" fill="none" stroke="#c9956b" stroke-width="0.4" opacity="0.6" transform="rotate(72)"/>
+            <path d="M0,-18 C5.1,-18 9.4,-12 7.7,-3.4 C6,5.1 -2.6,7.7 -7.7,3.4 C-12.9,-0.9 -9.4,-12.9 -3.4,-17.1 C-2.1,-17.8 -1.1,-18 0,-18Z" fill="none" stroke="#c9956b" stroke-width="0.4" opacity="0.35" transform="rotate(144)"/>
+            <path d="M0,-18 C5.1,-18 9.4,-12 7.7,-3.4 C6,5.1 -2.6,7.7 -7.7,3.4 C-12.9,-0.9 -9.4,-12.9 -3.4,-17.1 C-2.1,-17.8 -1.1,-18 0,-18Z" fill="none" stroke="#c9956b" stroke-width="0.4" opacity="0.2" transform="rotate(216)"/>
+          </g></svg>
+        </div>
+
         <div class="front-content">
 
-          <!-- Logo — top left, understated -->
+          <!-- Logo — larger icon with breathing room -->
           <div class="logo-mark">
             <div class="logo-icon">
               <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -508,16 +566,19 @@
             </span>
           </div>
 
+          <!-- Studios NYC -->
+          <div class="studios-nyc">Studios &middot; New York City</div>
+
           <!-- Tagline -->
           <div class="tagline">Every story deserves its own canvas.</div>
 
-          <!-- Divider -->
-          <div class="divider"></div>
 
-          <!-- Person -->
+        </div>
+
+        <!-- Person — bottom-left editorial placement -->
+        <div class="person-block">
           <div class="person-name">Sudhakar Avula</div>
           <div class="person-role">Founder &amp; Lead Photographer</div>
-
         </div>
       </div>
     </div>
