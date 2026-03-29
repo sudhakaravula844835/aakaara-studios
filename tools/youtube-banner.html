@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aakaara Studios — YouTube Banner</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --noir:       #09080b;
+    --umber:      #1e1a16;
+    --ivory:      #faf6f1;
+    --champagne:  #f2e6d9;
+    --rose:       #c9956b;
+    --rose-light: #dbb08a;
+    --blush:      #e8c4a8;
+  }
+
+  body {
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+
+  .banner-wrapper {
+    position: relative;
+    width: 2048px;
+    height: 1152px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  /* ── Base background ── */
+  .banner-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 120% 90% at 50% 50%, #1a1510 0%, #0f0d0a 40%, #09080b 80%),
+      linear-gradient(135deg, #12100e 0%, #09080b 100%);
+  }
+
+  /* ── Warm cinematic light leak — top center ── */
+  .light-leak {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 35% at 50% 15%, rgba(201,149,107,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 50% at 20% 50%, rgba(201,149,107,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 80% 50%, rgba(201,149,107,0.04) 0%, transparent 60%);
+  }
+
+  /* ── Dramatic vignette ── */
+  .vignette {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 50%, transparent 30%, rgba(9,8,11,0.6) 100%);
+  }
+
+  /* ── Film grain ── */
+  .grain {
+    position: absolute; inset: 0;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  /* ── Horizontal cinematic bars — subtle ── */
+  .cine-bars {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(9,8,11,0.5) 0%, transparent 8%, transparent 92%, rgba(9,8,11,0.5) 100%);
+    pointer-events: none;
+  }
+
+  /* ── Decorative horizontal lines ── */
+  .accent-line {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--rose), transparent);
+    opacity: 0.2;
+  }
+  .accent-line.top { top: 180px; left: 15%; right: 15%; }
+  .accent-line.bottom { bottom: 180px; left: 15%; right: 15%; }
+
+  /* ── Safe area guide (invisible in export) ── */
+  .safe-area {
+    position: absolute;
+    top: calc((1152px - 423px) / 2);
+    left: calc((2048px - 1546px) / 2);
+    width: 1546px;
+    height: 423px;
+    /* border: 1px dashed rgba(255,0,0,0.15); */
+    pointer-events: none;
+  }
+
+  /* ── Content container ── */
+  .content {
+    position: absolute; inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  /* ── Logo cluster ── */
+  .logo-cluster {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin-bottom: 8px;
+  }
+
+  .logo-icon {
+    width: 90px;
+    height: 90px;
+    flex-shrink: 0;
+  }
+
+  .logo-text-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+  }
+
+  .logo-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 300;
+    font-size: 72px;
+    letter-spacing: 0.22em;
+    color: var(--ivory);
+    line-height: 1;
+    position: relative;
+    display: inline-block;
+  }
+
+  .visarga-dots {
+    position: absolute;
+    top: -0.22em;
+    left: 0.9em;
+    display: flex;
+    gap: 0.16em;
+  }
+  .visarga-dots span {
+    width: 0.12em;
+    height: 0.12em;
+    border-radius: 50%;
+    background: var(--rose);
+    opacity: 0.85;
+  }
+
+  /* ── Studios line ── */
+  .studios-line {
+    font-family: 'Outfit', 'Helvetica Neue', sans-serif;
+    font-weight: 300;
+    font-size: 14.5px;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--champagne);
+    opacity: 0.55;
+    margin-top: 14px;
+    text-align: center;
+    width: 100%;
+  }
+
+  /* ── Tagline ── */
+  .tagline {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 28px;
+    color: var(--rose);
+    opacity: 0.75;
+    margin-top: 20px;
+    letter-spacing: 0.03em;
+    text-align: center;
+  }
+
+  /* ── Decorative side elements ── */
+  .side-accent {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 200px;
+    opacity: 0.08;
+  }
+  .side-accent.left {
+    left: 120px;
+    background: linear-gradient(to bottom, transparent, var(--rose), transparent);
+  }
+  .side-accent.right {
+    right: 120px;
+    background: linear-gradient(to bottom, transparent, var(--rose), transparent);
+  }
+
+  /* ── Floating petal watermarks ── */
+  .watermark-petal {
+    position: absolute;
+    opacity: 0.025;
+  }
+  .watermark-petal.left {
+    left: 80px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-15deg);
+  }
+  .watermark-petal.right {
+    right: 80px;
+    top: 50%;
+    transform: translateY(-50%) rotate(15deg);
+  }
+
+  /* ── Category pills — bottom safe area ── */
+  .categories {
+    display: flex;
+    gap: 24px;
+    margin-top: 40px;
+  }
+  .categories span {
+    font-family: 'Outfit', 'Helvetica Neue', sans-serif;
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--champagne);
+    opacity: 0.25;
+    padding: 6px 16px;
+    border: 1px solid rgba(201,149,107,0.1);
+    border-radius: 2px;
+  }
+
+  /* ── Corner accents ── */
+  .corner {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    opacity: 0.1;
+  }
+  .corner svg { width: 100%; height: 100%; }
+  .corner.tl { top: 140px; left: 140px; }
+  .corner.tr { top: 140px; right: 140px; transform: scaleX(-1); }
+  .corner.bl { bottom: 140px; left: 140px; transform: scaleY(-1); }
+  .corner.br { bottom: 140px; right: 140px; transform: scale(-1); }
+
+  /* ── Export button (not part of banner) ── */
+  .export-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 999;
+  }
+  .export-btn {
+    padding: 12px 28px;
+    background: var(--rose);
+    color: var(--noir);
+    border: none;
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  .export-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .info-text {
+    color: rgba(255,255,255,0.3);
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="banner-wrapper" id="banner">
+  <!-- Backgrounds -->
+  <div class="banner-bg"></div>
+  <div class="light-leak"></div>
+  <div class="vignette"></div>
+  <div class="grain"></div>
+  <div class="cine-bars"></div>
+
+  <!-- Accent lines -->
+  <div class="accent-line top"></div>
+  <div class="accent-line bottom"></div>
+
+  <!-- Side accents -->
+  <div class="side-accent left"></div>
+  <div class="side-accent right"></div>
+
+  <!-- Corner accents -->
+  <div class="corner tl"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="0.5" style="color:var(--rose)"><path d="M0 20 L0 0 L20 0"/></svg></div>
+  <div class="corner tr"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="0.5" style="color:var(--rose)"><path d="M0 20 L0 0 L20 0"/></svg></div>
+  <div class="corner bl"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="0.5" style="color:var(--rose)"><path d="M0 20 L0 0 L20 0"/></svg></div>
+  <div class="corner br"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="0.5" style="color:var(--rose)"><path d="M0 20 L0 0 L20 0"/></svg></div>
+
+  <!-- Watermark petals -->
+  <div class="watermark-petal left">
+    <svg width="180" height="180" viewBox="0 0 80 80" fill="none">
+      <ellipse cx="40" cy="40" rx="14" ry="22" stroke="var(--rose)" stroke-width="0.6" transform="rotate(0 40 40)"/>
+      <ellipse cx="40" cy="40" rx="14" ry="22" stroke="var(--rose)" stroke-width="0.6" transform="rotate(72 40 40)"/>
+      <ellipse cx="40" cy="40" rx="14" ry="22" stroke="var(--rose)" stroke-width="0.6" transform="rotate(144 40 40)"/>
+      <ellipse cx="40" cy="40" rx="14" ry="22" stroke="var(--rose)" stroke-width="0.6" transform="rotate(216 40 40)"/>
+    </svg>
+  </div>
+  <div class="watermark-petal right">
+    <svg width="180" height="180" viewBox="0 0 80 80" fill="none">
+      <ellipse cx="40" cy="40" rx="14" ry="22" stroke="var(--rose)" stroke-width="0.6" transform="rotate(0 40 40)"/>
+      <ellipse cx="40" cy="40" rx="14" ry="22" stroke="var(--rose)" stroke-width="0.6" transform="rotate(72 40 40)"/>
+      <ellipse cx="40" cy="40" rx="14" ry="22" stroke="var(--rose)" stroke-width="0.6" transform="rotate(144 40 40)"/>
+      <ellipse cx="40" cy="40" rx="14" ry="22" stroke="var(--rose)" stroke-width="0.6" transform="rotate(216 40 40)"/>
+    </svg>
+  </div>
+
+  <!-- Safe area marker -->
+  <div class="safe-area"></div>
+
+  <!-- Main content -->
+  <div class="content">
+    <div class="logo-cluster">
+      <!-- Petal logo icon -->
+      <svg class="logo-icon" viewBox="0 0 140 140" fill="none">
+        <g transform="translate(70,70)">
+          <!-- Outer orbit -->
+          <circle cx="0" cy="0" r="60" fill="none" stroke="#c9956b" stroke-width="0.8" opacity="0.25"/>
+          <!-- 4 petals — exact match to site logo -->
+          <path d="M0,-42 C12,-42 22,-28 18,-8 C14,12 -6,18 -18,8 C-30,-2 -22,-30 -8,-40 C-5,-41.5 -2.5,-42 0,-42Z" fill="none" stroke="#c9956b" stroke-width="1.5" opacity="0.85"/>
+          <path d="M0,-42 C12,-42 22,-28 18,-8 C14,12 -6,18 -18,8 C-30,-2 -22,-30 -8,-40 C-5,-41.5 -2.5,-42 0,-42Z" fill="none" stroke="#c9956b" stroke-width="1.5" opacity="0.55" transform="rotate(72)"/>
+          <path d="M0,-42 C12,-42 22,-28 18,-8 C14,12 -6,18 -18,8 C-30,-2 -22,-30 -8,-40 C-5,-41.5 -2.5,-42 0,-42Z" fill="none" stroke="#c9956b" stroke-width="1.5" opacity="0.35" transform="rotate(144)"/>
+          <path d="M0,-42 C12,-42 22,-28 18,-8 C14,12 -6,18 -18,8 C-30,-2 -22,-30 -8,-40 C-5,-41.5 -2.5,-42 0,-42Z" fill="none" stroke="#c9956b" stroke-width="1.5" opacity="0.2" transform="rotate(216)"/>
+          <!-- Center dot -->
+          <circle cx="0" cy="0" r="3.5" fill="#c9956b" opacity="0.85"/>
+        </g>
+      </svg>
+
+      <div class="logo-text-group">
+        <div class="logo-title">
+          <div class="visarga-dots"><span></span><span></span></div>
+          Aakaara
+        </div>
+      </div>
+    </div>
+
+    <div class="studios-line">Studios &nbsp;·&nbsp; New York City</div>
+
+    <div class="tagline">Every story deserves its own canvas.</div>
+
+    <div class="categories">
+      <span>Weddings</span>
+      <span>Films</span>
+      <span>Portraits</span>
+      <span>Conceptual</span>
+    </div>
+  </div>
+</div>
+
+<!-- Export controls -->
+<div class="export-controls">
+  <button class="export-btn" onclick="exportBanner()">Download Banner (2048 × 1152)</button>
+</div>
+<div class="info-text">YouTube recommended: 2048 × 1152 px &nbsp;|&nbsp; Max 6MB</div>
+
+<script>
+async function exportBanner() {
+  const banner = document.getElementById('banner');
+  const canvas = document.createElement('canvas');
+  canvas.width = 2048;
+  canvas.height = 1152;
+  const ctx = canvas.getContext('2d');
+
+  // Use html2canvas-like approach with SVG foreignObject
+  const data = new XMLSerializer().serializeToString(banner);
+  const svgData = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="2048" height="1152">
+      <foreignObject width="100%" height="100%">
+        ${new XMLSerializer().serializeToString(document.doctype || document.createDocumentType('html', '', ''))}
+        <html xmlns="http://www.w3.org/1999/xhtml">
+          <head>
+            <style>${Array.from(document.styleSheets).map(s => {
+              try { return Array.from(s.cssRules).map(r => r.cssText).join('\n'); }
+              catch(e) { return ''; }
+            }).join('\n')}</style>
+          </head>
+          <body style="margin:0;padding:0;display:flex;align-items:flex-start;justify-content:flex-start;">
+            ${banner.outerHTML}
+          </body>
+        </html>
+      </foreignObject>
+    </svg>`;
+
+  const img = new Image();
+  const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, 2048, 1152);
+    URL.revokeObjectURL(url);
+
+    canvas.toBlob((blob) => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'aakaara-youtube-banner.png';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }, 'image/png', 1.0);
+  };
+
+  img.onerror = () => {
+    // Fallback: screenshot instructions
+    alert('Auto-export failed due to font loading. Use browser screenshot instead:\n\n1. Right-click the banner → Inspect\n2. In DevTools, right-click the .banner-wrapper element\n3. Select "Capture node screenshot"\n\nThis gives you a pixel-perfect 2048×1152 PNG.');
+  };
+
+  img.src = url;
+}
+</script>
+
+</body>
+</html>
