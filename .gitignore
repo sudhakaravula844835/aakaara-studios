@@ -6,6 +6,9 @@ __pycache__/
 *.zip
 .venv/
 videos/
+# Ignore local video source files
+*.mp4
+*.mov
 node_modules/
 package-lock.json
 package.json

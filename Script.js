@@ -155,7 +155,9 @@ function filterGallery(cat, btn) {
     const shownCats = new Set();
     allItems.forEach(item => {
       const itemCat = item.dataset.cat;
-      if (!shownCats.has(itemCat)) {
+      if (item.dataset.hideAll === 'true') {
+        item.style.display = 'none';
+      } else if (!shownCats.has(itemCat)) {
         item.style.display = '';
         shownCats.add(itemCat);
       } else {
@@ -346,15 +348,17 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   const galleryCounter = document.getElementById('swGalleryCounter');
   const stage = document.getElementById('swGalleryStage');
 
-  let swImages = [], swIndex = 0, swIsOpen = false, swParafRAF = null;
+  let swImages = [], swIndex = 0, swIsOpen = false, swParafRAF = null, lastFocusedElement = null;
   let stripThumbCache = [];
   let dockMouseMoveFn = null, dockMouseLeaveFn = null;
 
   function openSwGallery(work) {
+    lastFocusedElement = document.activeElement;
     const folder = work.dataset.folder || 'images/default';
     const count = parseInt(work.dataset.count || '1', 10);
     const ext = work.dataset.ext || 'jpg';
     const isStatic = work.dataset.static === 'true';
+    const isComingSoon = work.dataset.comingSoon === 'true';
 
     // Build image array
     swImages = Array.from({ length: count }, (_, i) => `${folder}/${i + 1}.${ext}`);
@@ -365,9 +369,34 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     
     gallery.classList.add('sw-open', 'sw-gallery-enter');
     if (isStatic) gallery.classList.add('sw-static');
+    
+    // Handle Coming Soon state
+    gallery.classList.toggle('sw-is-coming-soon', isComingSoon);
+    if (isComingSoon) {
+      const cardGradient = work.className.match(/gi-\d+/);
+      if (cardGradient) gallery.classList.add(cardGradient[0]);
+      const noticeTitle = document.getElementById('swComingSoonTitle');
+      if (noticeTitle) noticeTitle.textContent = work.dataset.title || '';
+      galleryCounter.textContent = "";
+      if (galleryImg) galleryImg.style.backgroundImage = 'none';
+      document.body.style.overflow = 'hidden';
+      swIsOpen = true;
+      // Focus close button for accessibility
+      setTimeout(() => {
+        const closeBtn = document.getElementById('swGalleryClose');
+        if (closeBtn) closeBtn.focus();
+      }, 100);
+      return;
+    }
 
     document.body.style.overflow = 'hidden'; 
     swIsOpen = true;
+
+    // Focus close button for accessibility
+    setTimeout(() => {
+      const closeBtn = document.getElementById('swGalleryClose');
+      if (closeBtn) closeBtn.focus();
+    }, 100);
 
     renderSwStrip();
     renderSwImage(swIndex, true);
@@ -442,7 +471,10 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     if (!swIsOpen) return;
     gallery.classList.add('sw-gallery-exit');
     function cleanup() {
-      gallery.classList.remove('sw-open', 'sw-gallery-enter', 'sw-gallery-exit', 'sw-static');
+      gallery.classList.remove('sw-open', 'sw-gallery-enter', 'sw-gallery-exit', 'sw-static', 'sw-is-coming-soon');
+      // Remove any gi- classes added for coming soon background
+      gallery.className = gallery.className.replace(/gi-\d+/g, '').trim();
+      
       galleryImg.style.backgroundImage = '';
       if (galleryStrip) {
         galleryStrip.innerHTML = '';
@@ -451,6 +483,11 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       }
       stripThumbCache = [];
       swIsOpen = false;
+      // Return focus to triggering element
+      if (lastFocusedElement) {
+        lastFocusedElement.focus();
+        lastFocusedElement = null;
+      }
     }
     gallery.addEventListener('animationend', cleanup, { once: true });
     // Fallback if animationend never fires
@@ -1108,10 +1145,17 @@ function filterVideos(cat, btn) {
   }
 
   if (vmVideo) {
+    if (vmTrack) {
+      vmTrack.setAttribute('role', 'slider');
+      vmTrack.setAttribute('aria-label', 'Video progress');
+      vmTrack.setAttribute('aria-valuemin', '0');
+      vmTrack.setAttribute('aria-valuemax', '100');
+    }
     vmVideo.addEventListener('timeupdate', () => {
       const pct = (vmVideo.currentTime / vmVideo.duration) * 100;
       if (vmFill) vmFill.style.width = `${pct}%`;
       if (vmTime) vmTime.textContent = formatTime(vmVideo.currentTime);
+      if (vmTrack) vmTrack.setAttribute('aria-valuenow', Math.round(pct));
     });
   }
 
@@ -1166,22 +1210,27 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
 // ═══════ ACCESSIBILITY & KEYBOARD NAV ═══════
 (function() {
-  const grid = document.getElementById('galleryGrid');
-  if (!grid) return;
+  function initA11y(selector, labelPrefix) {
+    const items = document.querySelectorAll(selector);
+    items.forEach(item => {
+      if (!item.hasAttribute('tabindex')) item.setAttribute('tabindex', '0');
+      if (!item.hasAttribute('role')) item.setAttribute('role', 'button');
+      
+      if (!item.hasAttribute('aria-label')) {
+        const title = item.dataset.title || '';
+        const isComingSoon = item.dataset.comingSoon === 'true';
+        const label = (isComingSoon ? 'Coming Soon: ' : labelPrefix) + title;
+        if (title) item.setAttribute('aria-label', label);
+      }
+    });
+  }
 
-  // Initialize accessibility attributes for all gallery items
-  const items = grid.querySelectorAll('.gallery-item');
-  items.forEach(item => {
-    if (!item.hasAttribute('tabindex')) item.setAttribute('tabindex', '0');
-    if (!item.hasAttribute('role')) item.setAttribute('role', 'button');
-    if (!item.hasAttribute('aria-label') && item.dataset.title) {
-      item.setAttribute('aria-label', 'View gallery: ' + item.dataset.title);
-    }
-  });
+  initA11y('.gallery-item', 'View photo gallery: ');
+  initA11y('.vw-card', 'Play film: ');
 
   // Event delegation for keyboard interaction
-  grid.addEventListener('keydown', function(e) {
-    const item = e.target.closest('.gallery-item');
+  document.addEventListener('keydown', function(e) {
+    const item = e.target.closest('.gallery-item, .vw-card');
     if (item && (e.key === 'Enter' || e.key === ' ')) {
       e.preventDefault();
       item.click(); // Triggers the inline onclick handler
@@ -1441,8 +1490,16 @@ class EtherealCarousel {
   }
 
   _updateNav() {
-    if (this.prevBtn) this.prevBtn.classList.toggle('ec-disabled', this.currentIndex <= 0);
-    if (this.nextBtn) this.nextBtn.classList.toggle('ec-disabled', this.currentIndex >= this.filteredItems.length - 1);
+    const isFirst = this.currentIndex <= 0;
+    const isLast = this.currentIndex >= this.filteredItems.length - 1;
+    if (this.prevBtn) {
+      this.prevBtn.classList.toggle('ec-disabled', isFirst);
+      this.prevBtn.setAttribute('aria-disabled', isFirst);
+    }
+    if (this.nextBtn) {
+      this.nextBtn.classList.toggle('ec-disabled', isLast);
+      this.nextBtn.setAttribute('aria-disabled', isLast);
+    }
   }
 
   _triggerLazyLoad() {
