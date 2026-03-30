@@ -455,47 +455,5 @@
     </footer>
 
     <script src="/Script.js"></script>
-    <script>
-      // Location guide hover — swap preview image on right side
-      (function() {
-        var locs     = document.querySelectorAll('.nyc-loc');
-        var previews = document.querySelectorAll('.nyc-preview-img');
-        if (!locs.length || !previews.length) return;
-
-        function showPreview(id) {
-          previews.forEach(function(p) {
-            p.classList.toggle('active', p.classList.contains('nyc-' + id));
-          });
-        }
-
-        locs.forEach(function(loc) {
-          loc.addEventListener('mouseenter', function() {
-            showPreview(loc.dataset.locationId);
-          });
-          loc.addEventListener('click', function() {
-            var url = loc.dataset.locationUrl;
-            if (url) window.open(url, '_blank', 'noopener');
-          });
-        });
-      })();
-
-      // Filter bar — show/hide gallery cards by location
-      (function() {
-        var filterBar = document.querySelector('.filter-bar');
-        var workItems = document.querySelectorAll('.work-item');
-        if (!filterBar || !workItems.length) return;
-
-        filterBar.addEventListener('click', function(e) {
-          var btn = e.target.closest('.filter-btn');
-          if (!btn) return;
-          filterBar.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
-          btn.classList.add('active');
-          var filter = btn.dataset.filter;
-          workItems.forEach(function(item) {
-            item.style.display = (filter === 'all' || item.dataset.location === filter) ? '' : 'none';
-          });
-        });
-      })();
-    </script>
 </body>
 </html>

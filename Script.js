@@ -31,6 +31,7 @@
 // ═══════ CINEMATIC INTRO ANIMATION ═══════
 (function() {
   const intro = document.getElementById('intro');
+  if (!intro) return;
 
   // Skip intro when returning from a sub-page (e.g. couple-portraits)
   if (sessionStorage.getItem('skipIntro') === '1') {

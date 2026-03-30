@@ -1,0 +1,516 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic: View
+  - navigation [ref=e2]:
+    - link "Aakaara" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - img [ref=e4]
+      - generic [ref=e11]: Aakaara
+    - generic [ref=e15]:
+      - link "Portfolio" [ref=e16] [cursor=pointer]:
+        - /url: "#portfolio"
+      - link "Films" [ref=e17] [cursor=pointer]:
+        - /url: "#video-works"
+      - link "Couple Portraits" [ref=e18] [cursor=pointer]:
+        - /url: /couple-portraits.html
+      - link "About" [ref=e19] [cursor=pointer]:
+        - /url: "#about"
+      - link "Services" [ref=e20] [cursor=pointer]:
+        - /url: "#services-overview"
+      - link "Kind Words" [ref=e21] [cursor=pointer]:
+        - /url: "#testimonials"
+      - link "Book a Session" [ref=e22] [cursor=pointer]:
+        - /url: "#contact"
+  - generic [ref=e23]:
+    - generic:
+      - img
+    - generic [ref=e24]:
+      - img [ref=e26]
+      - heading "Aakaara" [level=1] [ref=e36]: Aakaara
+      - generic [ref=e40]: Studios · New York City
+      - generic [ref=e41]: Every story deserves its own canvas.
+    - generic [ref=e43]: Scroll
+  - generic [ref=e46]:
+    - generic [ref=e47]: Our Work
+    - generic [ref=e48]:
+      - generic [ref=e50]: Framed
+      - generic [ref=e52]: Stories
+    - generic [ref=e53]: Every frame holds a universe of emotion. Click any project to browse the full gallery.
+    - generic [ref=e55]:
+      - button "All" [ref=e56] [cursor=pointer]
+      - button "Weddings" [ref=e57] [cursor=pointer]
+      - button "Engagement" [ref=e58] [cursor=pointer]
+      - button "Couple Portraits" [ref=e59] [cursor=pointer]
+      - button "Maternity" [ref=e60] [cursor=pointer]
+      - button "First Birthday" [ref=e61] [cursor=pointer]
+      - button "Graduation" [ref=e62] [cursor=pointer]
+      - button "House Warming" [ref=e63] [cursor=pointer]
+      - button "Events" [ref=e64] [cursor=pointer]
+      - button "Brand Collabs" [ref=e65] [cursor=pointer]
+      - button "Conceptual" [ref=e66] [cursor=pointer]
+      - button "Spring" [ref=e67] [cursor=pointer]
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - button "Wedding photo gallery for Abhinav & Megha" [ref=e70]:
+          - generic [ref=e72]:
+            - img [ref=e73]
+            - text: 54 photos
+          - generic [ref=e77]:
+            - heading "Abhinav & Megha" [level=4] [ref=e78]
+            - paragraph [ref=e79]: Wedding
+        - 'button "View photo gallery: Vyshnavi & Daniel" [ref=e80] [cursor=pointer]':
+          - generic [ref=e82]:
+            - img [ref=e83]
+            - text: 54 photos
+          - generic [ref=e87]:
+            - heading "Vyshnavi & Daniel" [level=4] [ref=e88]
+            - paragraph [ref=e89]: Engagement
+      - button "Previous" [disabled]:
+        - img
+      - button "Next" [ref=e90] [cursor=pointer]:
+        - img [ref=e91]
+      - generic [ref=e93]: 1/10
+  - generic [ref=e95]:
+    - generic [ref=e96]:
+      - generic [ref=e97]: Moving Images
+      - generic [ref=e98]: Video Works
+      - generic [ref=e99]: Cinematic films for weddings, engagements & life's most intimate milestones.
+    - generic [ref=e100]:
+      - button "All" [ref=e101] [cursor=pointer]
+      - button "Weddings" [ref=e102] [cursor=pointer]
+      - button "Engagement" [ref=e103] [cursor=pointer]
+      - button "Pre-Wedding" [ref=e104] [cursor=pointer]
+      - button "Celebrations" [ref=e105] [cursor=pointer]
+      - button "House Warming" [ref=e106] [cursor=pointer]
+      - button "Conceptual" [ref=e107] [cursor=pointer]
+    - generic [ref=e108]:
+      - generic [ref=e109]:
+        - 'button "Play film: Vyshnavi & Daniel" [ref=e110]':
+          - img [ref=e115]
+          - generic [ref=e117]:
+            - generic [ref=e118]: Engagement
+            - heading "Vyshnavi & Daniel" [level=4] [ref=e119]
+            - paragraph [ref=e120]: Engagement Film
+          - generic [ref=e121]: Full Film
+        - 'button "Play film: Pooja & Amit" [ref=e122] [cursor=pointer]':
+          - img [ref=e127]
+          - generic [ref=e129]:
+            - generic [ref=e130]: Wedding
+            - heading "Pooja & Amit" [level=4] [ref=e131]
+            - paragraph [ref=e132]: Wedding Film
+          - generic [ref=e133]: Highlight
+      - button "Previous" [disabled]:
+        - img
+      - button "Next" [ref=e134] [cursor=pointer]:
+        - img [ref=e135]
+      - generic [ref=e137]: 1/6
+  - dialog "Video player":
+    - generic:
+      - generic:
+        - button "Close video":
+          - img
+          - text: Close
+          - generic: (Esc)
+      - generic:
+        - generic:
+          - generic:
+            - img
+          - paragraph: Video coming soon
+        - generic:
+          - img:
+            - generic: "5"
+        - generic:
+          - img:
+            - generic: "5"
+        - generic:
+          - button "Play or pause video":
+            - img
+          - button "Rewind 5 seconds":
+            - img:
+              - generic: "5"
+          - button "Forward 5 seconds":
+            - img:
+              - generic: "5"
+          - slider "Video progress"
+          - generic: 00:00
+          - button "Toggle mute":
+            - img
+          - button "Toggle fullscreen":
+            - img
+  - text: "-->"
+  - generic [ref=e140]:
+    - img "Aakaara Studios founder, Sudhakar, holding a camera on the Brooklyn Bridge with the Manhattan Bridge in the background." [ref=e141]
+    - generic [ref=e142]:
+      - generic [ref=e143]: Our Story
+      - generic [ref=e144]:
+        - text: Where Every Click Reveals
+        - text: the Artistry of Love
+      - paragraph [ref=e145]: We don't just take photographs — we hunt for the light that lives between two people. That stolen glance during the pheras. The nervous laugh before a first look. The quiet exhale when a mother holds her belly and imagines the future.
+      - paragraph [ref=e146]: "Aakaara Studios was born from a simple truth: love is the most beautiful thing in the world, and it deserves to be captured with reverence. Based in New York City with roots running deep into South Indian heritage, we bring a perspective that honors both tradition and the electric energy of the city."
+      - paragraph [ref=e147]: "Our name comes from the ancient Sanskrit word meaning \"shape\" and \"form\" — because that's what we do: we give shape to your most fleeting, most precious emotions and transform them into art you can hold forever."
+      - paragraph [ref=e148]: We work across three registers — cinematic, editorial, and intimate — because your story decides the aesthetic, not the other way around.
+      - generic [ref=e149]: ఆకారం(Ākāram) · आकार · Giving Shape to What You Feel
+      - generic [ref=e150]:
+        - generic [ref=e151]: The Visarga (विसर्ग)
+        - paragraph [ref=e155]: "The twin dots in our logo are inspired by the visarga (ः), representing duality: two people, two lives becoming one. It's the heart of our focus on couples and weddings."
+      - generic [ref=e156]:
+        - generic [ref=e157]:
+          - heading "200+" [level=4] [ref=e158]
+          - paragraph [ref=e159]: Stories captured
+        - generic [ref=e160]:
+          - heading "4" [level=4] [ref=e161]
+          - paragraph [ref=e162]: Years of craft
+        - generic [ref=e163]:
+          - heading "3" [level=4] [ref=e164]
+          - paragraph [ref=e165]: Countries
+  - generic [ref=e167]:
+    - generic [ref=e168]:
+      - generic [ref=e169]: What We Offer
+      - generic [ref=e170]:
+        - text: Six Ways We Tell
+        - text: Your Story
+      - generic [ref=e171]: From grand weddings to quiet intimate portraits — every session is crafted with intention.
+    - generic [ref=e172]:
+      - generic [ref=e173]:
+        - generic:
+          - img:
+            - generic: SCENE I
+        - generic [ref=e174]: "01"
+        - heading "Weddings" [level=3] [ref=e175]
+        - paragraph [ref=e176]: Full-day coverage, second shooter, and a beautifully curated online gallery — every chapter of your day preserved.
+        - generic [ref=e177]:
+          - text: Starting from
+          - strong [ref=e178]: $2,500
+        - link "Inquire" [ref=e179] [cursor=pointer]:
+          - /url: "#contact"
+          - text: Inquire
+          - img [ref=e180]
+      - generic [ref=e182]:
+        - generic:
+          - img:
+            - generic: SCENE II
+        - generic [ref=e183]: "02"
+        - heading "Couple Portraits" [level=3] [ref=e184]
+        - paragraph [ref=e185]: From engagements to family milestones, we capture the evolving story of your love in New York's most iconic backdrops.
+        - generic [ref=e187]: Family Portraits
+        - link "Inquire" [ref=e188] [cursor=pointer]:
+          - /url: "#contact"
+          - text: Inquire
+          - img [ref=e189]
+        - link "View Work" [ref=e191] [cursor=pointer]:
+          - /url: couple-portraits.html
+      - generic [ref=e192]:
+        - generic:
+          - img:
+            - generic: SCENE III
+        - generic [ref=e193]: "03"
+        - heading "Maternity" [level=3] [ref=e194]
+        - paragraph [ref=e195]: From the radiant glow of maternity to the tender first days of a newborn, we create timeless portraits of new beginnings.
+        - generic [ref=e197]: New Born Baby Portraits
+        - link "Inquire" [ref=e198] [cursor=pointer]:
+          - /url: "#contact"
+          - text: Inquire
+          - img [ref=e199]
+      - generic [ref=e201]:
+        - generic:
+          - img:
+            - generic: SCENE IV
+        - generic [ref=e202]: "04"
+        - heading "Celebrations" [level=3] [ref=e203]
+        - paragraph [ref=e204]: From milestones to new beginnings, we capture the joy of your special occasions with a cinematic touch.
+        - generic [ref=e205]:
+          - generic [ref=e206]: House Warming
+          - generic [ref=e207]: First Birthday
+          - generic [ref=e208]: Gender Reveal
+          - generic [ref=e209]: Sweet Sixteen
+          - generic [ref=e210]: Baby Shower
+        - link "Inquire" [ref=e211] [cursor=pointer]:
+          - /url: "#contact"
+          - text: Inquire
+          - img [ref=e212]
+      - generic [ref=e214]:
+        - generic:
+          - img:
+            - generic: SCENE V
+        - generic [ref=e215]: "05"
+        - heading "Commercial" [level=3] [ref=e216]
+        - paragraph [ref=e217]: Product photography, brand campaigns, and editorial content for businesses and creators who refuse to be ordinary.
+        - generic [ref=e218]:
+          - generic [ref=e219]: Brand Campaigns
+          - generic [ref=e220]: Lookbooks
+          - generic [ref=e221]: Social-First Content
+          - generic [ref=e222]: Usage Rights Available
+        - link "Inquire" [ref=e223] [cursor=pointer]:
+          - /url: "#contact"
+          - text: Inquire
+          - img [ref=e224]
+      - generic [ref=e226]:
+        - generic:
+          - img:
+            - generic: SCENE VI
+        - generic [ref=e227]: "06"
+        - heading "Conceptual" [level=3] [ref=e228]
+        - paragraph [ref=e229]: Surreal, editorial, and experimental visual storytelling — for those who see photography as pure art, unbound by convention.
+        - generic [ref=e230]:
+          - generic [ref=e231]: Editorial
+          - generic [ref=e232]: Artist Collabs
+          - generic [ref=e233]: Portfolio Projects
+          - generic [ref=e234]: Exhibition Prints
+        - link "Inquire" [ref=e235] [cursor=pointer]:
+          - /url: "#contact"
+          - text: Inquire
+          - img [ref=e236]
+    - link "Explore our Video work in Detail" [ref=e239] [cursor=pointer]:
+      - /url: "#video-works"
+      - generic [ref=e240]: Explore our Video work in Detail
+      - img [ref=e241]
+  - generic [ref=e245]:
+    - generic:
+      - generic: "06"
+      - generic: "07"
+    - generic [ref=e255]: Scroll
+    - button "Toggle audio" [ref=e257] [cursor=pointer]:
+      - img [ref=e258]
+    - generic:
+      - generic:
+        - generic: What We Offer
+        - heading "Every Story Deserves Its Own Canvas" [level=2]:
+          - text: Every Story
+          - text: Deserves Its Own
+          - text: Canvas
+        - paragraph: Scroll to explore our services
+      - generic:
+        - generic: 01 · Weddings
+        - heading "Where Two Souls Become One Story" [level=2]
+        - paragraph: Full-day coverage from getting-ready moments to the final dance. Second photographer and online gallery included.
+        - link "Book a Session":
+          - /url: "#contact"
+          - text: Book a Session
+          - img
+      - generic:
+        - generic: 02 · Couple Portraits
+        - heading "Love, Caught Mid-Breath" [level=2]
+        - paragraph: Engagement sessions, pre-wedding shoots, or simply celebrating your love story in iconic NYC locations.
+        - link "Book a Session":
+          - /url: "#contact"
+          - text: Book a Session
+          - img
+      - generic:
+        - generic: 03 · Celebrations
+        - heading "Moments That Make Life Extraordinary" [level=2]
+        - paragraph: Baby showers, housewarmings, first birthdays — every milestone deserves to be captured with joy and artistry.
+        - link "Book a Session":
+          - /url: "#contact"
+          - text: Book a Session
+          - img
+      - generic:
+        - generic: 04 · Commercial
+        - heading "Your Brand, Elevated" [level=2]
+        - paragraph: Product photography, brand campaigns, and editorial content for businesses and creators who refuse to be ordinary.
+        - link "Book a Session":
+          - /url: "#contact"
+          - text: Book a Session
+          - img
+      - generic:
+        - generic: 05 · Conceptual
+        - heading "Art That Defies the Frame" [level=2]
+        - paragraph: Surreal, editorial, and experimental visual storytelling — for those who see photography as pure art.
+        - link "Book a Session":
+          - /url: "#contact"
+          - text: Book a Session
+          - img
+      - generic [ref=e276]:
+        - generic [ref=e277]: 06 · Behind the Scenes
+        - heading "The Art of the Unseen" [level=2] [ref=e278]
+        - paragraph [ref=e279]: A glimpse into our process — the energy, the collaboration, and the quiet moments that lead to the final frame.
+        - link "Book a Session" [ref=e280] [cursor=pointer]:
+          - /url: "#contact"
+          - text: Book a Session
+          - img [ref=e281]
+  - generic [ref=e284]:
+    - generic [ref=e285]: Kind Words
+    - generic [ref=e286]: What Our Clients Say
+    - generic [ref=e287]: We build relationships, not just portfolios. Real words from real people.
+    - generic [ref=e288]:
+      - generic [ref=e289]:
+        - generic [ref=e290]:
+          - img [ref=e291]
+          - img [ref=e293]
+          - img [ref=e295]
+          - img [ref=e297]
+          - img [ref=e299]
+        - blockquote [ref=e301]: "\"Your client's testimonial here — paste their kind words when they send them to you.\""
+        - generic [ref=e304]:
+          - heading "Client Name" [level=5] [ref=e305]
+          - paragraph [ref=e306]: Service · Location
+      - generic [ref=e307]:
+        - generic [ref=e308]:
+          - img [ref=e309]
+          - img [ref=e311]
+          - img [ref=e313]
+          - img [ref=e315]
+          - img [ref=e317]
+        - blockquote [ref=e319]: "\"Your client's testimonial here — paste their kind words when they send them to you.\""
+        - generic [ref=e322]:
+          - heading "Client Name" [level=5] [ref=e323]
+          - paragraph [ref=e324]: Service · Location
+      - generic [ref=e325]:
+        - generic [ref=e326]:
+          - img [ref=e327]
+          - img [ref=e329]
+          - img [ref=e331]
+          - img [ref=e333]
+          - img [ref=e335]
+        - blockquote [ref=e337]: "\"Your client's testimonial here — paste their kind words when they send them to you.\""
+        - generic [ref=e340]:
+          - heading "Client Name" [level=5] [ref=e341]
+          - paragraph [ref=e342]: Service · Location
+      - generic [ref=e343]:
+        - generic [ref=e344]:
+          - img [ref=e345]
+          - img [ref=e347]
+          - img [ref=e349]
+          - img [ref=e351]
+          - img [ref=e353]
+        - blockquote [ref=e355]: "\"Your client's testimonial here — paste their kind words when they send them to you.\""
+        - generic [ref=e358]:
+          - heading "Client Name" [level=5] [ref=e359]
+          - paragraph [ref=e360]: Service · Location
+  - generic [ref=e363]:
+    - generic [ref=e364]:
+      - generic [ref=e365]: Get In Touch
+      - heading "Let's Create Something Beautiful Together" [level=3] [ref=e366]
+      - paragraph [ref=e367]: Whether you're planning a grand wedding or an intimate portrait session, we'd love to hear your story.
+      - generic [ref=e368]:
+        - generic [ref=e369]:
+          - img [ref=e371]
+          - generic [ref=e374]:
+            - heading "New York City" [level=5] [ref=e375]
+            - paragraph [ref=e376]: Available for travel worldwide
+        - link "info@aakaarastudiosnyc.com We respond within 24 hours" [ref=e377] [cursor=pointer]:
+          - /url: mailto:info@aakaarastudiosnyc.com
+          - img [ref=e379]
+          - generic [ref=e382]:
+            - heading "info@aakaarastudiosnyc.com" [level=5] [ref=e383]
+            - paragraph [ref=e384]: We respond within 24 hours
+        - link "+1 (475) 332-2020 Mon–Sat, 10am–7pm EST" [ref=e385] [cursor=pointer]:
+          - /url: tel:+14753322020
+          - img [ref=e387]
+          - generic [ref=e389]:
+            - heading "+1 (475) 332-2020" [level=5] [ref=e390]
+            - paragraph [ref=e391]: Mon–Sat, 10am–7pm EST
+        - link "@sudhakar_3697 Follow us on Instagram" [ref=e392] [cursor=pointer]:
+          - /url: https://www.instagram.com/sudhakar_3697?igsh=MWxodHZrOWlhcmpzOA%3D%3D&utm_source=qr
+          - img [ref=e394]
+          - generic [ref=e398]:
+            - heading "@sudhakar_3697" [level=5] [ref=e399]
+            - paragraph [ref=e400]: Follow us on Instagram
+    - generic [ref=e401]:
+      - generic [ref=e402]:
+        - generic [ref=e403]:
+          - generic [ref=e404]: Your Name
+          - textbox "Your Name" [ref=e405]:
+            - /placeholder: Full name
+            - text: Bot User
+        - generic [ref=e406]:
+          - generic [ref=e407]: Email
+          - textbox "Email" [active] [ref=e408]:
+            - /placeholder: you@email.com
+      - generic [ref=e409]:
+        - generic [ref=e410]:
+          - generic [ref=e411]: Event Type
+          - combobox "Event Type" [ref=e412]:
+            - option "Select a service" [selected]
+            - option "Wedding"
+            - option "Couple Portrait"
+            - option "Maternity"
+            - option "Baby Shower"
+            - option "Housewarming"
+            - option "First Birthday"
+            - option "Sweet Sixteen"
+            - option "Commercial"
+            - option "Conceptual"
+            - option "Other"
+        - generic [ref=e413]:
+          - generic [ref=e414]: Preferred Dates
+          - generic [ref=e415]:
+            - textbox "From" [ref=e416]
+            - textbox "To" [ref=e417]
+      - generic [ref=e418]:
+        - generic [ref=e419]: Tell Us Your Story
+        - textbox "Tell Us Your Story" [ref=e420]:
+          - /placeholder: Share a bit about your vision — we'd love to know what makes your celebration special...
+          - text: This should not be sent
+      - button "Send Message" [ref=e421] [cursor=pointer]
+  - button "Back to Top" [ref=e422] [cursor=pointer]:
+    - img [ref=e423]
+  - contentinfo [ref=e425]:
+    - generic [ref=e426]:
+      - generic [ref=e427]:
+        - generic [ref=e428]:
+          - generic [ref=e429]:
+            - img [ref=e430]
+            - generic [ref=e437]: Aakaara
+          - paragraph [ref=e441]:
+            - text: Giving shape to what you feel.
+            - text: A photography sanctuary where love and art converge.
+        - generic [ref=e442]:
+          - heading "Navigate" [level=5] [ref=e443]
+          - link "Home" [ref=e444] [cursor=pointer]:
+            - /url: "#home"
+          - link "Portfolio" [ref=e445] [cursor=pointer]:
+            - /url: "#portfolio"
+          - link "Films" [ref=e446] [cursor=pointer]:
+            - /url: "#video-works"
+          - link "Couple Portraits" [ref=e447] [cursor=pointer]:
+            - /url: couple-portraits.html
+          - link "About" [ref=e448] [cursor=pointer]:
+            - /url: "#about"
+          - link "Services" [ref=e449] [cursor=pointer]:
+            - /url: "#services"
+          - link "Contact" [ref=e450] [cursor=pointer]:
+            - /url: "#contact"
+        - generic [ref=e451]:
+          - heading "Services" [level=5] [ref=e452]
+          - link "Weddings" [ref=e453] [cursor=pointer]:
+            - /url: "#services"
+          - link "Couples" [ref=e454] [cursor=pointer]:
+            - /url: "#services"
+          - link "Maternity" [ref=e455] [cursor=pointer]:
+            - /url: "#services"
+          - link "Celebrations" [ref=e456] [cursor=pointer]:
+            - /url: "#services"
+          - link "Commercial" [ref=e457] [cursor=pointer]:
+            - /url: "#services"
+          - link "Conceptual" [ref=e458] [cursor=pointer]:
+            - /url: "#services"
+        - generic [ref=e459]:
+          - heading "Connect" [level=5] [ref=e460]
+          - link "Instagram" [ref=e461] [cursor=pointer]:
+            - /url: https://www.instagram.com/sudhakar_3697?igsh=MWxodHZrOWlhcmpzOA%3D%3D&utm_source=qr
+            - img [ref=e462]
+            - text: Instagram
+          - link "YouTube" [ref=e466] [cursor=pointer]:
+            - /url: https://youtube.com/@aakaarastudiosnyc?si=PFY_7hF7zYPeYz_l
+            - img [ref=e467]
+            - text: YouTube
+          - link "Email Us" [ref=e470] [cursor=pointer]:
+            - /url: mailto:info@aakaarastudiosnyc.com
+            - img [ref=e471]
+            - text: Email Us
+          - link "Call Us" [ref=e474] [cursor=pointer]:
+            - /url: tel:+14753322020
+            - img [ref=e475]
+            - text: Call Us
+      - generic [ref=e477]:
+        - paragraph [ref=e478]: © 2026 Aakaara Studios NYC · Every story deserves its own canvas.
+        - generic [ref=e479]:
+          - link "Instagram" [ref=e480] [cursor=pointer]:
+            - /url: https://www.instagram.com/sudhakar_3697?igsh=MWxodHZrOWlhcmpzOA%3D%3D&utm_source=qr
+            - img [ref=e481]
+          - link "YouTube" [ref=e485] [cursor=pointer]:
+            - /url: https://youtube.com/@aakaarastudiosnyc?si=PFY_7hF7zYPeYz_l
+            - img [ref=e486]
+```
