@@ -2261,8 +2261,13 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .about-image { max-height: 450px; }
   .gallery-grid, .testimonials-grid { grid-template-columns: 1fr; }
   .form-row, .date-grid { grid-template-columns: 1fr; }
-  .footer-top { grid-template-columns: 1fr; gap: 1.5rem; }
-  .footer-bottom { flex-direction: column; gap: 0.8rem; text-align: center; }
+  .footer-top { grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+  .footer-bottom { flex-direction: column; gap: 0.6rem; text-align: center; }
+  footer { padding: 2.5rem 1.5rem 1.5rem; }
+  .footer-logo-container { margin-bottom: 0.6rem; }
+  .footer-brand p { line-height: 1.6; }
+  .footer-col h5 { margin-bottom: 0.6rem; }
+  .footer-col a { margin-bottom: 0.3rem; }
   .about-stats { gap: 2rem; }
   .intro-mark svg { width: 80px; height: 80px; }
   .cs-text-overlay { left: 1.5rem; right: 1.5rem; bottom: 3rem; max-width: none; }
