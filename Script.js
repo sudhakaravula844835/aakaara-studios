@@ -1800,3 +1800,79 @@ let portfolioCarousel, videoCarousel;
     });
   });
 })();
+
+// ═══════ MOBILE TESTIMONIALS CAROUSEL ═══════
+(function() {
+  function makeSvgArrow(pointLeft) {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('width', '20'); svg.setAttribute('height', '20');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', '1.5');
+    const path = document.createElementNS(ns, 'path');
+    path.setAttribute('d', pointLeft ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6');
+    svg.appendChild(path);
+    return svg;
+  }
+
+  function initTestimonialsCarousel() {
+    if (window.innerWidth > 768) return;
+    const section = document.getElementById('testimonials');
+    if (!section) return;
+    const grid = section.querySelector('.testimonials-grid');
+    if (!grid) return;
+    const cards = Array.from(grid.querySelectorAll('.testimonial-card'));
+    if (cards.length < 2) return;
+
+    // Wrap grid with arrow-hint container
+    const wrapper = document.createElement('div');
+    wrapper.className = 'tm-arrow-hints';
+    grid.parentNode.insertBefore(wrapper, grid);
+    wrapper.appendChild(grid);
+
+    const leftArrow = document.createElement('div');
+    leftArrow.className = 'tm-arrow-hint tm-arrow-hint--left';
+    leftArrow.appendChild(makeSvgArrow(true));
+    wrapper.appendChild(leftArrow);
+
+    const rightArrow = document.createElement('div');
+    rightArrow.className = 'tm-arrow-hint tm-arrow-hint--right';
+    rightArrow.appendChild(makeSvgArrow(false));
+    wrapper.appendChild(rightArrow);
+
+    // Dot indicators below the wrapper
+    const dotsEl = document.createElement('div');
+    dotsEl.className = 'tm-dots';
+    cards.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'tm-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Go to testimonial ' + (i + 1));
+      dot.addEventListener('click', () => {
+        grid.scrollTo({ left: i * window.innerWidth, behavior: 'smooth' });
+      });
+      dotsEl.appendChild(dot);
+    });
+    wrapper.parentNode.insertBefore(dotsEl, wrapper.nextSibling);
+
+    // Fade arrows after 2 seconds
+    setTimeout(() => {
+      leftArrow.classList.add('faded');
+      rightArrow.classList.add('faded');
+    }, 2000);
+
+    // Sync active dot on scroll
+    const dots = Array.from(dotsEl.querySelectorAll('.tm-dot'));
+    grid.addEventListener('scroll', () => {
+      const idx = Math.round(grid.scrollLeft / window.innerWidth);
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    }, { passive: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTestimonialsCarousel);
+  } else {
+    initTestimonialsCarousel();
+  }
+})();
