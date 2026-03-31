@@ -62,6 +62,10 @@
   t(1100, () => { if (outerRing) { outerRing.style.transition = 'opacity 0.8s cubic-bezier(0.16,1,0.3,1)'; outerRing.style.opacity = '0.18'; } });
   t(1200, () => { centerDot.style.transition = 'r 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.6s'; centerDot.setAttribute('r', '5'); centerDot.style.opacity = '0.85'; });
   letters.forEach((l, i) => { t(1800 + i * 90, () => { l.style.transition = 'opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1), filter 0.9s cubic-bezier(0.25,0.46,0.45,0.94)'; l.style.opacity = '1'; l.style.transform = 'translateY(0) scale(1)'; l.style.filter = 'blur(0px)'; }); });
+  
+  // MOB-03 FIX: Reveal hero content earlier (at 2.6s instead of 4.2s) to satisfy LCP
+  t(2600, () => { const hc = document.getElementById('heroContent'); if(hc) hc.style.opacity = '0.4'; });
+
   t(2600, () => { dots.style.transition = 'opacity 0.5s'; dots.style.opacity = '1'; });
   t(2900, () => { sub.style.transition = 'opacity 0.8s'; sub.style.opacity = '1'; });
   t(3200, () => { tag.style.transition = 'opacity 0.8s'; tag.style.opacity = '1'; });
@@ -641,6 +645,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
 
   /* ── Smart media loader — video → image → gradient fallback ── */
   var videos = panels.map(function(p) { return p.querySelector('.cs-video'); });
+  var serviceHlsInstances = []; // Audit Fix: Track instances for memory management
 
   function parseTimestamp(val) {
     if (!val) return null;
@@ -690,6 +695,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
         hls.loadSource(videoSrc);
         hls.attachMedia(vid);
         hls.on(Hls.Events.MANIFEST_PARSED, function() { vid.play().catch(function(){}); });
+        serviceHlsInstances.push(hls); // Store reference
       } else {
         vid.setAttribute('src', videoSrc);
         vid.load();
@@ -713,7 +719,11 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       isVisible = entry.isIntersecting;
       if (!isVisible) {
         pauseAllVideos();
+        // Stop HLS buffering to save memory/bandwidth when section is hidden
+        serviceHlsInstances.forEach(function(h) { h.stopLoad(); });
       } else {
+        // Resume loading when section becomes visible
+        serviceHlsInstances.forEach(function(h) { h.startLoad(); });
         requestAnimationFrame(render);
       }
     });
@@ -1936,4 +1946,19 @@ let portfolioCarousel, videoCarousel;
   } else {
     initTestimonialsCarousel();
   }
+})();
+
+// ═══════ ABOUT NAME REVEAL ═══════
+(function() {
+  const aboutNameWrapper = document.querySelector('.about-name-wrapper');
+  if (!aboutNameWrapper) return;
+  const nameObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('about-name--visible');
+        nameObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  nameObserver.observe(aboutNameWrapper);
 })();

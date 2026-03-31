@@ -137,11 +137,11 @@ nav.scrolled {
 .nav-links a:hover::after { width: 100%; }
 .nav-cta {
   font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--noir); background: var(--rose);
-  padding: 0.55rem 1.4rem; border-radius: 2px; font-weight: 400;
+  color: var(--ivory); background: var(--rose);
+  padding: 0.55rem 1.4rem; border-radius: 2px; font-weight: 500;
   transition: all 0.4s;
 }
-.nav-cta:hover { background: var(--rose-light); transform: translateY(-1px); }
+.nav-cta:hover { background: var(--rose-light); color: var(--noir); transform: translateY(-1px); }
 .nav-cta::after { display: none !important; }
 .nav-toggle { display: none; flex-direction: column; gap: 5px; padding: 4px; }
 .nav-toggle span { width: 22px; height: 1.5px; background: var(--ivory); transition: all 0.3s; }
@@ -877,6 +877,9 @@ nav.scrolled {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   border-radius: 6px;
+  touch-action: pan-y;
+  /* Optimization: Tell browser to handle vertical scroll normally but let JS handle horizontal */
+  touch-action: pan-y;
 }
 
 /* Fast transition for category spin animation */
@@ -1119,7 +1122,10 @@ nav.scrolled {
 /* ═══════════════════════════════════════════════════════════
    ABOUT
    ═══════════════════════════════════════════════════════════ */
-.about-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 4rem; align-items: center; }
+.about-grid { display: grid; grid-template-columns: 1fr 1.3fr; grid-template-rows: auto auto; column-gap: 4rem; row-gap: 0; align-items: start; }
+.about-grid > .about-image  { grid-column: 1; grid-row: 1; }
+.about-grid > .about-name-wrapper { grid-column: 1; grid-row: 2; }
+.about-grid > .about-text   { grid-column: 2; grid-row: 1 / span 2; }
 .about-image {
   aspect-ratio: 3/4; border-radius: 6px; max-height: 650px;
   position: relative; overflow: hidden;
@@ -1174,6 +1180,101 @@ nav.scrolled {
 .about-stats { display: flex; gap: 3rem; margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid rgba(30,26,22,0.05); }
 .about-stats .stat h4 { font-family: var(--font-display); font-weight: 300; font-size: 2rem; color: var(--rose); line-height: 1; }
 .about-stats .stat p { font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(30,26,22,0.25); margin-top: 0.3rem; }
+
+
+/* ─── Name reveal wrapper ─── */
+.about-name-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  opacity: 0;
+  animation: nameReveal 1s ease forwards;
+  animation-delay: 0.6s;
+  animation-play-state: paused;
+}
+.about-name-wrapper.about-name--visible {
+  animation-play-state: running;
+}
+.about-name-wrapper.about-name--visible .about-name-line {
+  animation-play-state: running;
+}
+.about-name-wrapper.about-name--visible .about-name::after {
+  animation-play-state: running;
+}
+
+/* ─── The name itself ─── */
+.about-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.18em;
+  color: #c9956b;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  white-space: nowrap;
+}
+
+/* ─── Shimmer light streak ─── */
+.about-name::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255, 220, 160, 0.08) 35%,
+    rgba(255, 235, 190, 0.55) 50%,
+    rgba(255, 220, 160, 0.08) 65%,
+    transparent 80%
+  );
+  transform: skewX(-15deg);
+  animation: shimmerSweep 3.2s ease-in-out infinite;
+  animation-delay: 1.4s;
+  animation-play-state: paused;
+  pointer-events: none;
+}
+
+/* ─── Hover: shimmer speeds up ─── */
+.about-name:hover::after {
+  animation-duration: 1s;
+}
+
+/* ─── Thin decorative line below name ─── */
+.about-name-line {
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #c9956b, transparent);
+  animation: lineExpand 1s ease forwards;
+  animation-delay: 1s;
+  animation-play-state: paused;
+}
+
+/* ─── Keyframes ─── */
+@keyframes nameReveal {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmerSweep {
+  0%   { left: -80%; opacity: 0; }
+  10%  { opacity: 1; }
+  60%  { left: 130%; opacity: 1; }
+  61%  { opacity: 0; }
+  100% { left: 130%; opacity: 0; }
+}
+
+@keyframes lineExpand {
+  from { width: 0; }
+  to   { width: 80px; }
+}
 
 /* ═══════════════════════════════════════════════════════════
    SERVICES OVERVIEW GRID
@@ -2246,8 +2347,10 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .nav-links { display: none; }
   .nav-toggle { display: flex; }
   .section { padding: 4rem 1.5rem; }
-  .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .about-grid, .contact-grid { grid-template-columns: 1fr; grid-template-rows: auto; gap: 2rem; }
+  .about-grid > .about-image, .about-grid > .about-name-wrapper, .about-grid > .about-text { grid-column: auto; grid-row: auto; }
   .about-image { max-height: 450px; }
+  .about-name { font-size: 1.5rem; letter-spacing: 0.14em; }
   .gallery-grid, .testimonials-grid { grid-template-columns: 1fr; }
   .form-row, .date-grid { grid-template-columns: 1fr; }
   .footer-top { grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem; }
