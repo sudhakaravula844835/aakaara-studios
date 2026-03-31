@@ -644,6 +644,16 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   /* ── Smart media loader — video → image → gradient fallback ── */
   var videos = panels.map(function(p) { return p.querySelector('.cs-video'); });
 
+  function parseTimestamp(val) {
+    if (!val) return null;
+    val = String(val).trim();
+    if (val.indexOf(':') !== -1) {
+      var parts = val.split(':');
+      return parseInt(parts[0], 10) * 60 + parseFloat(parts[1]);
+    }
+    return parseFloat(val);
+  }
+
   panels.forEach(function(panel, i) {
     var videoSrc = panel.dataset.video;
     var imgSrc   = panel.dataset.bg;
@@ -652,6 +662,9 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
 
     if (videoSrc && videoSrc !== '') {
       /* VIDEO path — HLS (.m3u8) or direct file */
+      var startTime = parseTimestamp(panel.dataset.start) || 0;
+      var endTime   = parseTimestamp(panel.dataset.end);
+
       function showVideo() {
         bg.className = bg.className.replace(/cs-bg-\d/, '').trim();
         vid.classList.add('cs-vid-ready');
@@ -661,8 +674,18 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       vid.addEventListener('loadeddata',     function() { showVideo(); }, { once: true });
       vid.addEventListener('canplay',        function() { showVideo(); }, { once: true });
       vid.addEventListener('loadedmetadata', function() {
+        if (startTime > 0) vid.currentTime = startTime;
         vid.play().catch(function(){});
       }, { once: true });
+
+      /* Loop between start and end if data-end is set */
+      if (endTime !== null) {
+        vid.addEventListener('timeupdate', function() {
+          if (vid.currentTime >= endTime) {
+            vid.currentTime = startTime;
+          }
+        });
+      }
 
       if (videoSrc.indexOf('.m3u8') !== -1 && typeof Hls !== 'undefined' && Hls.isSupported()) {
         var hls = new Hls();
@@ -1653,6 +1676,14 @@ function lazyLoadGalleryItem(item) {
       if (item.dataset.bgPos) bg.style.backgroundPosition = item.dataset.bgPos;
     };
     img.src = coverSrc;
+    // Preload first few gallery images so opening feels instant
+    if (!item.dataset.comingSoon && folder) {
+      const count = parseInt(item.dataset.count || '1', 10);
+      for (let i = 2; i <= Math.min(4, count); i++) {
+        const preImg = new Image();
+        preImg.src = `${folder}/${i}.${ext}`;
+      }
+    }
   }
 }
 
@@ -1868,6 +1899,32 @@ let portfolioCarousel, videoCarousel;
     grid.addEventListener('scroll', () => {
       const idx = Math.round(grid.scrollLeft / window.innerWidth);
       dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    }, { passive: true });
+
+    // Touch swipe — explicit handler for reliability across iOS/Android
+    let tmTouchStartX = 0, tmTouchStartY = 0, tmIsHorizontal = null;
+    grid.addEventListener('touchstart', (e) => {
+      tmTouchStartX = e.touches[0].clientX;
+      tmTouchStartY = e.touches[0].clientY;
+      tmIsHorizontal = null;
+    }, { passive: true });
+    grid.addEventListener('touchmove', (e) => {
+      const dx = e.touches[0].clientX - tmTouchStartX;
+      const dy = e.touches[0].clientY - tmTouchStartY;
+      if (tmIsHorizontal === null && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+        tmIsHorizontal = Math.abs(dx) > Math.abs(dy);
+      }
+      if (tmIsHorizontal) e.preventDefault();
+    }, { passive: false });
+    grid.addEventListener('touchend', (e) => {
+      if (!tmIsHorizontal) return;
+      const dx = e.changedTouches[0].clientX - tmTouchStartX;
+      if (Math.abs(dx) > 40) {
+        const current = Math.round(grid.scrollLeft / window.innerWidth);
+        const next = Math.max(0, Math.min(cards.length - 1, current + (dx < 0 ? 1 : -1)));
+        grid.scrollTo({ left: next * window.innerWidth, behavior: 'smooth' });
+      }
+      tmIsHorizontal = null;
     }, { passive: true });
   }
 

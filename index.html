@@ -549,11 +549,13 @@
       <div class="sw-gallery-title" id="swGalleryTitle"></div>
       <div class="sw-gallery-subtitle" id="swGallerySubtitle"></div>
     </div>
-    <div class="sw-gallery-counter" id="swGalleryCounter"></div>
-    <button class="sw-gallery-close" id="swGalleryClose" aria-label="Close gallery">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      Close &nbsp;<span style="opacity:0.35;font-size:0.5rem" aria-hidden="true">(Esc)</span>
-    </button>
+    <div class="sw-gallery-bar-right">
+      <button class="sw-gallery-close" id="swGalleryClose" aria-label="Close gallery">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        Close &nbsp;<span style="opacity:0.35;font-size:0.5rem" aria-hidden="true">(Esc)</span>
+      </button>
+      <div class="sw-gallery-counter" id="swGalleryCounter"></div>
+    </div>
   </div>
   <div class="sw-gallery-stage" id="swGalleryStage">
     <div class="sw-gallery-img" id="swGalleryImg"></div>
@@ -1331,7 +1333,7 @@
       </div>
 
       <!-- Panel 1: Weddings -->
-      <div class="cs-panel" data-video="https://vz-757250d0-999.b-cdn.net/b2f9ce28-e321-4779-a01c-c8391257119d/playlist.m3u8" data-bg="" data-bg-fallback="cs-bg-1">
+      <div class="cs-panel" data-video="https://vz-757250d0-999.b-cdn.net/b2f9ce28-e321-4779-a01c-c8391257119d/playlist.m3u8" data-bg="" data-bg-fallback="cs-bg-1" data-start="0" data-end="100">
         <div class="cs-bg cs-bg-1" id="csBg1">
           <video class="cs-video" id="csVid1" muted loop playsinline preload="metadata"></video>
         </div>
@@ -1339,7 +1341,7 @@
       </div>
 
       <!-- Panel 2: Couple Portraits -->
-      <div class="cs-panel" data-video="https://vz-757250d0-999.b-cdn.net/ede4e777-1f11-42ee-935a-b5cd09d973b1/playlist.m3u8" data-bg="" data-bg-fallback="cs-bg-2">
+      <div class="cs-panel" data-video="https://vz-757250d0-999.b-cdn.net/ede4e777-1f11-42ee-935a-b5cd09d973b1/playlist.m3u8" data-bg="" data-bg-fallback="cs-bg-2" data-start="0" data-end="30">
         <div class="cs-bg cs-bg-2" id="csBg2">
           <video class="cs-video" id="csVid2" muted loop playsinline preload="metadata"></video>
         </div>
@@ -1347,7 +1349,7 @@
       </div>
 
       <!-- Panel 3: Celebrations -->
-      <div class="cs-panel" data-video="https://vz-757250d0-999.b-cdn.net/578081a7-bc44-4766-9aea-fb146918b327/playlist.m3u8" data-bg="" data-bg-fallback="cs-bg-4">
+      <div class="cs-panel" data-video="https://vz-757250d0-999.b-cdn.net/578081a7-bc44-4766-9aea-fb146918b327/playlist.m3u8" data-bg="" data-bg-fallback="cs-bg-4" data-start="0" data-end="46">
         <div class="cs-bg cs-bg-4" id="csBg3">
           <video class="cs-video" id="csVid3" muted loop playsinline preload="metadata"></video>
         </div>
@@ -1355,7 +1357,7 @@
       </div>
 
       <!-- Panel 4: Commercial -->
-      <div class="cs-panel" data-video="https://vz-757250d0-999.b-cdn.net/c9f992dd-879d-4570-9364-eb1bd103e226/playlist.m3u8" data-bg="" data-bg-fallback="cs-bg-5">
+      <div class="cs-panel" data-video="https://vz-757250d0-999.b-cdn.net/c9f992dd-879d-4570-9364-eb1bd103e226/playlist.m3u8" data-bg="" data-bg-fallback="cs-bg-5" data-start="5" data-end="35">
         <div class="cs-bg cs-bg-5" id="csBg4">
           <video class="cs-video" id="csVid4" muted loop playsinline preload="metadata"></video>
         </div>
@@ -1363,7 +1365,7 @@
       </div>
 
       <!-- Panel 5: Conceptual -->
-      <div class="cs-panel" data-video="https://vz-757250d0-999.b-cdn.net/d2898bcb-a7c4-4cab-bf9c-42d3b003a957/playlist.m3u8" data-bg="" data-bg-fallback="cs-bg-6">
+      <div class="cs-panel" data-video="https://vz-757250d0-999.b-cdn.net/d2898bcb-a7c4-4cab-bf9c-42d3b003a957/playlist.m3u8" data-bg="" data-bg-fallback="cs-bg-6" data-start="3" data-end="30">
         <div class="cs-bg cs-bg-6" id="csBg5">
           <video class="cs-video" id="csVid5" muted loop playsinline preload="metadata"></video>
         </div>
@@ -1371,7 +1373,7 @@
       </div>
 
       <!-- Panel 6: Behind the Scenes -->
-      <div class="cs-panel" data-video="https://vz-757250d0-999.b-cdn.net/9b822881-dbe7-4a9b-8c4b-d2e821547fd3/playlist.m3u8" data-bg="" data-bg-fallback="cs-bg-7">
+      <div class="cs-panel" data-video="https://vz-757250d0-999.b-cdn.net/9b822881-dbe7-4a9b-8c4b-d2e821547fd3/playlist.m3u8" data-bg="" data-bg-fallback="cs-bg-7" data-start="0" data-end="20">
         <div class="cs-bg cs-bg-7" id="csBg6">
           <video class="cs-video" id="csVid6" muted loop playsinline preload="metadata"></video>
         </div>
