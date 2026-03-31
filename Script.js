@@ -619,7 +619,6 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   var dots       = document.querySelectorAll('.cs-dot');
   var counterEl  = document.getElementById('csCounterCurrent');
   var scrollHint = document.getElementById('csScrollHint');
-  var muteBtn    = document.getElementById('csMuteToggle');
   var counterWrapper = document.getElementById('csCounter');
 
   /* Mobile reels mode disabled — scroll-stack slide-over effect runs on all sizes */
@@ -629,7 +628,6 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   var lastScrollY  = -1;
   var lastActive   = 0;
   var hintDismissed = false;
-  var isMuted      = true;
   var isVisible    = false;
 
   function pauseAllVideos() { videos.forEach(function(v) { if (v) v.pause(); }); }
@@ -709,15 +707,6 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     /* else — gradient fallback stays */
   });
 
-  /* Mute Toggle Logic */
-  if (muteBtn) {
-    muteBtn.addEventListener('click', function() {
-      isMuted = !isMuted;
-      muteBtn.classList.toggle('unmuted', !isMuted);
-      videos.forEach(function(v) { if(v) v.muted = isMuted; });
-    });
-  }
-
   /* Viewport Observer: Pause videos when out of view */
   var observer = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
@@ -741,7 +730,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     videos.forEach(function(vid, i) {
       if (!vid || !vid.getAttribute('src')) return;
       // Ensure mute state is consistent
-      vid.muted = isMuted;
+      vid.muted = true;
       
       if (i === idx1 || (idx2 !== undefined && i === idx2)) {
         vid.play().catch(function(){});
@@ -972,7 +961,10 @@ function filterVideos(cat, btn) {
 })();
 
 // Hover muted preview — preloaded on viewport entry, plays instantly on hover
+// Exclusive playback: only one card plays at a time (prevents audio overlap on swipe)
 (function() {
+  const cardControllers = new Map();
+
   document.querySelectorAll('.vw-card').forEach(card => {
     const src = card.dataset.video;
     if (!src) return;
@@ -993,6 +985,7 @@ function filterVideos(cat, btn) {
 
     const play = () => {
       if (!vid) preload();
+      vid.muted = true;
       vid.play().catch(() => {});
       poster.classList.add('active');
     };
@@ -1000,10 +993,13 @@ function filterVideos(cat, btn) {
     const pause = (reset = false) => {
       if (vid) {
         vid.pause();
+        vid.muted = true;
         if (reset) vid.currentTime = 0;
       }
       poster.classList.remove('active');
     };
+
+    cardControllers.set(card, { play, pause });
 
     // Preload video as soon as the card scrolls into view
     const preloadObserver = new IntersectionObserver((entries) => {
@@ -1011,9 +1007,10 @@ function filterVideos(cat, btn) {
     }, { threshold: 0.1 });
     preloadObserver.observe(card);
 
-    // Desktop: Hover — play immediately, no delay
+    // Desktop: Hover — pause all other cards first, then play this one
     card.addEventListener('mouseenter', () => {
       if (window.matchMedia('(hover: none)').matches) return;
+      cardControllers.forEach((ctrl, c) => { if (c !== card) ctrl.pause(true); });
       play();
     });
 
@@ -1021,18 +1018,24 @@ function filterVideos(cat, btn) {
       if (window.matchMedia('(hover: none)').matches) return;
       pause(true);
     });
-
-    // Mobile: Auto-play on scroll
-    if (window.matchMedia('(hover: none)').matches) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (e.isIntersecting) play();
-          else pause();
-        });
-      }, { threshold: 0.6 });
-      observer.observe(card);
-    }
   });
+
+  // Mobile: Single shared observer — exclusive playback, only the most-visible card plays
+  if (window.matchMedia('(hover: none)').matches) {
+    const mobileObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        const ctrl = cardControllers.get(e.target);
+        if (!ctrl) return;
+        if (e.isIntersecting) {
+          cardControllers.forEach((c, card) => { if (card !== e.target) c.pause(); });
+          ctrl.play();
+        } else {
+          ctrl.pause();
+        }
+      });
+    }, { threshold: 0.6 });
+    cardControllers.forEach((_ctrl, card) => mobileObserver.observe(card));
+  }
 })();
 
 // Cinematic modal player

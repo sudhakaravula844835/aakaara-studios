@@ -1603,18 +1603,6 @@ nav.scrolled {
   opacity: 0;
   transition: opacity 0.5s;
 }
-.cs-mute-toggle {
-  position: absolute; bottom: 3.5rem; left: 3.5rem; z-index: 20;
-  width: 40px; height: 40px; border-radius: 50%;
-  border: 1px solid rgba(250,246,241,0.15);
-  background: rgba(9,8,11,0.3); backdrop-filter: blur(5px);
-  color: rgba(250,246,241,0.6); display: flex; align-items: center; justify-content: center;
-  transition: all 0.3s;
-}
-.cs-mute-toggle:hover { background: var(--rose); color: var(--noir); border-color: var(--rose); }
-.cs-mute-toggle .cs-icon-unmuted { display: none; }
-.cs-mute-toggle.unmuted .cs-icon-unmuted { display: block; }
-.cs-mute-toggle.unmuted .cs-icon-muted { display: none; }
 .cs-scroll-hint.visible { opacity: 1; }
 .cs-scroll-hint span { font-size: 0.44rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(250,246,241,0.2); }
 .cs-scroll-line { width: 1px; height: 28px; position: relative; overflow: hidden; background: rgba(201,149,107,0.08); }
