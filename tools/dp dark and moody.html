@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aakaara — Instagram DP Generator</title>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -39,15 +40,15 @@
   .dp-container {
     position: relative;
     width: 1080px;
-    height: 1080px;
+    height: 1350px;
     overflow: hidden;
-    border-radius: 50%;
-    box-shadow: 0 0 80px rgba(201,149,107,0.06);
+    border-radius: 4px;
+    box-shadow: 0 50px 100px rgba(0,0,0,0.9), 0 0 80px rgba(201,149,107,0.08);
   }
 
   #dpCanvas {
     width: 1080px;
-    height: 1080px;
+    height: 1350px;
     position: relative;
     background: #080706;
     display: flex;
@@ -57,9 +58,8 @@
     overflow: hidden;
   }
 
-  /* Film grain texture via CSS noise */
-  #dpCanvas::before {
-    content: '';
+  /* Film grain texture via CSS noise (moved to real div for reliable capture) */
+  .grain-overlay {
     position: absolute;
     inset: -50%;
     width: 200%;
@@ -72,9 +72,8 @@
     mix-blend-mode: overlay;
   }
 
-  /* Warm cinematic light leak — top left */
-  #dpCanvas::after {
-    content: '';
+  /* Warm cinematic light leak (moved to real div for reliable capture) */
+  .light-leak {
     position: absolute;
     inset: 0;
     background:
@@ -108,25 +107,27 @@
     font-family: 'Cormorant Garamond', serif;
     font-weight: 300;
     font-size: 120px;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     color: #faf6f1;
     line-height: 1;
     position: relative;
+    text-shadow: 0 12px 30px rgba(0,0,0,0.7), 0 0 20px rgba(201,149,107,0.15);
   }
 
   .dp-dots {
     position: absolute;
-    top: -20px;
+    top: 10px;
     left: 98px;
     display: flex;
     gap: 12px;
   }
   .dp-dots span {
-    width: 11px;
-    height: 11px;
+    width: 13px;
+    height: 13px;
     background: #c9956b;
     border-radius: 50%;
     opacity: 0.9;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
   }
 
   .dp-divider {
@@ -138,7 +139,7 @@
 
   .dp-subtitle {
     font-family: 'Outfit', sans-serif;
-    font-weight: 300;
+    font-weight: 400;
     font-size: 22px;
     letter-spacing: 0.45em;
     text-transform: uppercase;
@@ -153,6 +154,7 @@
     text-transform: uppercase;
     color: rgba(250,246,241,0.25);
     margin-top: 14px;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.5);
   }
 
   /* Variant: Monogram */
@@ -163,15 +165,19 @@
     color: #faf6f1;
     line-height: 1;
     position: relative;
+    text-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(201,149,107,0.1);
   }
   .dp-monogram .dp-dots {
-    top: -36px;
-    left: 82px;
-    gap: 16px;
+    top: 5px;
+    left: 65px;
+    gap: 15px;
   }
   .dp-monogram .dp-dots span {
-    width: 14px;
-    height: 14px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    opacity: 0.9;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
   }
 
   /* Variant: Editorial */
@@ -180,24 +186,36 @@
     font-weight: 300;
     font-style: italic;
     font-size: 100px;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.1em;
     color: #faf6f1;
     line-height: 1.1;
     position: relative;
+    text-shadow: 0 10px 25px rgba(0,0,0,0.6);
   }
   .dp-editorial-name .dp-dots {
-    top: -18px;
-    left: 82px;
+    top: 10px;
+    left: 80px; 
+    gap: 10px;
+  }
+  .dp-editorial-name .dp-dots span {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    opacity: 0.9;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
   }
 
   .dp-editorial-tagline {
     font-family: 'Cormorant Garamond', serif;
-    font-weight: 300;
+    font-weight: 400;
     font-style: italic;
     font-size: 28px;
-    color: rgba(250,246,241,0.4);
-    margin-top: 20px;
-    letter-spacing: 0.06em;
+    color: rgba(250,246,241,0.6);
+    margin-top: 16px;
+    letter-spacing: 0.20em;
+    text-align: center;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  
   }
 
   /* ═══ PREVIEW ═══ */
@@ -208,7 +226,7 @@
   .preview-wrap .circle-guide {
     position: absolute;
     inset: 0;
-    border-radius: 50%;
+    border-radius: 4px;
     border: 2px dashed rgba(201,149,107,0.15);
     pointer-events: none;
     z-index: 10;
@@ -222,7 +240,7 @@
   .controls {
     display: flex;
     gap: 1rem;
-    margin-top: -280px;
+    margin-top: -420px;
     position: relative;
     z-index: 20;
   }
@@ -282,12 +300,19 @@
 <body>
 
 <h1>Instagram DP Generator</h1>
-<p class="page-subtitle">1080 &times; 1080 px &middot; cinematic film grain &middot; optimized for circular crop</p>
+<p class="page-subtitle">2160 &times; 2700 px &middot; cinematic film grain &middot; 4:5 retina quality</p>
+
+<div class="top-actions" style="margin-bottom: 2rem;">
+  <button class="btn btn-primary" onclick="downloadDP(this)">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v9m0 0L4 7.5m4 3.5l4-3.5M2 13h12"/></svg>
+    Quick Download
+  </button>
+</div>
 
 <div class="variants">
-  <button class="variant-btn active" onclick="setVariant('brand')">Brand</button>
-  <button class="variant-btn" onclick="setVariant('monogram')">Monogram</button>
-  <button class="variant-btn" onclick="setVariant('editorial')">Editorial</button>
+  <button class="variant-btn active" onclick="setVariant('brand', this)">Brand</button>
+  <button class="variant-btn" onclick="setVariant('monogram', this)">Monogram</button>
+  <button class="variant-btn" onclick="setVariant('editorial', this)">Editorial</button>
 </div>
 
 <div class="preview-wrap">
@@ -295,6 +320,8 @@
     <div class="dp-container">
       <div id="dpCanvas">
         <div class="vignette"></div>
+        <div class="grain-overlay"></div>
+        <div class="light-leak"></div>
 
         <div class="dp-content" id="dpContent">
           <!-- Default: Brand variant -->
@@ -313,16 +340,16 @@
 </div>
 
 <div class="controls">
-  <button class="btn btn-primary" onclick="downloadDP()">
+  <button class="btn btn-primary" onclick="downloadDP(this)">
     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v9m0 0L4 7.5m4 3.5l4-3.5M2 13h12"/></svg>
     Download PNG
   </button>
 </div>
 
 <script>
-function setVariant(type) {
+function setVariant(type, btn) {
   document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  if (btn) btn.classList.add('active');
 
   const content = document.getElementById('dpContent');
 
@@ -358,27 +385,69 @@ function setVariant(type) {
   }
 }
 
-async function downloadDP() {
-  const canvas = document.getElementById('dpCanvas');
-  try {
-    if (typeof html2canvas !== 'undefined') {
-      const c = await html2canvas(canvas, {
-        width: 1080, height: 1080, scale: 1,
-        backgroundColor: null, useCORS: true
+function downloadDP(btn) {
+  var el = document.getElementById('dpCanvas');
+  var exportEl = el.cloneNode(true);
+  
+  // Force the final animation state (consistent with carousel logic)
+  el.classList.add('is-visible');
+  exportEl.classList.add('is-visible');
+  exportEl.id = 'dpCanvasExport';
+  exportEl.style.position = 'absolute';
+  exportEl.style.left = '-99999px';
+  exportEl.style.top = '0';
+  exportEl.style.width = '1080px';
+  exportEl.style.height = '1350px';
+  exportEl.style.transform = 'none';
+  exportEl.style.margin = '0';
+  exportEl.style.display = 'flex';
+  exportEl.style.alignItems = 'center';
+  exportEl.style.justifyContent = 'center';
+  exportEl.style.overflow = 'hidden';
+  exportEl.style.zIndex = '-1';
+  document.body.appendChild(exportEl);
+
+  // Last child of the button is the text node after the SVG
+  var textNode = btn.lastChild;
+  var savedText = textNode.textContent;
+  textNode.textContent = ' Exporting\u2026';
+  btn.disabled = true;
+
+  html2canvas(exportEl, {
+    scale: 3,
+    useCORS: true,
+    allowTaint: false,
+    backgroundColor: null,
+    width: 1080,
+    height: 1350,
+    windowWidth: 1080,
+    windowHeight: 1350,
+    scrollX: 0,
+    scrollY: 0,
+    logging: false,
+    onclone: function(clonedDoc) {
+      clonedDoc.querySelectorAll('.dp-divider').forEach(function(divider) {
+        // html2canvas can fail on this gradient background in the cloned tree,
+        // so flatten it to a simple line for export only.
+        divider.style.backgroundImage = 'none';
+        divider.style.background = 'rgba(201,149,107,0.5)';
       });
-      const link = document.createElement('a');
-      link.download = 'aakaara-insta-dp.png';
-      link.href = c.toDataURL('image/png');
-      link.click();
-    } else {
-      const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-      script.onload = () => downloadDP();
-      document.head.appendChild(script);
     }
-  } catch(e) {
+  }).then(function(canvas) {
+    var link = document.createElement('a');
+    link.download = 'aakaara-insta-dp.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    exportEl.remove();
+    textNode.textContent = savedText;
+    btn.disabled = false;
+  }).catch(function(e) {
+    console.error(e);
     alert('Export failed. Try taking a screenshot of the preview instead.');
-  }
+    exportEl.remove();
+    textNode.textContent = savedText;
+    btn.disabled = false;
+  });
 }
 </script>
 </body>

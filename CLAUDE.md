@@ -88,6 +88,16 @@ HLS streams (`.m3u8`) use `hls.js` on supported browsers, native `<video src>` o
 
 ## Recent Changes (March 2026 Session)
 
+#### Carousel Animations
+- Implemented cinematic animations (wipeUp, fadeUp, fadeIn, lineGrow) in `tools/insta-carousel.html`.
+- Integrated `IntersectionObserver` to trigger reveals as slides scroll into view.
+- Refactored Slide 02 (divider) and Slide 03 (headline spans) for motion.
+
+#### Carousel Animations Plan
+- Created implementation plan for cinematic animations in `tools/insta-carousel.html`.
+- Defined steps for CSS @keyframes integration and HTML refactoring.
+- Outlined JS IntersectionObserver trigger mechanism.
+
 ### Logo Consistency
 The Aakaara logo is consistent across **header nav**, **hero intro**, and **footer**:
 - **4 petals** with gradually decreasing opacity (0.85 → 0.55 → 0.35 → 0.2)

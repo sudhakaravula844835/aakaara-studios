@@ -32,19 +32,37 @@
 (function() {
   const intro = document.getElementById('intro');
   if (!intro) return;
+  const heroContent = document.getElementById('heroContent');
+  const heroScroll = document.getElementById('heroScroll');
+  const navbar = document.getElementById('navbar');
+  const shouldSkipIntro =
+    window.matchMedia('(max-width: 768px)').matches ||
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+    Boolean(navigator.connection && navigator.connection.saveData);
+
+  function revealHeroImmediately() {
+    intro.classList.add('hidden');
+    document.body.classList.remove('intro-active');
+    if (heroContent) heroContent.style.opacity = '1';
+    if (heroScroll) heroScroll.style.opacity = '1';
+    if (navbar) navbar.classList.add('visible');
+  }
 
   // Skip intro when returning from a sub-page (e.g. couple-portraits)
   if (sessionStorage.getItem('skipIntro') === '1') {
     const savedY = parseInt(sessionStorage.getItem('returnScrollY') || '0', 10);
     sessionStorage.removeItem('skipIntro');
     sessionStorage.removeItem('returnScrollY');
-    intro.classList.add('hidden');
-    document.body.classList.remove('intro-active');
-    document.getElementById('heroContent').style.opacity = '1';
-    document.getElementById('heroScroll').style.opacity = '1';
-    document.getElementById('navbar').classList.add('visible');
+    revealHeroImmediately();
     // Restore scroll after layout settles
     requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0, savedY)));
+    return;
+  }
+
+  // Mobile users should land directly on the hero so the primary message paints
+  // immediately instead of waiting through the cinematic intro timeline.
+  if (shouldSkipIntro) {
+    revealHeroImmediately();
     return;
   }
 
@@ -71,7 +89,6 @@
   t(3200, () => { tag.style.transition = 'opacity 0.8s'; tag.style.opacity = '1'; });
   t(4200, () => {
     const introGroup = document.getElementById('introGroup');
-    const navbar = document.getElementById('navbar');
     navbar.style.transition = 'none'; navbar.style.opacity = '0'; navbar.style.transform = 'translateY(0)'; navbar.offsetHeight;
     const navLogo = document.querySelector('.nav-logo');
     const navRect = navLogo.getBoundingClientRect();
@@ -124,15 +141,35 @@
   const heroTitle = document.getElementById('heroTitle');
   const bgMark = document.getElementById('heroBgMark');
   const hero = document.querySelector('.hero');
+  if (!heroTitle || !bgMark || !hero) return;
   const heroH = hero.offsetHeight;
+  let heroSpacingMin = 0.18;
+  let heroSpacingMax = 1;
+
+  function updateHeroSpacing() {
+    if (window.innerWidth <= 480) {
+      heroSpacingMin = 0.12;
+      heroSpacingMax = 0.34;
+    } else if (window.innerWidth <= 768) {
+      heroSpacingMin = 0.14;
+      heroSpacingMax = 0.5;
+    } else {
+      heroSpacingMin = 0.18;
+      heroSpacingMax = 1;
+    }
+  }
+
+  updateHeroSpacing();
+
   window.addEventListener('scroll', () => {
     const y = window.scrollY;
     const progress = Math.min(y / heroH, 1);
-    heroTitle.style.letterSpacing = (0.18 + progress * 0.82) + 'em';
+    heroTitle.style.letterSpacing = (heroSpacingMin + progress * (heroSpacingMax - heroSpacingMin)) + 'em';
     bgMark.style.opacity = progress > 0.2 ? Math.min((progress - 0.2) * 1.5, 1) : 0;
     document.getElementById('heroContent').style.opacity = Math.max(1 - progress * 1.5, 0);
     document.getElementById('navbar').classList.toggle('scrolled', y > 60);
   }, { passive: true });
+  window.addEventListener('resize', updateHeroSpacing, { passive: true });
 })();
 
 // ═══════ REVEAL ON SCROLL ═══════
@@ -657,7 +694,13 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     return parseFloat(val);
   }
 
-  panels.forEach(function(panel, i) {
+  var panelMediaReady = panels.map(function() { return false; });
+
+  function ensurePanelMedia(i) {
+    if (i < 0 || i >= PANEL_COUNT || panelMediaReady[i]) return;
+
+    panelMediaReady[i] = true;
+    var panel = panels[i];
     var videoSrc = panel.dataset.video;
     var imgSrc   = panel.dataset.bg;
     var vid      = videos[i];
@@ -711,7 +754,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       img.src = imgSrc;
     }
     /* else — gradient fallback stays */
-  });
+  }
 
   /* Viewport Observer: Pause videos when out of view */
   var observer = new IntersectionObserver(function(entries) {
@@ -724,6 +767,8 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       } else {
         // Resume loading when section becomes visible
         serviceHlsInstances.forEach(function(h) { h.startLoad(); });
+        ensurePanelMedia(lastActive);
+        ensurePanelMedia(lastActive + 1);
         requestAnimationFrame(render);
       }
     });
@@ -738,7 +783,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     }
 
     videos.forEach(function(vid, i) {
-      if (!vid || !vid.getAttribute('src')) return;
+      if (!vid || (!vid.currentSrc && !vid.src)) return;
       // Ensure mute state is consistent
       vid.muted = true;
       
@@ -837,6 +882,8 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     
     /* Play both the base panel (being covered) and the incoming panel (covering) */
     var nextIdx = (activeIdx < PANEL_COUNT - 1) ? activeIdx + 1 : undefined;
+    ensurePanelMedia(activeIdx);
+    if (nextIdx !== undefined) ensurePanelMedia(nextIdx);
     syncVideos(activeIdx, nextIdx);
 
     /* Position panels:
@@ -957,22 +1004,32 @@ function filterVideos(cat, btn) {
 
 // Auto-load video poster/cover images from data-poster attribute
 (function() {
-  document.querySelectorAll('.vw-card').forEach(card => {
-    const posterSrc = card.dataset.poster;
-    if (!posterSrc) return;
-    const posterEl = card.querySelector('.vw-poster');
-    if (!posterEl) return;
-    const img = new Image();
-    img.onload = () => {
-      posterEl.style.backgroundImage = `url('${posterSrc}')`;
-    };
-    img.src = posterSrc;
-  });
+  const posterObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const card = entry.target;
+      const posterSrc = card.dataset.poster;
+      const posterEl = card.querySelector('.vw-poster');
+      if (posterSrc && posterEl && !posterEl.style.backgroundImage) {
+        const img = new Image();
+        img.decoding = 'async';
+        img.onload = () => {
+          posterEl.style.backgroundImage = `url('${posterSrc}')`;
+        };
+        img.src = posterSrc;
+      }
+      observer.unobserve(card);
+    });
+  }, { rootMargin: '300px 0px' });
+
+  document.querySelectorAll('.vw-card').forEach(card => posterObserver.observe(card));
 })();
 
 // Hover muted preview — preloaded on viewport entry, plays instantly on hover
 // Exclusive playback: only one card plays at a time (prevents audio overlap on swipe)
 (function() {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
   const cardControllers = new Map();
 
   document.querySelectorAll('.vw-card').forEach(card => {
@@ -1025,27 +1082,9 @@ function filterVideos(cat, btn) {
     });
 
     card.addEventListener('mouseleave', () => {
-      if (window.matchMedia('(hover: none)').matches) return;
       pause(true);
     });
   });
-
-  // Mobile: Single shared observer — exclusive playback, only the most-visible card plays
-  if (window.matchMedia('(hover: none)').matches) {
-    const mobileObserver = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        const ctrl = cardControllers.get(e.target);
-        if (!ctrl) return;
-        if (e.isIntersecting) {
-          cardControllers.forEach((c, card) => { if (card !== e.target) c.pause(); });
-          ctrl.play();
-        } else {
-          ctrl.pause();
-        }
-      });
-    }, { threshold: 0.6 });
-    cardControllers.forEach((_ctrl, card) => mobileObserver.observe(card));
-  }
 })();
 
 // Cinematic modal player
@@ -1070,6 +1109,7 @@ function filterVideos(cat, btn) {
   if (!modal) return;
 
   var activeHls = null; // Track active HLS instance for cleanup
+  var modalScrollY = 0;
 
   function attachHLS(videoEl, src) {
     if (activeHls) { activeHls.destroy(); activeHls = null; }
@@ -1082,30 +1122,60 @@ function filterVideos(cat, btn) {
       } else if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
         // Safari native HLS
         videoEl.src = src;
+        videoEl.load();
         videoEl.play().catch(function(){});
       }
     } else {
       videoEl.src = src;
+      videoEl.load();
       videoEl.play().catch(function(){});
     }
+  }
+
+  function syncPlayToggle() {
+    if (!vmPlay) return;
+    vmPlay.innerHTML = vmVideo.paused
+      ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>'
+      : '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+  }
+
+  function syncMuteToggle() {
+    if (!vmMute) return;
+    vmMute.innerHTML = vmVideo.muted
+      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93L4.93 19.07"/></svg>'
+      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
   }
 
   function openModal(card) {
     const src = card.dataset.video;
     vmTitle.textContent = card.dataset.title || '';
     vmSub.textContent   = card.dataset.type  || '';
+    modalScrollY = window.scrollY || window.pageYOffset || 0;
+    vmVideo.muted = true;
+    vmVideo.playsInline = true;
+    vmVideo.setAttribute('muted', '');
+    vmVideo.setAttribute('playsinline', '');
+    vmVideo.setAttribute('webkit-playsinline', 'true');
+    syncMuteToggle();
 
     if (src) {
       attachHLS(vmVideo, src);
       vmStage.classList.add('vm-has-video');
       // Reset controls
-      if (vmPlay) vmPlay.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+      syncPlayToggle();
       if (vmFill) vmFill.style.width = '0%';
     } else {
       vmStage.classList.remove('vm-has-video');
+      syncPlayToggle();
     }
     modal.classList.add('vm-open');
+    document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${modalScrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
   }
 
   function closeModal() {
@@ -1114,7 +1184,16 @@ function filterVideos(cat, btn) {
     if (activeHls) { activeHls.destroy(); activeHls = null; }
     vmVideo.src = '';
     vmStage.classList.remove('vm-has-video');
+    document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    window.scrollTo(0, modalScrollY);
+    syncPlayToggle();
+    syncMuteToggle();
 
     // Pause any hover-preview videos that may still be playing on .vw-card elements
     document.querySelectorAll('.vw-poster video').forEach(function(v) {
@@ -1137,20 +1216,17 @@ function filterVideos(cat, btn) {
     vmPlay.addEventListener('click', () => {
       if (vmVideo.paused) {
         vmVideo.play();
-        vmPlay.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
       } else {
         vmVideo.pause();
-        vmPlay.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
       }
+      syncPlayToggle();
     });
   }
 
   if (vmMute) {
     vmMute.addEventListener('click', () => {
       vmVideo.muted = !vmVideo.muted;
-      vmMute.innerHTML = vmVideo.muted 
-        ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93L4.93 19.07"/></svg>'
-        : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
+      syncMuteToggle();
     });
   }
 
@@ -1194,6 +1270,8 @@ function filterVideos(cat, btn) {
       if (vmTime) vmTime.textContent = formatTime(vmVideo.currentTime);
       if (vmTrack) vmTrack.setAttribute('aria-valuenow', Math.round(pct));
     });
+    vmVideo.addEventListener('play', syncPlayToggle);
+    vmVideo.addEventListener('pause', syncPlayToggle);
   }
 
   if (vmTrack) {
@@ -1390,6 +1468,28 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   const dateTo = document.getElementById('dateTo');
 
   if (dateFrom && dateTo) {
+    const useNativeDateInputs = window.matchMedia('(max-width: 768px), (hover: none)').matches;
+    const today = new Date().toISOString().split('T')[0];
+
+    if (useNativeDateInputs) {
+      [dateFrom, dateTo].forEach(input => {
+        input.type = 'date';
+        input.min = today;
+        input.inputMode = 'none';
+        input.placeholder = '';
+      });
+
+      dateFrom.addEventListener('change', () => {
+        if (dateFrom.value) {
+          dateTo.min = dateFrom.value;
+          if (dateTo.value && dateTo.value < dateFrom.value) {
+            dateTo.value = dateFrom.value;
+          }
+        }
+      });
+      return;
+    }
+
     const fpFrom = flatpickr(dateFrom, {
       altInput: true,
       altFormat: "F j, Y", // e.g., "November 4, 2023" - what the user sees
@@ -1424,7 +1524,60 @@ class EtherealCarousel {
     this.counterCurrent = containerEl.querySelector('.ec-counter-current');
     this.counterTotal = containerEl.querySelector('.ec-counter-total');
     this._cachedCardW = 0;
+    this._nativeScrollTicking = false;
+    this._hasRenderedNative = false;
     this._bindEvents();
+  }
+
+  _useNativeScroll() {
+    return window.innerWidth <= 768;
+  }
+
+  _markNativeOffsets() {
+    this.filteredItems.forEach((item, i) => {
+      const offset = i - this.currentIndex;
+      if (offset === 0) item.setAttribute('data-ec-offset', '0');
+      else item.setAttribute('data-ec-offset', offset < 0 ? '-1' : '1');
+    });
+  }
+
+  _scrollToCurrentItem(smooth) {
+    if (!this._useNativeScroll()) return;
+    const item = this.filteredItems[this.currentIndex];
+    if (!item) return;
+    const trackRect = this.track.getBoundingClientRect();
+    const itemRect = item.getBoundingClientRect();
+    const targetLeft = this.track.scrollLeft + (itemRect.left - trackRect.left) - ((trackRect.width - itemRect.width) / 2);
+    this.track.scrollTo({
+      left: Math.max(0, targetLeft),
+      behavior: smooth ? 'smooth' : 'auto'
+    });
+  }
+
+  _syncIndexFromScroll() {
+    if (!this._useNativeScroll() || !this.filteredItems.length) return;
+    const trackRect = this.track.getBoundingClientRect();
+    const trackCenter = trackRect.left + (trackRect.width / 2);
+    let nextIndex = this.currentIndex;
+    let minDistance = Infinity;
+
+    this.filteredItems.forEach((item, i) => {
+      const rect = item.getBoundingClientRect();
+      const center = rect.left + (rect.width / 2);
+      const distance = Math.abs(center - trackCenter);
+      if (distance < minDistance) {
+        minDistance = distance;
+        nextIndex = i;
+      }
+    });
+
+    if (nextIndex !== this.currentIndex) {
+      this.currentIndex = nextIndex;
+      this._markNativeOffsets();
+      this._updateCounter();
+      this._updateNav();
+      this._triggerLazyLoad();
+    }
   }
 
   rebuild() {
@@ -1460,6 +1613,26 @@ class EtherealCarousel {
     const allItems = this.track.querySelectorAll(this.itemSelector);
     const filtered = this.filteredItems;
     const ci = this.currentIndex;
+
+    if (this._useNativeScroll()) {
+      this.container.classList.add('is-native-scroll');
+      this.track.style.transform = '';
+      allItems.forEach(item => {
+        item.style.animation = 'none';
+        item.style.transform = 'none';
+        item.style.pointerEvents = item.style.display === 'none' ? 'none' : 'auto';
+      });
+      this._markNativeOffsets();
+      this._updateCounter();
+      this._updateNav();
+      this._triggerLazyLoad();
+      this._scrollToCurrentItem(this._hasRenderedNative);
+      this._hasRenderedNative = true;
+      return;
+    }
+
+    this.container.classList.remove('is-native-scroll');
+    this._hasRenderedNative = false;
 
     // Determine width of the ACTIVE card to calculate spacing dynamically
     const activeItem = filtered[ci];
@@ -1557,6 +1730,7 @@ class EtherealCarousel {
 
     // Click on side cards → navigate (capture phase prevents card-level handlers from firing)
     this.container.addEventListener('click', (e) => {
+      if (this._useNativeScroll()) return;
       const card = e.target.closest(this.itemSelector);
       if (!card) return;
       const offset = card.getAttribute('data-ec-offset');
@@ -1587,6 +1761,7 @@ class EtherealCarousel {
     let touchStartX = 0, touchStartY = 0, touchDX = 0, touchIsHorizontal = null;
 
     this.container.addEventListener('touchstart', (e) => {
+      if (this._useNativeScroll()) return;
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
       touchDX = 0;
@@ -1595,6 +1770,7 @@ class EtherealCarousel {
     }, { passive: true });
 
     this.container.addEventListener('touchmove', (e) => {
+      if (this._useNativeScroll()) return;
       const dx = e.touches[0].clientX - touchStartX;
       const dy = e.touches[0].clientY - touchStartY;
       if (touchIsHorizontal === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
@@ -1608,6 +1784,7 @@ class EtherealCarousel {
     }, { passive: false });
 
     this.container.addEventListener('touchend', () => {
+      if (this._useNativeScroll()) return;
       this.track.style.transition = 'transform 0.3s ease';
       this.track.style.transform = '';
       if (Math.abs(touchDX) > 30) {
@@ -1620,6 +1797,7 @@ class EtherealCarousel {
     // Mouse drag swipe (trackpad / click-and-drag)
     let mouseDown = false, mouseStartX = 0, mouseMoved = false;
     this.container.addEventListener('mousedown', (e) => {
+      if (this._useNativeScroll()) return;
       // Ignore clicks on nav buttons
       if (e.target.closest('.ec-nav')) return;
       mouseDown = true;
@@ -1645,6 +1823,7 @@ class EtherealCarousel {
     let wheelTimer = null;
     let wheelAccum = 0;
     this.container.addEventListener('wheel', (e) => {
+      if (this._useNativeScroll()) return;
       // Only intercept horizontal gestures (trackpad two-finger swipe left/right)
       // Let vertical scroll pass through so user can scroll down the page
       if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
@@ -1669,6 +1848,15 @@ class EtherealCarousel {
         this.render();
       }, 150);
     });
+
+    this.track.addEventListener('scroll', () => {
+      if (!this._useNativeScroll() || this._nativeScrollTicking) return;
+      this._nativeScrollTicking = true;
+      requestAnimationFrame(() => {
+        this._nativeScrollTicking = false;
+        this._syncIndexFromScroll();
+      });
+    }, { passive: true });
 
   }
 }

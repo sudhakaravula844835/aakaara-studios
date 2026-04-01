@@ -222,6 +222,10 @@ nav.scrolled {
   perspective: 900px;
   perspective-origin: 50% 30%;
 }
+#heroContent,
+#heroScroll { opacity: 1; }
+body.intro-active #heroContent,
+body.intro-active #heroScroll { opacity: 0; }
 .hero-title .v-dots {
   position: absolute; top: 0.14em; left: 0.9em;
   display: flex; gap: 0.14em;
@@ -880,6 +884,42 @@ nav.scrolled {
   touch-action: pan-y;
   /* Optimization: Tell browser to handle vertical scroll normally but let JS handle horizontal */
   touch-action: pan-y;
+}
+
+.ethereal-carousel.is-native-scroll {
+  perspective: none;
+  overflow: hidden;
+}
+.ethereal-carousel.is-native-scroll .ec-track {
+  display: flex !important;
+  align-items: center;
+  gap: 1rem !important;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  transform: none !important;
+}
+.ethereal-carousel.is-native-scroll .ec-track::-webkit-scrollbar { display: none; }
+.ethereal-carousel.is-native-scroll .gallery-item,
+.ethereal-carousel.is-native-scroll .vw-card {
+  position: relative !important;
+  top: auto;
+  left: auto;
+  flex: 0 0 auto;
+  margin: 0;
+  transform: none !important;
+  pointer-events: auto !important;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  will-change: auto;
+  touch-action: auto;
 }
 
 /* Fast transition for category spin animation */
@@ -2413,6 +2453,19 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .ethereal-carousel .gallery-item { width: min(260px, 70vw); }
   .ethereal-carousel .vw-card,
   .ethereal-carousel .vw-card.wide { width: min(380px, 85vw); }
+  .ethereal-carousel.is-native-scroll { perspective: none; overflow: hidden; }
+  #portfolioCarousel.is-native-scroll .ec-track {
+    padding-inline: max(1rem, calc((100vw - min(260px, 70vw)) / 2));
+  }
+  #videoCarousel.is-native-scroll .ec-track {
+    padding-inline: max(1rem, calc((100vw - min(380px, 85vw)) / 2));
+  }
+  .ethereal-carousel.is-native-scroll .gallery-item { width: min(260px, 70vw); }
+  .ethereal-carousel.is-native-scroll .vw-card,
+  .ethereal-carousel.is-native-scroll .vw-card.wide {
+    width: min(380px, 85vw);
+    aspect-ratio: 16 / 9;
+  }
   .ec-nav { width: 38px; height: 38px; }
   .ec-prev { left: 0.5rem; }
   .ec-next { right: 0.5rem; }
@@ -2434,12 +2487,42 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   }
   .vw-filters::-webkit-scrollbar { display: none; }
   .vw-filters button { flex-shrink: 0; white-space: nowrap; }
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .flatpickr-input {
+    font-size: 16px;
+  }
 
 }
 
 /* ── Small phones (≤480px) — prevent text overflow, tighten spacing ── */
 @media (max-width: 480px) {
-  .hero-title { font-size: clamp(2rem, 9vw, 3rem); }
+  .hero-title {
+    font-size: clamp(1.85rem, 8.4vw, 2.65rem);
+    letter-spacing: 0.12em;
+  }
+  .hero-title .v-dots {
+    top: 0.12em;
+    left: 0.78em;
+    gap: 0.12em;
+  }
+  .nav-logo-text {
+    font-size: 1.35rem;
+    letter-spacing: 0.08em;
+  }
+  .nav-logo-text .nav-logo-dots {
+    top: 0.36em;
+    left: 0.66em;
+  }
+  .footer-logo-text {
+    font-size: 1.35rem;
+    letter-spacing: 0.18em;
+  }
+  .footer-logo-dots {
+    top: 0.34em;
+    left: 0.82em;
+  }
   .section-title { font-size: clamp(1.4rem, 6vw, 1.8rem); }
   .section { padding: 3rem 1.2rem; }
   .sw-strip-thumb { width: 44px; height: 34px; }
@@ -2658,6 +2741,12 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .vm-stage:hover .vm-controls { opacity: 1; }
 .vm-ctrl-btn { color: var(--ivory); opacity: 0.8; transition: opacity 0.3s; display: flex; align-items: center; }
 .vm-ctrl-btn:hover { opacity: 1; color: var(--rose); }
+@media (hover: none) {
+  .vm-controls {
+    opacity: 1;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+}
 
 /* Skip overlays — YouTube-style on-screen indicators */
 .vm-skip-overlay {
