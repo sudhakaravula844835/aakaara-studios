@@ -2,11 +2,3 @@
   # No build step needed — site is static HTML/CSS/JS
   command = "echo 'Static site — no build needed'"
   publish = "."
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net use.typekit.net; style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net use.typekit.net; font-src 'self' fonts.gstatic.com use.typekit.net p.typekit.net; img-src 'self' data: https:; media-src 'self' https://*.b-cdn.net; connect-src 'self' formspree.io https://*.b-cdn.net; frame-ancestors 'none'"
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"

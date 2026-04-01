@@ -1183,7 +1183,10 @@ function filterVideos(cat, btn) {
 
   if (vmVideo) {
     if (vmTrack) {
-      vmTrack.setAttribute('aria-valuenow', '0');
+      vmTrack.setAttribute('role', 'slider');
+      vmTrack.setAttribute('aria-label', 'Video progress');
+      vmTrack.setAttribute('aria-valuemin', '0');
+      vmTrack.setAttribute('aria-valuemax', '100');
     }
     vmVideo.addEventListener('timeupdate', () => {
       const pct = (vmVideo.currentTime / vmVideo.duration) * 100;
@@ -1401,10 +1404,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
       altFormat: "F j, Y",
       dateFormat: "Y-m-d",
       minDate: "today"
-    });
-    // Reset tabindex — flatpickr on mobile sets tabindex="1" which violates WCAG
-    document.querySelectorAll('.flatpickr-input').forEach(el => {
-      if (el.getAttribute('tabindex') === '1') el.setAttribute('tabindex', '0');
     });
   }
 })();
