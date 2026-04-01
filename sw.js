@@ -1,55 +1,53 @@
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v1';
 const STATIC_CACHE  = `aakaara-static-${CACHE_VERSION}`;
 const IMAGE_CACHE   = `aakaara-images-${CACHE_VERSION}`;
 
-// Only cache the bare minimum required for the shell
 const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/styles.css',
   '/Script.js',
-  '/favicon.svg'
+  '/favicon.svg',
+  '/manifest.json'
 ];
 
 // ── Install: pre-cache shell assets ──────────────────────────────
 self.addEventListener('install', event => {
-  self.skipWaiting();
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then(cache => cache.addAll(PRECACHE_URLS))
+      .then(() => self.skipWaiting())
   );
 });
 
 // ── Activate: purge old caches ────────────────────────────────────
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys.filter(k => k !== STATIC_CACHE && k !== IMAGE_CACHE)
-            .map(k => caches.delete(k))
-      );
-    }).then(() => self.clients.claim())
+    caches.keys().then(keys =>
+      Promise.all(
+        keys
+          .filter(k => k !== STATIC_CACHE && k !== IMAGE_CACHE)
+          .map(k => caches.delete(k))
+      )
+    ).then(() => self.clients.claim())
   );
 });
 
 // ── Fetch ─────────────────────────────────────────────────────────
 self.addEventListener('fetch', event => {
   const { request } = event;
-  
-  // 1. Video/HLS: Network-only (never cache huge media files)
-  if (request.destination === 'video' || request.url.includes('.m3u8') || request.url.includes('.ts')) {
-    return; 
-  }
+  const url = new URL(request.url);
 
+  // Only handle same-origin and CDN image requests
   if (request.method !== 'GET') return;
 
-  // 2. HTML: Network-first (ensure user sees updated portfolio content)
+  // HTML pages → network-first (always fresh content)
   if (request.headers.get('Accept')?.includes('text/html')) {
     event.respondWith(
       fetch(request)
         .then(res => {
-          const copy = res.clone();
-          caches.open(STATIC_CACHE).then(cache => cache.put(request, copy));
+          const clone = res.clone();
+          caches.open(STATIC_CACHE).then(c => c.put(request, clone));
           return res;
         })
         .catch(() => caches.match(request))
@@ -57,23 +55,8 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 3. CSS/JS/Fonts: Stale-while-revalidate (speed + background update)
-  if (request.destination === 'style' || request.destination === 'script' || request.destination === 'font') {
-    event.respondWith(
-      caches.match(request).then(cached => {
-        const networked = fetch(request).then(res => {
-          const copy = res.clone();
-          caches.open(STATIC_CACHE).then(cache => cache.put(request, copy));
-          return res;
-        });
-        return cached || networked;
-      })
-    );
-    return;
-  }
-
-  // 4. Images: Cache-first
-  if (request.destination === 'image') {
+  // Images → cache-first
+  if (request.destination === 'image' || /\.(jpe?g|png|gif|webp|svg|avif)$/i.test(url.pathname)) {
     event.respondWith(
       caches.open(IMAGE_CACHE).then(cache =>
         cache.match(request).then(cached => {
@@ -87,4 +70,16 @@ self.addEventListener('fetch', event => {
     );
     return;
   }
+
+  // CSS / JS / fonts → cache-first with network fallback
+  event.respondWith(
+    caches.match(request).then(cached =>
+      cached || fetch(request).then(res => {
+        if (res.ok) {
+          caches.open(STATIC_CACHE).then(c => c.put(request, res.clone()));
+        }
+        return res;
+      })
+    )
+  );
 });
