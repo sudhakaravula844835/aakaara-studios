@@ -28,6 +28,58 @@
     currentPageLink.classList.add('active');
   }
 })();
+
+const externalAssetPromises = new Map();
+
+function loadScriptOnce(src, globalName) {
+  if (globalName && window[globalName]) return Promise.resolve(window[globalName]);
+
+  const cacheKey = `script:${src}`;
+  if (externalAssetPromises.has(cacheKey)) return externalAssetPromises.get(cacheKey);
+
+  const promise = new Promise((resolve, reject) => {
+    let script = Array.from(document.scripts).find(node => node.src === src);
+    const cleanup = () => {
+      script.removeEventListener('load', onLoad);
+      script.removeEventListener('error', onError);
+    };
+    const onLoad = () => {
+      cleanup();
+      resolve(globalName ? window[globalName] : script);
+    };
+    const onError = () => {
+      cleanup();
+      externalAssetPromises.delete(cacheKey);
+      reject(new Error(`Failed to load ${src}`));
+    };
+
+    if (!script) {
+      script = document.createElement('script');
+      script.src = src;
+      script.async = true;
+      document.head.appendChild(script);
+    }
+
+    if (globalName && window[globalName]) {
+      resolve(window[globalName]);
+      return;
+    }
+
+    script.addEventListener('load', onLoad, { once: true });
+    script.addEventListener('error', onError, { once: true });
+  });
+
+  externalAssetPromises.set(cacheKey, promise);
+  return promise;
+}
+
+function ensureHlsLibrary() {
+  return loadScriptOnce('https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js', 'Hls');
+}
+
+function ensureFlatpickrLibrary() {
+  return loadScriptOnce('https://cdn.jsdelivr.net/npm/flatpickr', 'flatpickr');
+}
 // ═══════ CINEMATIC INTRO ANIMATION ═══════
 (function() {
   const intro = document.getElementById('intro');
@@ -694,6 +746,22 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     return parseFloat(val);
   }
 
+  function attachServiceHls(vid, videoSrc, onReady) {
+    ensureHlsLibrary().then(function(HlsCtor) {
+      if (!HlsCtor || !HlsCtor.isSupported()) return;
+      var hls = new HlsCtor();
+      hls.loadSource(videoSrc);
+      hls.attachMedia(vid);
+      hls.on(HlsCtor.Events.MANIFEST_PARSED, function() {
+        onReady();
+        vid.play().catch(function(){});
+      });
+      serviceHlsInstances.push(hls);
+    }).catch(function() {
+      // Allow a later retry if the library could not be fetched yet.
+    });
+  }
+
   var panelMediaReady = panels.map(function() { return false; });
 
   function ensurePanelMedia(i) {
@@ -733,12 +801,11 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
         });
       }
 
-      if (videoSrc.indexOf('.m3u8') !== -1 && typeof Hls !== 'undefined' && Hls.isSupported()) {
-        var hls = new Hls();
-        hls.loadSource(videoSrc);
-        hls.attachMedia(vid);
-        hls.on(Hls.Events.MANIFEST_PARSED, function() { vid.play().catch(function(){}); });
-        serviceHlsInstances.push(hls); // Store reference
+      if (videoSrc.indexOf('.m3u8') !== -1 && vid.canPlayType('application/vnd.apple.mpegurl')) {
+        vid.setAttribute('src', videoSrc);
+        vid.load();
+      } else if (videoSrc.indexOf('.m3u8') !== -1) {
+        attachServiceHls(vid, videoSrc, showVideo);
       } else {
         vid.setAttribute('src', videoSrc);
         vid.load();
@@ -1110,26 +1177,56 @@ function filterVideos(cat, btn) {
 
   var activeHls = null; // Track active HLS instance for cleanup
   var modalScrollY = 0;
+  var modalRequestId = 0;
 
-  function attachHLS(videoEl, src) {
+  function lockModalScroll(scrollY) {
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+  }
+
+  function restoreModalScroll(scrollY) {
+    const root = document.documentElement;
+    const previousBehavior = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    window.scrollTo(0, scrollY);
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollY);
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollY);
+        root.style.scrollBehavior = previousBehavior;
+      });
+    });
+  }
+
+  async function attachHLS(videoEl, src, requestId) {
     if (activeHls) { activeHls.destroy(); activeHls = null; }
     if (src.includes('.m3u8')) {
-      if (typeof Hls !== 'undefined' && Hls.isSupported()) {
-        activeHls = new Hls();
-        activeHls.loadSource(src);
-        activeHls.attachMedia(videoEl);
-        activeHls.on(Hls.Events.MANIFEST_PARSED, function() { videoEl.play().catch(function(){}); });
-      } else if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
+      if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
         // Safari native HLS
         videoEl.src = src;
         videoEl.load();
         videoEl.play().catch(function(){});
+        return;
       }
-    } else {
-      videoEl.src = src;
-      videoEl.load();
-      videoEl.play().catch(function(){});
+
+      const HlsCtor = await ensureHlsLibrary();
+      if (requestId !== modalRequestId || !HlsCtor || !HlsCtor.isSupported()) return;
+
+      activeHls = new HlsCtor();
+      activeHls.loadSource(src);
+      activeHls.attachMedia(videoEl);
+      activeHls.on(HlsCtor.Events.MANIFEST_PARSED, function() { videoEl.play().catch(function(){}); });
+      return;
     }
+
+    videoEl.src = src;
+    videoEl.load();
+    videoEl.play().catch(function(){});
   }
 
   function syncPlayToggle() {
@@ -1146,8 +1243,9 @@ function filterVideos(cat, btn) {
       : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
   }
 
-  function openModal(card) {
+  async function openModal(card) {
     const src = card.dataset.video;
+    const requestId = ++modalRequestId;
     vmTitle.textContent = card.dataset.title || '';
     vmSub.textContent   = card.dataset.type  || '';
     modalScrollY = window.scrollY || window.pageYOffset || 0;
@@ -1157,9 +1255,12 @@ function filterVideos(cat, btn) {
     vmVideo.setAttribute('playsinline', '');
     vmVideo.setAttribute('webkit-playsinline', 'true');
     syncMuteToggle();
+    modal.classList.add('vm-open');
+    lockModalScroll(modalScrollY);
 
     if (src) {
-      attachHLS(vmVideo, src);
+      await attachHLS(vmVideo, src, requestId);
+      if (requestId !== modalRequestId) return;
       vmStage.classList.add('vm-has-video');
       // Reset controls
       syncPlayToggle();
@@ -1168,17 +1269,11 @@ function filterVideos(cat, btn) {
       vmStage.classList.remove('vm-has-video');
       syncPlayToggle();
     }
-    modal.classList.add('vm-open');
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${modalScrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.width = '100%';
   }
 
   function closeModal() {
+    modalRequestId += 1;
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     modal.classList.remove('vm-open');
     vmVideo.pause();
     if (activeHls) { activeHls.destroy(); activeHls = null; }
@@ -1191,7 +1286,7 @@ function filterVideos(cat, btn) {
     document.body.style.left = '';
     document.body.style.right = '';
     document.body.style.width = '';
-    window.scrollTo(0, modalScrollY);
+    restoreModalScroll(modalScrollY);
     syncPlayToggle();
     syncMuteToggle();
 
@@ -1470,6 +1565,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   if (dateFrom && dateTo) {
     const useNativeDateInputs = window.matchMedia('(max-width: 768px), (hover: none)').matches;
     const today = new Date().toISOString().split('T')[0];
+    let flatpickrInitialized = false;
 
     if (useNativeDateInputs) {
       [dateFrom, dateTo].forEach(input => {
@@ -1490,21 +1586,42 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
       return;
     }
 
-    const fpFrom = flatpickr(dateFrom, {
-      altInput: true,
-      altFormat: "F j, Y", // e.g., "November 4, 2023" - what the user sees
-      dateFormat: "Y-m-d", // Actual value submitted in the form (e.g., "2023-11-04")
-      minDate: "today", // Prevents selecting past dates
-      onChange: function(selectedDates, dateStr, instance) {
-        fpTo.set('minDate', dateStr);
-      }
+    const initializeFlatpickr = () => {
+      if (flatpickrInitialized) return Promise.resolve();
+      return ensureFlatpickrLibrary().then((flatpickrLib) => {
+        if (flatpickrInitialized || typeof flatpickrLib !== 'function') return;
+        flatpickrInitialized = true;
+        const fpFrom = flatpickrLib(dateFrom, {
+          altInput: true,
+          altFormat: "F j, Y",
+          dateFormat: "Y-m-d",
+          minDate: "today",
+          onChange: function(selectedDates, dateStr, instance) {
+            fpTo.set('minDate', dateStr);
+          }
+        });
+        const fpTo = flatpickrLib(dateTo, {
+          altInput: true,
+          altFormat: "F j, Y",
+          dateFormat: "Y-m-d",
+          minDate: "today"
+        });
+      });
+    };
+
+    [dateFrom, dateTo].forEach(input => {
+      input.addEventListener('focus', () => { initializeFlatpickr(); }, { once: true });
     });
-    const fpTo = flatpickr(dateTo, {
-      altInput: true,
-      altFormat: "F j, Y",
-      dateFormat: "Y-m-d",
-      minDate: "today"
-    });
+
+    const contactSection = document.getElementById('contact');
+    if (contactSection && 'IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (!entries.some(entry => entry.isIntersecting)) return;
+        observer.disconnect();
+        initializeFlatpickr();
+      }, { rootMargin: '260px 0px' });
+      observer.observe(contactSection);
+    }
   }
 })();
 
@@ -1862,6 +1979,15 @@ class EtherealCarousel {
 }
 
 // Lazy-load helper for gallery items
+function shouldPreloadGalleryFrames() {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const onTouchDevice = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  if (onTouchDevice) return false;
+  if (connection && connection.saveData) return false;
+  if (connection && /(^|slow-)?2g|3g/.test(connection.effectiveType || '')) return false;
+  return true;
+}
+
 function lazyLoadGalleryItem(item) {
   const bg = item.querySelector('.gi-bg');
   if (!bg || bg.style.backgroundImage) return; // Already loaded
@@ -1877,11 +2003,13 @@ function lazyLoadGalleryItem(item) {
       if (item.dataset.bgPos) bg.style.backgroundPosition = item.dataset.bgPos;
     };
     img.src = coverSrc;
-    // Preload first few gallery images so opening feels instant
-    if (!item.dataset.comingSoon && folder) {
+    // Keep the first-click experience snappy on desktop without front-loading
+    // several multi-megabyte gallery frames on mobile.
+    if (!item.dataset.comingSoon && folder && shouldPreloadGalleryFrames()) {
       const count = parseInt(item.dataset.count || '1', 10);
-      for (let i = 2; i <= Math.min(4, count); i++) {
+      for (let i = 2; i <= Math.min(2, count); i++) {
         const preImg = new Image();
+        preImg.decoding = 'async';
         preImg.src = `${folder}/${i}.${ext}`;
       }
     }

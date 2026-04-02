@@ -77,5 +77,27 @@ for (const [label, device] of mobileDevices) {
       expect(formState.dateMin).not.toBe('');
       expect(formState.inputFontSize).toBe('16px');
     });
+
+    test('defers heavy libraries and preserves scroll position after closing a film', async ({ page }) => {
+      const initialState = await page.evaluate(() => ({
+        hasHlsScript: [...document.scripts].some(script => script.src.includes('hls.js')),
+        hasFlatpickrScript: [...document.scripts].some(script => script.src.includes('flatpickr')),
+      }));
+
+      expect(initialState.hasHlsScript).toBe(false);
+      expect(initialState.hasFlatpickrScript).toBe(false);
+
+      await page.locator('#video-works').scrollIntoViewIfNeeded();
+      await page.waitForTimeout(300);
+      const before = await page.evaluate(() => window.scrollY);
+
+      await page.locator('.vw-card').first().click();
+      await expect(page.locator('#videoModal')).toHaveClass(/vm-open/);
+      await page.locator('#vmClose').click();
+      await expect(page.locator('#videoModal')).not.toHaveClass(/vm-open/);
+
+      const after = await page.evaluate(() => window.scrollY);
+      expect(Math.abs(after - before)).toBeLessThanOrEqual(2);
+    });
   });
 }
