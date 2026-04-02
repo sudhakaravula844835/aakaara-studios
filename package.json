@@ -1,0 +1,16 @@
+{
+  "name": "aakaara-studios-v2",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "http-server": "^14.1.1",
+    "jsdom": "^23.0.0",
+    "vitest": "^1.0.0"
+  }
+}

@@ -92,6 +92,8 @@ test.describe('Aakaara Studios Portfolio', () => {
     await page.route('https://formspree.io/f/xlgwznnz', () => { requestSent = true; });
 
     await page.fill('#contactName', 'Bot User');
+    await page.fill('#contactEmail', 'bot@example.com');
+    await page.selectOption('#contactEventType', 'Wedding');
     // Use evaluate to bypass visibility checks for the hidden honeypot field
     await page.locator('input[name="_gotcha"]').evaluate(node => node.value = 'I am a robot');
     await page.fill('#contactMessage', 'This should not be sent');

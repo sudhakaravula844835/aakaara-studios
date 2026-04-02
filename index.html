@@ -594,10 +594,10 @@
 -->
 <section class="section section-dark" id="video-works">
   <div class="container">
-    <div class="reveal" style="animation-delay: 0.2s;">
-      <div class="section-tag">Moving Images</div>
-      <div class="section-title" style="color:var(--ivory)">Video Works</div>
-      <div class="section-desc" style="max-width: 580px;">Cinematic films for weddings, engagements & life's most intimate milestones.</div>
+    <div class="video-intro" id="videoIntro">
+      <div class="section-tag" id="videoEyebrow">Moving Images</div>
+      <div class="section-title" id="videoTitle" style="color:var(--ivory)">Video Works</div>
+      <div class="section-desc" id="videoDesc" style="max-width: 580px;">Cinematic films for weddings, engagements & life's most intimate milestones.</div>
     </div>
     <div class="vw-filters reveal">
       <button class="active" data-filter="all">All</button>
@@ -610,23 +610,6 @@
     </div>
     <div class="ethereal-carousel" id="videoCarousel">
     <div class="vw-grid ec-track reveal" id="vwGrid">
-
-      <!-- ENGAGEMENT VIDEO -->
-      <div class="vw-card vw-gi-1" data-vcat="engagement" data-video="https://vz-757250d0-999.b-cdn.net/f8156d9b-53cb-415d-9d0a-c0fc05ba26e1/playlist.m3u8" data-title="Vyshnavi & Daniel" data-type="Engagement Film" data-poster="/images/video-covers/engagement/vyshnavi-daniel.jpg">
-        <div class="vw-poster vw-gi-1"></div>
-        <div class="vw-play-wrap">
-          <div class="vw-play-ring"></div>
-          <div class="vw-play-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          </div>
-        </div>
-        <div class="vw-overlay">
-          <div class="vw-badge">Engagement</div>
-          <h4>Vyshnavi & Daniel</h4>
-          <p>Engagement Film</p>
-        </div>
-        <div class="vw-duration">Full Film</div>
-      </div>
 
       <!-- WEDDING VIDEO -->
       <div class="vw-card wide vw-gi-2" data-vcat="wedding" data-video="https://vz-757250d0-999.b-cdn.net/37fbf5f0-9b20-4186-801e-d4955af125e9/playlist.m3u8" data-title="Pooja & Amit" data-type="Wedding Film" data-poster="/images/video-covers/wedding/pooja-amit/cover.jpg">
@@ -643,6 +626,23 @@
           <p>Wedding Film</p>
         </div>
         <div class="vw-duration">Highlight</div>
+      </div>
+
+      <!-- ENGAGEMENT VIDEO -->
+      <div class="vw-card vw-gi-1" data-vcat="engagement" data-video="https://vz-757250d0-999.b-cdn.net/f8156d9b-53cb-415d-9d0a-c0fc05ba26e1/playlist.m3u8" data-title="Vyshnavi & Daniel" data-type="Engagement Film" data-poster="/images/video-covers/engagement/vyshnavi-daniel.jpg">
+        <div class="vw-poster vw-gi-1"></div>
+        <div class="vw-play-wrap">
+          <div class="vw-play-ring"></div>
+          <div class="vw-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="vw-overlay">
+          <div class="vw-badge">Engagement</div>
+          <h4>Vyshnavi & Daniel</h4>
+          <p>Engagement Film</p>
+        </div>
+        <div class="vw-duration">Full Film</div>
       </div>
       <div class="vw-card wide vw-gi-2" data-vcat="wedding" data-video="https://vz-757250d0-999.b-cdn.net/9003fec7-04b8-4e5a-95f9-6f659354e0dc/playlist.m3u8" data-title="Abhinav & Megha" data-type="Wedding Film" data-poster="/images/video-covers/wedding/abhinav-megha/cover.jpg">
         <div class="vw-poster vw-gi-2"></div>
@@ -1053,22 +1053,23 @@
         <div class="about-name-line"></div>
       </div>
       <div class="about-text reveal">
-        <div class="section-tag">Our Story</div>
-        <div class="section-title">Where Every Click Reveals<br>the Artistry of Love</div>
-        <p>We don't just take photographs — we hunt for the light that lives between two people. That stolen glance during the pheras. The nervous laugh before a first look. The quiet exhale when a mother holds her belly and imagines the future.</p>
-        <p>Aakaara Studios was born from a simple truth: love is the most beautiful thing in the world, and it deserves to be captured with reverence. Based in New York City with roots running deep into South Indian heritage, we bring a perspective that honors both tradition and the electric energy of the city.</p>
-        <p>Our name comes from the ancient Sanskrit word meaning "shape" and "form" — because that's what we do: we give shape to your most fleeting, most precious emotions and transform them into art you can hold forever.</p>
-        <p class="about-quote">We work across three registers — cinematic, editorial, and intimate — because your story decides the aesthetic, not the other way around.</p>
+        <div class="section-tag">About the Founder</div>
+        <h2 class="section-title">Where Every Click Reveals<br>the Artistry of Love</h2>
+        <p class="about-lead">Sudhakar leads Aakaara Studios NYC with a visual language shaped by cinematic storytelling, editorial restraint, and South Indian cultural sensitivity.</p>
+        <p>We look for what happens between the obvious moments: the hand squeeze before the ceremony, the breath between laughs, the glance no one else noticed. That is where the photograph starts to feel lived in, not just posed.</p>
+        <p>Based in New York City, our work moves between metropolitan energy and deeply personal ritual. We photograph with reverence for tradition, but never at the cost of intimacy, elegance, or emotional truth.</p>
+        <p>The name Aakaara comes from the Sanskrit idea of shape and form. That belief guides every frame we make: to give shape to feelings that are fleeting in the moment and lasting in memory.</p>
+        <p class="about-quote">Your story sets the aesthetic. We move between cinematic, editorial, and intimate so the work feels personal, never templated.</p>
         <div class="about-sanskrit">
           <span class="telugu" lang="te">ఆకారం(Ākāram)</span> <span style="color:rgba(30,26,22,0.12)">·</span>
           <span class="devnag" lang="hi">आकार</span> <span style="color:rgba(30,26,22,0.12)">·</span>
           <span class="english">Giving Shape to What You Feel</span>
         </div>
         <div class="about-symbolism">
-          <div class="symbol-title">
+          <h3 class="symbol-title">
             <div class="symbol-dots"><span></span><span></span></div>
             The Visarga (विसर्ग)
-          </div>
+          </h3>
           <p class="symbol-desc">
             The twin dots in our logo are inspired by the visarga (ः), representing duality: two people, two lives becoming one. It's the heart of our focus on couples and weddings.
           </p>
@@ -1077,6 +1078,10 @@
           <div class="stat"><h4>200+</h4><p>Stories captured</p></div>
           <div class="stat"><h4>4</h4><p>Years of craft</p></div>
           <div class="stat"><h4>3</h4><p>Countries</p></div>
+        </div>
+        <div class="about-actions">
+          <a href="#contact" class="about-cta about-cta-primary">Book a Session</a>
+          <a href="couple-portraits.html#couple-experience" class="about-cta about-cta-secondary" onclick="sessionStorage.setItem('skipIntro','1'); sessionStorage.setItem('returnScrollY', window.scrollY)">Explore The Experience</a>
         </div>
       </div>
     </div>
@@ -1151,7 +1156,8 @@
           <span>Family Portraits</span>
         </div>
         <a href="#contact" class="sov-link">Inquire <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
-        <a href="couple-portraits.html" class="sov-link sov-link-view" onclick="sessionStorage.setItem('skipIntro','1'); sessionStorage.setItem('returnScrollY', window.scrollY)">View Work</a>
+        <a href="couple-portraits.html#couple-gallery" class="sov-link sov-link-view" onclick="sessionStorage.setItem('skipIntro','1'); sessionStorage.setItem('returnScrollY', window.scrollY)">View Work</a>
+        <a href="couple-portraits.html#couple-experience" class="sov-link sov-link-view" onclick="sessionStorage.setItem('skipIntro','1'); sessionStorage.setItem('returnScrollY', window.scrollY)">The Experience</a>
       </div>
       <div class="sov-card sov-card--maternity">
         <div class="sov-stamp sov-stamp--maternity" aria-hidden="true">

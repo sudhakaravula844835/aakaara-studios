@@ -10,8 +10,9 @@ videos/
 *.mp4
 *.mov
 node_modules/
-package-lock.json
-package.json
+playwright-report/
+test-results/
+framer-lab.html
 tools/generate-card-pdf.py
 tools/render-card-pdf.mjs
 tools/aakaara-business-card-print.pdf

@@ -4,48 +4,58 @@ import fs from 'fs';
 import path from 'path';
 
 const html = fs.readFileSync(path.resolve(__dirname, './couple-portraits.html'), 'utf8');
-const script = fs.readFileSync(path.resolve(__dirname, './Script.js'), 'utf8');
 
 describe('Location Guide Interaction', () => {
   let document;
+  let window;
 
-  beforeEach(() => {
-    const dom = new JSDOM(html, { runScripts: "dangerously" });
-    document = dom.window.document;
-    const { window } = dom;
+  beforeEach(async () => {
+    const dom = new JSDOM(html, {
+      runScripts: 'dangerously',
+      url: 'https://www.aakaarastudiosnyc.com/couple-portraits.html',
+      beforeParse(parsedWindow) {
+        parsedWindow.IntersectionObserver = class IntersectionObserver {
+          observe() {}
+          unobserve() {}
+          disconnect() {}
+        };
+        parsedWindow.matchMedia = () => ({
+          matches: false,
+          media: '',
+          addEventListener() {},
+          removeEventListener() {},
+          addListener() {},
+          removeListener() {},
+          dispatchEvent() { return false; }
+        });
+        parsedWindow.requestAnimationFrame = (callback) => setTimeout(() => callback(0), 0);
+        parsedWindow.cancelAnimationFrame = (id) => clearTimeout(id);
+        parsedWindow.scrollTo = () => {};
+      }
+    });
 
-    // Mock missing browser globals in JSDOM context
-    window.IntersectionObserver = class IntersectionObserver {
-      constructor() {}
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    };
-    window.requestAnimationFrame = (callback) => setTimeout(callback, 0);
-    window.cancelAnimationFrame = (id) => clearTimeout(id);
-    window.scrollTo = () => {};
-    
-    // Mock external libraries used in Script.js to prevent runtime errors
-    window.Hls = class { static isSupported() { return false; } };
-    window.flatpickr = () => ({ set: () => {} });
+    window = dom.window;
+    document = window.document;
 
-    // Inject Script.js content manually. 
-    // JSDOM does not automatically load external scripts from the local filesystem.
-    const scriptEl = document.createElement('script');
-    scriptEl.textContent = script;
-    document.body.appendChild(scriptEl);
+    await new Promise((resolve) => setTimeout(resolve, 0));
   });
 
-  it('should activate the correct preview image on hover', () => {
-    const locationTrigger = document.querySelector('.nyc-loc[data-location-id="dumbo"]');
+  it('marks the first location preview active by default', () => {
+    const centralParkPreview = document.querySelector('.nyc-preview-img.nyc-cp');
+    const activeLocation = document.querySelector('.nyc-loc.is-active');
+
+    expect(centralParkPreview?.classList.contains('active')).toBe(true);
+    expect(activeLocation?.dataset.locationId).toBe('cp');
+  });
+
+  it('activates the matching preview when a different location is hovered', () => {
+    const dumboLocation = document.querySelector('.nyc-loc[data-location-id="dumbo"]');
     const dumboPreview = document.querySelector('.nyc-preview-img.nyc-dumbo');
     const centralParkPreview = document.querySelector('.nyc-preview-img.nyc-cp');
 
-    // Simulate mouseenter
-    const event = new document.defaultView.MouseEvent('mouseenter');
-    locationTrigger.dispatchEvent(event);
+    dumboLocation.dispatchEvent(new window.MouseEvent('mouseenter', { bubbles: true }));
 
-    // Check classes
+    expect(dumboLocation.classList.contains('is-active')).toBe(true);
     expect(dumboPreview.classList.contains('active')).toBe(true);
     expect(centralParkPreview.classList.contains('active')).toBe(false);
   });

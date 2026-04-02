@@ -388,6 +388,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
 // animated in the same rAF loop to avoid CSS-vs-JS transform conflicts.
 (function() {
   const cursor = document.getElementById('cursorFollow');
+  if (!cursor) return;
   let mouseX = 0, mouseY = 0, curX = 0, curY = 0;
   let curScale = 0.3, targetScale = 0.3;
   // Half-width / half-height of the pill to center it on the pointer
@@ -441,6 +442,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   const gallerySubtitle = document.getElementById('swGallerySubtitle');
   const galleryCounter = document.getElementById('swGalleryCounter');
   const stage = document.getElementById('swGalleryStage');
+  if (!gallery || !galleryImg || !galleryTitle || !gallerySubtitle || !galleryCounter || !stage) return;
 
   let swImages = [], swIndex = 0, swIsOpen = false, swParafRAF = null, lastFocusedElement = null;
   let stripThumbCache = [];
@@ -1178,6 +1180,17 @@ function filterVideos(cat, btn) {
   var activeHls = null; // Track active HLS instance for cleanup
   var modalScrollY = 0;
   var modalRequestId = 0;
+  var modalLastFocusedEl = null;
+  const YT_ARROW_SKIP = 5;
+  const YT_JL_SKIP = 10;
+  const YT_VOLUME_STEP = 0.05;
+
+  if (!modal.hasAttribute('tabindex')) modal.setAttribute('tabindex', '-1');
+  if (vmPlay) vmPlay.setAttribute('aria-keyshortcuts', 'Space K');
+  if (vmMute) vmMute.setAttribute('aria-keyshortcuts', 'M');
+  if (vmFs) vmFs.setAttribute('aria-keyshortcuts', 'F');
+  if (vmSkipBackBtn) vmSkipBackBtn.setAttribute('aria-keyshortcuts', 'ArrowLeft J');
+  if (vmSkipFwdBtn) vmSkipFwdBtn.setAttribute('aria-keyshortcuts', 'ArrowRight L');
 
   function lockModalScroll(scrollY) {
     document.documentElement.style.overflow = 'hidden';
@@ -1243,13 +1256,55 @@ function filterVideos(cat, btn) {
       : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
   }
 
+  function modalHasPlayableVideo() {
+    return vmStage.classList.contains('vm-has-video') && !!vmVideo.currentSrc;
+  }
+
+  function togglePlayback() {
+    if (!modalHasPlayableVideo()) return;
+    if (vmVideo.paused) {
+      vmVideo.play().catch(() => {});
+    } else {
+      vmVideo.pause();
+    }
+    syncPlayToggle();
+  }
+
+  function toggleMute(forceMuted) {
+    if (!modalHasPlayableVideo()) return;
+    vmVideo.muted = typeof forceMuted === 'boolean' ? forceMuted : !vmVideo.muted;
+    syncMuteToggle();
+  }
+
+  function setVolume(nextVolume) {
+    if (!modalHasPlayableVideo()) return;
+    const clampedVolume = Math.max(0, Math.min(1, nextVolume));
+    vmVideo.volume = clampedVolume;
+    vmVideo.muted = clampedVolume === 0 ? true : false;
+    syncMuteToggle();
+  }
+
+  function toggleFullscreen() {
+    if (!modalHasPlayableVideo()) return;
+    if (!document.fullscreenElement) {
+      if (vmStage.requestFullscreen) vmStage.requestFullscreen();
+      else if (vmStage.webkitRequestFullscreen) vmStage.webkitRequestFullscreen();
+      else if (vmVideo.webkitEnterFullscreen) vmVideo.webkitEnterFullscreen(); // iOS fallback
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+  }
+
   async function openModal(card) {
     const src = card.dataset.video;
     const requestId = ++modalRequestId;
+    modalLastFocusedEl = document.activeElement instanceof HTMLElement ? document.activeElement : card;
     vmTitle.textContent = card.dataset.title || '';
     vmSub.textContent   = card.dataset.type  || '';
     modalScrollY = window.scrollY || window.pageYOffset || 0;
     vmVideo.muted = true;
+    vmVideo.volume = 1;
     vmVideo.playsInline = true;
     vmVideo.setAttribute('muted', '');
     vmVideo.setAttribute('playsinline', '');
@@ -1257,6 +1312,7 @@ function filterVideos(cat, btn) {
     syncMuteToggle();
     modal.classList.add('vm-open');
     lockModalScroll(modalScrollY);
+    requestAnimationFrame(() => modal.focus({ preventScroll: true }));
 
     if (src) {
       await attachHLS(vmVideo, src, requestId);
@@ -1289,6 +1345,9 @@ function filterVideos(cat, btn) {
     restoreModalScroll(modalScrollY);
     syncPlayToggle();
     syncMuteToggle();
+    if (modalLastFocusedEl && document.contains(modalLastFocusedEl)) {
+      requestAnimationFrame(() => modalLastFocusedEl.focus({ preventScroll: true }));
+    }
 
     // Pause any hover-preview videos that may still be playing on .vw-card elements
     document.querySelectorAll('.vw-poster video').forEach(function(v) {
@@ -1298,6 +1357,7 @@ function filterVideos(cat, btn) {
     document.querySelectorAll('.vw-poster.active').forEach(function(p) {
       p.classList.remove('active');
     });
+    modalLastFocusedEl = null;
   }
 
   function formatTime(s) {
@@ -1308,34 +1368,15 @@ function filterVideos(cat, btn) {
 
   // Controls Logic
   if (vmPlay) {
-    vmPlay.addEventListener('click', () => {
-      if (vmVideo.paused) {
-        vmVideo.play();
-      } else {
-        vmVideo.pause();
-      }
-      syncPlayToggle();
-    });
+    vmPlay.addEventListener('click', togglePlayback);
   }
 
   if (vmMute) {
-    vmMute.addEventListener('click', () => {
-      vmVideo.muted = !vmVideo.muted;
-      syncMuteToggle();
-    });
+    vmMute.addEventListener('click', () => toggleMute());
   }
 
   if (vmFs) {
-    vmFs.addEventListener('click', () => {
-      if (!document.fullscreenElement) {
-        if (vmStage.requestFullscreen) vmStage.requestFullscreen();
-        else if (vmStage.webkitRequestFullscreen) vmStage.webkitRequestFullscreen();
-        else if (vmVideo.webkitEnterFullscreen) vmVideo.webkitEnterFullscreen(); // iOS fallback
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-      }
-    });
+    vmFs.addEventListener('click', toggleFullscreen);
 
     function updateFsIcon() {
       if (document.fullscreenElement) {
@@ -1383,6 +1424,8 @@ function filterVideos(cat, btn) {
     vmVideo.currentTime = Math.max(0, Math.min(vmVideo.duration, vmVideo.currentTime + seconds));
     const overlay = seconds < 0 ? vmSkipBackOvl : vmSkipFwdOvl;
     if (overlay) {
+      const overlayText = overlay.querySelector('text');
+      if (overlayText) overlayText.textContent = Math.abs(seconds);
       overlay.classList.remove('vm-skip-active');
       void overlay.offsetWidth; // force reflow to restart animation
       overlay.classList.add('vm-skip-active');
@@ -1393,19 +1436,109 @@ function filterVideos(cat, btn) {
   if (vmSkipBackBtn) vmSkipBackBtn.addEventListener('click', () => triggerSkip(-5));
   if (vmSkipFwdBtn) vmSkipFwdBtn.addEventListener('click', () => triggerSkip(5));
 
-  // Arrow key support when modal is open
-  document.addEventListener('keydown', (e) => {
+  function seekToPercentage(percent) {
+    if (!modalHasPlayableVideo() || !Number.isFinite(vmVideo.duration)) return;
+    vmVideo.currentTime = vmVideo.duration * percent;
+  }
+
+  function isTypingTarget(target) {
+    if (!(target instanceof HTMLElement)) return false;
+    return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+  }
+
+  function handleModalKeydown(e) {
     if (!modal.classList.contains('vm-open')) return;
-    if (e.key === 'ArrowLeft') { e.preventDefault(); triggerSkip(-5); }
-    if (e.key === 'ArrowRight') { e.preventDefault(); triggerSkip(5); }
-  });
+    if (isTypingTarget(e.target)) return;
+
+    const key = e.key;
+    const lowerKey = key.length === 1 ? key.toLowerCase() : key;
+    const modalShortcutKeys = new Set([
+      ' ', 'Spacebar', 'k', 'K', 'j', 'J', 'l', 'L', 'm', 'M', 'f', 'F',
+      'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Escape',
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+    ]);
+
+    if (!modalShortcutKeys.has(key) && !modalShortcutKeys.has(lowerKey)) return;
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    if (key === 'Escape') {
+      closeModal();
+      return;
+    }
+
+    if (!modalHasPlayableVideo()) return;
+
+    if (key === ' ' || key === 'Spacebar' || lowerKey === 'k') {
+      togglePlayback();
+      return;
+    }
+
+    if (lowerKey === 'j') {
+      triggerSkip(-YT_JL_SKIP);
+      return;
+    }
+
+    if (lowerKey === 'l') {
+      triggerSkip(YT_JL_SKIP);
+      return;
+    }
+
+    if (key === 'ArrowLeft') {
+      triggerSkip(-YT_ARROW_SKIP);
+      return;
+    }
+
+    if (key === 'ArrowRight') {
+      triggerSkip(YT_ARROW_SKIP);
+      return;
+    }
+
+    if (key === 'ArrowUp') {
+      setVolume((vmVideo.muted ? 0 : vmVideo.volume) + YT_VOLUME_STEP);
+      return;
+    }
+
+    if (key === 'ArrowDown') {
+      setVolume((vmVideo.muted ? 0 : vmVideo.volume) - YT_VOLUME_STEP);
+      return;
+    }
+
+    if (lowerKey === 'm') {
+      toggleMute();
+      return;
+    }
+
+    if (lowerKey === 'f') {
+      toggleFullscreen();
+      return;
+    }
+
+    if (key === 'Home') {
+      vmVideo.currentTime = 0;
+      return;
+    }
+
+    if (key === 'End') {
+      vmVideo.currentTime = Math.max(0, vmVideo.duration - 0.1);
+      return;
+    }
+
+    if (/^[0-9]$/.test(key)) {
+      if (key === '0') {
+        vmVideo.currentTime = 0;
+      } else {
+        seekToPercentage(Number(key) / 10);
+      }
+    }
+  }
+
+  document.addEventListener('keydown', handleModalKeydown);
 
   document.querySelectorAll('.vw-card').forEach(c => c.addEventListener('click', () => openModal(c)));
   vmClose.addEventListener('click', closeModal);
   vmBg.addEventListener('click', closeModal);
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && modal.classList.contains('vm-open')) closeModal();
-  });
 })();
 
 // ═══════ SMOOTH SCROLL ═══════
@@ -1440,6 +1573,10 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
   // Event delegation for keyboard interaction
   document.addEventListener('keydown', function(e) {
+    const galleryOpen = document.getElementById('swGallery')?.classList.contains('sw-open');
+    const modalOpen = document.getElementById('videoModal')?.classList.contains('vm-open');
+    if (galleryOpen || modalOpen) return;
+
     const item = e.target.closest('.gallery-item, .vw-card');
     if (item && (e.key === 'Enter' || e.key === ' ')) {
       e.preventDefault();
@@ -1643,11 +1780,31 @@ class EtherealCarousel {
     this._cachedCardW = 0;
     this._nativeScrollTicking = false;
     this._hasRenderedNative = false;
+    this._nativeScrollSettleTimer = null;
+    this._suppressClicksUntil = 0;
+    this._blockNextCardClick = false;
+    this._nativeTouchStart = null;
     this._bindEvents();
   }
 
   _useNativeScroll() {
-    return window.innerWidth <= 768;
+    // Keep the cinematic coverflow consistent across desktop, tablet, and phone.
+    // Reserve the simpler native rail for reduced-motion users only.
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  _noteInteraction(duration = 520) {
+    this._suppressClicksUntil = performance.now() + duration;
+  }
+
+  _shouldSuppressClick() {
+    return performance.now() < this._suppressClicksUntil;
+  }
+
+  _consumeBlockedCardClick() {
+    if (!this._blockNextCardClick) return false;
+    this._blockNextCardClick = false;
+    return true;
   }
 
   _markNativeOffsets() {
@@ -1713,16 +1870,19 @@ class EtherealCarousel {
     this.render();
   }
 
-  navigate(dir) {
+  navigate(dir, source = 'programmatic') {
     const next = this.currentIndex + dir;
     if (next < 0 || next >= this.filteredItems.length) return;
     this.currentIndex = next;
+    if (source === 'gesture') this._blockNextCardClick = true;
+    this._noteInteraction(source === 'gesture' ? 520 : 320);
     this.render();
   }
 
   goTo(index) {
     if (index < 0 || index >= this.filteredItems.length) return;
     this.currentIndex = index;
+    this._noteInteraction(320);
     this.render();
   }
 
@@ -1757,19 +1917,32 @@ class EtherealCarousel {
 
     const isMobile = window.innerWidth <= 768;
     const isTablet = window.innerWidth <= 1024;
+    const isVideoCarousel = this.container.id === 'videoCarousel';
     
     // Adjust offset based on active card width (Wide cards need different spacing factor)
     let offsetPx = activeW * 0.9; 
     if (activeW > 600) offsetPx = activeW * 0.65; // Wide card (760px) needs more absolute space
     
-    if (isMobile) offsetPx = activeW * 0.72;
-    else if (isTablet) offsetPx = activeW * 0.87;
+    if (isMobile) offsetPx = activeW * (isVideoCarousel ? 0.62 : 0.72);
+    else if (isTablet) offsetPx = activeW * (isVideoCarousel ? 0.81 : 0.87);
 
     // 3D depth values — reduced on mobile for cleaner look inside overflow:hidden
-    const sideZ    = isMobile ? -60  : -120;
-    const sideRot  = isMobile ? 18   : 35;
-    const sideScale = isMobile ? 0.8 : 0.75;
-    const centerZ  = isMobile ? 30   : 60;
+    let sideZ = isMobile ? -60 : -120;
+    let sideRot = isMobile ? 18 : 35;
+    let sideScale = isMobile ? 0.8 : 0.75;
+    let centerZ = isMobile ? 30 : 60;
+
+    if (isVideoCarousel && isMobile) {
+      sideZ = -42;
+      sideRot = 15;
+      sideScale = 0.86;
+      centerZ = 24;
+    } else if (isVideoCarousel && isTablet) {
+      sideZ = -92;
+      sideRot = 28;
+      sideScale = 0.79;
+      centerZ = 48;
+    }
 
     // Hide every item first (clear fadeIn animation — its fill-mode overrides inline transforms)
     allItems.forEach(item => {
@@ -1847,7 +2020,21 @@ class EtherealCarousel {
 
     // Click on side cards → navigate (capture phase prevents card-level handlers from firing)
     this.container.addEventListener('click', (e) => {
-      if (this._useNativeScroll()) return;
+      const blockedCardClick = this._consumeBlockedCardClick();
+      const suppressedClick = this._shouldSuppressClick();
+
+      if (this._useNativeScroll()) {
+        if (suppressedClick || blockedCardClick) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+        }
+        return;
+      }
+      if (suppressedClick || blockedCardClick) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        return;
+      }
       const card = e.target.closest(this.itemSelector);
       if (!card) return;
       const offset = card.getAttribute('data-ec-offset');
@@ -1878,7 +2065,13 @@ class EtherealCarousel {
     let touchStartX = 0, touchStartY = 0, touchDX = 0, touchIsHorizontal = null;
 
     this.container.addEventListener('touchstart', (e) => {
-      if (this._useNativeScroll()) return;
+      if (this._useNativeScroll()) {
+        this._nativeTouchStart = {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY,
+        };
+        return;
+      }
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
       touchDX = 0;
@@ -1887,7 +2080,14 @@ class EtherealCarousel {
     }, { passive: true });
 
     this.container.addEventListener('touchmove', (e) => {
-      if (this._useNativeScroll()) return;
+      if (this._useNativeScroll()) {
+        if (this._nativeTouchStart) {
+          const dx = e.touches[0].clientX - this._nativeTouchStart.x;
+          const dy = e.touches[0].clientY - this._nativeTouchStart.y;
+          if (Math.abs(dx) > 8 || Math.abs(dy) > 8) this._noteInteraction(700);
+        }
+        return;
+      }
       const dx = e.touches[0].clientX - touchStartX;
       const dy = e.touches[0].clientY - touchStartY;
       if (touchIsHorizontal === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
@@ -1896,16 +2096,21 @@ class EtherealCarousel {
       if (touchIsHorizontal) {
         e.preventDefault();
         touchDX = dx;
-        this.track.style.transform = `translateX(${dx * 0.35}px)`;
+        const dragResistance = window.innerWidth <= 768 ? 0.42 : 0.38;
+        this.track.style.transform = `translateX(${dx * dragResistance}px)`;
       }
     }, { passive: false });
 
     this.container.addEventListener('touchend', () => {
-      if (this._useNativeScroll()) return;
+      if (this._useNativeScroll()) {
+        this._nativeTouchStart = null;
+        return;
+      }
       this.track.style.transition = 'transform 0.3s ease';
       this.track.style.transform = '';
+      if (Math.abs(touchDX) > 10) this._noteInteraction(700);
       if (Math.abs(touchDX) > 30) {
-        this.navigate(touchDX < 0 ? 1 : -1);
+        this.navigate(touchDX < 0 ? 1 : -1, 'gesture');
       }
       touchDX = 0;
       touchIsHorizontal = null;
@@ -1931,8 +2136,9 @@ class EtherealCarousel {
       mouseDown = false;
       this.container.style.cursor = '';
       const dx = e.clientX - mouseStartX;
+      if (mouseMoved && Math.abs(dx) > 10) this._noteInteraction(700);
       if (Math.abs(dx) > 30 && mouseMoved) {
-        this.navigate(dx < 0 ? 1 : -1);
+        this.navigate(dx < 0 ? 1 : -1, 'gesture');
       }
     });
 
@@ -1950,7 +2156,8 @@ class EtherealCarousel {
       clearTimeout(wheelTimer);
       wheelTimer = setTimeout(() => {
         if (Math.abs(wheelAccum) > 30) {
-          this.navigate(wheelAccum > 0 ? 1 : -1);
+          this._noteInteraction(700);
+          this.navigate(wheelAccum > 0 ? 1 : -1, 'gesture');
         }
         wheelAccum = 0;
       }, 50);
@@ -1967,12 +2174,12 @@ class EtherealCarousel {
     });
 
     this.track.addEventListener('scroll', () => {
-      if (!this._useNativeScroll() || this._nativeScrollTicking) return;
-      this._nativeScrollTicking = true;
-      requestAnimationFrame(() => {
-        this._nativeScrollTicking = false;
+      if (!this._useNativeScroll()) return;
+      this._noteInteraction(700);
+      clearTimeout(this._nativeScrollSettleTimer);
+      this._nativeScrollSettleTimer = setTimeout(() => {
         this._syncIndexFromScroll();
-      });
+      }, 90);
     }, { passive: true });
 
   }
@@ -2091,6 +2298,49 @@ let portfolioCarousel, videoCarousel;
   portfolioObserver.observe(portfolioSection);
 })();
 
+// ═══════ VIDEO WORKS SECTION INTRO ═══════
+(function() {
+  const videoSection = document.getElementById('video-works');
+  const videoIntro = document.getElementById('videoIntro');
+  const videoEyebrow = document.getElementById('videoEyebrow');
+  const videoTitle = document.getElementById('videoTitle');
+  const videoDesc = document.getElementById('videoDesc');
+  if (!videoSection || !videoIntro || !videoEyebrow || !videoTitle || !videoDesc) return;
+
+  if (!videoEyebrow.querySelector('.video-tag-letter')) {
+    const text = videoEyebrow.textContent.trim();
+    videoEyebrow.textContent = '';
+
+    [...text].forEach((char, i) => {
+      const span = document.createElement('span');
+      span.className = 'video-tag-letter';
+      span.textContent = char === ' ' ? '\u00A0' : char;
+      span.style.transitionDelay = `${80 + i * 34}ms`;
+      videoEyebrow.appendChild(span);
+    });
+  }
+
+  videoSection.classList.add('video-works-enhanced');
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    videoSection.classList.add('is-animated');
+    return;
+  }
+
+  videoTitle.style.transitionDelay = '320ms';
+  videoDesc.style.transitionDelay = '520ms';
+
+  const videoObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      videoSection.classList.add('is-animated');
+      videoObserver.unobserve(videoSection);
+    });
+  }, { threshold: 0.28 });
+
+  videoObserver.observe(videoSection);
+})();
+
 // ═══════ ATTACH FILTER EVENT LISTENERS ═══════
 (function() {
   // This runs after the DOM is ready because the script is at the end of the body.
@@ -2119,14 +2369,30 @@ let portfolioCarousel, videoCarousel;
 (function() {
   const locs = document.querySelectorAll('.nyc-loc');
   const previews = document.querySelectorAll('.nyc-preview-img');
-  if (!locs.length || !previews.length) return;
+  const previewShell = document.querySelector('.nyc-preview');
+  if (!locs.length || !previews.length || !previewShell) return;
 
   // Map data-location-id → preview class suffix (e.g. "cp" → ".nyc-cp")
   function showPreview(id) {
+    let activePreview = null;
     previews.forEach(p => {
       const matches = p.classList.contains('nyc-' + id);
       p.classList.toggle('active', matches);
+      if (matches) activePreview = p;
     });
+
+    if (!activePreview) return;
+
+    const previewAspect = activePreview.dataset.previewAspect;
+    const previewWidth = activePreview.dataset.previewWidth;
+
+    if (previewAspect) {
+      previewShell.style.setProperty('--preview-aspect', previewAspect);
+    }
+
+    if (previewWidth) {
+      previewShell.style.setProperty('--preview-width', previewWidth);
+    }
   }
 
   locs.forEach(loc => {
@@ -2134,9 +2400,16 @@ let portfolioCarousel, videoCarousel;
       showPreview(loc.dataset.locationId);
     });
 
-    loc.addEventListener('click', () => {
+    loc.addEventListener('focus', () => {
+      showPreview(loc.dataset.locationId);
+    });
+
+    loc.addEventListener('click', (e) => {
+      if (loc.tagName === 'A' && loc.href) return;
       const url = loc.dataset.locationUrl;
-      if (url) window.open(url, '_blank', 'noopener');
+      if (!url) return;
+      e.preventDefault();
+      window.open(url, '_blank', 'noopener,noreferrer');
     });
   });
 })();

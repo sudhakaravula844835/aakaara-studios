@@ -1,14 +1,61 @@
 const { test, expect, devices } = require('@playwright/test');
 
-const mobileDevices = [
+async function swipeCarousel(page, selector, { startXRatio = 0.76, endXRatio = 0.28, steps = 5 } = {}) {
+  await page.locator(selector).evaluate((el, options) => {
+    if (typeof Touch !== 'function' || typeof TouchEvent !== 'function') {
+      throw new Error('Touch constructors are unavailable in this browser context.');
+    }
+
+    const rect = el.getBoundingClientRect();
+    const y = rect.top + rect.height * 0.5;
+    const startX = rect.left + rect.width * options.startXRatio;
+    const endX = rect.left + rect.width * options.endXRatio;
+
+    const dispatchTouch = (type, x) => {
+      const touch = new Touch({
+        identifier: 1,
+        target: el,
+        clientX: x,
+        clientY: y,
+        pageX: x + window.scrollX,
+        pageY: y + window.scrollY,
+        screenX: x,
+        screenY: y,
+        radiusX: 2,
+        radiusY: 2,
+        rotationAngle: 0,
+        force: 0.5,
+      });
+      const activeTouches = type === 'touchend' ? [] : [touch];
+      el.dispatchEvent(new TouchEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        touches: activeTouches,
+        targetTouches: activeTouches,
+        changedTouches: [touch],
+      }));
+    };
+
+    dispatchTouch('touchstart', startX);
+    for (let step = 1; step <= options.steps; step += 1) {
+      const progress = step / options.steps;
+      const nextX = startX + ((endX - startX) * progress);
+      dispatchTouch('touchmove', nextX);
+    }
+    dispatchTouch('touchend', endX);
+  }, { startXRatio, endXRatio, steps });
+}
+
+const touchDevices = [
   ['iPhone SE', devices['iPhone SE']],
   ['Pixel 7', devices['Pixel 7']],
 ];
 
-for (const [label, device] of mobileDevices) {
+for (const [label, device] of touchDevices) {
   const { defaultBrowserType, ...emulation } = device;
 
-  test.describe(`Aakaara mobile regression checks — ${label}`, () => {
+  test.describe(`Aakaara touch regression checks — ${label}`, () => {
     test.use({ ...emulation });
 
     test.beforeEach(async ({ page }) => {
@@ -28,22 +75,26 @@ for (const [label, device] of mobileDevices) {
       expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
     });
 
-    test('uses native horizontal scroll for portfolio and exposes touch-safe video controls', async ({ page }) => {
+    test('uses the cinematic coverflow carousel and exposes touch-safe video controls', async ({ page }) => {
       await page.locator('#portfolio').scrollIntoViewIfNeeded();
 
-      const trackStyles = await page.locator('#portfolioCarousel .ec-track').evaluate((el) => {
-        const style = getComputedStyle(el);
+      const carouselState = await page.evaluate(() => {
+        const portfolio = document.getElementById('portfolioCarousel');
+        const video = document.getElementById('videoCarousel');
+        const activeVideoCard = document.querySelector('#videoCarousel .vw-card[data-ec-offset="0"]');
+        const sideVideoCard = document.querySelector('#videoCarousel .vw-card[data-ec-offset="1"], #videoCarousel .vw-card[data-ec-offset="-1"]');
         return {
-          overflowX: style.overflowX,
-          scrollSnapType: style.scrollSnapType,
-          scrollWidth: el.scrollWidth,
-          clientWidth: el.clientWidth,
+          portfolioNative: portfolio.classList.contains('is-native-scroll'),
+          videoNative: video.classList.contains('is-native-scroll'),
+          activeTransform: getComputedStyle(activeVideoCard).transform,
+          sideOpacity: Number(getComputedStyle(sideVideoCard).opacity),
         };
       });
 
-      expect(trackStyles.overflowX).toBe('auto');
-      expect(trackStyles.scrollSnapType).toContain('x');
-      expect(trackStyles.scrollWidth).toBeGreaterThan(trackStyles.clientWidth);
+      expect(carouselState.portfolioNative).toBe(false);
+      expect(carouselState.videoNative).toBe(false);
+      expect(carouselState.activeTransform).not.toBe('none');
+      expect(carouselState.sideOpacity).toBeLessThan(1);
 
       await page.locator('#video-works').scrollIntoViewIfNeeded();
       await page.locator('.vw-card').first().click();
@@ -89,15 +140,100 @@ for (const [label, device] of mobileDevices) {
 
       await page.locator('#video-works').scrollIntoViewIfNeeded();
       await page.waitForTimeout(300);
-      const before = await page.evaluate(() => window.scrollY);
 
       await page.locator('.vw-card').first().click();
       await expect(page.locator('#videoModal')).toHaveClass(/vm-open/);
       await page.locator('#vmClose').click();
       await expect(page.locator('#videoModal')).not.toHaveClass(/vm-open/);
 
-      const after = await page.evaluate(() => window.scrollY);
-      expect(Math.abs(after - before)).toBeLessThanOrEqual(2);
+      const sectionState = await page.evaluate(() => {
+        const section = document.getElementById('video-works');
+        const rect = section.getBoundingClientRect();
+        return {
+          delta: Math.abs(window.scrollY - rect.top),
+          top: rect.top,
+          bottom: rect.bottom,
+          viewportHeight: window.innerHeight,
+        };
+      });
+
+      expect(sectionState.top).toBeLessThan(sectionState.viewportHeight);
+      expect(sectionState.bottom).toBeGreaterThan(0);
+    });
+
+    test('does not open a film when the wedding carousel was just swiped', async ({ page }) => {
+      await page.locator('#video-works').scrollIntoViewIfNeeded();
+      await page.locator('#video-works .vw-filters').getByRole('button', { name: 'Weddings' }).click();
+      await page.waitForTimeout(250);
+      await expect(page.locator('#videoCarousel')).not.toHaveClass(/is-native-scroll/);
+
+      const beforeTitle = await page.locator('#videoCarousel .vw-card[data-ec-offset="0"] h4').textContent();
+      await swipeCarousel(page, '#videoCarousel');
+      await page.waitForTimeout(220);
+      const afterTitle = await page.locator('#videoCarousel .vw-card[data-ec-offset="0"] h4').textContent();
+      expect(afterTitle).not.toBe(beforeTitle);
+
+      const weddingCard = page.locator('#videoCarousel .vw-card[data-vcat="wedding"][data-ec-offset="0"]').first();
+      await weddingCard.click({ force: true });
+      await page.waitForTimeout(150);
+      await expect(page.locator('#videoModal')).not.toHaveClass(/vm-open/);
+
+      await page.waitForTimeout(1100);
+      await weddingCard.click({ force: true });
+      await expect(page.locator('#videoModal')).toHaveClass(/vm-open/);
+    });
+  });
+}
+
+const tabletDevices = [
+  ['iPad Mini landscape', devices['iPad Mini landscape']],
+  ['iPad Pro 11 landscape', devices['iPad Pro 11 landscape']],
+];
+
+for (const [label, device] of tabletDevices) {
+  const { defaultBrowserType, ...emulation } = device;
+
+  test.describe(`Aakaara tablet video regression checks — ${label}`, () => {
+    test.use({ ...emulation });
+
+    test.beforeEach(async ({ page }) => {
+      await page.goto('/');
+    });
+
+    test('keeps the wedding carousel in coverflow mode and does not open a film right after a swipe', async ({ page }) => {
+      await page.locator('#video-works').scrollIntoViewIfNeeded();
+      await page.locator('#video-works .vw-filters').getByRole('button', { name: 'Weddings' }).click();
+      await page.waitForTimeout(250);
+      await expect(page.locator('#videoCarousel')).not.toHaveClass(/is-native-scroll/);
+
+      const carouselState = await page.locator('#videoCarousel').evaluate((el) => {
+        const activeCard = el.querySelector('.vw-card[data-ec-offset="0"]');
+        const sideCard = el.querySelector('.vw-card[data-ec-offset="1"], .vw-card[data-ec-offset="-1"]');
+        return {
+          hasNativeClass: el.classList.contains('is-native-scroll'),
+          activeTransform: getComputedStyle(activeCard).transform,
+          sideOpacity: Number(getComputedStyle(sideCard).opacity),
+        };
+      });
+
+      expect(carouselState.hasNativeClass).toBe(false);
+      expect(carouselState.activeTransform).not.toBe('none');
+      expect(carouselState.sideOpacity).toBeLessThan(1);
+
+      const beforeTitle = await page.locator('#videoCarousel .vw-card[data-ec-offset="0"] h4').textContent();
+      await swipeCarousel(page, '#videoCarousel', { startXRatio: 0.78, endXRatio: 0.34, steps: 6 });
+      await page.waitForTimeout(220);
+      const afterTitle = await page.locator('#videoCarousel .vw-card[data-ec-offset="0"] h4').textContent();
+      expect(afterTitle).not.toBe(beforeTitle);
+
+      const weddingCard = page.locator('#videoCarousel .vw-card[data-vcat="wedding"][data-ec-offset="0"]').first();
+      await weddingCard.click({ force: true });
+      await page.waitForTimeout(150);
+      await expect(page.locator('#videoModal')).not.toHaveClass(/vm-open/);
+
+      await page.waitForTimeout(1100);
+      await weddingCard.click({ force: true });
+      await expect(page.locator('#videoModal')).toHaveClass(/vm-open/);
     });
   });
 }
