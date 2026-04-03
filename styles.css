@@ -135,14 +135,14 @@ nav.scrolled {
 .nav-links a.active { color: var(--rose); }
 .nav-links a.active::after,
 .nav-links a:hover::after { width: 100%; }
-.nav-cta {
+.nav-links a.nav-cta {
   font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--ivory); background: var(--rose);
   padding: 0.55rem 1.4rem; border-radius: 2px; font-weight: 500;
   transition: all 0.4s;
 }
-.nav-cta:hover { background: var(--rose-light); color: var(--noir); transform: translateY(-1px); }
-.nav-cta::after { display: none !important; }
+.nav-links a.nav-cta:hover { background: var(--rose-light); color: var(--noir); transform: translateY(-1px); }
+.nav-links a.nav-cta::after { display: none !important; }
 .nav-toggle { display: none; flex-direction: column; gap: 5px; padding: 4px; }
 .nav-toggle span { width: 22px; height: 1.5px; background: var(--ivory); transition: all 0.3s; }
 
