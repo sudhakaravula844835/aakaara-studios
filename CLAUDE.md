@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Site Overview
 
-Aakaara Studios NYC — a static photography portfolio site. No build step, no package manager, no framework. Pure HTML/CSS/JS deployed directly to Netlify.
+Aakaara Studios NYC — a static photography portfolio site. No build step, no framework. Pure HTML/CSS/JS deployed directly to Netlify. ~7,600 lines of code total.
+
+- **URL**: https://www.aakaarastudiosnyc.com/
+- **Deployment**: Netlify (auto-deploy from repo root)
+- **Tech stack**: HTML5, CSS3, Vanilla JS (ES6+), HLS.js, Flatpickr, Formspree
 
 ## Running the Site Locally
 
@@ -14,62 +18,166 @@ npx serve .
 python3 -m http.server 8080
 ```
 
-Open `http://localhost:8080`. The site must be served (not opened as `file://`) because image paths use absolute roots (`/images/...`).
+Open `http://localhost:8080`. The site **must** be served (not opened as `file://`) because image paths use absolute roots (`/images/...`).
+
+## Running Tests
+
+```bash
+npm test           # All tests (unit + e2e)
+npm run test:unit  # Vitest unit tests only
+npm run test:e2e   # Playwright e2e tests only
+```
+
+Test files: `gallery.spec.js`, `location-guide.test.js`, `mobile.integration.spec.js`
 
 ## Deployment
 
-Netlify auto-deploys from the repo root. Config is minimal:
-
 ```toml
 # netlify.toml
-publish = "."   # root is the publish directory
+[build]
+  command = "echo 'Static site — no build needed'"
+  publish = "."
 ```
 
-`_redirects` serves `404.html` for all unmatched paths.
+**`_redirects`**:
+```
+/the-experience.html   /couple-portraits.html   301
+/*                     /404.html                404
+```
 
 ## File Structure
 
+### Root-level files
+
 | File | Purpose |
 |------|---------|
-| `index.html` | Entire main site (hero → portfolio → films → about → services → testimonials → contact → footer) |
+| `index.html` | Entire main site (intro → hero → portfolio → films → about → services → testimonials → contact → footer) |
 | `couple-portraits.html` | Standalone gallery page for couple portraits |
 | `404.html` / `thank-you.html` | Utility pages |
-| `styles.css` | All styles for all pages (single file, ~2100 lines) |
-| `Script.js` | All JS for `index.html` (~1700 lines) |
+| `styles.css` | All styles for all pages (~3,568 lines) |
+| `Script.js` | All JS for `index.html` (~2,553 lines) |
+| `favicon.svg` | Site logo as SVG favicon |
+| `package.json` | Dev dependencies: Vitest, Playwright |
+| `playwright.config.js` / `vitest.config.js` | Test configuration |
+
+### Directories
+
+| Directory | Purpose |
+|-----------|---------|
+| `/images/` | Photography assets by category (see Image Directory below) |
+| `/templates/` | Reusable `header.html`, `footer.html`, `include.js` loader |
+| `/tools/` | Utility pages: business cards, Instagram DP, carousel templates |
+| `/admin/` | Internal dashboard, quote generator, contract generator |
+| `/docs/` | Planning docs and brainstorm notes |
+| `/build/` | Python/Ruby build and image optimization scripts |
+
+### Templates (`/templates/`)
+
+`include.js` fetches and injects `header.html` / `footer.html` before `Script.js` loads. Sub-pages use this to avoid duplicating markup.
+
+### Tools (`/tools/`)
+
+| File | Purpose |
+|------|---------|
+| `business-card.html` | Dark cinematic business card |
+| `business-card-print.html` | Print-to-PDF version |
+| `generate-card-pdf.py` | reportlab-based PDF generator |
+| `insta-carousel.html` | Instagram carousel animation tool |
+| `insta-dp.html` | Instagram DP editor |
+| `dp dark and moody.html` | Dark profile picture tool |
+
+### Admin (`/admin/`)
+
+| File | Purpose |
+|------|---------|
+| `dashboard.html` / `dashboard.js` / `dashboard.css` | Quote management dashboard (localStorage-based) |
+| `quote-generator.html` / `.js` / `.css` | Quote creation form with PDF export |
+| `contract-generator.html` | HTML contract builder |
+
+### Image Directory
+
+```
+/images/
+├── about/
+├── conceptual/        (9 sub-folders)
+├── couple-portraits/  (13 sub-folders)
+├── engagement/        (3 sub-folders)
+├── first-birthday/    (3 sub-folders)
+├── graduation/        (4 sub-folders)
+├── house-warming/     (4 sub-folders)
+├── maternity/         (3 sub-folders)
+├── nyc/               (location guides)
+├── nyfw-runway/       (fashion/runway)
+└── video-covers/      (7 sub-folders)
+```
+
+Each project folder uses numbered images: `1.jpg`, `2.jpg`, … `N.jpg`.
 
 ## Architecture & Key Patterns
 
 ### Gallery System
+
 Gallery items in `index.html` use data attributes — no server-side logic:
+
 ```html
 <a class="gallery-item" data-folder="/images/weddings/pooja-amit" data-count="10" data-ext="jpg" onclick="openSwGallery(this); return false;">
 ```
+
 `Script.js` builds image URLs as `${folder}/${1..count}.${ext}`. Cover image defaults to `folder/1.jpg` unless `data-cover` is set. Images are lazy-loaded via `IntersectionObserver`.
 
+All gallery items require: `data-cat`, `data-title`, `data-type`, `data-folder`, `data-count`. Optional: `data-ext` (default: `jpg`), `data-cover`.
+
 ### Cinematic Gallery Viewer (`openSwGallery`)
+
 Defined inside an IIFE in `Script.js`, exposed as `window.openSwGallery`. Handles swipe, keyboard nav, filmstrip dock effect, and parallax. Called from inline `onclick` on every gallery item.
 
 ### Ethereal Coverflow Carousel (`EtherealCarousel` class)
+
 Both the portfolio grid and video grid are wrapped in `.ethereal-carousel` and driven by the `EtherealCarousel` class. The carousel:
 - Positions cards via JS `transform` (not CSS grid) using `data-ec-offset` attributes (`"0"` = center, `"1"`/`"-1"` = sides, `"hidden"` = offscreen)
 - `portfolioCarousel` and `videoCarousel` are global `let` vars reset when filters change via `filterGallery()` / `filterVideos()`
+- Falls back to native scroll for `prefers-reduced-motion` users
 
 ### Cinematic Services Scroll Stack (`#services`)
-`.cs-wrapper` is `7 * 100vh` tall. `.cs-sticky-zone` is `position: sticky; top: 0; height: 100vh`. JS reads `scrollY` relative to `wrapTop` and translates each `.cs-panel` via `translateY()` to create a slide-over wipe effect. Videos are HLS streams via `hls.js` with image/gradient fallback chain.
+
+`.cs-wrapper` is `700vh` tall (intentional — same on all screen sizes). `.cs-sticky-zone` is `position: sticky; top: 0; height: 100vh`. JS reads `scrollY` relative to `wrapTop` and translates each `.cs-panel` via `translateY()` to create a slide-over wipe effect. Videos are HLS streams via `hls.js` with image/gradient fallback chain.
 
 ### Intro Animation & Sub-page Navigation
+
 `body.intro-active` (set on `<body>`) locks scroll during the 4-second cinematic intro. The intro is skipped when `sessionStorage.getItem('skipIntro') === '1'`. When linking to `couple-portraits.html`, always set both:
+
 ```js
 sessionStorage.setItem('skipIntro', '1');
 sessionStorage.setItem('returnScrollY', window.scrollY);
 ```
+
 so the intro doesn't replay and scroll position is restored on return.
 
 ### Video Modal
+
 HLS streams (`.m3u8`) use `hls.js` on supported browsers, native `<video src>` on Safari. `activeHls` instance is destroyed on close to prevent memory leaks. Video cards also have a muted hover-preview that auto-plays inline.
 
+**Keyboard shortcuts** (when modal is open): `Space`/`K` = play/pause, `J`/`←` = skip back 5s, `L`/`→` = skip forward 5s, `F` = fullscreen, `M` = mute.
+
 ### Contact Form
+
 `action="https://formspree.io/f/xlgwznnz"` — AJAX submission via `fetch`. On success redirects to `thank-you.html`. Honeypot field `name="_gotcha"` is present for bot filtering.
+
+Date picker uses **Flatpickr** on desktop and native `<input type="date">` on touch devices.
+
+## Global JavaScript State
+
+```
+portfolioCarousel      EtherealCarousel instance for the gallery grid
+videoCarousel          EtherealCarousel instance for the video grid
+activeHls              Current HLS.js instance in the video modal
+serviceHlsInstances    Array of HLS instances in the scroll-stack panels
+```
+
+Global functions exposed to inline HTML:
+- `openSwGallery(element)` — opens cinematic gallery viewer
+- `filterGallery(cat, btn)` — filter portfolio by category
+- `triggerSkip(seconds)` — skip ±5s in video modal
 
 ## Adding Content
 
@@ -82,36 +190,48 @@ HLS streams (`.m3u8`) use `hls.js` on supported browsers, native `<video src>` o
 ## CSS Conventions
 
 - All CSS variables are in `:root` at the top of `styles.css`. Always use variables (`var(--rose)`, `var(--ivory)`, etc.) rather than raw hex values.
+
+**Key variables:**
+```css
+--noir: #09080b;        /* Deep black background */
+--umber: #1e1a16;       /* Dark brown */
+--rose: #c9956b;        /* Signature bronze/rose accent */
+--rose-light: #dbb08a;
+--ivory: #faf6f1;
+--champagne: #f2e6d9;
+--font-display: 'Cormorant Garamond';
+--font-body: 'Outfit';
+--ease: cubic-bezier(0.16, 1, 0.3, 1);
+```
+
 - Responsive breakpoints: `1024px` (tablet), `768px` (mobile), `480px` (small phone).
 - The `@media (max-width: 768px)` block is near the bottom of `styles.css` — all mobile overrides live there.
-- `backdrop-filter` is used throughout; always pair with `-webkit-backdrop-filter` and a solid-color fallback `background` for Firefox Android.
+- `backdrop-filter` is used throughout; always pair with `-webkit-backdrop-filter` and a solid-color fallback `background` for Firefox Android:
 
-## Recent Changes (March 2026 Session)
+```css
+backdrop-filter: blur(12px);
+-webkit-backdrop-filter: blur(12px);
+background: rgba(24, 21, 24, 0.68); /* solid fallback */
+```
 
-#### Carousel Animations
-- Implemented cinematic animations (wipeUp, fadeUp, fadeIn, lineGrow) in `tools/insta-carousel.html`.
-- Integrated `IntersectionObserver` to trigger reveals as slides scroll into view.
-- Refactored Slide 02 (divider) and Slide 03 (headline spans) for motion.
+- The `.vw-filters` mobile override must appear **after** the base `.vw-filters` definition in `styles.css` to win specificity.
 
-#### Carousel Animations Plan
-- Created implementation plan for cinematic animations in `tools/insta-carousel.html`.
-- Defined steps for CSS @keyframes integration and HTML refactoring.
-- Outlined JS IntersectionObserver trigger mechanism.
+## Logo & Branding Consistency
 
-### Logo Consistency
 The Aakaara logo is consistent across **header nav**, **hero intro**, and **footer**:
-- **4 petals** with gradually decreasing opacity (0.85 → 0.55 → 0.35 → 0.2)
+- **4 organic petals** with gradually decreasing opacity (0.85 → 0.55 → 0.35 → 0.2)
 - Petal shapes are organic (not perfect ovals)
-- **Visarga dots** positioned above the second letter "a" in "Aakaara"
-- Dots are close to the text, not floating high above
+- **Visarga dots** positioned above the second letter "a" in "Aakaara" — close to the text, not floating high above
 
-### Footer Connect Icons
+## Footer Connect Icons
+
 Each link in the footer "Connect" column has an inline SVG icon:
 - Instagram (camera icon), Email Us (envelope), Call Us (phone)
 - Icons use `display: flex; align-items: center; gap: 0.5rem`
 - Icons are 50% opacity, brighten to 100% on hover
 
-### Video Player — 5-Second Skip Controls
+## Video Player — 5-Second Skip Controls
+
 The cinematic video modal (`#videoModal`) has YouTube-style skip controls:
 - **Control bar buttons**: Rewind 5s and Forward 5s buttons between play/pause and progress bar
 - **On-screen overlays**: `.vm-skip-overlay` with ripple animation on left/right sides of video
@@ -119,32 +239,40 @@ The cinematic video modal (`#videoModal`) has YouTube-style skip controls:
 - JS function `triggerSkip(seconds)` handles both button clicks and keyboard events
 - Elements: `#vmSkipBackBtn`, `#vmSkipFwdBtn`, `#vmSkipBack`, `#vmSkipFwd`
 
-### Portfolio Filter Pills
+## Portfolio Filter Pills
+
 - **Desktop**: Keyframe-based intro animation with staggered delays (`filterPillIn`)
 - **Mobile (≤768px)**: Horizontal scroll strip (`flex-wrap: nowrap; overflow-x: auto`) for both `.portfolio-filters` and `.vw-filters`
 - Interaction transitions are snappy (`0.15s`) — separated from intro animation
-- The `.vw-filters` mobile override must appear AFTER the base `.vw-filters` definition in `styles.css` to win specificity
 
-### Mobile Scroll-Stack
-The "Explore our Video Work" services section uses the same slide-over cover effect on mobile as desktop. The old mobile "reels mode" was removed entirely — `position: sticky` + `translateY` transforms run on all screen sizes.
+## Admin Dashboard (`admin/dashboard.js`)
 
-### Business Card (`tools/business-card.html`)
+- localStorage-based quote management; mock data fallback when empty
+- Quote record shape: `{ id, clientName, clientEmail, eventDate, eventDateTo, status, quotedPrice, confirmedPrice }`
+- Delete button uses two-click confirmation: first click shows "Sure?", auto-reverts after 5 seconds, second click within 5s confirms deletion
+- Calendar visualization with event date indicators
+
+## Business Card (`tools/business-card.html`)
+
 - Dark cinematic design (01 — Dark Cinematic palette)
 - Editorial asymmetric layout: name + role bottom-left, logo centered
-- "STUDIOS · NEW YORK CITY" and tagline width-matched to "Aakaara" text
-- Logo icon enlarged with 4 petals matching the site logo
-- Divider removed for cleaner look
 - Print HTML version at `tools/business-card-print.html`
 - PDF generator script at `tools/generate-card-pdf.py` (uses reportlab)
 
-### Admin Dashboard (`admin/dashboard.js`)
-- Delete button on each quote row with two-click confirmation pattern
-- First click shows "Sure?" text, auto-reverts after 5 seconds
-- Second click within 5s actually deletes the quote
+## Recent Changes (March–April 2026)
+
+- **Carousel animations**: Implemented cinematic animations (wipeUp, fadeUp, fadeIn, lineGrow) in `tools/insta-carousel.html` with `IntersectionObserver` triggers.
+- **Mobile scroll-stack**: The services section uses `position: sticky` + `translateY` on all screen sizes (old mobile "reels mode" removed entirely).
+- **Mobile filter pills**: Horizontal scroll strip for both portfolio and video filters on mobile.
+- **Video modal skip controls**: 5-second skip with on-screen ripple overlays and keyboard shortcuts.
+- **Production header CTA**: Improved contrast for accessibility.
+- **Code refactoring**: Removed unused code, standardized structure, removed broken GitHub Actions workflows (Netlify only).
+- **Testing infrastructure added**: Vitest unit tests + Playwright e2e tests.
 
 ## Known Constraints
 
 - **Testimonials section** (`#testimonials`) contains placeholder copy — replace with real client quotes before publishing.
-- **Bhandhavi graduation folder** (`/images/graduation/bhandhavi`) was corrected in `data-folder` but the actual image folder may still be named differently on disk — verify the folder name matches.
-- The `#services` cinematic scroll stack is 700vh tall on all screen sizes by design (intentional trade-off for mobile UX).
+- **Bhandhavi graduation folder** (`/images/graduation/bhandhavi`) was corrected in `data-folder` but the actual image folder on disk may be named differently — verify before deploying.
+- The `#services` cinematic scroll stack is **700vh tall on all screen sizes** by design (intentional trade-off for mobile UX).
 - **Business card PDF**: The reportlab-generated PDF doesn't perfectly match the HTML version. For best results, use browser print-to-PDF from `business-card-print.html` with "Background graphics" enabled.
+- `styles.css` is a single global file for all pages (~3,568 lines). Be careful about selector specificity when adding mobile overrides — they must appear after their base definitions.
