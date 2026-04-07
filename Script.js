@@ -892,7 +892,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
         s.classList.remove('cs-slide-active');
         s.classList.add('cs-slide-exit');
         (function(el) {
-          setTimeout(function() { el.classList.remove('cs-slide-exit'); }, 700);
+          setTimeout(function() { el.classList.remove('cs-slide-exit'); }, 360);
         })(s);
       } else {
         s.classList.remove('cs-slide-active', 'cs-slide-exit');
@@ -934,20 +934,21 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     var activeIdx = Math.max(0, Math.min(PANEL_COUNT - 1, Math.floor(rawPanel)));
     var progress  = rawPanel - activeIdx;
 
-    // Handle counter visibility and text
+    var displayIdx = (progress > 0.72 && activeIdx < PANEL_COUNT - 1) ? activeIdx + 1 : activeIdx;
+
+    // Keep the UI in sync with the panel that is visually dominant,
+    // not the one that has only just started sliding in.
     if (counterWrapper) {
-      counterWrapper.style.opacity = activeIdx === 0 ? '0' : '1';
+      counterWrapper.style.opacity = displayIdx === 0 ? '0' : '1';
       counterWrapper.style.transition = 'opacity 0.4s ease';
     }
-    if (counterEl && activeIdx > 0) {
-      var newCount = String(activeIdx).padStart(2, '0');
+    if (counterEl && displayIdx > 0) {
+      var newCount = String(displayIdx).padStart(2, '0');
       if (counterEl.textContent !== newCount) counterEl.textContent = newCount;
     }
 
-    dots.forEach(function(d, i) { d.classList.toggle('active', i === activeIdx); });
-
-    var slideIdx = (progress > 0.4 && activeIdx < PANEL_COUNT - 1) ? activeIdx + 1 : activeIdx;
-    showSlide(slideIdx);
+    dots.forEach(function(d, i) { d.classList.toggle('active', i === displayIdx); });
+    showSlide(displayIdx);
     
     /* Play both the base panel (being covered) and the incoming panel (covering) */
     var nextIdx = (activeIdx < PANEL_COUNT - 1) ? activeIdx + 1 : undefined;

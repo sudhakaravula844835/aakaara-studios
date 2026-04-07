@@ -84,6 +84,22 @@
     z-index: 1;
   }
 
+  .content-glow {
+    position: absolute;
+    left: 50%;
+    top: 49%;
+    width: 860px;
+    height: 720px;
+    transform: translate(-50%, -50%);
+    background:
+      radial-gradient(circle at 50% 46%, rgba(201,149,107,0.14) 0%, rgba(201,149,107,0.1) 18%, rgba(201,149,107,0.05) 38%, rgba(201,149,107,0.02) 56%, transparent 74%);
+    border-radius: 50%;
+    filter: blur(30px);
+    opacity: 0.95;
+    pointer-events: none;
+    z-index: 2;
+  }
+
   /* Vignette */
   .vignette {
     position: absolute;
@@ -322,6 +338,7 @@
         <div class="vignette"></div>
         <div class="grain-overlay"></div>
         <div class="light-leak"></div>
+        <div class="content-glow"></div>
 
         <div class="dp-content" id="dpContent">
           <!-- Default: Brand variant -->
@@ -347,24 +364,11 @@
 </div>
 
 <script>
-function setVariant(type, btn) {
-  document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+let currentVariant = 'brand';
 
-  const content = document.getElementById('dpContent');
-
-  if (type === 'brand') {
-    content.innerHTML = `
-      <div class="dp-name">
-        <div class="dp-dots"><span></span><span></span></div>
-        Aakaara
-      </div>
-      <div class="dp-divider"></div>
-      <div class="dp-subtitle">Studios</div>
-      <div class="dp-location">New York City</div>
-    `;
-  } else if (type === 'monogram') {
-    content.innerHTML = `
+function getVariantMarkup(type) {
+  if (type === 'monogram') {
+    return `
       <div class="dp-monogram">
         <div class="dp-dots"><span></span><span></span></div>
         A
@@ -372,8 +376,10 @@ function setVariant(type, btn) {
       <div class="dp-divider" style="margin-top:16px;"></div>
       <div class="dp-subtitle" style="font-size:18px; letter-spacing:0.5em;">Aakaara Studios</div>
     `;
-  } else if (type === 'editorial') {
-    content.innerHTML = `
+  }
+
+  if (type === 'editorial') {
+    return `
       <div class="dp-editorial-name">
         <div class="dp-dots"><span></span><span></span></div>
         Aakaara
@@ -383,13 +389,41 @@ function setVariant(type, btn) {
       <div class="dp-location" style="margin-top:0;">NYC</div>
     `;
   }
+
+  return `
+    <div class="dp-name">
+      <div class="dp-dots"><span></span><span></span></div>
+      Aakaara
+    </div>
+    <div class="dp-divider"></div>
+    <div class="dp-subtitle">Studios</div>
+    <div class="dp-location">New York City</div>
+  `;
 }
 
-function downloadDP(btn) {
+function setVariant(type, btn) {
+  currentVariant = type;
+  document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const content = document.getElementById('dpContent');
+  content.innerHTML = getVariantMarkup(type);
+}
+
+async function downloadDP(btn) {
   var el = document.getElementById('dpCanvas');
   var exportEl = el.cloneNode(true);
+  var exportContent = exportEl.querySelector('#dpContent');
   
-  // Force the final animation state (consistent with carousel logic)
+  if (exportContent) {
+    exportContent.innerHTML = getVariantMarkup(currentVariant);
+  }
+
+  // Avoid duplicate ids in the temporary export node.
+  exportEl.querySelectorAll('[id]').forEach(function(node) {
+    node.removeAttribute('id');
+  });
+
   el.classList.add('is-visible');
   exportEl.classList.add('is-visible');
   exportEl.id = 'dpCanvasExport';
@@ -413,6 +447,12 @@ function downloadDP(btn) {
   textNode.textContent = ' Exporting\u2026';
   btn.disabled = true;
 
+  try {
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
+  } catch (e) {}
+
   html2canvas(exportEl, {
     scale: 3,
     useCORS: true,
@@ -432,10 +472,29 @@ function downloadDP(btn) {
         divider.style.backgroundImage = 'none';
         divider.style.background = 'rgba(201,149,107,0.5)';
       });
+
+      var leak = clonedDoc.querySelector('.light-leak');
+      if (leak) {
+        leak.style.background = [
+          'radial-gradient(ellipse at 25% 20%, rgba(201,149,107,0.12) 0%, transparent 52%)',
+          'radial-gradient(ellipse at 75% 80%, rgba(140,100,65,0.08) 0%, transparent 48%)',
+          'radial-gradient(ellipse at 50% 50%, rgba(201,149,107,0.06) 0%, transparent 72%)'
+        ].join(',');
+      }
+
+      var contentGlow = clonedDoc.querySelector('.content-glow');
+      if (contentGlow) {
+        contentGlow.style.width = '980px';
+        contentGlow.style.height = '820px';
+        contentGlow.style.borderRadius = '50%';
+        contentGlow.style.filter = 'blur(14px)';
+        contentGlow.style.opacity = '1';
+        contentGlow.style.background = 'radial-gradient(circle at 50% 46%, rgba(201,149,107,0.2) 0%, rgba(201,149,107,0.13) 20%, rgba(201,149,107,0.06) 42%, rgba(201,149,107,0.025) 58%, transparent 76%)';
+      }
     }
   }).then(function(canvas) {
     var link = document.createElement('a');
-    link.download = 'aakaara-insta-dp.png';
+    link.download = 'aakaara-insta-dp-' + currentVariant + '.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
     exportEl.remove();

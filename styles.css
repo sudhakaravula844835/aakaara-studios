@@ -1832,11 +1832,14 @@ body.intro-active #heroScroll { opacity: 0; }
 /* ── Shared text overlay — lives ABOVE all panels in the sticky zone ── */
 .cs-text-overlay {
   position: absolute;
-  bottom: 6rem;
+  top: clamp(8rem, 16vh, 10.5rem);
   left: 3.5rem;
   right: 8rem;
   z-index: 100;
   max-width: 540px;
+  min-height: min(26rem, 52vh);
+  display: flex;
+  align-items: flex-end;
   pointer-events: none;
   perspective: 1000px;
 }
@@ -1846,6 +1849,8 @@ body.intro-active #heroScroll { opacity: 0; }
   left: 0;
   width: 100%;
   opacity: 0;
+  visibility: hidden;
+  filter: blur(0);
   transform: translateY(22px) rotateX(14deg) translateZ(-90px);
   transform-style: preserve-3d;
   transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1853,14 +1858,18 @@ body.intro-active #heroScroll { opacity: 0; }
 }
 .cs-text-slide.cs-slide-active {
   opacity: 1;
+  visibility: visible;
+  z-index: 2;
   pointer-events: auto;
   animation: csSlideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards,
              csFloat 4.5s ease-in-out 0.8s infinite;
 }
 .cs-text-slide.cs-slide-exit {
   opacity: 0;
+  visibility: visible;
+  z-index: 1;
   pointer-events: none;
-  animation: csSlideOut 0.52s cubic-bezier(0.87, 0, 0.13, 1) forwards;
+  animation: csSlideOut 0.32s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 @keyframes csSlideIn {
   from { opacity: 0; transform: translateY(22px) rotateX(14deg) translateZ(-90px); }
@@ -1871,8 +1880,31 @@ body.intro-active #heroScroll { opacity: 0; }
   50%     { transform: translateY(-9px) rotateX(1.8deg) translateZ(20px); }
 }
 @keyframes csSlideOut {
-  from { opacity: 1; transform: translateY(0)     rotateX(0deg)   translateZ(0);    }
-  to   { opacity: 0; transform: translateY(-18px) rotateX(-11deg) translateZ(-65px);}
+  from {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) rotateX(0deg) translateZ(0);
+  }
+  to {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(-20px) rotateX(-11deg) translateZ(-65px);
+  }
+}
+.cs-text-slide[data-slide="0"].cs-slide-exit {
+  animation: csIntroSlideOut 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes csIntroSlideOut {
+  from {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) rotateX(0deg) translateZ(0);
+  }
+  to {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(-26px) rotateX(-9deg) translateZ(-80px);
+  }
 }
 /* cs-text-slide initial state handled above */
 .cs-label {
@@ -2648,7 +2680,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .portfolio-tools { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
   .portfolio-actions { width: 100%; justify-content: flex-start; }
   .sov-grid { grid-template-columns: repeat(2, 1fr); }
-  .cs-text-overlay { left: 2rem; right: 5rem; }
+  .cs-text-overlay { left: 2rem; right: 5rem; top: clamp(7rem, 13vh, 9rem); min-height: min(24rem, 48vh); }
 }
 
 @media (max-width: 768px) {
@@ -2676,7 +2708,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .about-stats { gap: 2rem; }
   .about-actions { flex-direction: column; align-items: flex-start; margin-top: 1.5rem; }
   .intro-mark svg { width: 80px; height: 80px; }
-  .cs-text-overlay { left: 1.5rem; right: 1.5rem; bottom: 3rem; max-width: none; }
+  .cs-text-overlay { left: 1.5rem; right: 1.5rem; top: auto; bottom: 3rem; min-height: auto; display: block; max-width: none; }
   .cs-title { font-size: clamp(1.9rem, 7vw, 2.8rem); }
   .cs-counter { top: 1.5rem; right: 1.5rem; }
   .cs-dots { right: 1rem; }
