@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aakaara Studios — Couple Portraits Pricing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://use.typekit.net/ffu1awu.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0a0d;
+      --card-bg: #141114;
+      --ivory: #f0ebe4;
+      --gold: #c9956b;
+      --gold-soft: rgba(201, 149, 107, 0.15);
+      --muted: rgba(240, 235, 228, 0.5);
+      --line: rgba(214, 190, 170, 0.12);
+      --serif: "ivymode", "Cormorant Garamond", Georgia, serif;
+      --sans: "Outfit", "Helvetica Neue", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ivory);
+      font-family: var(--sans);
+      min-height: 100vh;
+    }
+
+    .sheet {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 3rem;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      aspect-ratio: 16 / 6;
+      overflow: hidden;
+    }
+
+    .hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.7) saturate(0.9);
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(12, 10, 13, 0.3) 0%, rgba(12, 10, 13, 0.05) 40%, rgba(12, 10, 13, 0.65) 80%, rgba(12, 10, 13, 1) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 3.5rem 4rem;
+    }
+
+    .hero-logo {
+      position: absolute;
+      top: 1.5rem;
+      left: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .hero-logo-text {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      color: rgba(240, 235, 228, 0.9);
+    }
+
+    .hero-badge {
+      position: absolute;
+      top: 1.5rem;
+      right: 2rem;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid rgba(201, 149, 107, 0.3);
+      border-radius: 999px;
+      font-size: 0.52rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(201, 149, 107, 0.08);
+    }
+
+    .hero h1 {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: clamp(2.4rem, 4.5vw, 4.2rem);
+      line-height: 1;
+      letter-spacing: 0.02em;
+      color: #fff;
+    }
+
+    .hero-sub {
+      margin-top: 0.5rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    /* ── INTRO ── */
+    .intro {
+      padding: 2.5rem 0;
+      border-bottom: 1px solid var(--line);
+      text-align: center;
+    }
+
+    .intro p {
+      font-size: 0.92rem;
+      line-height: 1.85;
+      color: var(--muted);
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .intro p strong {
+      color: var(--ivory);
+      font-weight: 400;
+    }
+
+    /* ── PACKAGES ── */
+    .packages {
+      padding: 3rem 0 1.5rem;
+    }
+
+    .packages-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .packages-header h2 {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: 1.8rem;
+      letter-spacing: 0.02em;
+    }
+
+    .packages-header::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .pkg-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    .pkg {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      overflow: hidden;
+      background: var(--card-bg);
+      transition: border-color 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .pkg:hover {
+      border-color: rgba(201, 149, 107, 0.3);
+      transform: translateY(-4px);
+    }
+
+    .pkg-img {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 4 / 3;
+    }
+
+    .pkg-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(0.92) brightness(0.88);
+      transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .pkg:hover .pkg-img img {
+      transform: scale(1.06);
+    }
+
+    .pkg-img::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 50%, rgba(20, 17, 20, 0.3) 100%);
+      pointer-events: none;
+    }
+
+    .pkg-info {
+      padding: 1.6rem 1.5rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pkg-tier {
+      font-size: 0.5rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .pkg-name {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: 1.4rem;
+      line-height: 1.1;
+      letter-spacing: 0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .pkg-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex: 1;
+    }
+
+    .pkg-features li {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 0.76rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .pkg-features li::before {
+      content: "";
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--gold);
+      flex-shrink: 0;
+    }
+
+    .pkg-price {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.15rem;
+      border-top: 1px solid var(--line);
+      padding-top: 1.2rem;
+    }
+
+    .pkg-price-currency {
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: var(--gold);
+    }
+
+    .pkg-price-amount {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: 2.4rem;
+      letter-spacing: -0.02em;
+      color: var(--ivory);
+    }
+
+    .section-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      padding: 0.55rem 1.1rem;
+      border: 1px solid rgba(201, 149, 107, 0.25);
+      border-radius: 999px;
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+      background: rgba(201, 149, 107, 0.06);
+      transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .section-link:hover {
+      background: rgba(201, 149, 107, 0.12);
+      border-color: rgba(201, 149, 107, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .section-link svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ── REELS ADD-ON ── */
+    .addons {
+      padding: 2.5rem 0 3rem;
+    }
+
+    .addons-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+    }
+
+    .addons-header h2 {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: 1.8rem;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .addons-header::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .addon-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8rem;
+    }
+
+    .addon {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 1.5rem 1.2rem;
+      background: var(--card-bg);
+      text-align: center;
+      transition: border-color 0.4s ease;
+    }
+
+    .addon:hover {
+      border-color: rgba(201, 149, 107, 0.3);
+    }
+
+    .addon-duration {
+      font-size: 0.48rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.7rem;
+    }
+
+    .addon-time {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: 1.15rem;
+      line-height: 1.2;
+      color: var(--ivory);
+      margin-bottom: 0.3rem;
+    }
+
+    .addon-desc {
+      font-size: 0.66rem;
+      line-height: 1.6;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .addon-price {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.1rem;
+    }
+
+    .addon-price-currency {
+      font-size: 0.65rem;
+      color: var(--gold);
+    }
+
+    .addon-price-amount {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: 1.6rem;
+      color: var(--ivory);
+    }
+
+    /* ── CINEMATIC SECTION ── */
+    .cinematic {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      margin-bottom: 2.5rem;
+      border: 1px solid var(--line);
+    }
+
+    .cinematic img {
+      width: 100%;
+      aspect-ratio: 680 / 280;
+      object-fit: cover;
+      filter: brightness(0.6) saturate(0.85);
+    }
+
+    .cinematic-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(12, 10, 13, 0.4) 0%, rgba(12, 10, 13, 0.2) 40%, rgba(12, 10, 13, 0.75) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem;
+    }
+
+    .cinematic-tag {
+      font-size: 0.48rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .cinematic h3 {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: 1.5rem;
+      line-height: 1.15;
+      letter-spacing: 0.02em;
+      max-width: 22ch;
+    }
+
+    .cinematic-note {
+      margin-top: 0.5rem;
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* ── FOOTER ── */
+    .sheet-footer {
+      border-top: 1px solid var(--line);
+      padding: 2rem 0 3rem;
+      text-align: center;
+    }
+
+    .sheet-footer-logo {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: 1.3rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.8rem;
+      color: rgba(240, 235, 228, 0.85);
+    }
+
+    .sheet-footer-contact {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .sheet-footer-contact a {
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .sheet-footer-contact a:hover {
+      color: var(--gold);
+    }
+
+    .sheet-footer-tagline {
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(240, 235, 228, 0.25);
+      margin-top: 0.5rem;
+    }
+
+    .sheet-footer-note {
+      margin-top: 1.2rem;
+      font-size: 0.64rem;
+      line-height: 1.7;
+      color: rgba(240, 235, 228, 0.3);
+      font-style: italic;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .sheet { padding: 0 1.5rem; }
+      .pkg-grid { grid-template-columns: 1fr; max-width: 480px; }
+      .hero-overlay { padding: 2.5rem 2rem; }
+      .hero { aspect-ratio: 16 / 9; }
+    }
+
+    @media (max-width: 600px) {
+      .sheet { padding: 0 1rem; }
+      .hero { aspect-ratio: 4 / 3; }
+      .hero-overlay { padding: 1.5rem; }
+      .hero-logo { top: 1rem; left: 1.2rem; }
+      .hero-badge { top: 1rem; right: 1.2rem; }
+      .addon-grid { grid-template-columns: 1fr; }
+      .cinematic-overlay { padding: 1.5rem; }
+      .sheet-footer-contact { flex-direction: column; gap: 0.6rem; }
+    }
+
+    /* ── PRINT ── */
+    @media print {
+      body { background: #fff; color: #1a1a1a; }
+      .sheet { max-width: 100%; }
+      .pkg, .addon, .cinematic { border-color: #ddd; break-inside: avoid; }
+      .pkg-img img { filter: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sheet">
+
+    <!-- Hero -->
+    <div class="hero">
+      <img src="/images/couple-portraits/anusha-akshay/7.jpg" alt="Couple portrait by Aakaara Studios">
+      <div class="hero-overlay">
+        <div class="hero-logo">
+          <span class="hero-logo-text">Aakaara Studios</span>
+        </div>
+        <div class="hero-badge">New York City</div>
+        <h1>Couple Portraits</h1>
+        <p class="hero-sub">Investment Guide 2026</p>
+      </div>
+    </div>
+
+    <!-- Intro -->
+    <div class="intro">
+      <p>Every love story is unique, and your portraits should reflect that. From intimate golden-hour sessions to cinematic NYC adventures, we craft images that feel as real as your connection.<br><strong>Choose the package that fits your story.</strong></p>
+    </div>
+
+    <!-- Packages -->
+    <div class="packages">
+      <div class="packages-header">
+        <h2>Packages</h2>
+      </div>
+
+      <div class="pkg-grid">
+        <!-- Package 1 -->
+        <div class="pkg">
+          <div class="pkg-img">
+            <img src="/images/couple-portraits/abhinav-megha/1.jpg" alt="Couple portrait session">
+          </div>
+          <div class="pkg-info">
+            <span class="pkg-tier">Package 01</span>
+            <h3 class="pkg-name">The Story Begins</h3>
+            <ul class="pkg-features">
+              <li>One hour session</li>
+              <li>One location</li>
+              <li>30 edited photos</li>
+              <li>Online gallery</li>
+            <li>Full gallery of unedited proofs — choose your favorites for professional editing</li>
+            </ul>
+            <div class="pkg-price">
+              <span class="pkg-price-currency">$</span>
+              <span class="pkg-price-amount">300</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Package 2 -->
+        <div class="pkg">
+          <div class="pkg-img">
+            <img src="/images/couple-portraits/karthik-sowmya/8.jpg" alt="Couple golden hour session">
+          </div>
+          <div class="pkg-info">
+            <span class="pkg-tier">Package 02</span>
+            <h3 class="pkg-name">The Golden Hour</h3>
+            <ul class="pkg-features">
+              <li>Two hour session</li>
+              <li>Two locations</li>
+              <li>50 edited photos</li>
+              <li>Online gallery</li>
+            <li>Full gallery of unedited proofs — choose your favorites for professional editing</li>
+            </ul>
+            <div class="pkg-price">
+              <span class="pkg-price-currency">$</span>
+              <span class="pkg-price-amount">500</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Package 3 -->
+        <div class="pkg">
+          <div class="pkg-img">
+            <img src="/images/couple-portraits/yogesh-supritha/35.jpg" alt="NYC couple portrait experience">
+          </div>
+          <div class="pkg-info">
+            <span class="pkg-tier">Package 03</span>
+            <h3 class="pkg-name">The NYC Experience</h3>
+            <ul class="pkg-features">
+              <li>Three hour session</li>
+              <li>Three locations</li>
+              <li>75 edited photos</li>
+              <li>Online gallery</li>
+            <li>Full gallery of unedited proofs — choose your favorites for professional editing</li>
+            </ul>
+            <div class="pkg-price">
+              <span class="pkg-price-currency">$</span>
+              <span class="pkg-price-amount">700</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <a href="https://aakaarastudiosnyc.com/couple-portraits.html" target="_blank" class="section-link">
+        View our couple portraits
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H8M17 7V16"/></svg>
+      </a>
+    </div>
+
+    <!-- Reels Add-on -->
+    <div class="addons">
+      <div class="addons-header">
+        <h2>Aesthetic Reels</h2>
+      </div>
+
+      <div class="addon-grid">
+        <div class="addon">
+          <p class="addon-duration">Short Reel</p>
+          <h4 class="addon-time">30 – 40 sec</h4>
+          <p class="addon-desc">Aesthetic reel with B-roll, color grading, and music sync</p>
+          <div class="addon-price">
+            <span class="addon-price-currency">$</span>
+            <span class="addon-price-amount">75</span>
+          </div>
+        </div>
+
+        <div class="addon">
+          <p class="addon-duration">Standard Reel</p>
+          <h4 class="addon-time">30 sec – 1 min</h4>
+          <p class="addon-desc">Stylized reel with transitions, cuts, and storytelling</p>
+          <div class="addon-price">
+            <span class="addon-price-currency">$</span>
+            <span class="addon-price-amount">100</span>
+          </div>
+        </div>
+
+        <div class="addon">
+          <p class="addon-duration">Extended Reel</p>
+          <h4 class="addon-time">2+ min</h4>
+          <p class="addon-desc">Multi-location story with mixed clips and cinematic edit</p>
+          <div class="addon-price">
+            <span class="addon-price-currency">$</span>
+            <span class="addon-price-amount">150</span>
+          </div>
+        </div>
+      </div>
+
+      <a href="https://aakaarastudiosnyc.com/#video-works" target="_blank" class="section-link">
+        View our video work
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H8M17 7V16"/></svg>
+      </a>
+    </div>
+
+    <!-- Cinematic Video -->
+    <div class="cinematic">
+      <img src="/images/couple-portraits/sameeksha-aman/5.jpg" alt="Cinematic NYC couple video">
+      <div class="cinematic-overlay">
+        <span class="cinematic-tag">Premium Add-On</span>
+        <h3>Full Cinematic Video</h3>
+        <p class="cinematic-note">Covering multiple iconic NYC locations — pricing based on scope. Let's discuss your vision.</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="sheet-footer">
+      <div class="sheet-footer-logo">Aakaara Studios</div>
+      <div class="sheet-footer-contact">
+        <a href="tel:+14753122437">+1 475-312-2437</a>
+        <a href="mailto:info@aakaarastudios.com">info@aakaarastudios.com</a>
+        <a href="https://www.instagram.com/aakaarastudiosnyc" target="_blank">@aakaarastudiosnyc</a>
+      </div>
+      <p class="sheet-footer-tagline">Every story deserves its own canvas</p>
+      <p class="sheet-footer-note">Time excludes travel between locations. Prices valid through 2026. All images delivered within 7–10 business days.</p>
+    </div>
+
+  </div>
+
+</body>
+</html>
