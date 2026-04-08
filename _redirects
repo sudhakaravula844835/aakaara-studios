@@ -1,2 +1,4 @@
- /the-experience.html   /couple-portraits.html   301
-/*    /404.html   404
+/the-experience.html   /couple-portraits.html   301
+/admin/*              /admin/:splat            200
+/tools/*              /tools/:splat            200
+/*                    /404.html                404
