@@ -1128,6 +1128,11 @@
             50% { transform: translateY(-10px); }
         }
 
+        @keyframes cpHeroIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
         @media (min-width: 1181px) {
             .cp-experience .cp-section-head {
                 max-width: 68rem;
@@ -1413,12 +1418,17 @@
 
             .cp-section,
             .gallery-shell {
-                padding-top: 4.5rem;
+                padding-top: 3.75rem;
             }
 
             .cp-section {
                 padding-left: 1.1rem;
                 padding-right: 1.1rem;
+                padding-bottom: 3.5rem;
+            }
+
+            .cp-section-head {
+                margin-bottom: 2.25rem;
             }
 
             .cp-hero-copy,
@@ -1426,7 +1436,6 @@
             .gallery-intro,
             .location-guide,
             .filter-bar,
-            .masonry-grid,
             .gallery-footer {
                 padding-left: 1rem;
                 padding-right: 1rem;
@@ -1455,15 +1464,17 @@
             }
 
             .cp-hero-text h1 {
-                font-size: clamp(2.3rem, 11vw, 3.1rem);
-                line-height: 0.98;
-                max-width: 10.6ch;
+                font-size: clamp(1.75rem, 6vw, 2.5rem);
+                line-height: 1.15;
+                max-width: 100%;
                 margin-bottom: 0.75rem;
+                animation: cpHeroIn 0.9s 0.1s ease-out both;
             }
 
             .cp-hero-desc {
-                font-size: 0.84rem;
-                line-height: 1.75;
+                font-size: 0.87rem;
+                line-height: 1.72;
+                opacity: 0.82;
             }
 
             .cp-hero-meta {
@@ -1485,8 +1496,41 @@
                 text-align: center;
             }
 
+            /* Section titles — tighter, more readable on mobile */
+            .cp-section-head h2 {
+                font-size: clamp(1.55rem, 5.5vw, 2.25rem);
+                line-height: 1.18;
+                margin-bottom: 0.65rem;
+            }
+
+            .cp-section-head p {
+                font-size: 0.88rem;
+                line-height: 1.65;
+                opacity: 0.82;
+            }
+
+            .cp-step h3 {
+                font-size: clamp(1.35rem, 5vw, 1.85rem);
+                line-height: 1.18;
+                margin-bottom: 0.5rem;
+            }
+
+            .cp-step p {
+                font-size: 0.85rem;
+                line-height: 1.75;
+            }
+
             .cp-includes-copy h2 {
-                max-width: 10ch;
+                max-width: 100%;
+                font-size: clamp(1.5rem, 5.5vw, 2.1rem);
+                line-height: 1.12;
+            }
+
+            .cp-includes-item h3 {
+                font-size: clamp(1.25rem, 4.8vw, 1.75rem);
+                line-height: 1.18;
+                max-width: 100%;
+                margin-bottom: 0.45rem;
             }
 
             .cp-includes-visual {
@@ -1524,10 +1568,64 @@
                 flex-shrink: 0;
             }
 
+            /* Gallery → horizontal snap carousel */
             .masonry-grid {
-                grid-template-columns: 1fr;
+                display: flex !important;
+                overflow-x: auto;
+                overflow-y: visible;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior-x: contain;
                 gap: 12px;
-                padding-bottom: 4rem;
+                padding: 0 20px 48px;
+                scroll-padding-left: 20px;
+                scrollbar-width: none;
+                max-width: 100%;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .masonry-grid::-webkit-scrollbar {
+                display: none;
+            }
+
+            .work-item {
+                min-width: 76%;
+                max-width: 76%;
+                flex: 0 0 76%;
+                scroll-snap-align: center;
+                border-radius: 16px;
+                aspect-ratio: 3 / 4;
+                height: auto;
+                transform: none;
+            }
+
+            .work-item:hover {
+                transform: none;
+            }
+
+            /* Subtle scale on tap (touch feedback) */
+            .work-item:active {
+                transform: scale(0.98);
+                transition: transform 0.12s ease;
+            }
+
+            /* Gradient depth overlay — always visible on mobile */
+            .work-item::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(180deg, transparent 50%, rgba(9, 8, 11, 0.75));
+                border-radius: 14px;
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            /* Caption always visible on touch (no hover) */
+            .work-item .work-caption {
+                opacity: 1;
+                z-index: 2;
+                font-size: 1rem;
             }
 
             .gallery-footer {
@@ -1589,8 +1687,9 @@
             }
 
             .cp-hero-text h1 {
-                font-size: clamp(1.88rem, 9.6vw, 2.55rem);
-                max-width: 10ch;
+                font-size: clamp(1.55rem, 5.5vw, 2rem);
+                line-height: 1.15;
+                max-width: 100%;
             }
 
             .cp-overline,
@@ -1606,6 +1705,11 @@
             .lg-desc,
             .gallery-intro p {
                 font-size: 0.78rem;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .cp-hero-text h1 {
+                animation: none;
             }
         }
     </style>
@@ -1817,8 +1921,16 @@
             <img src="images/couple-portraits/abhinav-megha/1.jpg" alt="Couple embraces in a sunlit park, photography by Aakaara Studios." loading="lazy" decoding="async" width="1600" height="2400">
             <div class="work-caption">Abhinav & Megha</div>
         </div>
-        <div class="work-item landscape" data-location="central-park">
+        <div class="work-item" data-location="central-park">
             <img src="images/couple-portraits/abhinav-megha/2.jpg" alt="Wide shot of a couple walking hand-in-hand through Central Park." loading="lazy" decoding="async" width="1600" height="2400">
+            <div class="work-caption">Abhinav & Megha</div>
+        </div>
+        <div class="work-item" data-location="central-park">
+            <img src="images/couple-portraits/abhinav-megha/3.jpg" alt="Abhinav & Megha in a tender moment during their NYC portrait session." loading="lazy" decoding="async" width="1600" height="2400">
+            <div class="work-caption">Abhinav & Megha</div>
+        </div>
+        <div class="work-item" data-location="central-park">
+            <img src="images/couple-portraits/abhinav-megha/4.jpg" alt="Abhinav & Megha photographed by Aakaara Studios in Central Park." loading="lazy" decoding="async" width="1600" height="2400">
             <div class="work-caption">Abhinav & Megha</div>
         </div>
 
@@ -1827,8 +1939,16 @@
             <img src="images/couple-portraits/sripad-ritika/1.jpg" alt="Sripad & Ritika pose in DUMBO, Brooklyn." loading="lazy" decoding="async" width="690" height="1035">
             <div class="work-caption">Sripad & Ritika</div>
         </div>
-        <div class="work-item landscape" data-location="dumbo">
+        <div class="work-item" data-location="dumbo">
             <img src="images/couple-portraits/sripad-ritika/2.jpg" alt="A couple laughs together on a cobblestone street in DUMBO." loading="lazy" decoding="async" width="690" height="1035">
+            <div class="work-caption">Sripad & Ritika</div>
+        </div>
+        <div class="work-item" data-location="dumbo">
+            <img src="images/couple-portraits/sripad-ritika/3.jpg" alt="Sripad & Ritika share a candid moment in Brooklyn." loading="lazy" decoding="async" width="690" height="1035">
+            <div class="work-caption">Sripad & Ritika</div>
+        </div>
+        <div class="work-item" data-location="dumbo">
+            <img src="images/couple-portraits/sripad-ritika/4.jpg" alt="Sripad & Ritika photographed by Aakaara Studios in DUMBO." loading="lazy" decoding="async" width="690" height="1035">
             <div class="work-caption">Sripad & Ritika</div>
         </div>
 
@@ -1837,8 +1957,16 @@
             <img src="images/couple-portraits/arvind-nikhila/1.jpg" alt="Intimate studio portrait of Arvind & Nikhila." loading="lazy" decoding="async" width="1920" height="2880">
             <div class="work-caption">Arvind & Nikhila</div>
         </div>
-        <div class="work-item landscape" data-location="studio">
+        <div class="work-item" data-location="studio">
             <img src="images/couple-portraits/arvind-nikhila/2.jpg" alt="A couple in a stylish studio setting, captured by Aakaara Studios." loading="lazy" decoding="async" width="1638" height="2048">
+            <div class="work-caption">Arvind & Nikhila</div>
+        </div>
+        <div class="work-item" data-location="studio">
+            <img src="images/couple-portraits/arvind-nikhila/3.jpg" alt="Arvind & Nikhila in a warm editorial portrait." loading="lazy" decoding="async" width="1920" height="2880">
+            <div class="work-caption">Arvind & Nikhila</div>
+        </div>
+        <div class="work-item" data-location="studio">
+            <img src="images/couple-portraits/arvind-nikhila/4.jpg" alt="Arvind & Nikhila photographed by Aakaara Studios NYC." loading="lazy" decoding="async" width="1638" height="2048">
             <div class="work-caption">Arvind & Nikhila</div>
         </div>
 
@@ -1847,8 +1975,16 @@
             <img src="images/couple-portraits/sachin-poojitha/1.jpg" alt="Sachin & Poojitha on the Brooklyn Bridge at sunrise." loading="lazy" decoding="async" width="1600" height="2400">
             <div class="work-caption">Sachin & Poojitha</div>
         </div>
-        <div class="work-item landscape" data-location="brooklyn-bridge">
+        <div class="work-item" data-location="brooklyn-bridge">
             <img src="images/couple-portraits/sachin-poojitha/2.jpg" alt="A couple walking on the iconic Brooklyn Bridge." loading="lazy" decoding="async" width="1920" height="1280">
+            <div class="work-caption">Sachin & Poojitha</div>
+        </div>
+        <div class="work-item" data-location="brooklyn-bridge">
+            <img src="images/couple-portraits/sachin-poojitha/3.jpg" alt="Sachin & Poojitha share a quiet moment near the Brooklyn Bridge." loading="lazy" decoding="async" width="1600" height="2400">
+            <div class="work-caption">Sachin & Poojitha</div>
+        </div>
+        <div class="work-item" data-location="brooklyn-bridge">
+            <img src="images/couple-portraits/sachin-poojitha/4.jpg" alt="Sachin & Poojitha photographed by Aakaara Studios at the Brooklyn Bridge." loading="lazy" decoding="async" width="1600" height="2400">
             <div class="work-caption">Sachin & Poojitha</div>
         </div>
 
@@ -1857,8 +1993,16 @@
             <img src="images/couple-portraits/yogesh-supritha/1.jpg" alt="Yogesh & Supritha in a stylish DUMBO portrait session." loading="lazy" decoding="async" width="1920" height="1280">
             <div class="work-caption">Yogesh & Supritha</div>
         </div>
-        <div class="work-item landscape" data-location="dumbo">
+        <div class="work-item" data-location="dumbo">
             <img src="images/couple-portraits/yogesh-supritha/2.jpg" alt="Couple portrait with the Manhattan Bridge in the background." loading="lazy" decoding="async" width="1920" height="2880">
+            <div class="work-caption">Yogesh & Supritha</div>
+        </div>
+        <div class="work-item" data-location="dumbo">
+            <img src="images/couple-portraits/yogesh-supritha/3.jpg" alt="Yogesh & Supritha in a candid moment in Brooklyn." loading="lazy" decoding="async" width="1920" height="2880">
+            <div class="work-caption">Yogesh & Supritha</div>
+        </div>
+        <div class="work-item" data-location="dumbo">
+            <img src="images/couple-portraits/yogesh-supritha/4.jpg" alt="Yogesh & Supritha photographed by Aakaara Studios in DUMBO." loading="lazy" decoding="async" width="1920" height="2880">
             <div class="work-caption">Yogesh & Supritha</div>
         </div>
 
@@ -1867,8 +2011,16 @@
             <img src="images/couple-portraits/suprith-pragnya/1.jpg" alt="Suprith & Pragnya enjoying a walk in Central Park." loading="lazy" decoding="async" width="4439" height="6658">
             <div class="work-caption">Suprith & Pragnya</div>
         </div>
-        <div class="work-item landscape" data-location="central-park">
+        <div class="work-item" data-location="central-park">
             <img src="images/couple-portraits/suprith-pragnya/2.jpg" alt="A candid moment between a couple in a New York park." loading="lazy" decoding="async" width="7008" height="4672">
+            <div class="work-caption">Suprith & Pragnya</div>
+        </div>
+        <div class="work-item" data-location="central-park">
+            <img src="images/couple-portraits/suprith-pragnya/3.jpg" alt="Suprith & Pragnya in an intimate portrait by Aakaara Studios." loading="lazy" decoding="async" width="4439" height="6658">
+            <div class="work-caption">Suprith & Pragnya</div>
+        </div>
+        <div class="work-item" data-location="central-park">
+            <img src="images/couple-portraits/suprith-pragnya/4.jpg" alt="Suprith & Pragnya photographed in New York City." loading="lazy" decoding="async" width="4439" height="6658">
             <div class="work-caption">Suprith & Pragnya</div>
         </div>
 
@@ -1877,8 +2029,16 @@
             <img src="images/couple-portraits/vyshnavi-shiva/1.jpg" alt="Vyshnavi & Shiva in a classic DUMBO photo spot." loading="lazy" decoding="async" width="1371" height="2056">
             <div class="work-caption">Vyshnavi & Shiva</div>
         </div>
-        <div class="work-item landscape" data-location="dumbo">
+        <div class="work-item" data-location="dumbo">
             <img src="images/couple-portraits/vyshnavi-shiva/2.jpg" alt="Couple portrait session in the streets of DUMBO, Brooklyn." loading="lazy" decoding="async" width="1371" height="2056">
+            <div class="work-caption">Vyshnavi & Shiva</div>
+        </div>
+        <div class="work-item" data-location="dumbo">
+            <img src="images/couple-portraits/vyshnavi-shiva/3.jpg" alt="Vyshnavi & Shiva share a tender moment in Brooklyn." loading="lazy" decoding="async" width="1371" height="2056">
+            <div class="work-caption">Vyshnavi & Shiva</div>
+        </div>
+        <div class="work-item" data-location="dumbo">
+            <img src="images/couple-portraits/vyshnavi-shiva/4.jpg" alt="Vyshnavi & Shiva photographed by Aakaara Studios in DUMBO." loading="lazy" decoding="async" width="1371" height="2056">
             <div class="work-caption">Vyshnavi & Shiva</div>
         </div>
 
@@ -1887,9 +2047,89 @@
             <img src="images/couple-portraits/anuradha-suresh/1.jpg" alt="Anuradha & Suresh in an elegant studio portrait." loading="lazy" decoding="async" width="2333" height="3500">
             <div class="work-caption">Anuradha & Suresh</div>
         </div>
-        <div class="work-item landscape" data-location="studio">
+        <div class="work-item" data-location="studio">
             <img src="images/couple-portraits/anuradha-suresh/2.jpg" alt="A creative studio portrait of a couple by Aakaara Studios." loading="lazy" decoding="async" width="2333" height="3500">
             <div class="work-caption">Anuradha & Suresh</div>
+        </div>
+        <div class="work-item" data-location="studio">
+            <img src="images/couple-portraits/anuradha-suresh/3.jpg" alt="Anuradha & Suresh in a warm editorial portrait session." loading="lazy" decoding="async" width="2333" height="3500">
+            <div class="work-caption">Anuradha & Suresh</div>
+        </div>
+        <div class="work-item" data-location="studio">
+            <img src="images/couple-portraits/anuradha-suresh/4.jpg" alt="Anuradha & Suresh photographed by Aakaara Studios NYC." loading="lazy" decoding="async" width="2333" height="3500">
+            <div class="work-caption">Anuradha & Suresh</div>
+        </div>
+
+        <!-- Anusha & Akshay -->
+        <div class="work-item" data-location="central-park">
+            <img src="images/couple-portraits/anusha-akshay/1.jpg" alt="Anusha & Akshay share a quiet moment during their New York portrait session." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Anusha & Akshay</div>
+        </div>
+        <div class="work-item" data-location="central-park">
+            <img src="images/couple-portraits/anusha-akshay/2.jpg" alt="Anusha & Akshay photographed by Aakaara Studios NYC." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Anusha & Akshay</div>
+        </div>
+        <div class="work-item" data-location="central-park">
+            <img src="images/couple-portraits/anusha-akshay/3.jpg" alt="Anusha & Akshay in a candid moment during their NYC session." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Anusha & Akshay</div>
+        </div>
+        <div class="work-item" data-location="central-park">
+            <img src="images/couple-portraits/anusha-akshay/4.jpg" alt="Anusha & Akshay in an intimate portrait by Aakaara Studios." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Anusha & Akshay</div>
+        </div>
+
+        <!-- Karthik & Sowmya -->
+        <div class="work-item" data-location="dumbo">
+            <img src="images/couple-portraits/karthik-sowmya/1.jpg" alt="Karthik & Sowmya in a cinematic couple portrait in New York City." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Karthik & Sowmya</div>
+        </div>
+        <div class="work-item" data-location="dumbo">
+            <img src="images/couple-portraits/karthik-sowmya/2.jpg" alt="Karthik & Sowmya captured by Aakaara Studios in Brooklyn." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Karthik & Sowmya</div>
+        </div>
+        <div class="work-item" data-location="dumbo">
+            <img src="images/couple-portraits/karthik-sowmya/3.jpg" alt="Karthik & Sowmya share a tender moment in New York City." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Karthik & Sowmya</div>
+        </div>
+        <div class="work-item" data-location="dumbo">
+            <img src="images/couple-portraits/karthik-sowmya/4.jpg" alt="Karthik & Sowmya in an editorial portrait by Aakaara Studios." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Karthik & Sowmya</div>
+        </div>
+
+        <!-- Sai Srinivas & Akruthi -->
+        <div class="work-item" data-location="central-park">
+            <img src="images/couple-portraits/sai-srinivas-akruthi/1.jpg" alt="Sai Srinivas & Akruthi in an intimate portrait session in New York." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Sai Srinivas & Akruthi</div>
+        </div>
+        <div class="work-item" data-location="central-park">
+            <img src="images/couple-portraits/sai-srinivas-akruthi/2.jpg" alt="Sai Srinivas & Akruthi photographed by Aakaara Studios NYC." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Sai Srinivas & Akruthi</div>
+        </div>
+        <div class="work-item" data-location="central-park">
+            <img src="images/couple-portraits/sai-srinivas-akruthi/3.jpg" alt="Sai Srinivas & Akruthi share a candid moment in New York City." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Sai Srinivas & Akruthi</div>
+        </div>
+        <div class="work-item" data-location="central-park">
+            <img src="images/couple-portraits/sai-srinivas-akruthi/4.jpg" alt="Sai Srinivas & Akruthi in a warm portrait by Aakaara Studios." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Sai Srinivas & Akruthi</div>
+        </div>
+
+        <!-- Sameeksha & Aman -->
+        <div class="work-item" data-location="brooklyn-bridge">
+            <img src="images/couple-portraits/sameeksha-aman/1.jpg" alt="Sameeksha & Aman in a cinematic portrait session in New York City." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Sameeksha & Aman</div>
+        </div>
+        <div class="work-item" data-location="brooklyn-bridge">
+            <img src="images/couple-portraits/sameeksha-aman/2.jpg" alt="Sameeksha & Aman photographed by Aakaara Studios NYC." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Sameeksha & Aman</div>
+        </div>
+        <div class="work-item" data-location="brooklyn-bridge">
+            <img src="images/couple-portraits/sameeksha-aman/3.jpg" alt="Sameeksha & Aman share a tender moment during their NYC session." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Sameeksha & Aman</div>
+        </div>
+        <div class="work-item" data-location="brooklyn-bridge">
+            <img src="images/couple-portraits/sameeksha-aman/4.jpg" alt="Sameeksha & Aman in an editorial portrait by Aakaara Studios." loading="lazy" decoding="async" width="1440" height="2160">
+            <div class="work-caption">Sameeksha & Aman</div>
         </div>
     </main>
 
