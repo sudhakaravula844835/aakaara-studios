@@ -17,3 +17,6 @@ framer-lab.html
 tools/generate-card-pdf.py
 tools/render-card-pdf.mjs
 tools/aakaara-business-card-print.pdf
+
+# Local Netlify folder
+.netlify
