@@ -10,7 +10,12 @@ def optimize_images(folder_path, backup_dir=None, max_width=1920, quality=75, we
  
     if backup_dir:
         backup_dir = Path(backup_dir)
-        print(f"✅ Backing up original images to: {backup_dir.name}")
+        if backup_dir.exists():
+            print(f"⚠️  Backup directory already exists, skipping backup: {backup_dir.name}")
+        else:
+            print(f"Backing up original images to: {backup_dir.name} ...")
+            shutil.copytree(folder_path, backup_dir)
+            print(f"✅ Backup complete: {backup_dir.name}")
 
     watermark = None
     if watermark_path and Path(watermark_path).exists():
@@ -82,7 +87,7 @@ def optimize_images(folder_path, backup_dir=None, max_width=1920, quality=75, we
     print(f"Total space saved: {saved_space/1024/1024:.2f} MB")
  
 if __name__ == "__main__":
-    SRC_DIR = Path(__file__).parent
+    SRC_DIR = Path(__file__).parent.parent
     images_dir = SRC_DIR / "images"
     backup_dir = SRC_DIR / "images_original_backup"
  

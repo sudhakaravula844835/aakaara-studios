@@ -2706,7 +2706,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .footer-col h5 { margin-bottom: 0.6rem; }
   .footer-col a { margin-bottom: 0.3rem; }
   .about-stats { gap: 2rem; }
-  .about-actions { flex-direction: column; align-items: flex-start; margin-top: 1.5rem; }
+  .about-actions { flex-direction: column; align-items: stretch; margin-top: 1.5rem; text-align: center; max-width: 20rem; }
   .intro-mark svg { width: 80px; height: 80px; }
   .cs-text-overlay { left: 1.5rem; right: 1.5rem; top: auto; bottom: 3rem; min-height: auto; display: block; max-width: none; }
   .cs-title { font-size: clamp(1.9rem, 7vw, 2.8rem); }
