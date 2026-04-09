@@ -725,7 +725,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     };
 
     dockMouseLeaveFn = () => {
-      dockTargetScales = dockTargetScales.map(() => MIN_SCALE);
+      for (let i = 0; i < dockTargetScales.length; i++) dockTargetScales[i] = MIN_SCALE;
       dockLerp = 0.10;
       if (!dockRAFRunning) {
         dockRAFRunning = true;
