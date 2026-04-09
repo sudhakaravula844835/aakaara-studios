@@ -677,24 +677,61 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   }
 
   // Mac Dock Effect for Filmstrip — desktop/pointer only
+  // Listeners are re-attached in renderSwStrip() on every gallery open
   if (galleryStrip && !window.matchMedia('(hover: none)').matches) {
-    const RADIUS = 120, MAX_BOOST = 0.9;
-    dockMouseMoveFn = (e) => {
-      const mx = e.clientX;
-      stripThumbCache.forEach(thumb => {
-        const rect = thumb.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const dist = Math.abs(mx - cx);
-        // Gaussian-style falloff: max scale 1.9, influence radius 120px
-        const scale = dist < RADIUS ? 1 + MAX_BOOST * Math.pow(1 - dist / RADIUS, 2) : 1;
-        thumb.style.transform = `scale(${scale.toFixed(3)})`;
+    const EFFECT_WIDTH = 240, MAX_SCALE = 1.85, MIN_SCALE = 1.0;
+
+    function dockTick() {
+      let settled = true;
+      stripThumbCache.forEach((thumb, i) => {
+        const diff = dockTargetScales[i] - dockCurrentScales[i];
+        if (Math.abs(diff) > 0.002) {
+          dockCurrentScales[i] += diff * dockLerp;
+          settled = false;
+        } else {
+          dockCurrentScales[i] = dockTargetScales[i];
+        }
+        thumb.style.transform = `scale(${dockCurrentScales[i].toFixed(4)})`;
       });
+      if (!settled) {
+        dockRAF = requestAnimationFrame(dockTick);
+      } else {
+        dockRAFRunning = false;
+        dockRAF = null;
+      }
+    }
+
+    dockMouseMoveFn = (e) => {
+      const stripRect = galleryStrip.getBoundingClientRect();
+      const mouseRelX = e.clientX - stripRect.left;
+      stripThumbCache.forEach((thumb, i) => {
+        const thumbRect = thumb.getBoundingClientRect();
+        const thumbCenterX = thumbRect.left - stripRect.left + thumbRect.width / 2;
+        const minX = mouseRelX - EFFECT_WIDTH / 2;
+        const maxX = mouseRelX + EFFECT_WIDTH / 2;
+        if (thumbCenterX >= minX && thumbCenterX <= maxX) {
+          const theta = ((thumbCenterX - minX) / EFFECT_WIDTH) * 2 * Math.PI;
+          const scaleFactor = (1 - Math.cos(theta)) / 2;
+          dockTargetScales[i] = MIN_SCALE + scaleFactor * (MAX_SCALE - MIN_SCALE);
+        } else {
+          dockTargetScales[i] = MIN_SCALE;
+        }
+      });
+      dockLerp = 0.18;
+      if (!dockRAFRunning) {
+        dockRAFRunning = true;
+        dockRAF = requestAnimationFrame(dockTick);
+      }
     };
+
     dockMouseLeaveFn = () => {
-      stripThumbCache.forEach(thumb => { thumb.style.transform = ''; });
+      dockTargetScales = dockTargetScales.map(() => MIN_SCALE);
+      dockLerp = 0.10;
+      if (!dockRAFRunning) {
+        dockRAFRunning = true;
+        dockRAF = requestAnimationFrame(dockTick);
+      }
     };
-    galleryStrip.addEventListener('mousemove', dockMouseMoveFn);
-    galleryStrip.addEventListener('mouseleave', dockMouseLeaveFn);
   }
 
   window.openSwGallery = openSwGallery;
