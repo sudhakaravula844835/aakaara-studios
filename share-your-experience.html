@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Share Your Experience · Aakaara Studios NYC</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --noir: #09080b;
+      --umber: #1e1a16;
+      --rose: #c9956b;
+      --rose-light: #dbb08a;
+      --ivory: #faf6f1;
+      --champagne: #f2e6d9;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Outfit', sans-serif;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body {
+      background: var(--noir);
+      color: var(--ivory);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+    }
+
+    .logo {
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+
+    .logo svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    .logo-name {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      color: var(--ivory);
+      margin-top: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .card {
+      background: var(--umber);
+      border: 1px solid rgba(201, 149, 107, 0.15);
+      border-radius: 16px;
+      padding: 3rem 2.5rem;
+      max-width: 620px;
+      width: 100%;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 300;
+      line-height: 1.2;
+      color: var(--ivory);
+      margin-bottom: 0.75rem;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: rgba(250, 246, 241, 0.55);
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--rose-light);
+      margin-bottom: 0.5rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: rgba(9, 8, 11, 0.5);
+      border: 1px solid rgba(201, 149, 107, 0.2);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      color: var(--ivory);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--rose);
+    }
+
+    select option {
+      background: var(--umber);
+    }
+
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .star-row {
+      display: flex;
+      gap: 0.4rem;
+      margin-top: 0.25rem;
+    }
+
+    .star-row input[type="radio"] { display: none; }
+
+    .star-row label {
+      font-size: 1.8rem;
+      color: rgba(201, 149, 107, 0.25);
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: 0;
+      padding: 0;
+      margin: 0;
+      transition: color 0.15s;
+      line-height: 1;
+    }
+
+    .star-row:hover label { color: var(--rose); }
+    .star-row label:hover ~ label { color: rgba(201, 149, 107, 0.25); }
+    .star-row input[type="radio"]:checked ~ label { color: rgba(201, 149, 107, 0.25); }
+    .star-row input[type="radio"]:checked + label,
+    .star-row label:has(~ input[type="radio"]:checked) { color: var(--rose); }
+
+    /* simpler fallback for star highlighting */
+    .star-btn {
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: rgba(201, 149, 107, 0.25);
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.15s;
+    }
+    .star-btn.active { color: var(--rose); }
+
+    .consent-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+    }
+
+    .consent-row input[type="checkbox"] {
+      width: auto;
+      flex-shrink: 0;
+      margin-top: 3px;
+      accent-color: var(--rose);
+    }
+
+    .consent-row p {
+      font-size: 0.85rem;
+      color: rgba(250, 246, 241, 0.5);
+      line-height: 1.5;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--rose);
+      color: var(--noir);
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s var(--ease), transform 0.15s;
+    }
+
+    .submit-btn:hover { background: var(--rose-light); transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
+
+    /* honeypot */
+    .ohnohoney { display: none !important; }
+
+    .success-state {
+      display: none;
+      text-align: center;
+      padding: 2rem 0;
+    }
+
+    .success-state .check {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .success-state h2 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 300;
+      margin-bottom: 0.75rem;
+    }
+
+    .success-state p {
+      color: rgba(250, 246, 241, 0.55);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 3rem;
+      font-size: 0.85rem;
+      color: rgba(250, 246, 241, 0.4);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--rose); }
+
+    @media (max-width: 600px) {
+      .card { padding: 2rem 1.5rem; }
+      h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo">
+    <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="30" cy="18" rx="8" ry="15" fill="#c9956b" opacity="0.85" transform="rotate(0 30 30)"/>
+      <ellipse cx="30" cy="18" rx="8" ry="15" fill="#c9956b" opacity="0.55" transform="rotate(90 30 30)"/>
+      <ellipse cx="30" cy="18" rx="8" ry="15" fill="#c9956b" opacity="0.35" transform="rotate(45 30 30)"/>
+      <ellipse cx="30" cy="18" rx="8" ry="15" fill="#c9956b" opacity="0.20" transform="rotate(135 30 30)"/>
+    </svg>
+    <div class="logo-name">Aakaara Studios</div>
+  </div>
+
+  <div class="card">
+    <div id="formState">
+      <h1>Your Experience Matters</h1>
+      <p class="subtitle">Thank you for trusting us with your story. A few words from you mean the world — and help others find the same experience.</p>
+
+      <form
+        name="testimonial"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        id="testimonialForm"
+      >
+        <input type="hidden" name="form-name" value="testimonial">
+        <p class="ohnohoney"><label>Don't fill this out: <input name="bot-field"></label></p>
+
+        <div class="form-group">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" name="name" placeholder="e.g. Priya & Arjun" required>
+        </div>
+
+        <div class="form-group">
+          <label for="service">Session Type</label>
+          <select id="service" name="service" required>
+            <option value="" disabled selected>Select your session</option>
+            <option>Wedding Photography</option>
+            <option>Engagement Session</option>
+            <option>Couple Portraits</option>
+            <option>Maternity Session</option>
+            <option>First Birthday</option>
+            <option>Graduation</option>
+            <option>House Warming</option>
+            <option>Conceptual / Editorial</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="location">City / Location</label>
+          <input type="text" id="location" name="location" placeholder="e.g. Brooklyn, NY" required>
+        </div>
+
+        <div class="form-group">
+          <label>Your Rating</label>
+          <div class="star-row" id="starRow" role="group" aria-label="Star rating">
+            <button type="button" class="star-btn" data-val="1" aria-label="1 star">★</button>
+            <button type="button" class="star-btn" data-val="2" aria-label="2 stars">★</button>
+            <button type="button" class="star-btn" data-val="3" aria-label="3 stars">★</button>
+            <button type="button" class="star-btn" data-val="4" aria-label="4 stars">★</button>
+            <button type="button" class="star-btn" data-val="5" aria-label="5 stars">★</button>
+          </div>
+          <input type="hidden" name="stars" id="starsInput" value="5">
+        </div>
+
+        <div class="form-group">
+          <label for="quote">Your Words</label>
+          <textarea id="quote" name="quote" placeholder="Tell us about your experience — what stood out, how it felt, what you'll carry with you…" required></textarea>
+        </div>
+
+        <div class="consent-row">
+          <input type="checkbox" id="consent" name="consent" value="yes" required>
+          <p>I give Aakaara Studios permission to display this testimonial on their website and social media.</p>
+        </div>
+
+        <button type="submit" class="submit-btn">Send My Testimonial</button>
+      </form>
+    </div>
+
+    <div class="success-state" id="successState">
+      <div class="check">✦</div>
+      <h2>Thank you so much.</h2>
+      <p>Your words mean more than you know. We're grateful you trusted us with your story, and we'd love to work with you again.</p>
+    </div>
+  </div>
+
+  <a href="/" class="back-link">← Back to Aakaara Studios</a>
+
+  <script>
+    // Star rating interaction
+    var stars = document.querySelectorAll('.star-btn');
+    var starsInput = document.getElementById('starsInput');
+    var currentVal = 5;
+
+    // default all active
+    stars.forEach(function(s) { s.classList.add('active'); });
+
+    stars.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        currentVal = parseInt(btn.getAttribute('data-val'));
+        starsInput.value = currentVal;
+        stars.forEach(function(s) {
+          s.classList.toggle('active', parseInt(s.getAttribute('data-val')) <= currentVal);
+        });
+      });
+    });
+
+    // AJAX form submit → show success state instead of redirecting
+    document.getElementById('testimonialForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var form = e.target;
+      fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(new FormData(form)).toString()
+      })
+      .then(function() {
+        document.getElementById('formState').style.display = 'none';
+        document.getElementById('successState').style.display = 'block';
+      })
+      .catch(function() {
+        alert('Something went wrong. Please email us directly at info@aakaarastudiosnyc.com');
+      });
+    });
+  </script>
+
+</body>
+</html>
