@@ -587,7 +587,10 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   function closeSwGallery() {
     if (!swIsOpen) return;
     gallery.classList.add('sw-gallery-exit');
+    let cleanupCalled = false;
     function cleanup() {
+      if (cleanupCalled) return;
+      cleanupCalled = true;
       gallery.classList.remove('sw-open', 'sw-gallery-enter', 'sw-gallery-exit', 'sw-static', 'sw-is-coming-soon');
       // Remove any gi- classes added for coming soon background
       gallery.className = gallery.className.replace(/gi-\d+/g, '').trim();
@@ -597,6 +600,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       if (galleryStrip) {
         galleryStrip.innerHTML = '';
         if (_dockBoundMoveFn) { galleryStrip.removeEventListener('mousemove', _dockBoundMoveFn); _dockBoundMoveFn = null; }
+        // dockMouseLeaveFn is stable (set once in IIFE) — null check guards touch devices where it was never assigned
         if (dockMouseLeaveFn) { galleryStrip.removeEventListener('mouseleave', dockMouseLeaveFn); }
       }
       stripThumbCache = [];
@@ -728,6 +732,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
         const minX = mouseRelX - EFFECT_WIDTH / 2;
         const maxX = mouseRelX + EFFECT_WIDTH / 2;
         if (thumbCenterX >= minX && thumbCenterX <= maxX) {
+          // Cosine bell: theta sweeps 0→2π across EFFECT_WIDTH; (1-cos(θ))/2 gives 0 at edges, 1 at centre (θ=π)
           const theta = ((thumbCenterX - minX) / EFFECT_WIDTH) * 2 * Math.PI;
           const scaleFactor = (1 - Math.cos(theta)) / 2;
           dockTargetScales[i] = MIN_SCALE + scaleFactor * (MAX_SCALE - MIN_SCALE);
@@ -735,7 +740,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
           dockTargetScales[i] = MIN_SCALE;
         }
       });
-      dockLerp = 0.18;
+      dockLerp = 0.18; // Reset to fast lerp (may have been slowed to 0.10 by a prior mouseleave)
       if (!dockRAFRunning) {
         dockRAFRunning = true;
         dockRAF = requestAnimationFrame(dockTick);
