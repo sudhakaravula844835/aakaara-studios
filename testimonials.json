@@ -1,0 +1,30 @@
+[
+  {
+    "quote": "Working with Aakaara Studios was an absolute dream. Every shot captured exactly who we are as a couple — the light, the emotion, the details we almost missed ourselves. These photos are our forever.",
+    "name": "Priya & Arjun",
+    "service": "Wedding Photography",
+    "location": "New York City",
+    "stars": 5
+  },
+  {
+    "quote": "I've worked with photographers before but nothing like this. Sudhakar has a gift for making you feel completely at ease, and the images show it. My maternity photos are stunning.",
+    "name": "Divya Menon",
+    "service": "Maternity Session",
+    "location": "New Jersey",
+    "stars": 5
+  },
+  {
+    "quote": "The engagement shoot exceeded every expectation. The cinematic quality, the attention to every small moment — we didn't just get photos, we got a story. Absolutely worth every penny.",
+    "name": "Sana & Rahul",
+    "service": "Engagement Session",
+    "location": "Brooklyn, NY",
+    "stars": 5
+  },
+  {
+    "quote": "Our daughter's first birthday portraits are breathtaking. You can feel the joy in every frame. We'll be coming back for every milestone.",
+    "name": "Ananya Krishnan",
+    "service": "First Birthday",
+    "location": "Queens, NY",
+    "stars": 5
+  }
+]
