@@ -448,6 +448,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   let stripThumbCache = [];
   let dockMouseMoveFn = null, dockMouseLeaveFn = null;
   let dockCurrentScales = [], dockTargetScales = [], dockRAF = null, dockRAFRunning = false, dockLerp = 0.18;
+  let _dockBoundMoveFn = null;
 
   function openSwGallery(work) {
     lastFocusedElement = document.activeElement;
@@ -568,7 +569,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     dockCurrentScales = stripThumbCache.map(() => 1.0);
     dockTargetScales  = stripThumbCache.map(() => 1.0);
     if (dockMouseMoveFn) {
-      galleryStrip.removeEventListener('mousemove',  dockMouseMoveFn);
+      if (_dockBoundMoveFn) galleryStrip.removeEventListener('mousemove', _dockBoundMoveFn);
       galleryStrip.removeEventListener('mouseleave', dockMouseLeaveFn);
       // Cache strip rect and thumb centres — stable while gallery is open (scroll locked)
       const cachedStripRect = galleryStrip.getBoundingClientRect();
@@ -577,7 +578,8 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
         return r.left - cachedStripRect.left + r.width / 2;
       });
       // Wrap listeners with cached values to avoid per-event layout reads
-      galleryStrip.addEventListener('mousemove', (e) => dockMouseMoveFn(e, cachedStripRect, thumbCenters));
+      _dockBoundMoveFn = (e) => dockMouseMoveFn(e, cachedStripRect, thumbCenters);
+      galleryStrip.addEventListener('mousemove', _dockBoundMoveFn);
       galleryStrip.addEventListener('mouseleave', dockMouseLeaveFn);
     }
   }
@@ -593,7 +595,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       galleryImg.style.backgroundImage = '';
       if (galleryStrip) {
         galleryStrip.innerHTML = '';
-        if (dockMouseMoveFn)  { galleryStrip.removeEventListener('mousemove',  dockMouseMoveFn);  }
+        if (_dockBoundMoveFn) { galleryStrip.removeEventListener('mousemove', _dockBoundMoveFn); _dockBoundMoveFn = null; }
         if (dockMouseLeaveFn) { galleryStrip.removeEventListener('mouseleave', dockMouseLeaveFn); }
       }
       stripThumbCache = [];
