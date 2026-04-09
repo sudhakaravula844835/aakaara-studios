@@ -447,6 +447,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   let swImages = [], swIndex = 0, swIsOpen = false, swParafRAF = null, lastFocusedElement = null;
   let stripThumbCache = [];
   let dockMouseMoveFn = null, dockMouseLeaveFn = null;
+  let dockCurrentScales = [], dockTargetScales = [], dockRAF = null, dockRAFRunning = false, dockLerp = 0.18;
 
   function openSwGallery(work) {
     lastFocusedElement = document.activeElement;
@@ -2436,106 +2437,121 @@ let portfolioCarousel, videoCarousel;
   });
 })();
 
-// ═══════ MOBILE TESTIMONIALS CAROUSEL ═══════
+// ═══════ TESTIMONIALS — FLOATING SCROLL ANIMATION ═══════
 (function() {
-  function makeSvgArrow(pointLeft) {
-    const ns = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(ns, 'svg');
-    svg.setAttribute('width', '20'); svg.setAttribute('height', '20');
-    svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('fill', 'none');
-    svg.setAttribute('stroke', 'currentColor');
-    svg.setAttribute('stroke-width', '1.5');
-    const path = document.createElementNS(ns, 'path');
-    path.setAttribute('d', pointLeft ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6');
-    svg.appendChild(path);
-    return svg;
-  }
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  function initTestimonialsCarousel() {
-    if (window.innerWidth > 768) return;
-    const section = document.getElementById('testimonials');
-    if (!section) return;
-    const grid = section.querySelector('.testimonials-grid');
-    if (!grid) return;
-    const cards = Array.from(grid.querySelectorAll('.testimonial-card'));
-    if (cards.length < 2) return;
+  const wrapper = document.querySelector('.lab-testimonial-wrapper');
+  const stage = document.querySelector('.lab-testimonial-stage');
+  if (!wrapper || !stage) return;
 
-    // Wrap grid with arrow-hint container
-    const wrapper = document.createElement('div');
-    wrapper.className = 'tm-arrow-hints';
-    grid.parentNode.insertBefore(wrapper, grid);
-    wrapper.appendChild(grid);
+  const marquee = stage.querySelector('.lab-testimonial-marquee');
+  const track = stage.querySelector('.lab-testimonial-track');
+  const cards = Array.from(stage.querySelectorAll('.lab-quote-card'));
+  if (!marquee || !track || !cards.length) return;
 
-    const leftArrow = document.createElement('div');
-    leftArrow.className = 'tm-arrow-hint tm-arrow-hint--left';
-    leftArrow.appendChild(makeSvgArrow(true));
-    wrapper.appendChild(leftArrow);
+  const interactiveViewport = () => window.innerWidth > 767 && !prefersReducedMotion.matches;
 
-    const rightArrow = document.createElement('div');
-    rightArrow.className = 'tm-arrow-hint tm-arrow-hint--right';
-    rightArrow.appendChild(makeSvgArrow(false));
-    wrapper.appendChild(rightArrow);
+  let wrapTop = 0;
+  let currentProgress = 0;
+  let targetProgress = 0;
 
-    // Dot indicators below the wrapper
-    const dotsEl = document.createElement('div');
-    dotsEl.className = 'tm-dots';
-    cards.forEach((_, i) => {
-      const dot = document.createElement('button');
-      dot.className = 'tm-dot' + (i === 0 ? ' active' : '');
-      dot.setAttribute('aria-label', 'Go to testimonial ' + (i + 1));
-      dot.addEventListener('click', () => {
-        grid.scrollTo({ left: i * window.innerWidth, behavior: 'smooth' });
-      });
-      dotsEl.appendChild(dot);
+  const cacheLayout = () => {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    wrapTop = wrapper.getBoundingClientRect().top + scrollTop;
+  };
+
+  const pauseTrack = () => stage.classList.add('is-paused');
+  const resumeTrack = () => stage.classList.remove('is-paused');
+
+  marquee.addEventListener('pointerenter', pauseTrack);
+  marquee.addEventListener('pointerleave', resumeTrack);
+  marquee.addEventListener('focusin', pauseTrack);
+  marquee.addEventListener('focusout', resumeTrack);
+  cards.forEach((card) => {
+    card.addEventListener('pointerenter', pauseTrack);
+    card.addEventListener('pointerleave', resumeTrack);
+    card.addEventListener('focusin', pauseTrack);
+    card.addEventListener('focusout', resumeTrack);
+  });
+
+  cacheLayout();
+  window.addEventListener('resize', cacheLayout, { passive: true });
+  window.addEventListener('load', cacheLayout, { once: true });
+
+  const motionCards = cards.map((card, index) => ({
+    element: card,
+    order: Number(card.dataset.cardIndex || index),
+    baseX: Number(card.dataset.x || 0),
+    amplitude: Number(card.dataset.amp || 14),
+    speed: 0.00055 * Number(card.dataset.speed || 1),
+    phase: Number(card.dataset.phase || 0) + index * 0.37,
+    rotationBase: Number(card.dataset.rotate || 0),
+    rotationAmplitude: 0.28 + (index % 4) * 0.09,
+    driftAmplitude: 4.2 + (index % 3) * 1.8
+  }));
+
+  let activeTime = 0;
+  let lastTime = 0;
+
+  const render = (time) => {
+    if (!lastTime) lastTime = time;
+    const delta = Math.min(time - lastTime, 40);
+    lastTime = time;
+
+    const isInteractive = interactiveViewport();
+    const isPaused = stage.classList.contains('is-paused');
+
+    if (isInteractive && !isPaused) activeTime += delta;
+
+    if (isInteractive) {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const viewportHeight = window.innerHeight || 1;
+      const scrollInto = scrollY - wrapTop;
+      const maxProgress = Math.max(cards.length - 1, 0);
+      targetProgress = Math.max(0, Math.min(maxProgress, scrollInto / viewportHeight));
+      currentProgress += (targetProgress - currentProgress) * 0.12;
+    } else {
+      currentProgress = 0;
+      targetProgress = 0;
+    }
+
+    const stageWidth = stage.clientWidth || window.innerWidth;
+    const horizontalGutter = Math.max(18, stageWidth * 0.025);
+
+    motionCards.forEach((card) => {
+      const t = activeTime * card.speed + card.phase;
+      const driftX = Math.cos(t * 0.82) * card.driftAmplitude;
+      const y = Math.sin(t) * card.amplitude;
+      const rotation = card.rotationBase + Math.sin(t * 0.74) * card.rotationAmplitude;
+      const relative = card.order - currentProgress;
+      const distance = Math.abs(relative);
+      const verticalStep = (window.innerHeight || 900) * 0.74;
+      const scrollY = relative * verticalStep;
+      const opacity = Math.max(0, Math.min(1, 1 - distance * 0.4));
+      const scale = Math.max(0.84, 1 - distance * 0.08);
+      const zIndex = String(40 - Math.round(distance * 10));
+      const halfCardWidth = (card.element.offsetWidth * scale) / 2;
+      const baseX = (card.baseX / 100) * stageWidth;
+      const safeX = Math.max(
+        (-stageWidth / 2) + halfCardWidth + horizontalGutter,
+        Math.min((stageWidth / 2) - halfCardWidth - horizontalGutter, baseX + driftX)
+      );
+
+      card.element.style.setProperty('--float-x', '0px');
+      card.element.style.setProperty('--card-safe-x', `${safeX.toFixed(2)}px`);
+      card.element.style.setProperty('--float-y', `${y.toFixed(2)}px`);
+      card.element.style.setProperty('--float-rotate', `${rotation.toFixed(2)}deg`);
+      card.element.style.setProperty('--scroll-react-y', `${scrollY.toFixed(2)}px`);
+      card.element.style.setProperty('--card-scale', `${scale.toFixed(3)}`);
+      card.element.style.setProperty('--card-opacity', `${opacity.toFixed(3)}`);
+      card.element.style.zIndex = zIndex;
     });
-    wrapper.parentNode.insertBefore(dotsEl, wrapper.nextSibling);
 
-    // Fade arrows after 2 seconds
-    setTimeout(() => {
-      leftArrow.classList.add('faded');
-      rightArrow.classList.add('faded');
-    }, 2000);
+    requestAnimationFrame(render);
+  };
 
-    // Sync active dot on scroll
-    const dots = Array.from(dotsEl.querySelectorAll('.tm-dot'));
-    grid.addEventListener('scroll', () => {
-      const idx = Math.round(grid.scrollLeft / window.innerWidth);
-      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
-    }, { passive: true });
-
-    // Touch swipe — explicit handler for reliability across iOS/Android
-    let tmTouchStartX = 0, tmTouchStartY = 0, tmIsHorizontal = null;
-    grid.addEventListener('touchstart', (e) => {
-      tmTouchStartX = e.touches[0].clientX;
-      tmTouchStartY = e.touches[0].clientY;
-      tmIsHorizontal = null;
-    }, { passive: true });
-    grid.addEventListener('touchmove', (e) => {
-      const dx = e.touches[0].clientX - tmTouchStartX;
-      const dy = e.touches[0].clientY - tmTouchStartY;
-      if (tmIsHorizontal === null && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
-        tmIsHorizontal = Math.abs(dx) > Math.abs(dy);
-      }
-      if (tmIsHorizontal) e.preventDefault();
-    }, { passive: false });
-    grid.addEventListener('touchend', (e) => {
-      if (!tmIsHorizontal) return;
-      const dx = e.changedTouches[0].clientX - tmTouchStartX;
-      if (Math.abs(dx) > 40) {
-        const current = Math.round(grid.scrollLeft / window.innerWidth);
-        const next = Math.max(0, Math.min(cards.length - 1, current + (dx < 0 ? 1 : -1)));
-        grid.scrollTo({ left: next * window.innerWidth, behavior: 'smooth' });
-      }
-      tmIsHorizontal = null;
-    }, { passive: true });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initTestimonialsCarousel);
-  } else {
-    initTestimonialsCarousel();
-  }
+  requestAnimationFrame(render);
 })();
 
 // ═══════ ABOUT NAME REVEAL ═══════
