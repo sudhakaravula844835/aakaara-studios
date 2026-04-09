@@ -593,6 +593,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       gallery.className = gallery.className.replace(/gi-\d+/g, '').trim();
       
       galleryImg.style.backgroundImage = '';
+      if (dockRAF) { cancelAnimationFrame(dockRAF); dockRAF = null; dockRAFRunning = false; }
       if (galleryStrip) {
         galleryStrip.innerHTML = '';
         if (_dockBoundMoveFn) { galleryStrip.removeEventListener('mousemove', _dockBoundMoveFn); _dockBoundMoveFn = null; }
