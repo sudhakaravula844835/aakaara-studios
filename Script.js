@@ -571,14 +571,12 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     if (dockMouseMoveFn) {
       if (_dockBoundMoveFn) galleryStrip.removeEventListener('mousemove', _dockBoundMoveFn);
       galleryStrip.removeEventListener('mouseleave', dockMouseLeaveFn);
-      // Cache strip rect and thumb centres — stable while gallery is open (scroll locked)
-      const cachedStripRect = galleryStrip.getBoundingClientRect();
-      const thumbCenters = stripThumbCache.map(t => {
-        const r = t.getBoundingClientRect();
-        return r.left - cachedStripRect.left + r.width / 2;
-      });
-      // Wrap listeners with cached values to avoid per-event layout reads
-      _dockBoundMoveFn = (e) => dockMouseMoveFn(e, cachedStripRect, thumbCenters);
+      // Cache strip's left edge (viewport-relative, stable while gallery is open).
+      // Thumb centres use offsetLeft (scroll-content space) so they stay valid after horizontal scroll.
+      const cachedStripLeft = galleryStrip.getBoundingClientRect().left;
+      const thumbCenters = stripThumbCache.map(t => t.offsetLeft + t.offsetWidth / 2);
+      // Wrap listener with cached values to avoid per-event layout reads
+      _dockBoundMoveFn = (e) => dockMouseMoveFn(e, cachedStripLeft, thumbCenters);
       galleryStrip.addEventListener('mousemove', _dockBoundMoveFn);
       galleryStrip.addEventListener('mouseleave', dockMouseLeaveFn);
     }
@@ -726,8 +724,9 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       }
     }
 
-    dockMouseMoveFn = (e, stripRect, thumbCenters) => {
-      const mouseRelX = e.clientX - stripRect.left;
+    dockMouseMoveFn = (e, stripLeft, thumbCenters) => {
+      // Add scrollLeft so mouseRelX and thumbCenters share the same scroll-content coordinate space
+      const mouseRelX = e.clientX - stripLeft + galleryStrip.scrollLeft;
       thumbCenters.forEach((thumbCenterX, i) => {
         const minX = mouseRelX - EFFECT_WIDTH / 2;
         const maxX = mouseRelX + EFFECT_WIDTH / 2;
