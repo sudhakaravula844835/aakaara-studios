@@ -562,6 +562,24 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
         renderSwImage(swIndex, false);
       });
     });
+
+    // Reset dock scale state for fresh strip, then re-attach listeners.
+    // Re-attachment is needed because closeSwGallery removes listeners on every close.
+    dockCurrentScales = stripThumbCache.map(() => 1.0);
+    dockTargetScales  = stripThumbCache.map(() => 1.0);
+    if (dockMouseMoveFn) {
+      galleryStrip.removeEventListener('mousemove',  dockMouseMoveFn);
+      galleryStrip.removeEventListener('mouseleave', dockMouseLeaveFn);
+      // Cache strip rect and thumb centres — stable while gallery is open (scroll locked)
+      const cachedStripRect = galleryStrip.getBoundingClientRect();
+      const thumbCenters = stripThumbCache.map(t => {
+        const r = t.getBoundingClientRect();
+        return r.left - cachedStripRect.left + r.width / 2;
+      });
+      // Wrap listeners with cached values to avoid per-event layout reads
+      galleryStrip.addEventListener('mousemove', (e) => dockMouseMoveFn(e, cachedStripRect, thumbCenters));
+      galleryStrip.addEventListener('mouseleave', dockMouseLeaveFn);
+    }
   }
 
   function closeSwGallery() {
@@ -701,12 +719,9 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       }
     }
 
-    dockMouseMoveFn = (e) => {
-      const stripRect = galleryStrip.getBoundingClientRect();
+    dockMouseMoveFn = (e, stripRect, thumbCenters) => {
       const mouseRelX = e.clientX - stripRect.left;
-      stripThumbCache.forEach((thumb, i) => {
-        const thumbRect = thumb.getBoundingClientRect();
-        const thumbCenterX = thumbRect.left - stripRect.left + thumbRect.width / 2;
+      thumbCenters.forEach((thumbCenterX, i) => {
         const minX = mouseRelX - EFFECT_WIDTH / 2;
         const maxX = mouseRelX + EFFECT_WIDTH / 2;
         if (thumbCenterX >= minX && thumbCenterX <= maxX) {
