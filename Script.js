@@ -2510,14 +2510,96 @@ let portfolioCarousel, videoCarousel;
   if (!marquee || !track || !cards.length) return;
 
   const interactiveViewport = () => window.innerWidth > 767 && !prefersReducedMotion.matches;
+  const mobileCurrentEl = stage.querySelector('[data-testimonial-mobile-current]');
+  const mobilePips = Array.from(stage.querySelectorAll('.lab-testimonial-mobile-pip'));
+  const clampValue = (value, min, max) => Math.min(max, Math.max(min, value));
 
   let wrapTop = 0;
   let currentProgress = 0;
   let targetProgress = 0;
+  let mobileScrollTick = 0;
+  let mobileSnapTimer = 0;
+
+  const setMobileActive = (index) => {
+    cards.forEach((card, cardIndex) => {
+      card.classList.toggle('is-mobile-active', cardIndex === index);
+    });
+
+    mobilePips.forEach((pip, pipIndex) => {
+      pip.classList.toggle('is-active', pipIndex === index);
+    });
+
+    if (mobileCurrentEl) {
+      mobileCurrentEl.textContent = String(index + 1).padStart(2, '0');
+    }
+  };
+
+  const syncMobileActive = () => {
+    if (interactiveViewport()) return;
+    const trackRect = track.getBoundingClientRect();
+    const trackCenter = trackRect.left + (trackRect.width / 2);
+
+    let activeIndex = 0;
+    let nearestDistance = Infinity;
+
+    cards.forEach((card, index) => {
+      const rect = card.getBoundingClientRect();
+      const cardCenter = rect.left + (rect.width / 2);
+      const deltaPx = cardCenter - trackCenter;
+      const distance = Math.abs(deltaPx);
+      const normalized = clampValue(deltaPx / (rect.width * 0.92), -1.35, 1.35);
+      const depth = 1 - Math.min(Math.abs(normalized), 1);
+      const scale = 0.92 + (depth * 0.08);
+      const rotateY = normalized * -10;
+      const shiftX = normalized * -12;
+      const lift = 5 - (depth * 8);
+      const opacity = 0.5 + (depth * 0.5);
+      const shadow = 0.08 + (depth * 0.14);
+      const quoteParallax = -1 * depth;
+      const footerParallax = 4.5 * depth;
+      const avatarParallax = -3 * depth;
+      const sealParallax = 2 * depth;
+
+      card.style.setProperty('--mobile-rotateY', `${rotateY.toFixed(2)}deg`);
+      card.style.setProperty('--mobile-shift-x', `${shiftX.toFixed(2)}px`);
+      card.style.setProperty('--mobile-lift', `${lift.toFixed(2)}px`);
+      card.style.setProperty('--mobile-scale', `${scale.toFixed(3)}`);
+      card.style.setProperty('--mobile-opacity', `${opacity.toFixed(3)}`);
+      card.style.setProperty('--mobile-shadow', `${shadow.toFixed(3)}`);
+      card.style.setProperty('--quote-parallax', `${quoteParallax.toFixed(2)}px`);
+      card.style.setProperty('--footer-parallax', `${footerParallax.toFixed(2)}px`);
+      card.style.setProperty('--avatar-parallax', `${avatarParallax.toFixed(2)}px`);
+      card.style.setProperty('--seal-parallax', `${sealParallax.toFixed(2)}px`);
+
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        activeIndex = index;
+      }
+    });
+
+    setMobileActive(activeIndex);
+    return activeIndex;
+  };
+
+  const snapMobileTrack = () => {
+    if (interactiveViewport()) return;
+    const activeIndex = syncMobileActive();
+    const activeCard = cards[activeIndex];
+    if (!activeCard) return;
+
+    const targetLeft = activeCard.offsetLeft - ((track.clientWidth - activeCard.offsetWidth) / 2);
+    track.scrollTo({
+      left: Math.max(0, targetLeft),
+      behavior: 'smooth'
+    });
+  };
 
   const cacheLayout = () => {
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
     wrapTop = wrapper.getBoundingClientRect().top + scrollTop;
+    if (!interactiveViewport()) {
+      syncMobileActive();
+    }
   };
 
   const pauseTrack = () => stage.classList.add('is-paused');
@@ -2527,6 +2609,20 @@ let portfolioCarousel, videoCarousel;
   marquee.addEventListener('pointerleave', resumeTrack);
   marquee.addEventListener('focusin', pauseTrack);
   marquee.addEventListener('focusout', resumeTrack);
+
+  track.addEventListener('scroll', () => {
+    if (mobileScrollTick) return;
+    mobileScrollTick = requestAnimationFrame(() => {
+      mobileScrollTick = 0;
+      syncMobileActive();
+    });
+
+    window.clearTimeout(mobileSnapTimer);
+    mobileSnapTimer = window.setTimeout(() => {
+      snapMobileTrack();
+    }, 110);
+  }, { passive: true });
+
   cards.forEach((card) => {
     card.addEventListener('pointerenter', pauseTrack);
     card.addEventListener('pointerleave', resumeTrack);
@@ -2537,6 +2633,7 @@ let portfolioCarousel, videoCarousel;
   cacheLayout();
   window.addEventListener('resize', cacheLayout, { passive: true });
   window.addEventListener('load', cacheLayout, { once: true });
+  setMobileActive(0);
 
   const motionCards = cards.map((card, index) => ({
     element: card,
@@ -2606,6 +2703,10 @@ let portfolioCarousel, videoCarousel;
       card.element.style.setProperty('--card-opacity', `${opacity.toFixed(3)}`);
       card.element.style.zIndex = zIndex;
     });
+
+    if (!isInteractive) {
+      syncMobileActive();
+    }
 
     requestAnimationFrame(render);
   };
