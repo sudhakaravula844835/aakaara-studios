@@ -141,6 +141,18 @@ body::after {
   text-transform: uppercase;
   margin-top: 2px;
 }
+.draft-indicator {
+  margin-top: 7px;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 1.7px;
+  color: var(--warm-grey);
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+.draft-indicator[data-tone="saving"] { color: var(--gold); }
+.draft-indicator[data-tone="saved"] { color: var(--gold-light); }
+.draft-indicator[data-tone="error"] { color: var(--red); }
 .topbar-actions { display: flex; gap: 10px; }
 
 /* ── BUTTONS ── */
@@ -327,6 +339,47 @@ body::after {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 8px;
+}
+
+/* ── QUICK IMPORT ── */
+.import-card {
+  background: linear-gradient(180deg, rgba(32, 28, 20, 0.92), rgba(19, 19, 17, 0.98));
+  border: 1px solid var(--border);
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  box-shadow: inset 0 0 0 1px rgba(201, 168, 76, 0.04);
+}
+.import-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.import-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+.import-copy {
+  margin-top: 6px;
+  color: var(--warm-grey);
+  font-size: 12px;
+  max-width: 540px;
+  line-height: 1.6;
+}
+.import-textarea {
+  min-height: 156px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+}
+.import-status {
+  margin-top: 12px;
+  color: var(--warm-grey);
+  font-size: 12px;
+  line-height: 1.6;
 }
 
 /* ── EVENT DAY BLOCKS ── */
@@ -530,6 +583,7 @@ body::after {
   .form-row.three { grid-template-columns: 1fr; }
   .event-item { grid-template-columns: 1fr; }
   .deliverables-grid { grid-template-columns: 1fr; }
+  .import-header { flex-direction: column; }
   .container { padding: 16px 16px 120px; }
   .topbar { padding: 12px 16px; }
   .generate-bar { padding: 12px 16px; }

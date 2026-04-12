@@ -29,9 +29,10 @@
     <div>
       <div class="topbar-brand">Aakaara Studios</div>
       <div class="topbar-title">Quote Generator</div>
+      <div class="draft-indicator" id="draftIndicator" aria-live="polite">Local draft ready</div>
     </div>
     <div class="topbar-actions">
-      <button class="btn btn-ghost btn-small" onclick="resetForm()">New Quote</button>
+      <button type="button" class="btn btn-ghost btn-small" onclick="resetForm()">New Quote</button>
       <a href="dashboard.html" class="btn btn-ghost btn-small" style="text-decoration: none;">Dashboard</a>
     </div>
   </div>
@@ -41,6 +42,29 @@
     <!-- CLIENT INFO -->
     <div class="section">
       <div class="section-label">01 — Client Information</div>
+      <div class="import-card">
+        <div class="import-header">
+          <div>
+            <div class="import-title">Quick Import</div>
+            <div class="import-copy">Paste rough event notes and auto-fill the schedule, location, and email.</div>
+          </div>
+          <button type="button" class="btn btn-ghost btn-small" onclick="importBrief()">Import Details</button>
+        </div>
+        <div class="form-row single" style="margin-top:12px;">
+          <div class="form-group">
+            <label class="form-label">Paste Event Brief</label>
+            <textarea class="form-textarea import-textarea" id="quickImportText" placeholder="July 4th engagement (4 hours)
+14th Sangeet (4 hours)
+Aug 15th Haldi (4 hours)
+Aug 15th Peli Koduku, Peli Kuthuru (3 hours)
+Aug 16th Marriage Wedding (6 hours)
+
+Charlotte, North Carolina
+client@example.com"></textarea>
+          </div>
+        </div>
+        <div class="import-status" id="importStatus">Dates, hours, and repeated-day events will be grouped automatically.</div>
+      </div>
       <div class="form-row three">
         <div class="form-group">
           <label class="form-label">Client Name(s)</label>
@@ -79,7 +103,7 @@
     <div class="section">
       <div class="section-label">02 — Event Schedule</div>
       <div id="daysContainer"></div>
-      <button class="add-btn" id="addDayBtn" onclick="addDay()">+ Add Day</button>
+      <button type="button" class="add-btn" id="addDayBtn" onclick="addDay()">+ Add Day</button>
     </div>
 
     <!-- DELIVERABLES -->
@@ -122,7 +146,7 @@
       <div class="form-row three">
         <div class="form-group">
           <label class="form-label">Pricing Model</label>
-          <select class="form-select" id="pricingModel" onchange="updatePricingUI()">
+          <select class="form-select" id="pricingModel">
             <option value="hourly">Hourly Rate</option>
             <option value="flat">Flat Package</option>
           </select>
@@ -153,7 +177,7 @@
       </div>
       <div class="form-row">
         <label class="form-checkbox">
-          <input type="checkbox" id="showIntro" onchange="updatePricingUI()">
+          <input type="checkbox" id="showIntro">
           <span>Show as Introductory/Special Rate</span>
         </label>
         <div class="form-group" id="standardRateGroup" style="display:none;">
@@ -196,8 +220,8 @@
       <div class="total-display" id="totalDisplay">$0</div>
     </div>
     <div style="display:flex;gap:10px;">
-      <button class="btn btn-danger btn-small" onclick="resetForm()">Reset</button>
-      <button class="btn btn-primary" onclick="generatePDF('preview')">
+      <button type="button" class="btn btn-danger btn-small" onclick="resetForm()">Reset</button>
+      <button type="button" class="btn btn-primary" onclick="generatePDF('preview')">
         Preview Quote
       </button>
     </div>
@@ -212,8 +236,8 @@
   <div class="preview-header">
     <div class="preview-title">Quote Preview</div>
     <div style="display:flex;gap:10px;">
-      <button class="btn btn-ghost btn-small" onclick="closePreview()">Close</button>
-      <button class="btn btn-primary btn-small" onclick="sendQuoteEmail()">Confirm & Send</button>
+      <button type="button" class="btn btn-ghost btn-small" onclick="closePreview()">Close</button>
+      <button type="button" class="btn btn-primary btn-small" onclick="sendQuoteEmail()">Confirm & Send</button>
     </div>
   </div>
   <div class="preview-body"><iframe id="previewFrame" class="preview-frame"></iframe></div>

@@ -335,6 +335,185 @@ if (portfolioSelect) {
   });
 }
 
+// ═══════ PORTFOLIO STORY CARDS ═══════
+const portfolioNarrativeDefaults = {
+  wedding: {
+    kicker: 'Wedding Story',
+    scene: '',
+    story: 'A quiet beginning, then a celebration that gathered everyone close.'
+  },
+  engagement: {
+    kicker: 'Engagement Session',
+    scene: '',
+    story: 'Soft light, easy laughter, and the feeling of what comes next.'
+  },
+  couple: {
+    kicker: 'Portrait Session',
+    scene: '',
+    story: 'Two people, one rhythm, and a frame that lingers a little longer.'
+  },
+  graduation: {
+    kicker: 'Graduation Portraits',
+    scene: 'Milestone Story',
+    story: 'A chapter closing with pride, and the next one already in view.'
+  },
+  maternity: {
+    kicker: 'Maternity Story',
+    scene: '',
+    story: 'A season of waiting, tenderness, and becoming held with care.'
+  },
+  brand: {
+    kicker: 'Brand Story',
+    scene: 'Editorial Collaboration',
+    story: 'Craft, texture, and identity shaped into images with quiet confidence.'
+  },
+  housewarming: {
+    kicker: 'House Warming',
+    scene: 'Home Story',
+    story: 'Blessings, movement, and a home slowly filling with meaning.'
+  },
+  events: {
+    kicker: 'Event Story',
+    scene: 'Live Coverage',
+    story: 'A fast-moving room, distilled into moments that still feel personal.'
+  },
+  birthday: {
+    kicker: 'Celebration Story',
+    scene: 'Family Milestone',
+    story: 'Joy in motion, held with the warmth of the people around it.'
+  },
+  spring: {
+    kicker: 'Seasonal Portrait',
+    scene: 'Editorial Study',
+    story: 'Light, texture, and atmosphere shaped into something quietly memorable.'
+  },
+  default: {
+    kicker: 'Featured Story',
+    scene: '',
+    story: 'A cinematic moment shaped to feel lived in, not staged.'
+  }
+};
+
+const portfolioNarrativeLibrary = {
+  '/images/weddings/abhinav-megha': {
+    story: 'A poised beginning that opened into a celebration full of warmth.'
+  },
+  '/images/weddings/bhavya-subodh': {
+    story: 'Sacred rituals, steady glances, and a room that kept leaning closer.'
+  },
+  '/images/weddings/abhishek-tanya': {
+    story: 'Classic, luminous, and carried by the energy of everyone present.'
+  },
+  '/images/weddings/sophie-eric': {
+    story: 'Tender vows, elegant light, and a day that felt quietly cinematic.'
+  },
+  '/images/weddings/central-park-wedding': {
+    scene: 'Central Park, New York City',
+    story: 'Open sky, city air, and promises held right in the middle of it all.'
+  },
+  '/images/engagement/vyshnavi-daniel': {
+    story: 'Easy laughter, held glances, and the quiet certainty of what comes next.'
+  },
+  '/images/couple-portraits/anusha-akshay': {
+    story: 'A soft conversation between style, chemistry, and unhurried presence.'
+  },
+  '/images/couple-portraits/abhinav-megha': {
+    story: 'Playful, intimate, and shaped around the spaces between the poses.'
+  },
+  '/images/couple-portraits/karthik-sowmya': {
+    story: 'Warm light, quiet confidence, and a love that reads effortlessly on camera.'
+  },
+  '/images/couple-portraits/sripad-ritika': {
+    story: 'Classic portraiture with the kind of ease that makes it feel lived in.'
+  },
+  '/images/couple-portraits/arvind-nikhila': {
+    story: 'A calm, grounded story built from glances, pacing, and presence.'
+  },
+  '/images/couple-portraits/sachin-poojitha': {
+    story: 'Playfulness in the frame, tenderness underneath it.'
+  },
+  '/images/couple-portraits/yogesh-supritha': {
+    story: 'Elegant, affectionate, and made to feel effortless rather than posed.'
+  },
+  '/images/couple-portraits/sameeksha-aman': {
+    story: 'Editorial in mood, intimate in feeling, and full of quiet confidence.'
+  },
+  '/images/couple-portraits/suprith-pragnya': {
+    story: 'A portrait story with movement, softness, and just enough restraint.'
+  },
+  '/images/couple-portraits/vyshnavi-shiva': {
+    story: 'Gentle light, expressive styling, and a connection that carries the frame.'
+  },
+  '/images/couple-portraits/anuradha-suresh': {
+    story: 'Simple, warm, and centered on the comfort they carry together.'
+  },
+  '/images/couple-portraits/sai-srinivas-akruthi': {
+    story: 'Natural chemistry, clean composition, and emotion that never feels forced.'
+  },
+  '/images/graduation/Nicoli': {
+    story: 'A proud turning point captured with elegance and a sense of arrival.'
+  },
+  '/images/graduation/bhandhavi': {
+    story: 'The kind of milestone portrait that feels both accomplished and deeply personal.'
+  },
+  '/images/maternity/shreya': {
+    story: 'Grace, anticipation, and the softness of a new chapter beginning.'
+  },
+  '/images/brand-collabs/mrga': {
+    scene: 'Editorial Brand Story',
+    story: 'Product, texture, and identity brought together with cinematic restraint.'
+  },
+  '/images/house-warming/Sharan & soundarya': {
+    story: 'Threshold rituals, gathered voices, and warmth settling into every room.'
+  },
+  '/images/house-warming/bhargavi': {
+    story: 'A home becoming memory through detail, blessing, and family presence.'
+  }
+};
+
+function createStoryElement(tagName, className, text) {
+  const node = document.createElement(tagName);
+  node.className = className;
+  node.textContent = text;
+  return node;
+}
+
+function initPortfolioStoryCards() {
+  document.querySelectorAll('.gallery-item:not(.gi-cinematic)').forEach(item => {
+    if (item.dataset.comingSoon === 'true') return;
+
+    const overlayBody = item.querySelector('.gi-overlay > div');
+    if (!overlayBody) return;
+
+    const category = item.dataset.cat || 'default';
+    const defaults = portfolioNarrativeDefaults[category] || portfolioNarrativeDefaults.default;
+    const custom = portfolioNarrativeLibrary[item.dataset.folder] || {};
+    const title = item.dataset.title || overlayBody.querySelector('h4')?.textContent?.trim() || '';
+    const kicker = item.dataset.type || custom.kicker || defaults.kicker;
+    const scene = item.dataset.location || custom.scene || defaults.scene;
+    const story = item.dataset.story || custom.story || defaults.story;
+
+    const storyCard = document.createElement('div');
+    storyCard.className = 'gi-story-card';
+    storyCard.append(
+      createStoryElement('div', 'gi-kicker', kicker),
+      createStoryElement('h4', 'gi-editorial-title', title),
+    );
+
+    if (scene) {
+      storyCard.append(createStoryElement('div', 'gi-scene', scene));
+    }
+
+    storyCard.append(createStoryElement('span', 'gi-divider gi-editorial-divider', ''));
+    storyCard.append(createStoryElement('p', 'gi-storyline', story));
+
+    overlayBody.replaceWith(storyCard);
+    item.classList.add('gi-editorial');
+  });
+}
+
+initPortfolioStoryCards();
+
 // ═══════ AUTO-LOAD COVER IMAGES ═══════
 const galleryObserver = new IntersectionObserver((entries, observer) => {
   entries.forEach(entry => {
