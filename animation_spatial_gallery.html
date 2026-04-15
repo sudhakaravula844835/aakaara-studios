@@ -413,7 +413,7 @@
 
     // Per-card: depth nudge. Shine angle only when a card is hovered.
     var shineAngle = hoveredCount > 0
-      ? Math.atan2(mouse.y, mouse.x) * (180 / Math.PI)
+      ? Math.atan2(lerped.y, lerped.x) * (180 / Math.PI)
       : null;
 
     cards.forEach(function (card, i) {
