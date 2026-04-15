@@ -380,8 +380,55 @@
     }, 200);
   }
 
-  /* ─── Temporary stub — will be replaced in Task 7 ───────── */
-  function startParallax() {}
+  /* ─── Parallax state ─────────────────────────────────────── */
+  var mouse  = { x: 0, y: 0 };   // normalised [-1, 1] target
+  var lerped = { x: 0, y: 0 };   // smoothed current value
+  var rafId  = null;
+  var active = false;
+  var hoveredCount = 0;           // tracks how many cards are hovered
+
+  function startParallax() {
+    active = true;
+    tick();
+  }
+
+  function stopParallax() {
+    active = false;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  }
+
+  function tick() {
+    if (!active) return;
+    rafId = requestAnimationFrame(tick);
+
+    // Smooth lerp toward mouse target
+    lerped.x = lerp(lerped.x, mouse.x, 0.06);
+    lerped.y = lerp(lerped.y, mouse.y, 0.06);
+
+    // World tilt — rotate the entire helix field toward the cursor
+    field.style.transform = (
+      'rotateY(' + (lerped.x * 8) + 'deg) ' +
+      'rotateX(' + (lerped.y * -5) + 'deg)'
+    );
+
+    // Per-card: depth nudge. Shine angle only when a card is hovered.
+    var shineAngle = hoveredCount > 0
+      ? Math.atan2(mouse.y, mouse.x) * (180 / Math.PI)
+      : null;
+
+    cards.forEach(function (card, i) {
+      var h = HELIX[i];
+      // Front cards (depth=0) get full nudge; back cards (depth=1) get almost none
+      var nudgeX = lerped.x * (1 - h.depth) * 18;
+      var nudgeY = lerped.y * (1 - h.depth) * 10;
+      card.style.transform = cardTransform(i, nudgeX, nudgeY);
+
+      // Only update shine angle when a card is hovered (avoids unnecessary repaints)
+      if (shineAngle !== null) {
+        card.style.setProperty('--shine-angle', (shineAngle + 115) + 'deg');
+      }
+    });
+  }
 
   initHelix();
 
