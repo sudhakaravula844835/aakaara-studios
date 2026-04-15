@@ -296,7 +296,7 @@
       </div>
     </section>
 
-    <div class="study-meta">Wheel · Drag · Arrow Keys</div>
+    <div class="study-meta">Move cursor to explore</div>
   </main>
 <script>
 (function () {
@@ -430,7 +430,42 @@
     });
   }
 
-  initHelix();
+  /* ─── Mouse listeners ────────────────────────────────────── */
+  stage.addEventListener('mousemove', function (e) {
+    var r = stage.getBoundingClientRect();
+    mouse.x = ((e.clientX - r.left)  / r.width  - 0.5) * 2;
+    mouse.y = ((e.clientY - r.top)   / r.height - 0.5) * 2;
+  });
+
+  stage.addEventListener('mouseleave', function () {
+    mouse.x = 0;
+    mouse.y = 0;
+  });
+
+  // Card hover: toggle .is-hovered for border/shadow lift and enable shine tracking
+  cards.forEach(function (card) {
+    card.addEventListener('mouseenter', function () {
+      card.classList.add('is-hovered');
+      hoveredCount++;
+    });
+    card.addEventListener('mouseleave', function () {
+      card.classList.remove('is-hovered');
+      hoveredCount--;
+    });
+  });
+
+  /* ─── Boot ───────────────────────────────────────────────── */
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // Skip animation — place cards directly at helix positions, still respond to mouse
+    cards.forEach(function (card, i) {
+      var h = HELIX[i];
+      card.style.opacity = String(h.op);
+      card.style.transform = cardTransform(i, 0, 0);
+    });
+    startParallax();
+  } else {
+    initHelix();
+  }
 
 })();
 </script>
