@@ -11,6 +11,7 @@
       --muted: rgba(245, 238, 232, 0.55);
       --accent: #c9956b;
       --line: rgba(201, 149, 107, 0.25);
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);   /* ← add this */
     }
 
     * {
@@ -109,20 +110,27 @@
     .gallery-stage {
       position: relative;
       z-index: 1;
-      padding: 1.6rem 0 0;
+      width: 100%;
+      height: 100vh;
+      perspective: 1200px;
+      overflow: hidden;
     }
 
-    .gallery-track {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 1.15rem;
-      width: min(100%, 33rem);
-      margin: 0 auto;
-      padding: 0 1.5rem 2.8rem;
+    .helix-field {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      will-change: transform;
     }
 
     .gallery-card {
-      position: relative;
+      position: absolute;
+      width: 28rem;
+      aspect-ratio: 1.42;
+      top: 50%;
+      left: 50%;
+      margin-top: -9.86rem;
+      margin-left: -14rem;
       overflow: hidden;
       border-radius: 2.5rem;
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -131,12 +139,7 @@
       background-repeat: no-repeat;
       background-size: cover;
       box-shadow: 0 40px 90px rgba(0, 0, 0, 0.28);
-      display: block;
-      transition: box-shadow 260ms ease, border-color 260ms ease;
-      opacity: 1 !important;
-      filter: none !important;
-      transform: none !important;
-      min-height: clamp(13.5rem, 25.5vw, 18rem);
+      will-change: transform, opacity;
     }
 
     .gallery-card::before {
@@ -160,15 +163,6 @@
       z-index: 2;
     }
 
-    .gallery-card.is-wide,
-    .gallery-card.is-tall,
-    .gallery-card.is-medium,
-    .gallery-card.is-small,
-    .gallery-card.is-tiny {
-      width: 100%;
-      aspect-ratio: 1.42;
-    }
-
     .gallery-card__copy {
       position: absolute;
       left: 1.35rem;
@@ -177,7 +171,6 @@
       z-index: 1;
       display: grid;
       gap: 0.3rem;
-      transform-style: preserve-3d;
     }
 
     .gallery-card__eyebrow {
@@ -223,25 +216,6 @@
       opacity: 1;
     }
 
-    @media (max-width: 900px) {
-      .study-head {
-        padding: 1.6rem 1.2rem 0;
-      }
-
-      .study-head h1 {
-        max-width: none;
-      }
-
-      .gallery-track {
-        gap: 1rem;
-        width: min(100%, 25.5rem);
-        padding: 1rem 1rem 0;
-      }
-
-      .study-meta {
-        padding: 1.4rem 1rem 2rem;
-      }
-    }
   </style>
 </head>
 <body>
