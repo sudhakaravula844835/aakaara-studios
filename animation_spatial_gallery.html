@@ -338,6 +338,53 @@
     );
   }
 
+  /* ─── DOM refs ───────────────────────────────────────────── */
+  const stage = document.querySelector('.gallery-stage');
+  const field = document.getElementById('helixField');
+  const cards = Array.from(field.querySelectorAll('.gallery-card'));
+
+  /* ─── Entry animation ────────────────────────────────────── */
+  function initHelix() {
+    // 1. Apply collapsed (flat) entry state — no transition active yet
+    cards.forEach(function (card, i) {
+      var h = HELIX[i];
+      card.style.opacity = '0';
+      card.style.transform = (
+        'translateX(' + h.tx + ') ' +
+        'translateY(' + h.ty + ') ' +
+        'translateZ(0px) ' +
+        'rotateY(0deg) ' +
+        'rotateZ(' + h.rz + 'deg) ' +
+        'scale(0.85)'
+      );
+    });
+
+    // 2. After 200ms: add .is-ready (enables CSS transitions), then set helix transforms
+    setTimeout(function () {
+      field.classList.add('is-ready');
+
+      // Double rAF ensures browser registers the initial transform before transitioning
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          cards.forEach(function (card, i) {
+            var h = HELIX[i];
+            card.style.opacity = String(h.op);
+            card.style.transform = cardTransform(i, 0, 0);
+          });
+
+          // 3. Activate parallax after last card finishes
+          // Last card delay: 5 × 80ms = 400ms, transition: 900ms → total ≈ 1300ms + 100ms buffer
+          setTimeout(startParallax, 1400);
+        });
+      });
+    }, 200);
+  }
+
+  /* ─── Temporary stub — will be replaced in Task 7 ───────── */
+  function startParallax() {}
+
+  initHelix();
+
 })();
 </script>
 </body>
