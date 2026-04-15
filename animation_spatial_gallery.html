@@ -450,7 +450,7 @@
     });
     card.addEventListener('mouseleave', function () {
       card.classList.remove('is-hovered');
-      hoveredCount--;
+      hoveredCount = Math.max(0, hoveredCount - 1);
     });
   });
 
