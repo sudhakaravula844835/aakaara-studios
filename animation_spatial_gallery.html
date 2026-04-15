@@ -298,5 +298,47 @@
 
     <div class="study-meta">Wheel · Drag · Arrow Keys</div>
   </main>
+<script>
+(function () {
+  'use strict';
+
+  /* ─── Helix data ─────────────────────────────────────────────
+     One entry per card (index 0 = front/left, 5 = back/right).
+     tx/ty: offset from the card's centred anchor point.
+     tz: depth in px (negative = further from viewer).
+     ry: Y-axis rotation in degrees.
+     rz: subtle lean in degrees.
+     sc: scale multiplier.
+     op: resting opacity.
+     depth: 0.0 (front) → 1.0 (back) — drives parallax magnitude.
+     --i must remain a unitless integer (used in calc() for transition-delay).
+  ─────────────────────────────────────────────────────────────── */
+  const HELIX = [
+    { tx: '-38vw', ty: '-2%',  tz:    0, ry:    0, rz:  -1,   sc: 1.00, op: 1.00, depth: 0.0 },
+    { tx: '-20vw', ty: '-6%',  tz: -120, ry:  -28, rz:   1,   sc: 0.88, op: 0.90, depth: 0.2 },
+    { tx:  '-4vw', ty:  '4%',  tz: -240, ry:  -54, rz:  -1.5, sc: 0.76, op: 0.78, depth: 0.4 },
+    { tx:  '12vw', ty: '-4%',  tz: -360, ry:  -78, rz:   1,   sc: 0.66, op: 0.68, depth: 0.6 },
+    { tx:  '24vw', ty:  '3%',  tz: -480, ry: -100, rz:  -1,   sc: 0.57, op: 0.60, depth: 0.8 },
+    { tx:  '34vw', ty: '-2%',  tz: -580, ry: -120, rz:   1.5, sc: 0.49, op: 0.52, depth: 1.0 },
+  ];
+
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  function cardTransform(i, nudgeX, nudgeY) {
+    const h = HELIX[i];
+    return (
+      'translateX(calc(' + h.tx + ' + ' + nudgeX + 'px)) ' +
+      'translateY(calc(' + h.ty + ' + ' + nudgeY + 'px)) ' +
+      'translateZ(' + h.tz + 'px) ' +
+      'rotateY(' + h.ry + 'deg) ' +
+      'rotateZ(' + h.rz + 'deg) ' +
+      'scale(' + h.sc + ')'
+    );
+  }
+
+})();
+</script>
 </body>
 </html>
