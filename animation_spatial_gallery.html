@@ -123,6 +123,13 @@
       will-change: transform;
     }
 
+    .helix-field.is-ready .gallery-card {
+      transition-property: transform, opacity;
+      transition-duration: 900ms, 700ms;
+      transition-timing-function: var(--ease), ease;
+      transition-delay: calc(var(--i) * 80ms);
+    }
+
     .gallery-card {
       position: absolute;
       width: 28rem;
@@ -199,7 +206,7 @@
     .gallery-card__shine {
       position: absolute;
       inset: 0;
-      background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.12) 50%, transparent 72%);
+      background: linear-gradient(var(--shine-angle, 115deg), transparent 30%, rgba(255, 255, 255, 0.12) 50%, transparent 72%);
       mix-blend-mode: screen;
       opacity: 0;
       transition: opacity 220ms ease;
