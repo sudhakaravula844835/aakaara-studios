@@ -123,13 +123,6 @@
       will-change: transform;
     }
 
-    .helix-field.is-ready .gallery-card {
-      transition-property: transform, opacity;
-      transition-duration: 900ms, 700ms;
-      transition-timing-function: var(--ease), ease;
-      transition-delay: calc(var(--i) * 80ms);
-    }
-
     .gallery-card {
       position: absolute;
       width: 28rem;
@@ -147,6 +140,13 @@
       background-size: cover;
       box-shadow: 0 40px 90px rgba(0, 0, 0, 0.28);
       will-change: transform, opacity;
+    }
+
+    .helix-field.is-ready .gallery-card {
+      transition-property: transform, opacity;
+      transition-duration: 900ms, 700ms;
+      transition-timing-function: var(--ease), ease;
+      transition-delay: calc(var(--i) * 80ms);
     }
 
     .gallery-card::before {
