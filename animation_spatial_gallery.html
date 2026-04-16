@@ -285,169 +285,69 @@
 (function () {
   'use strict';
 
-  /* ─── Helix data ─────────────────────────────────────────────
-     One entry per card (index 0 = front/left, 5 = back/right).
-     tx/ty: offset from the card's centred anchor point.
-     tz: depth in px (negative = further from viewer).
-     ry: Y-axis rotation in degrees.
-     rz: subtle lean in degrees.
-     sc: scale multiplier.
-     op: resting opacity.
-     depth: 0.0 (front) → 1.0 (back) — drives parallax magnitude.
-     --i must remain a unitless integer (used in calc() for transition-delay).
-  ─────────────────────────────────────────────────────────────── */
-  const HELIX = [
-    { tx:  '0vw',  ty:  '-25%',   tz:    0, ry:  0,  rz: 0,     sc: 1.00,  op: 1.00, depth:  0.0 },
-    { tx: '30vw',  ty:   '15%',   tz: -500, ry: 55,  rz: 0,     sc: 1.25,  op: 1.00, depth:  0.0 },
-    { tx: '47vw',ty:   '125%',   tz: -1680,   ry: 110, rz: 0,   sc: 1.0,  op: 1.00, depth: 0.0 },
-    { tx: '24vw',  ty:  '150%',   tz: -1400, ry: -38, rz: 0,  sc: 0.90,  op: 1.00, depth:  0.0 },
-    { tx:  '-02vw',ty:  '180%',   tz: -850, ry:  0,  rz: 0,     sc: 0.85,  op: 1.00, depth:  0.0 }
+  /* ─── Slot positions ──────────────────────────────────────────────
+     9 slots: −4 (upper-left past) → 0 (featured centre) → +4 (lower-right future).
+     Array index = slotOffset + 4.
+     tx  : lateral offset in vw  (positive = right)
+     ty  : vertical offset in %  (of card's own height, positive = down)
+     tz  : depth in px (negative = further from viewer)
+     ry  : Y-axis rotation in degrees
+     sc  : scale
+     op  : opacity
+  ──────────────────────────────────────────────────────────────── */
+  var SLOTS = [
+    { tx:   2, ty: -230, tz:  -850, ry:   0, sc: 0.70, op: 0.30 }, // −4
+    { tx: -24, ty: -200, tz: -1400, ry:  38, sc: 0.75, op: 0.42 }, // −3
+    { tx: -47, ty: -175, tz: -1680, ry: -110,sc: 0.82, op: 0.55 }, // −2
+    { tx: -30, ty:  -65, tz:  -500, ry: -55, sc: 0.88, op: 0.78 }, // −1
+    { tx:   0, ty:  -25, tz:     0, ry:   0, sc: 1.18, op: 1.00 }, //  0 FEATURED
+    { tx:  30, ty:   15, tz:  -500, ry:  55, sc: 0.88, op: 0.78 }, // +1
+    { tx:  47, ty:  125, tz: -1680, ry: 110, sc: 0.82, op: 0.55 }, // +2
+    { tx:  24, ty:  150, tz: -1400, ry: -38, sc: 0.75, op: 0.42 }, // +3
+    { tx:  -2, ty:  180, tz:  -850, ry:   0, sc: 0.70, op: 0.30 }, // +4
   ];
 
-  function lerp(a, b, t) {
-    return a + (b - a) * t;
+  /* ─── Helpers ─────────────────────────────────────────────────── */
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function slotProps(slotOffset) {
+    var clamped = Math.max(-4, Math.min(4, slotOffset));
+    var idx     = clamped + 4;          // 0–8
+    var lo      = Math.floor(idx);
+    var hi      = Math.min(8, lo + 1);
+    var t       = idx - lo;
+    var A = SLOTS[lo], B = SLOTS[hi];
+    return {
+      tx: lerp(A.tx, B.tx, t),
+      ty: lerp(A.ty, B.ty, t),
+      tz: lerp(A.tz, B.tz, t),
+      ry: lerp(A.ry, B.ry, t),
+      sc: lerp(A.sc, B.sc, t),
+      op: lerp(A.op, B.op, t),
+    };
   }
 
-  function cardTransform(i, nudgeX, nudgeY) {
-    const h = HELIX[i];
+  function buildTransform(p) {
     return (
-      'translateX(calc(' + h.tx + ' + ' + nudgeX + 'px)) ' +
-      'translateY(calc(' + h.ty + ' + ' + nudgeY + 'px)) ' +
-      'translateZ(' + h.tz + 'px) ' +
-      'rotateY(' + h.ry + 'deg) ' +
-      'rotateZ(' + h.rz + 'deg) ' +
-      'scale(' + h.sc + ')'
+      'translateX(' + p.tx.toFixed(2) + 'vw) ' +
+      'translateY(' + p.ty.toFixed(2) + '%) ' +
+      'translateZ(' + p.tz.toFixed(0) + 'px) ' +
+      'rotateY('    + p.ry.toFixed(1) + 'deg) ' +
+      'scale('      + p.sc.toFixed(4) + ')'
     );
   }
 
-  /* ─── DOM refs ───────────────────────────────────────────── */
-  const stage = document.querySelector('.gallery-stage');
-  const field = document.getElementById('helixField');
-  const cards = Array.from(field.querySelectorAll('.gallery-card'));
+  /* ─── DOM refs ────────────────────────────────────────────────── */
+  var field = document.getElementById('helixField');
+  var cards = Array.prototype.slice.call(
+    field.querySelectorAll('.gallery-card')
+  );
+  var NUM_CARDS    = cards.length;   // 5
+  var MAX_PROGRESS = NUM_CARDS - 1;  // 4
 
-  /* ─── Entry animation ────────────────────────────────────── */
-  function initHelix() {
-    // 1. Apply collapsed (flat) entry state — no transition active yet
-    cards.forEach(function (card, i) {
-      var h = HELIX[i];
-      card.style.opacity = '0';
-      card.style.transform = (
-        'translateX(' + h.tx + ') ' +
-        'translateY(' + h.ty + ') ' +
-        'translateZ(0px) ' +
-        'rotateY(0deg) ' +
-        'rotateZ(' + h.rz + 'deg) ' +
-        'scale(0.85)'
-      );
-    });
-
-    // 2. After 200ms: add .is-ready (enables CSS transitions), then set helix transforms
-    setTimeout(function () {
-      field.classList.add('is-ready');
-
-      // Double rAF ensures browser registers the initial transform before transitioning
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-          cards.forEach(function (card, i) {
-            var h = HELIX[i];
-            card.style.opacity = String(h.op);
-            card.style.transform = cardTransform(i, 0, 0);
-          });
-
-          // 3. Activate parallax after last card finishes
-          // Last card delay: 5 × 80ms = 400ms, transition: 900ms → total ≈ 1300ms + 100ms buffer
-          setTimeout(startParallax, 1400);
-        });
-      });
-    }, 200);
-  }
-
-  /* ─── Parallax state ─────────────────────────────────────── */
-  var mouse  = { x: 0, y: 0 };   // normalised [-1, 1] target
-  var lerped = { x: 0, y: 0 };   // smoothed current value
-  var rafId  = null;
-  var active = false;
-  var hoveredCount = 0;           // tracks how many cards are hovered
-
-  function startParallax() {
-    active = true;
-    tick();
-  }
-
-  function stopParallax() {
-    active = false;
-    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-  }
-
-  function tick() {
-    if (!active) return;
-    rafId = requestAnimationFrame(tick);
-
-    // Smooth lerp toward mouse target
-    lerped.x = lerp(lerped.x, mouse.x, 0.06);
-    lerped.y = lerp(lerped.y, mouse.y, 0.06);
-
-    // World tilt — rotate the entire helix field toward the cursor
-    field.style.transform = (
-      'rotateY(' + (lerped.x * 8) + 'deg) ' +
-      'rotateX(' + (lerped.y * -5) + 'deg)'
-    );
-
-    // Per-card: depth nudge. Shine angle only when a card is hovered.
-    var shineAngle = hoveredCount > 0
-      ? Math.atan2(lerped.y, lerped.x) * (180 / Math.PI)
-      : null;
-
-    cards.forEach(function (card, i) {
-      var h = HELIX[i];
-      // Front cards (depth=0) get full nudge; back cards (depth=1) get almost none
-      var nudgeX = lerped.x * (1 - h.depth) * 18;
-      var nudgeY = lerped.y * (1 - h.depth) * 10;
-      card.style.transform = cardTransform(i, nudgeX, nudgeY);
-
-      // Only update shine angle when a card is hovered (avoids unnecessary repaints)
-      if (shineAngle !== null) {
-        card.style.setProperty('--shine-angle', (shineAngle + 115) + 'deg');
-      }
-    });
-  }
-
-  /* ─── Mouse listeners ────────────────────────────────────── */
-  stage.addEventListener('mousemove', function (e) {
-    var r = stage.getBoundingClientRect();
-    mouse.x = ((e.clientX - r.left)  / r.width  - 0.5) * 2;
-    mouse.y = ((e.clientY - r.top)   / r.height - 0.5) * 2;
-  });
-
-  stage.addEventListener('mouseleave', function () {
-    mouse.x = 0;
-    mouse.y = 0;
-  });
-
-  // Card hover: toggle .is-hovered for border/shadow lift and enable shine tracking
-  cards.forEach(function (card) {
-    card.addEventListener('mouseenter', function () {
-      card.classList.add('is-hovered');
-      hoveredCount++;
-    });
-    card.addEventListener('mouseleave', function () {
-      card.classList.remove('is-hovered');
-      hoveredCount = Math.max(0, hoveredCount - 1);
-    });
-  });
-
-  /* ─── Boot ───────────────────────────────────────────────── */
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    // Skip animation — place cards directly at helix positions, still respond to mouse
-    cards.forEach(function (card, i) {
-      var h = HELIX[i];
-      card.style.opacity = String(h.op);
-      card.style.transform = cardTransform(i, 0, 0);
-    });
-    startParallax();
-  } else {
-    initHelix();
-  }
+  /* PLACEHOLDER: render loop (Task 3) */
+  /* PLACEHOLDER: scroll hijack (Task 3) */
+  /* PLACEHOLDER: entry animation + boot (Task 4) */
 
 })();
 </script>
