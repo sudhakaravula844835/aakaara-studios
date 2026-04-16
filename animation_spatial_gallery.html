@@ -111,8 +111,9 @@
       position: absolute;
       inset: 0;
       z-index: 1;
-      perspective: 1200px;
-      pointer-events: none; /* TEMP: hover disabled */
+      perspective: 1900px;
+      perspective-origin: 50% 48%;
+      pointer-events: none;
     }
 
     .helix-field {
@@ -139,13 +140,6 @@
       background-size: cover;
       box-shadow: 0 40px 90px rgba(0, 0, 0, 0.28);
       will-change: transform, opacity;
-    }
-
-    .helix-field.is-ready .gallery-card {
-      transition-property: transform, opacity;
-      transition-duration: 900ms, 700ms;
-      transition-timing-function: var(--ease), ease;
-      transition-delay: calc(var(--i) * 80ms);
     }
 
     .gallery-card::before {
@@ -222,23 +216,6 @@
       opacity: 1;
     }
 
-    /* Style override for the first card */
-    .gallery-card[style*="--i:0"] {
-      cursor: auto;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      margin: 0;
-      border-radius: 0;
-      display: block;
-      object-fit: cover;
-      background-color: rgba(0, 0, 0, 0);
-      object-position: 50% 50%;
-      border: none;
-      box-shadow: none;
-    }
-
   </style>
 </head>
 <body>
@@ -302,7 +279,7 @@
       </div>
     </section>
 
-    <div class="study-meta">Move cursor to explore</div>
+    <div class="study-meta">Scroll to explore</div>
   </main>
 <script>
 (function () {
@@ -320,11 +297,11 @@
      --i must remain a unitless integer (used in calc() for transition-delay).
   ─────────────────────────────────────────────────────────────── */
   const HELIX = [
-    { tx: '-18vw', ty: '-12%', tz:    0, ry:   0, rz: -1,  sc: 1.00, op: 1.00, depth: 0.0 },
-    { tx:  '12vw', ty:  '-5%', tz:  -80, ry:  28, rz:  1,  sc: 0.82, op: 0.95, depth: 0.2 },
-    { tx:  '20vw', ty:  '35%', tz: -200, ry:  54, rz: -1,  sc: 0.65, op: 0.85, depth: 0.4 },
-    { tx:  '12vw', ty:  '65%', tz: -300, ry:  78, rz:  1,  sc: 0.52, op: 0.72, depth: 0.7 },
-    { tx:  '-5vw', ty:  '82%', tz: -360, ry:  95, rz: -1,  sc: 0.42, op: 0.60, depth: 1.0 }
+    { tx:  '0vw',  ty:  '-25%',   tz:    0, ry:  0,  rz: 0,     sc: 1.00,  op: 1.00, depth:  0.0 },
+    { tx: '30vw',  ty:   '15%',   tz: -500, ry: 55,  rz: 0,     sc: 1.25,  op: 1.00, depth:  0.0 },
+    { tx: '47vw',ty:   '125%',   tz: -1680,   ry: 110, rz: 0,   sc: 1.0,  op: 1.00, depth: 0.0 },
+    { tx: '24vw',  ty:  '150%',   tz: -1400, ry: -38, rz: 0,  sc: 0.90,  op: 1.00, depth:  0.0 },
+    { tx:  '-02vw',ty:  '180%',   tz: -850, ry:  0,  rz: 0,     sc: 0.85,  op: 1.00, depth:  0.0 }
   ];
 
   function lerp(a, b, t) {
