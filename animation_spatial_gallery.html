@@ -401,7 +401,47 @@
     targetProgress = Math.max(0, Math.min(MAX_PROGRESS,
       targetProgress + dy * SENSITIVITY));
   }, { passive: false });
-  /* PLACEHOLDER: entry animation + boot (Task 4) */
+
+  /* ─── Entry animation ─────────────────────────────────────────── */
+  function boot() {
+    // 1. Place cards at initial positions, invisible
+    cards.forEach(function (card, i) {
+      var p = slotProps(i); // progress=0, so slotOffset=i
+      card.style.opacity   = '0';
+      card.style.transform = buildTransform(p);
+    });
+
+    // 2. After short pause, fade each card in with a stagger
+    setTimeout(function () {
+      cards.forEach(function (card, i) {
+        setTimeout(function () {
+          card.style.transition = 'opacity 700ms ease';
+          card.style.opacity    = slotProps(i).op.toFixed(3);
+        }, i * 110);
+      });
+
+      // 3. Once all fades complete, strip transitions and start the loop
+      // Last card fade starts at (NUM_CARDS-1)*110 ms, lasts 700ms, +80ms buffer
+      var loopDelay = 220 + (NUM_CARDS - 1) * 110 + 700 + 80;
+      setTimeout(function () {
+        cards.forEach(function (card) { card.style.transition = ''; });
+        tick();
+      }, loopDelay);
+    }, 220);
+  }
+
+  /* ─── Boot ────────────────────────────────────────────────────── */
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // Skip entry animation — place cards directly and start loop
+    cards.forEach(function (card, i) {
+      var p = slotProps(i);
+      card.style.opacity   = p.op.toFixed(3);
+      card.style.transform = buildTransform(p);
+    });
+    tick();
+  } else {
+    boot();
+  }
 
 })();
 </script>
