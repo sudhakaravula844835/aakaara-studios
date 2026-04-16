@@ -85,7 +85,9 @@
     }
 
     .study-meta {
-      position: relative;
+      position: absolute;
+      bottom: 2rem;
+      left: 1.5rem;
       z-index: 5;
       display: flex;
       align-items: center;
@@ -96,8 +98,6 @@
       text-transform: uppercase;
       color: rgba(255, 255, 255, 0.34);
       pointer-events: none;
-      max-width: 36rem;
-      padding: 0 1.5rem 2rem;
     }
 
     .study-meta::before {
@@ -111,16 +111,14 @@
       position: absolute;
       inset: 0;
       z-index: 1;
-      perspective: 1900px;
-      perspective-origin: 50% 48%;
       pointer-events: none;
     }
 
     .helix-field {
       position: absolute;
       inset: 0;
-      transform-style: preserve-3d;
-      will-change: transform;
+      perspective: 1900px;
+      perspective-origin: 50% 48%;
     }
 
     .gallery-card {
@@ -196,26 +194,6 @@
       color: rgba(255, 255, 255, 0.56);
     }
 
-    .gallery-card__shine {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(var(--shine-angle, 115deg), transparent 30%, rgba(255, 255, 255, 0.12) 50%, transparent 72%);
-      mix-blend-mode: screen;
-      opacity: 0;
-      transition: opacity 220ms ease;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .gallery-card.is-hovered {
-      border-color: rgba(255, 255, 255, 0.16);
-      box-shadow: 0 52px 100px rgba(0, 0, 0, 0.34);
-    }
-
-    .gallery-card.is-hovered .gallery-card__shine {
-      opacity: 1;
-    }
-
   </style>
 </head>
 <body>
@@ -227,9 +205,9 @@
 
     <section class="gallery-stage" aria-label="3D spatial gallery study">
       <div class="helix-field" id="helixField">
-        <article class="gallery-card is-wide"
-          style="--i:0; --depth:0.0; background-image: linear-gradient(180deg, rgba(12,8,8,0.02), rgba(12,8,8,0.32)), url('/images/couple-portraits/karthik-sowmya/1.jpg')">
-          <div class="gallery-card__shine"></div>
+
+        <article class="gallery-card"
+          style="background-image: linear-gradient(180deg, rgba(12,8,8,0.02), rgba(12,8,8,0.32)), url('/images/couple-portraits/karthik-sowmya/1.jpg')">
           <div class="gallery-card__copy">
             <p class="gallery-card__eyebrow">Frame 01</p>
             <h3 class="gallery-card__title">Weddings</h3>
@@ -237,9 +215,8 @@
           </div>
         </article>
 
-        <article class="gallery-card is-tall"
-          style="--i:1; --depth:0.2; background-image: linear-gradient(180deg, rgba(12,8,8,0.03), rgba(12,8,8,0.32)), url('/images/couple-portraits/anusha-akshay/2.jpg')">
-          <div class="gallery-card__shine"></div>
+        <article class="gallery-card"
+          style="background-image: linear-gradient(180deg, rgba(12,8,8,0.03), rgba(12,8,8,0.32)), url('/images/couple-portraits/anusha-akshay/2.jpg')">
           <div class="gallery-card__copy">
             <p class="gallery-card__eyebrow">Frame 02</p>
             <h3 class="gallery-card__title">Portraits</h3>
@@ -247,9 +224,8 @@
           </div>
         </article>
 
-        <article class="gallery-card is-small"
-          style="--i:2; --depth:0.4; background-image: linear-gradient(180deg, rgba(12,8,8,0.04), rgba(12,8,8,0.42)), url('/images/couple-portraits/sripad-ritika/2.jpg')">
-          <div class="gallery-card__shine"></div>
+        <article class="gallery-card"
+          style="background-image: linear-gradient(180deg, rgba(12,8,8,0.04), rgba(12,8,8,0.42)), url('/images/couple-portraits/sripad-ritika/2.jpg')">
           <div class="gallery-card__copy">
             <p class="gallery-card__eyebrow">Frame 03</p>
             <h3 class="gallery-card__title">Films</h3>
@@ -257,9 +233,8 @@
           </div>
         </article>
 
-        <article class="gallery-card is-medium"
-          style="--i:3; --depth:0.6; background-image: linear-gradient(180deg, rgba(12,8,8,0.03), rgba(12,8,8,0.36)), url('/images/couple-portraits/sameeksha-aman/5.jpg')">
-          <div class="gallery-card__shine"></div>
+        <article class="gallery-card"
+          style="background-image: linear-gradient(180deg, rgba(12,8,8,0.03), rgba(12,8,8,0.36)), url('/images/couple-portraits/sameeksha-aman/5.jpg')">
           <div class="gallery-card__copy">
             <p class="gallery-card__eyebrow">Frame 04</p>
             <h3 class="gallery-card__title">Editorial</h3>
@@ -267,15 +242,15 @@
           </div>
         </article>
 
-        <article class="gallery-card is-small"
-          style="--i:4; --depth:0.8; background-image: linear-gradient(180deg, rgba(12,8,8,0.05), rgba(12,8,8,0.42)), url('/images/couple-portraits/yogesh-supritha/3.jpg')">
-          <div class="gallery-card__shine"></div>
+        <article class="gallery-card"
+          style="background-image: linear-gradient(180deg, rgba(12,8,8,0.05), rgba(12,8,8,0.42)), url('/images/couple-portraits/yogesh-supritha/3.jpg')">
           <div class="gallery-card__copy">
             <p class="gallery-card__eyebrow">Frame 05</p>
             <h3 class="gallery-card__title">Couples</h3>
             <p class="gallery-card__subtitle">Held in warmth</p>
           </div>
         </article>
+
       </div>
     </section>
 
@@ -291,7 +266,7 @@
      tx  : lateral offset in vw  (positive = right)
      ty  : vertical offset in %  (of card's own height, positive = down)
      tz  : depth in px (negative = further from viewer)
-     ry  : Y-axis rotation in degrees
+     ry  : Y-axis rotation in degrees (monotonically spread — no direction reversals)
      sc  : scale
      op  : opacity
   ──────────────────────────────────────────────────────────────── */
@@ -358,17 +333,17 @@
       var p      = slotProps(offset);
       card.style.transform = buildTransform(p);
       card.style.opacity   = p.op.toFixed(3);
-      card.style.zIndex    = String(Math.round(10 - Math.abs(offset)));
+      // Depth-based z-index: featured (tz=0) → 2000, deepest (tz=-1680) → 320
+      card.style.zIndex    = String(Math.round(p.tz + 2000));
     });
   }
 
-  var rafId = null;
   function tick() {
     if (Math.abs(targetProgress - lerpedProgress) > 0.0001) {
       lerpedProgress += (targetProgress - lerpedProgress) * 0.07;
       applyFrame();
     }
-    rafId = requestAnimationFrame(tick);
+    requestAnimationFrame(tick);
   }
 
   /* ─── Scroll hijack ───────────────────────────────────────────── */
@@ -421,8 +396,8 @@
       });
 
       // 3. Once all fades complete, strip transitions and start the loop
-      // Last card fade starts at (NUM_CARDS-1)*110 ms, lasts 700ms, +80ms buffer
-      var loopDelay = 220 + (NUM_CARDS - 1) * 110 + 700 + 80;
+      // Last card fade starts at (NUM_CARDS-1)*110ms, lasts 700ms, +80ms buffer
+      var loopDelay = (NUM_CARDS - 1) * 110 + 700 + 80;
       setTimeout(function () {
         cards.forEach(function (card) { card.style.transition = ''; });
         tick();
