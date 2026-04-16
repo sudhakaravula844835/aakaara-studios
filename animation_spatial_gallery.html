@@ -364,14 +364,16 @@
 
   var rafId = null;
   function tick() {
-    lerpedProgress += (targetProgress - lerpedProgress) * 0.07;
-    applyFrame();
+    if (Math.abs(targetProgress - lerpedProgress) > 0.0001) {
+      lerpedProgress += (targetProgress - lerpedProgress) * 0.07;
+      applyFrame();
+    }
     rafId = requestAnimationFrame(tick);
   }
 
   /* ─── Scroll hijack ───────────────────────────────────────────── */
   window.addEventListener('wheel', function (e) {
-    var dy = e.deltaY;
+    var dy = e.deltaMode === 1 ? e.deltaY * 20 : e.deltaY;
 
     if (!scrollLocked) {
       // Re-lock if user scrolls back into the orbit range
@@ -382,6 +384,7 @@
       } else {
         return; // still unlocked — let page scroll
       }
+      // fall through — first event after re-lock: consume it and resume orbit
     }
 
     // Release when orbit is complete
