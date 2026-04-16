@@ -345,8 +345,59 @@
   var NUM_CARDS    = cards.length;   // 5
   var MAX_PROGRESS = NUM_CARDS - 1;  // 4
 
-  /* PLACEHOLDER: render loop (Task 3) */
-  /* PLACEHOLDER: scroll hijack (Task 3) */
+  /* ─── Progress state ─────────────────────────────────────────── */
+  var SENSITIVITY    = 0.005;   // deltaY of 200 → advance 1 card
+  var targetProgress = 0;
+  var lerpedProgress = 0;
+  var scrollLocked   = true;    // true = hijack active
+
+  /* ─── Render ──────────────────────────────────────────────────── */
+  function applyFrame() {
+    cards.forEach(function (card, i) {
+      var offset = i - lerpedProgress;
+      var p      = slotProps(offset);
+      card.style.transform = buildTransform(p);
+      card.style.opacity   = p.op.toFixed(3);
+      card.style.zIndex    = String(Math.round(10 - Math.abs(offset)));
+    });
+  }
+
+  var rafId = null;
+  function tick() {
+    lerpedProgress += (targetProgress - lerpedProgress) * 0.07;
+    applyFrame();
+    rafId = requestAnimationFrame(tick);
+  }
+
+  /* ─── Scroll hijack ───────────────────────────────────────────── */
+  window.addEventListener('wheel', function (e) {
+    var dy = e.deltaY;
+
+    if (!scrollLocked) {
+      // Re-lock if user scrolls back into the orbit range
+      if (targetProgress >= MAX_PROGRESS && dy < 0) {
+        scrollLocked = true;
+      } else if (targetProgress <= 0 && dy > 0) {
+        scrollLocked = true;
+      } else {
+        return; // still unlocked — let page scroll
+      }
+    }
+
+    // Release when orbit is complete
+    if (targetProgress >= MAX_PROGRESS && dy > 0) {
+      scrollLocked = false;
+      return;
+    }
+    if (targetProgress <= 0 && dy < 0) {
+      scrollLocked = false;
+      return;
+    }
+
+    e.preventDefault();
+    targetProgress = Math.max(0, Math.min(MAX_PROGRESS,
+      targetProgress + dy * SENSITIVITY));
+  }, { passive: false });
   /* PLACEHOLDER: entry animation + boot (Task 4) */
 
 })();
