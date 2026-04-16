@@ -112,6 +112,7 @@
       inset: 0;
       z-index: 1;
       perspective: 1200px;
+      pointer-events: none; /* TEMP: hover disabled */
     }
 
     .helix-field {
@@ -221,6 +222,23 @@
       opacity: 1;
     }
 
+    /* Style override for the first card */
+    .gallery-card[style*="--i:0"] {
+      cursor: auto;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      margin: 0;
+      border-radius: 0;
+      display: block;
+      object-fit: cover;
+      background-color: rgba(0, 0, 0, 0);
+      object-position: 50% 50%;
+      border: none;
+      box-shadow: none;
+    }
+
   </style>
 </head>
 <body>
@@ -281,16 +299,6 @@
             <p class="gallery-card__subtitle">Held in warmth</p>
           </div>
         </article>
-
-        <article class="gallery-card is-tiny"
-          style="--i:5; --depth:1.0; background-image: linear-gradient(180deg, rgba(12,8,8,0.05), rgba(12,8,8,0.44)), url('/images/couple-portraits/suprith-pragnya/1.jpg')">
-          <div class="gallery-card__shine"></div>
-          <div class="gallery-card__copy">
-            <p class="gallery-card__eyebrow">Frame 06</p>
-            <h3 class="gallery-card__title">Events</h3>
-            <p class="gallery-card__subtitle">Echo at the edge</p>
-          </div>
-        </article>
       </div>
     </section>
 
@@ -312,12 +320,11 @@
      --i must remain a unitless integer (used in calc() for transition-delay).
   ─────────────────────────────────────────────────────────────── */
   const HELIX = [
-    { tx: '-30vw', ty: '-18%',  tz:    0, ry:  0, rz:  -1,   sc: 0.84, op: 0.90, depth: 0.0 },
-    { tx:  '-2vw', ty:  '65%',  tz:    0, ry:  0, rz:   1,   sc: 0.84, op: 0.90, depth: 0.2 },
-    { tx:  '20vw', ty: '140%',  tz:    0, ry:  0, rz:  -1.5, sc: 0.84, op: 0.90, depth: 0.4 },
-    { tx:  '40vw', ty: '200%',  tz:    0, ry:  0, rz:   1,   sc: 0.84, op: 0.90, depth: 0.6 },
-    { tx:  '57vw', ty: '250%',  tz:    0, ry:  0, rz:  -1,   sc: 0.84, op: 0.90, depth: 0.8 },
-    { tx:  '71vw', ty: '290%',  tz:    0, ry:  0, rz:   1.5, sc: 0.84, op: 0.90, depth: 1.0 },
+    { tx: '-18vw', ty: '-12%', tz:    0, ry:   0, rz: -1,  sc: 1.00, op: 1.00, depth: 0.0 },
+    { tx:  '12vw', ty:  '-5%', tz:  -80, ry:  28, rz:  1,  sc: 0.82, op: 0.95, depth: 0.2 },
+    { tx:  '20vw', ty:  '35%', tz: -200, ry:  54, rz: -1,  sc: 0.65, op: 0.85, depth: 0.4 },
+    { tx:  '12vw', ty:  '65%', tz: -300, ry:  78, rz:  1,  sc: 0.52, op: 0.72, depth: 0.7 },
+    { tx:  '-5vw', ty:  '82%', tz: -360, ry:  95, rz: -1,  sc: 0.42, op: 0.60, depth: 1.0 }
   ];
 
   function lerp(a, b, t) {
