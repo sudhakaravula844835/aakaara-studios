@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animation Check — 3D Gallery</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #000;
+      overflow: hidden;
+      font-family: Georgia, serif;
+      color: #fff;
+    }
+
+    canvas {
+      display: block;
+      width: 100vw !important;
+      height: 100vh !important;
+    }
+
+    #overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      mix-blend-mode: exclusion;
+      z-index: 10;
+    }
+
+    #overlay h1 {
+      font-size: clamp(2.5rem, 7vw, 6rem);
+      letter-spacing: -0.02em;
+      color: #fff;
+      text-align: center;
+      line-height: 1.05;
+    }
+
+    #overlay h1 em {
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    #hint {
+      position: fixed;
+      bottom: 2rem;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="overlay">
+    <h1><em>Aakaara</em> Studios</h1>
+  </div>
+  <div id="hint">Wheel · Arrow keys · Touch &nbsp;·&nbsp; Autoplay resumes after 3s</div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    // ─── Images ────────────────────────────────────────────────────────────────
+    const IMAGES = [
+      '/images/couple-portraits/sameeksha-aman/1.jpg',
+      '/images/couple-portraits/sameeksha-aman/5.jpg',
+      '/images/couple-portraits/sameeksha-aman/10.jpg',
+      '/images/couple-portraits/sameeksha-aman/15.jpg',
+      '/images/couple-portraits/karthik-sowmya/1.jpg',
+      '/images/couple-portraits/karthik-sowmya/2.jpg',
+      '/images/couple-portraits/anusha-akshay/1.jpg',
+      '/images/couple-portraits/anusha-akshay/2.jpg',
+      '/images/couple-portraits/yogesh-supritha/1.jpg',
+      '/images/couple-portraits/yogesh-supritha/3.jpg',
+      '/images/couple-portraits/suprith-pragnya/1.jpg',
+      '/images/couple-portraits/suprith-pragnya/3.jpg',
+      '/images/couple-portraits/sripad-ritika/1.jpg',
+      '/images/couple-portraits/sripad-ritika/2.jpg',
+    ];
+
+    // ─── Config ─────────────────────────────────────────────────────────────────
+    const VISIBLE   = 10;
+    const DEPTH     = 50;
+    const AUTOFORCE = 0.3;
+    const DAMPING   = 0.95;
+    const RESUME_MS = 3000;
+
+    const FADE = {
+      inStart: 0.05, inEnd: 0.25,
+      outStart: 0.40, outEnd: 0.43,
+    };
+    const BLUR = {
+      inStart: 0.0,  inEnd: 0.1,
+      outStart: 0.40, outEnd: 0.43,
+      max: 8.0,
+    };
+
+    // ─── Renderer / Scene / Camera ──────────────────────────────────────────────
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.prepend(renderer.domElement);
+
+    const scene  = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 200);
+    camera.position.set(0, 0, 0);
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ─── Shader ─────────────────────────────────────────────────────────────────
+    const vertexShader = `
+      uniform float scrollForce;
+      uniform float time;
+      uniform float isHovered;
+      varying vec2 vUv;
+
+      void main() {
+        vUv = uv;
+        vec3 pos = position;
+
+        float curveIntensity = scrollForce * 0.3;
+        float distFromCenter = length(pos.xy);
+        float curve = distFromCenter * distFromCenter * curveIntensity;
+
+        float ripple1 = sin(pos.x * 2.0 + scrollForce * 3.0) * 0.02;
+        float ripple2 = sin(pos.y * 2.5 + scrollForce * 2.0) * 0.015;
+        float cloth   = (ripple1 + ripple2) * abs(curveIntensity) * 2.0;
+
+        float flagWave = 0.0;
+        if (isHovered > 0.5) {
+          float phase    = pos.x * 3.0 + time * 8.0;
+          float damp     = smoothstep(-0.5, 0.5, pos.x);
+          flagWave       = sin(phase) * 0.1 * damp;
+          flagWave      += sin(pos.x * 5.0 + time * 12.0) * 0.03 * damp;
+        }
+
+        pos.z -= (curve + cloth + flagWave);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+      }
+    `;
+
+    const fragmentShader = `
+      uniform sampler2D map;
+      uniform float opacity;
+      uniform float blurAmount;
+      uniform float scrollForce;
+      varying vec2 vUv;
+
+      void main() {
+        vec4 color = texture2D(map, vUv);
+
+        if (blurAmount > 0.0) {
+          vec2 texel  = 1.0 / vec2(512.0);
+          vec4 blurred = vec4(0.0);
+          float total  = 0.0;
+          for (float x = -2.0; x <= 2.0; x += 1.0) {
+            for (float y = -2.0; y <= 2.0; y += 1.0) {
+              vec2 offset = vec2(x, y) * texel * blurAmount;
+              float w     = 1.0 / (1.0 + length(vec2(x, y)));
+              blurred    += texture2D(map, vUv + offset) * w;
+              total      += w;
+            }
+          }
+          color = blurred / total;
+        }
+
+        color.rgb += vec3(abs(scrollForce) * 0.05);
+        gl_FragColor = vec4(color.rgb, color.a * opacity);
+      }
+    `;
+
+    // ─── Spatial positions (golden angle) ───────────────────────────────────────
+    const spatial = Array.from({ length: VISIBLE }, (_, i) => {
+      const ha = (i * 2.618) % (Math.PI * 2);
+      const va = (i * 1.618 + Math.PI / 3) % (Math.PI * 2);
+      const hr = (i % 3) * 1.2;
+      const vr = ((i + 1) % 4) * 0.8;
+      return {
+        x: (Math.sin(ha) * hr * 8) / 3,
+        y: (Math.cos(va) * vr * 8) / 4,
+      };
+    });
+
+    // ─── Load textures ──────────────────────────────────────────────────────────
+    const loader   = new THREE.TextureLoader();
+    const textures = IMAGES.map(src => {
+      const t = loader.load(src);
+      t.colorSpace = THREE.SRGBColorSpace;
+      return t;
+    });
+
+    // ─── Build planes ───────────────────────────────────────────────────────────
+    const planes = Array.from({ length: VISIBLE }, (_, i) => ({
+      index:      i,
+      z:          ((DEPTH / VISIBLE) * i) % DEPTH,
+      imageIndex: i % IMAGES.length,
+      x:          spatial[i].x,
+      y:          spatial[i].y,
+    }));
+
+    const meshes = planes.map((plane, i) => {
+      const mat = new THREE.ShaderMaterial({
+        transparent: true,
+        uniforms: {
+          map:         { value: textures[plane.imageIndex] },
+          opacity:     { value: 1.0 },
+          blurAmount:  { value: 0.0 },
+          scrollForce: { value: 0.0 },
+          time:        { value: 0.0 },
+          isHovered:   { value: 0.0 },
+        },
+        vertexShader,
+        fragmentShader,
+      });
+
+      const mesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(1, 1, 32, 32),
+        mat
+      );
+      mesh.userData = { planeIndex: i, hovered: false };
+      scene.add(mesh);
+      return mesh;
+    });
+
+    // ─── State ──────────────────────────────────────────────────────────────────
+    let velocity        = 0;
+    let autoplay        = true;
+    let lastInteraction = Date.now();
+
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+    const interact = () => {
+      autoplay = false;
+      lastInteraction = Date.now();
+    };
+
+    // ─── Input handlers ─────────────────────────────────────────────────────────
+    renderer.domElement.addEventListener('wheel', e => {
+      e.preventDefault();
+      velocity += e.deltaY * 0.01 * 1.2;
+      interact();
+    }, { passive: false });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowUp'   || e.key === 'ArrowLeft')  { velocity -= 2; interact(); }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { velocity += 2; interact(); }
+    });
+
+    let lastTouchY = null;
+    renderer.domElement.addEventListener('touchstart', e => {
+      lastTouchY = e.touches[0]?.clientY ?? null;
+      interact();
+    }, { passive: true });
+    renderer.domElement.addEventListener('touchmove', e => {
+      if (lastTouchY === null) return;
+      const y = e.touches[0]?.clientY;
+      if (typeof y !== 'number') return;
+      velocity += (lastTouchY - y) * 0.035;
+      lastTouchY = y;
+      if (e.cancelable) e.preventDefault();
+      interact();
+    }, { passive: false });
+    renderer.domElement.addEventListener('touchend', () => { lastTouchY = null; });
+
+    // ─── Hover via raycasting ───────────────────────────────────────────────────
+    const raycaster = new THREE.Raycaster();
+    const mouse     = new THREE.Vector2();
+
+    renderer.domElement.addEventListener('pointermove', e => {
+      mouse.x =  (e.clientX / window.innerWidth)  * 2 - 1;
+      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    // ─── Fade / blur helpers ─────────────────────────────────────────────────────
+    const opacityFor = n => {
+      if (n < FADE.inStart)                          return 0;
+      if (n <= FADE.inEnd)   return (n - FADE.inStart) / (FADE.inEnd - FADE.inStart);
+      if (n < FADE.outStart)                         return 1;
+      if (n <= FADE.outEnd)  return 1 - (n - FADE.outStart) / (FADE.outEnd - FADE.outStart);
+      return 0;
+    };
+
+    const blurFor = n => {
+      if (n < BLUR.inStart)                          return BLUR.max;
+      if (n <= BLUR.inEnd)   return BLUR.max * (1 - (n - BLUR.inStart) / (BLUR.inEnd - BLUR.inStart));
+      if (n < BLUR.outStart)                         return 0;
+      if (n <= BLUR.outEnd)  return BLUR.max * ((n - BLUR.outStart) / (BLUR.outEnd - BLUR.outStart));
+      return BLUR.max;
+    };
+
+    // ─── Render loop ────────────────────────────────────────────────────────────
+    const clock   = new THREE.Clock();
+    const imageAdv = VISIBLE % IMAGES.length || IMAGES.length;
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const delta = Math.min(clock.getDelta(), 0.04);
+      const time  = clock.getElapsedTime();
+
+      // Auto-resume
+      if (Date.now() - lastInteraction > RESUME_MS) autoplay = true;
+      if (autoplay) velocity += AUTOFORCE * delta;
+      velocity *= DAMPING;
+
+      // Raycasting for hover
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(meshes);
+      meshes.forEach(m => {
+        const wasHovered = m.userData.hovered;
+        m.userData.hovered = hits.some(h => h.object === m);
+        if (wasHovered !== m.userData.hovered) {
+          m.material.uniforms.isHovered.value = m.userData.hovered ? 1.0 : 0.0;
+        }
+      });
+
+      // Update planes
+      planes.forEach((plane, i) => {
+        let newZ = plane.z + velocity * delta * 10;
+        let fw = 0, bw = 0;
+
+        if (newZ >= DEPTH) {
+          fw = Math.floor(newZ / DEPTH);
+          newZ -= DEPTH * fw;
+        } else if (newZ < 0) {
+          bw = Math.ceil(-newZ / DEPTH);
+          newZ += DEPTH * bw;
+        }
+
+        if (fw > 0) plane.imageIndex = (plane.imageIndex + fw * imageAdv) % IMAGES.length;
+        if (bw > 0) {
+          const s = plane.imageIndex - bw * imageAdv;
+          plane.imageIndex = ((s % IMAGES.length) + IMAGES.length) % IMAGES.length;
+        }
+
+        plane.z = ((newZ % DEPTH) + DEPTH) % DEPTH;
+
+        const norm   = plane.z / DEPTH;
+        const worldZ = plane.z - DEPTH / 2;
+        const opacity = clamp(opacityFor(norm), 0, 1);
+        const blur    = clamp(blurFor(norm), 0, BLUR.max);
+
+        const mesh = meshes[i];
+        const mat  = mesh.material;
+        const tex  = textures[plane.imageIndex];
+
+        if (mat.uniforms.map.value !== tex) {
+          mat.uniforms.map.value = tex;
+        }
+
+        // Maintain aspect ratio
+        const img    = tex.image;
+        const aspect = img?.naturalWidth && img?.naturalHeight
+          ? img.naturalWidth / img.naturalHeight : 1;
+        const sx = aspect > 1 ? 2 * aspect : 2;
+        const sy = aspect > 1 ? 2 : 2 / aspect;
+        mesh.scale.set(sx, sy, 1);
+
+        mesh.position.set(spatial[i].x, spatial[i].y, worldZ);
+
+        mat.uniforms.opacity.value     = opacity;
+        mat.uniforms.blurAmount.value  = blur;
+        mat.uniforms.scrollForce.value = velocity;
+        mat.uniforms.time.value        = time;
+      });
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  </script>
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Combined A+C Preview</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #050404;
+    color: #f5eee8;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    padding: 1.2rem 2rem 0.6rem;
+    display: flex;
+    align-items: baseline;
+    gap: 1.2rem;
+    z-index: 10;
+  }
+  .header h2 { font-size: 1.3rem; font-weight: 500; letter-spacing: -0.03em; }
+  .header p { font-family: Arial, sans-serif; font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(245,238,232,0.4); }
+
+  .stage {
+    flex: 1;
+    position: relative;
+    perspective: 1900px;
+    perspective-origin: 50% 48%;
+  }
+
+  .pole {
+    position: absolute;
+    left: 50%;
+    top: 10%;
+    bottom: 10%;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(201,149,107,0.3) 30%, rgba(201,149,107,0.3) 70%, transparent);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .pole-dot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(201,149,107,0.6);
+    box-shadow: 0 0 8px rgba(201,149,107,0.4);
+  }
+
+  .field {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+
+  .card {
+    position: absolute;
+    width: 22rem;
+    aspect-ratio: 1.42;
+    top: 50%; left: 50%;
+    margin-top: -7.75rem;
+    margin-left: -11rem;
+    border-radius: 1.8rem;
+    border: 1px solid rgba(255,255,255,0.09);
+    overflow: hidden;
+    will-change: transform, opacity;
+    transition: transform 0.8s cubic-bezier(0.16,1,0.3,1), opacity 0.6s ease;
+  }
+
+  .card-img {
+    width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  .card-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(9,7,6,0.7) 100%);
+  }
+  .card-label {
+    position: absolute;
+    bottom: 1rem; left: 1.2rem;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .card-label .eyebrow {
+    font-family: Arial, sans-serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(201,149,107,0.85);
+    margin-bottom: 0.2rem;
+  }
+  .card-label .title {
+    font-size: 1.1rem;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-weight: 500;
+  }
+
+  .footer-bar {
+    padding: 0.7rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    z-index: 10;
+  }
+  .progress-track {
+    flex: 1;
+    height: 2px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 1px;
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    background: #c9956b;
+    border-radius: 1px;
+    transition: width 0.4s ease;
+  }
+  .nav-btns { display: flex; gap: 0.5rem; }
+  .nav-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+    color: #f5eee8;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .nav-btn:hover { border-color: #c9956b; background: rgba(201,149,107,0.1); }
+
+  .hint {
+    font-family: Arial, sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(245,238,232,0.35);
+  }
+
+  /* Card colour placeholders */
+  .c0 { background: linear-gradient(135deg, #2d1f16 0%, #1a0f0b 100%); }
+  .c1 { background: linear-gradient(135deg, #161e26 0%, #0d1318 100%); }
+  .c2 { background: linear-gradient(135deg, #1c1625 0%, #110d18 100%); }
+  .c3 { background: linear-gradient(135deg, #1a1f14 0%, #0e1209 100%); }
+  .c4 { background: linear-gradient(135deg, #251616 0%, #180d0d 100%); }
+
+  /* selection overlay */
+  .return-note {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    padding: 0.5rem 2rem;
+    background: rgba(5,4,4,0.9);
+    font-family: Arial, sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(201,149,107,0.7);
+    text-align: center;
+    border-top: 1px solid rgba(201,149,107,0.15);
+    z-index: 20;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h2>Orbit + Diagonal Spiral</h2>
+  <p>Approach A motion · Approach C placement · Use ← → or buttons</p>
+</div>
+
+<div class="stage" id="stage">
+  <div class="pole"><div class="pole-dot"></div></div>
+  <div class="field" id="field">
+
+    <div class="card" id="card0">
+      <div class="card-img c0">
+        <div class="card-label">
+          <div class="eyebrow">Frame 01</div>
+          <div class="title">Weddings</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="card1">
+      <div class="card-img c1">
+        <div class="card-label">
+          <div class="eyebrow">Frame 02</div>
+          <div class="title">Portraits</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="card2">
+      <div class="card-img c2">
+        <div class="card-label">
+          <div class="eyebrow">Frame 03</div>
+          <div class="title">Films</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="card3">
+      <div class="card-img c3">
+        <div class="card-label">
+          <div class="eyebrow">Frame 04</div>
+          <div class="title">Editorial</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="card4">
+      <div class="card-img c4">
+        <div class="card-label">
+          <div class="eyebrow">Frame 05</div>
+          <div class="title">Couples</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer-bar">
+  <span class="hint">Scroll or use arrows</span>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="step(-1)">←</button>
+    <button class="nav-btn" onclick="step(1)">→</button>
+  </div>
+</div>
+
+<div class="return-note">This is the combined A+C concept · Interact to feel the orbit motion · Tell me in the terminal if this is the direction</div>
+
+<script>
+(function() {
+  // ── Slot positions ────────────────────────────────────────────
+  // 9 slots: -4 (upper-left past) → 0 (featured) → +4 (lower-right future)
+  // tx in vw, ty in %, tz in px, ry in deg, sc scale, op opacity
+  const SLOTS = [
+    { tx:  2,  ty:-230, tz: -850, ry:   0, sc:0.70, op:0.30 }, // -4
+    { tx:-24,  ty:-200, tz:-1400, ry:  38, sc:0.75, op:0.42 }, // -3
+    { tx:-47,  ty:-175, tz:-1680, ry:-110, sc:0.82, op:0.55 }, // -2
+    { tx:-30,  ty: -65, tz: -500, ry: -55, sc:0.88, op:0.78 }, // -1
+    { tx:  0,  ty: -25, tz:    0, ry:   0, sc:1.18, op:1.00 }, //  0 FEATURED
+    { tx: 30,  ty:  15, tz: -500, ry:  55, sc:0.88, op:0.78 }, // +1
+    { tx: 47,  ty: 125, tz:-1680, ry: 110, sc:0.82, op:0.55 }, // +2
+    { tx: 24,  ty: 150, tz:-1400, ry: -38, sc:0.75, op:0.42 }, // +3
+    { tx: -2,  ty: 180, tz: -850, ry:   0, sc:0.70, op:0.30 }, // +4
+  ];
+
+  function lerp(a,b,t){ return a+(b-a)*t; }
+
+  function getProps(slotOffset) {
+    const clamped = Math.max(-4, Math.min(4, slotOffset));
+    const idx = clamped + 4;
+    const lo = Math.floor(idx), hi = Math.min(8, lo+1), t = idx-lo;
+    const A=SLOTS[lo], B=SLOTS[hi];
+    return {
+      tx: lerp(A.tx,B.tx,t), ty: lerp(A.ty,B.ty,t),
+      tz: lerp(A.tz,B.tz,t), ry: lerp(A.ry,B.ry,t),
+      sc: lerp(A.sc,B.sc,t), op: lerp(A.op,B.op,t),
+    };
+  }
+
+  const cards = [0,1,2,3,4].map(i => document.getElementById('card'+i));
+  const progressFill = document.getElementById('progressFill');
+  const NUM = 5, MAX = 4;
+
+  let target = 0, current = 0;
+
+  function applyFrame() {
+    cards.forEach(function(card, i) {
+      const p = getProps(i - current);
+      card.style.transform =
+        'translateX('+p.tx.toFixed(1)+'vw) ' +
+        'translateY('+p.ty.toFixed(1)+'%) ' +
+        'translateZ('+p.tz.toFixed(0)+'px) ' +
+        'rotateY('+p.ry.toFixed(1)+'deg) ' +
+        'scale('+p.sc.toFixed(3)+')';
+      card.style.opacity = p.op.toFixed(3);
+      card.style.zIndex = Math.round(10 - Math.abs(i - current));
+    });
+    progressFill.style.width = (current/MAX*100)+'%';
+  }
+
+  let lerpedCurrent = 0, raf;
+  function tick() {
+    lerpedCurrent += (target - lerpedCurrent) * 0.08;
+    current = lerpedCurrent;
+    applyFrame();
+    raf = requestAnimationFrame(tick);
+  }
+
+  window.step = function(dir) {
+    target = Math.max(0, Math.min(MAX, target + dir));
+  };
+
+  // Scroll hijack
+  window.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    target = Math.max(0, Math.min(MAX, target + e.deltaY * 0.005));
+  }, { passive: false });
+
+  // Arrow keys
+  window.addEventListener('keydown', function(e) {
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') step(1);
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp') step(-1);
+  });
+
+  // Init
+  applyFrame();
+  tick();
+})();
+</script>
+</body>
+</html>

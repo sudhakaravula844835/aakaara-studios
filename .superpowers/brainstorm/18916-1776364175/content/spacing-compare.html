@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Card Spacing Comparison</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #050404;
+    color: #f5eee8;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .header {
+    padding: 1rem 2rem 0.5rem;
+    display: flex; align-items: baseline; gap: 1.2rem; z-index: 10;
+    flex-shrink: 0;
+  }
+  .header h2 { font-size: 1.2rem; font-weight: 500; letter-spacing: -0.03em; }
+  .header p { font-family: Arial, sans-serif; font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(245,238,232,0.4); }
+
+  .split { display: flex; flex: 1; gap: 1px; overflow: hidden; }
+  .pane { flex: 1; position: relative; overflow: hidden; }
+  .pane-label {
+    position: absolute; top: 1rem; left: 50%; transform: translateX(-50%);
+    font-family: Arial, sans-serif; font-size: 0.62rem; letter-spacing: 0.28em;
+    text-transform: uppercase; color: rgba(245,238,232,0.35); z-index: 10;
+    background: rgba(5,4,4,0.7); padding: 0.25rem 0.7rem; border-radius: 2rem;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .divider {
+    width: 1px; background: rgba(255,255,255,0.06); flex-shrink: 0;
+  }
+
+  .stage {
+    position: absolute; inset: 0;
+    perspective: 1900px;
+    perspective-origin: 50% 48%;
+  }
+  .field {
+    position: absolute; inset: 0;
+    transform-style: preserve-3d;
+  }
+  .card {
+    position: absolute;
+    width: 20rem; aspect-ratio: 1.42;
+    top: 50%; left: 50%;
+    margin-top: -7rem; margin-left: -10rem;
+    border-radius: 1.6rem;
+    border: 1px solid rgba(255,255,255,0.09);
+    overflow: hidden;
+    will-change: transform, opacity;
+    transition: transform 0.8s cubic-bezier(0.16,1,0.3,1), opacity 0.6s ease;
+  }
+  .card-img {
+    width: 100%; height: 100%;
+    background-size: cover; background-position: center; position: relative;
+  }
+  .card-img::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(9,7,6,0.7) 100%);
+  }
+  .card-label {
+    position: absolute; bottom: 0.8rem; left: 1rem; z-index: 1;
+  }
+  .card-label .eyebrow {
+    font-family: Arial, sans-serif; font-size: 0.55rem;
+    letter-spacing: 0.28em; text-transform: uppercase;
+    color: rgba(201,149,107,0.85); margin-bottom: 0.15rem;
+  }
+  .card-label .title { font-size: 1rem; letter-spacing: -0.03em; line-height: 1; font-weight: 500; }
+
+  .c0 { background: linear-gradient(135deg, #2d1f16, #1a0f0b); }
+  .c1 { background: linear-gradient(135deg, #161e26, #0d1318); }
+  .c2 { background: linear-gradient(135deg, #1c1625, #110d18); }
+  .c3 { background: linear-gradient(135deg, #1a1f14, #0e1209); }
+  .c4 { background: linear-gradient(135deg, #251616, #180d0d); }
+
+  .footer-bar {
+    padding: 0.6rem 2rem; display: flex; align-items: center; gap: 1.2rem;
+    z-index: 10; flex-shrink: 0;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  .hint { font-family: Arial, sans-serif; font-size: 0.63rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,238,232,0.3); }
+  .nav-btns { display: flex; gap: 0.4rem; margin-left: auto; }
+  .nav-btn {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05); color: #f5eee8;
+    font-size: 0.8rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .nav-btn:hover { border-color: #c9956b; background: rgba(201,149,107,0.1); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h2>Card Spacing</h2>
+  <p>Current spread vs Tighter — scroll or use arrows to orbit</p>
+</div>
+
+<div class="split">
+  <div class="pane" id="paneA">
+    <div class="pane-label">Current</div>
+    <div class="stage">
+      <div class="field" id="fieldA">
+        <div class="card" id="a0"><div class="card-img c0"><div class="card-label"><div class="eyebrow">Frame 01</div><div class="title">Weddings</div></div></div></div>
+        <div class="card" id="a1"><div class="card-img c1"><div class="card-label"><div class="eyebrow">Frame 02</div><div class="title">Portraits</div></div></div></div>
+        <div class="card" id="a2"><div class="card-img c2"><div class="card-label"><div class="eyebrow">Frame 03</div><div class="title">Films</div></div></div></div>
+        <div class="card" id="a3"><div class="card-img c3"><div class="card-label"><div class="eyebrow">Frame 04</div><div class="title">Editorial</div></div></div></div>
+        <div class="card" id="a4"><div class="card-img c4"><div class="card-label"><div class="eyebrow">Frame 05</div><div class="title">Couples</div></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="pane" id="paneB">
+    <div class="pane-label">Tighter</div>
+    <div class="stage">
+      <div class="field" id="fieldB">
+        <div class="card" id="b0"><div class="card-img c0"><div class="card-label"><div class="eyebrow">Frame 01</div><div class="title">Weddings</div></div></div></div>
+        <div class="card" id="b1"><div class="card-img c1"><div class="card-label"><div class="eyebrow">Frame 02</div><div class="title">Portraits</div></div></div></div>
+        <div class="card" id="b2"><div class="card-img c2"><div class="card-label"><div class="eyebrow">Frame 03</div><div class="title">Films</div></div></div></div>
+        <div class="card" id="b3"><div class="card-img c3"><div class="card-label"><div class="eyebrow">Frame 04</div><div class="title">Editorial</div></div></div></div>
+        <div class="card" id="b4"><div class="card-img c4"><div class="card-label"><div class="eyebrow">Frame 05</div><div class="title">Couples</div></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer-bar">
+  <span class="hint">Scroll or ← → to orbit both sides in sync</span>
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="step(-1)">←</button>
+    <button class="nav-btn" onclick="step(1)">→</button>
+  </div>
+</div>
+
+<script>
+(function() {
+
+  // ── Current (original) spacing ──────────────────────────────
+  const SLOTS_A = [
+    { tx:  2, ty:-230, tz: -850, ry:   0, sc:0.70, op:0.30 },
+    { tx:-24, ty:-200, tz:-1400, ry:  38, sc:0.75, op:0.42 },
+    { tx:-47, ty:-175, tz:-1680, ry:-110, sc:0.82, op:0.55 },
+    { tx:-30, ty: -65, tz: -500, ry: -55, sc:0.88, op:0.78 },
+    { tx:  0, ty: -25, tz:    0, ry:   0, sc:1.18, op:1.00 }, // centre
+    { tx: 30, ty:  15, tz: -500, ry:  55, sc:0.88, op:0.78 },
+    { tx: 47, ty: 125, tz:-1680, ry: 110, sc:0.82, op:0.55 },
+    { tx: 24, ty: 150, tz:-1400, ry: -38, sc:0.75, op:0.42 },
+    { tx: -2, ty: 180, tz: -850, ry:   0, sc:0.70, op:0.30 },
+  ];
+
+  // ── Tighter spacing (~50% reduction in tx/ty/tz offsets) ───
+  const SLOTS_B = [
+    { tx:  1, ty:-125, tz: -500, ry:   0, sc:0.70, op:0.30 },
+    { tx:-13, ty:-110, tz: -800, ry:  38, sc:0.75, op:0.42 },
+    { tx:-26, ty: -90, tz: -950, ry:-110, sc:0.82, op:0.55 },
+    { tx:-18, ty: -45, tz: -320, ry: -55, sc:0.88, op:0.78 },
+    { tx:  0, ty: -25, tz:    0, ry:   0, sc:1.18, op:1.00 }, // centre
+    { tx: 18, ty:   8, tz: -320, ry:  55, sc:0.88, op:0.78 },
+    { tx: 26, ty:  65, tz: -950, ry: 110, sc:0.82, op:0.55 },
+    { tx: 13, ty:  80, tz: -800, ry: -38, sc:0.75, op:0.42 },
+    { tx: -1, ty:  95, tz: -500, ry:   0, sc:0.70, op:0.30 },
+  ];
+
+  function lerp(a,b,t){ return a+(b-a)*t; }
+
+  function getProps(slots, slotOffset) {
+    const clamped = Math.max(-4, Math.min(4, slotOffset));
+    const idx = clamped + 4;
+    const lo = Math.floor(idx), hi = Math.min(8, lo+1), t = idx-lo;
+    const A=slots[lo], B=slots[hi];
+    return {
+      tx: lerp(A.tx,B.tx,t), ty: lerp(A.ty,B.ty,t),
+      tz: lerp(A.tz,B.tz,t), ry: lerp(A.ry,B.ry,t),
+      sc: lerp(A.sc,B.sc,t), op: lerp(A.op,B.op,t),
+    };
+  }
+
+  const cardsA = [0,1,2,3,4].map(i => document.getElementById('a'+i));
+  const cardsB = [0,1,2,3,4].map(i => document.getElementById('b'+i));
+  const MAX = 4;
+
+  let target = 0, current = 0;
+
+  function applyFrame() {
+    [cardsA, cardsB].forEach(function(group, gi) {
+      const slots = gi === 0 ? SLOTS_A : SLOTS_B;
+      group.forEach(function(card, i) {
+        const p = getProps(slots, i - current);
+        card.style.transform =
+          'translateX('+p.tx.toFixed(1)+'vw) ' +
+          'translateY('+p.ty.toFixed(1)+'%) ' +
+          'translateZ('+p.tz.toFixed(0)+'px) ' +
+          'rotateY('+p.ry.toFixed(1)+'deg) ' +
+          'scale('+p.sc.toFixed(3)+')';
+        card.style.opacity = p.op.toFixed(3);
+        card.style.zIndex = Math.round(10 - Math.abs(i - current));
+      });
+    });
+  }
+
+  let lerpedCurrent = 0;
+  function tick() {
+    lerpedCurrent += (target - lerpedCurrent) * 0.08;
+    current = lerpedCurrent;
+    applyFrame();
+    requestAnimationFrame(tick);
+  }
+
+  window.step = function(dir) {
+    target = Math.max(0, Math.min(MAX, target + dir));
+  };
+
+  window.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    target = Math.max(0, Math.min(MAX, target + e.deltaY * 0.005));
+  }, { passive: false });
+
+  window.addEventListener('keydown', function(e) {
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') step(1);
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp') step(-1);
+  });
+
+  applyFrame();
+  tick();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<style>
+  body { background: #050404; color: #f5eee8; font-family: 'Cormorant Garamond', Georgia, serif; }
+  h2 { color: #f5eee8; font-size: 1.6rem; letter-spacing: -0.03em; }
+  .subtitle { color: rgba(245,238,232,0.55); font-family: Arial, sans-serif; font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 1.5rem; }
+  .card { background: #110d0c; border: 1px solid rgba(255,255,255,0.09); border-radius: 1.2rem; overflow: hidden; cursor: pointer; transition: border-color 0.2s; }
+  .card:hover { border-color: rgba(201,149,107,0.5); }
+  .card.selected { border-color: #c9956b !important; }
+  .card-image { height: 200px; position: relative; overflow: hidden; }
+  .card-body { padding: 1rem 1.2rem 1.2rem; }
+  .card-body h3 { font-size: 1.05rem; font-weight: 500; margin-bottom: 0.35rem; letter-spacing: -0.02em; }
+  .card-body p { font-family: Arial, sans-serif; font-size: 0.72rem; color: rgba(245,238,232,0.55); line-height: 1.5; margin-bottom: 0.6rem; }
+  .tag { display: inline-block; font-family: Arial, sans-serif; font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 3rem; background: rgba(201,149,107,0.12); color: #c9956b; margin-right: 0.35rem; }
+  .tag.warn { background: rgba(255,200,100,0.1); color: rgba(255,200,120,0.8); }
+
+  /* Approach A — Smooth Orbit */
+  .scene-a { width: 100%; height: 100%; position: relative; perspective: 600px; display: flex; align-items: center; justify-content: center; }
+  .orbit-a { position: relative; width: 80px; height: 80px; transform-style: preserve-3d; animation: orbitA 4s linear infinite; }
+  @keyframes orbitA { from { transform: rotateY(0deg); } to { transform: rotateY(-360deg); } }
+  .mini-card { width: 52px; height: 36px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.18); position: absolute; }
+  .mc1 { background: linear-gradient(135deg,#c9956b55,#2a1f1a); transform: translateZ(42px) translateX(-26px); }
+  .mc2 { background: linear-gradient(135deg,#2a1f1a,#c9956b33); transform: rotateY(72deg) translateZ(42px) translateX(-26px); }
+  .mc3 { background: linear-gradient(135deg,#1a1a2a,#c9956b22); transform: rotateY(144deg) translateZ(42px) translateX(-26px); }
+  .mc4 { background: linear-gradient(135deg,#1a2a1a,#c9956b11); transform: rotateY(216deg) translateZ(42px) translateX(-26px); }
+  .mc5 { background: linear-gradient(135deg,#2a1a2a,#c9956b08); transform: rotateY(288deg) translateZ(42px) translateX(-26px); }
+
+  /* Approach B — Snap Steps */
+  .scene-b { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; }
+  .snap-cards { display: flex; gap: 5px; align-items: center; animation: snapB 3s steps(1) infinite; }
+  @keyframes snapB {
+    0%   { transform: translateX(0); }
+    25%  { transform: translateX(-40px); }
+    50%  { transform: translateX(-80px); }
+    75%  { transform: translateX(-120px); }
+    100% { transform: translateX(0); }
+  }
+  .scard { width: 38px; height: 26px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0; }
+  .scard.big { width: 54px; height: 38px; border-color: #c9956b; box-shadow: 0 0 10px rgba(201,149,107,0.3); }
+  .sc1 { background: linear-gradient(135deg,#c9956b55,#2a1f1a); }
+  .sc2 { background: #1e1a16; }
+  .sc3 { background: #1a1a1a; }
+  .sc4 { background: #161618; }
+  .sc5 { background: #141212; }
+  .progress-dots { display: flex; gap: 5px; }
+  .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+  .dot.active { background: #c9956b; }
+
+  /* Approach C — Diagonal Spiral */
+  .scene-c { position: relative; width: 100%; height: 100%; overflow: hidden; }
+  .diag-card { position: absolute; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
+  .dc0 { width: 60px; height: 42px; top: 50%; left: 50%; transform: translate(-50%,-50%); background: linear-gradient(135deg,#c9956b44,#2a1f1a); border-color: #c9956b; animation: dcFeatured 4s ease-in-out infinite; }
+  @keyframes dcFeatured {
+    0%,100% { transform: translate(-50%,-50%) scale(1.0); }
+    50%      { transform: translate(-50%,-50%) scale(1.08); }
+  }
+  .dc1 { width: 42px; height: 30px; top: 58%; left: 64%; background: #1e1a16; animation: dc1move 4s ease-in-out infinite; }
+  @keyframes dc1move {
+    0%,100% { top: 58%; left: 64%; opacity:0.85; }
+    50%      { top: 56%; left: 62%; opacity:0.9; }
+  }
+  .dc2 { width: 34px; height: 24px; top: 70%; left: 74%; background: #1a1a1a; opacity: 0.7; }
+  .dc3 { width: 28px; height: 20px; top: 78%; left: 70%; background: #161618; opacity: 0.55; }
+  .dc4 { width: 24px; height: 17px; top: 84%; left: 60%; background: #141212; opacity: 0.4; }
+  .scroll-hint { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); font-family: Arial, sans-serif; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+  .arrow-anim { animation: arrowBounce 1.5s ease-in-out infinite; display: inline-block; }
+  @keyframes arrowBounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+</style>
+
+<h2>How should cards orbit?</h2>
+<p class="subtitle">Choose the animation model that feels right for the gallery</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="card-image" style="background: #0d0a09;">
+      <div class="scene-a">
+        <div class="orbit-a">
+          <div class="mini-card mc1"></div>
+          <div class="mini-card mc2"></div>
+          <div class="mini-card mc3"></div>
+          <div class="mini-card mc4"></div>
+          <div class="mini-card mc5"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Smooth Continuous Orbit</h3>
+      <p>Cards flow fluidly around a vertical pole. Scroll speed directly controls rotation speed. Feels like dragging a physical carousel.</p>
+      <span class="tag">Cinematic</span>
+      <span class="tag">Fluid</span>
+      <span class="tag warn">Complex</span>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="card-image" style="background: #0d0a09; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px;">
+      <div class="scene-b">
+        <div class="snap-cards">
+          <div class="scard sc5"></div>
+          <div class="scard sc4"></div>
+          <div class="scard sc3"></div>
+          <div class="scard sc2"></div>
+          <div class="scard sc1 big"></div>
+        </div>
+        <div class="progress-dots">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Snap-to-Card Steps</h3>
+      <p>Each scroll gesture advances one card. Snaps with an eased transition. Clean and deliberate — like flipping a book.</p>
+      <span class="tag">Controlled</span>
+      <span class="tag">Snappy</span>
+      <span class="tag warn">Less Fluid</span>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="card-image" style="background: #0d0a09; position:relative;">
+      <div class="scene-c">
+        <div class="diag-card dc4"></div>
+        <div class="diag-card dc3"></div>
+        <div class="diag-card dc2"></div>
+        <div class="diag-card dc1"></div>
+        <div class="diag-card dc0"></div>
+        <div class="scroll-hint"><span class="arrow-anim">↓</span> scroll advances cards</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Diagonal Spiral w/ Lerp</h3>
+      <p>Cards sit on a "/" diagonal path. Scroll smoothly lerps each card forward along the spiral. Featured card grows as it reaches centre.</p>
+      <span class="tag">Elegant</span>
+      <span class="tag">Smooth</span>
+      <span class="tag">Your Layout</span>
+    </div>
+  </div>
+
+</div>

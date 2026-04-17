@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orbit Exit — Approaches</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0a0808;
+    color: #f5eee8;
+    font-family: Arial, sans-serif;
+    padding: 2rem 1.5rem;
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 1.9rem;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.4rem;
+    color: #f5eee8;
+  }
+
+  .sub {
+    color: rgba(245,238,232,0.45);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    max-width: 580px;
+  }
+
+  .sub strong { color: rgba(245,238,232,0.75); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card {
+    border-radius: 12px;
+    border: 1.5px solid rgba(201,149,107,0.12);
+    background: #0f0c0b;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    user-select: none;
+  }
+
+  .card:hover {
+    border-color: rgba(201,149,107,0.35);
+    transform: translateY(-2px);
+  }
+
+  .card.selected {
+    border-color: #c9956b;
+    box-shadow: 0 0 0 1px #c9956b, 0 8px 32px rgba(201,149,107,0.12);
+  }
+
+  /* ── Viewport ── */
+  .vp {
+    width: 100%;
+    height: 148px;
+    background: #050404;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle radial glow at center */
+  .vp::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 52%, rgba(201,149,107,0.07) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Center dot */
+  .vp::after {
+    content: '';
+    position: absolute;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: rgba(201,149,107,0.25);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+  }
+
+  /* Path SVG overlay */
+  .vp-path {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ── Animated card chip ── */
+  .chip {
+    position: absolute;
+    width: 50px;
+    height: 34px;
+    border-radius: 6px;
+    top: 50%;
+    left: 50%;
+    margin-top: -17px;
+    margin-left: -25px;
+    background: linear-gradient(145deg, #c9956b 0%, #7a4b2a 100%);
+    border: 1px solid rgba(255,255,255,0.14);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.5);
+    z-index: 2;
+  }
+
+  /* ── CURRENT: slide visible upward ── */
+  @keyframes cur {
+    0%   { transform: translate(54px, 58px) scale(0.6);  opacity: 0.5; }
+    6%   { opacity: 0.75; }
+    35%  { transform: translate(0,    0)    scale(1.0);  opacity: 1.0; }
+    68%  { transform: translate(-46px,-46px) scale(0.7); opacity: 0.88; }
+    88%  { transform: translate(-54px,-58px) scale(0.58);opacity: 0.7; }
+    99%  { transform: translate(56px,  60px) scale(0.6); opacity: 0; }
+    100% { transform: translate(54px,  58px) scale(0.6); opacity: 0; }
+  }
+
+  /* ── FADE: opacity collapses after featured ── */
+  @keyframes fad {
+    0%   { transform: translate(54px, 58px) scale(0.6);  opacity: 0; }
+    8%   { opacity: 0.65; }
+    35%  { transform: translate(0,    0)    scale(1.0);  opacity: 1.0; }
+    52%  { transform: translate(-20px,-20px) scale(0.84);opacity: 0.3; }
+    65%  { transform: translate(-38px,-36px) scale(0.7); opacity: 0; }
+    99%  { transform: translate(56px,  60px) scale(0.6); opacity: 0; }
+    100% { transform: translate(54px,  58px) scale(0.6); opacity: 0; }
+  }
+
+  /* ── DEPTH: shrinks toward vanishing point ── */
+  @keyframes dep {
+    0%   { transform: translate(54px, 58px) scale(0.6);  opacity: 0; }
+    8%   { opacity: 0.65; }
+    35%  { transform: translate(0,    0)    scale(1.0);  opacity: 1.0; }
+    55%  { transform: translate(4px,  4px)  scale(0.45); opacity: 0.28; }
+    70%  { transform: translate(2px,  2px)  scale(0.15); opacity: 0; }
+    99%  { transform: translate(56px,  60px) scale(0.6); opacity: 0; }
+    100% { transform: translate(54px,  58px) scale(0.6); opacity: 0; }
+  }
+
+  /* ── FLOW: continuous diagonal — entry upper-left, exit lower-right ── */
+  @keyframes flw {
+    0%   { transform: translate(-62px,-44px) scale(0.58); opacity: 0; }
+    8%   { opacity: 0.6; }
+    35%  { transform: translate(0,    0)    scale(1.0);  opacity: 1.0; }
+    68%  { transform: translate(54px, 42px) scale(0.68); opacity: 0.5; }
+    88%  { transform: translate(64px, 54px) scale(0.55); opacity: 0; }
+    99%  { transform: translate(-64px,-46px) scale(0.58);opacity: 0; }
+    100% { transform: translate(-62px,-44px) scale(0.58);opacity: 0; }
+  }
+
+  .anim-cur { animation: cur 3s cubic-bezier(0.4,0,0.2,1) infinite; }
+  .anim-fad { animation: fad 3s cubic-bezier(0.4,0,0.2,1) infinite; }
+  .anim-dep { animation: dep 3s cubic-bezier(0.4,0,0.2,1) infinite; }
+  .anim-flw { animation: flw 3s cubic-bezier(0.4,0,0.2,1) infinite; }
+
+  .b { animation-delay: -1s; }
+  .c { animation-delay: -2s; }
+
+  /* ── Info panel ── */
+  .info {
+    padding: 0.75rem 0.9rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.12rem 0.45rem;
+    border-radius: 20px;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+  }
+  .b-prob { background: rgba(200,70,70,0.18); color: #e87070; border: 1px solid rgba(200,70,70,0.3); }
+  .b-reco { background: rgba(100,190,100,0.14); color: #7ecb7e; border: 1px solid rgba(100,190,100,0.28); }
+  .b-opt  { background: rgba(201,149,107,0.12); color: #c9956b; border: 1px solid rgba(201,149,107,0.25); }
+
+  .info h3 {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: #f5eee8;
+    margin-bottom: 0.2rem;
+  }
+
+  .info p {
+    font-size: 0.69rem;
+    color: rgba(245,238,232,0.42);
+    line-height: 1.55;
+  }
+
+  .hint {
+    text-align: center;
+    color: rgba(245,238,232,0.28);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding-bottom: 1rem;
+  }
+</style>
+</head>
+<body>
+
+<h1>Card exit — what should happen?</h1>
+<p class="sub">
+  <strong>The bug:</strong> after card 1 leaves the featured (center) position, it's fully visible as it slides
+  upward-left — same corridor as the incoming cards. No sense of orbit, just a slide.<br><br>
+  Watch the animated demos below. All four show the same number of cards and the same orbit timing — only the <em>exit behavior</em> changes.
+</p>
+
+<div class="grid">
+
+  <!-- Current -->
+  <div class="card" data-choice="current" onclick="toggleSelect(this)">
+    <div class="vp">
+      <svg class="vp-path" viewBox="0 0 210 148" fill="none">
+        <!-- entry: lower-right → center -->
+        <path d="M 175 128 Q 105 74 35 20" stroke="#c9956b" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.3"/>
+        <!-- exit: center → upper-left (same corridor — the problem) -->
+        <path d="M 105 74 Q 68 47 35 20" stroke="#e87070" stroke-width="1.5" stroke-dasharray="3 4" opacity="0.45"/>
+        <text x="28" y="14" fill="#e87070" font-size="7" opacity="0.7" font-family="Arial">exit ↑</text>
+        <text x="28" y="22" fill="#e87070" font-size="7" opacity="0.7" font-family="Arial">same</text>
+      </svg>
+      <div class="chip anim-cur"></div>
+      <div class="chip anim-cur b"></div>
+      <div class="chip anim-cur c"></div>
+    </div>
+    <div class="info">
+      <div class="badge b-prob">Current · Bug</div>
+      <h3>Visible Slide</h3>
+      <p>Exit travels the same upper-left corridor as incoming cards. Fully opaque — clearly visible sliding upward.</p>
+    </div>
+  </div>
+
+  <!-- Fade -->
+  <div class="card" data-choice="fade" onclick="toggleSelect(this)">
+    <div class="vp">
+      <svg class="vp-path" viewBox="0 0 210 148" fill="none">
+        <path d="M 175 128 Q 105 74 35 20" stroke="#c9956b" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.3"/>
+        <!-- exit fades: dashed gets lighter -->
+        <path d="M 105 74 Q 80 57 60 42" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="2 6" opacity="0.2"/>
+        <text x="58" y="36" fill="rgba(255,255,255,0.35)" font-size="7" font-family="Arial">→ fades</text>
+      </svg>
+      <div class="chip anim-fad"></div>
+      <div class="chip anim-fad b"></div>
+      <div class="chip anim-fad c"></div>
+    </div>
+    <div class="info">
+      <div class="badge b-reco">Recommended · A</div>
+      <h3>Graceful Fade</h3>
+      <p>Same geometry. Opacity collapses immediately after featured — the upward slide becomes invisible. Minimal code change.</p>
+    </div>
+  </div>
+
+  <!-- Depth push -->
+  <div class="card" data-choice="depth" onclick="toggleSelect(this)">
+    <div class="vp">
+      <svg class="vp-path" viewBox="0 0 210 148" fill="none">
+        <path d="M 175 128 Q 105 74 35 20" stroke="#c9956b" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.3"/>
+        <!-- concentric shrink at center -->
+        <circle cx="107" cy="74" r="18" stroke="rgba(255,255,255,0.18)" stroke-width="1" stroke-dasharray="3 3"/>
+        <circle cx="107" cy="74" r="9"  stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+        <circle cx="107" cy="74" r="3"  stroke="rgba(255,255,255,0.1)"  stroke-width="1"/>
+      </svg>
+      <div class="chip anim-dep"></div>
+      <div class="chip anim-dep b"></div>
+      <div class="chip anim-dep c"></div>
+    </div>
+    <div class="info">
+      <div class="badge b-opt">Option · B</div>
+      <h3>Depth Disappear</h3>
+      <p>After featured, card shrinks toward a vanishing point (tz push) and fades. Cinematic "receding into the scene" feel.</p>
+    </div>
+  </div>
+
+  <!-- Continuous flow -->
+  <div class="card" data-choice="flow" onclick="toggleSelect(this)">
+    <div class="vp">
+      <svg class="vp-path" viewBox="0 0 210 148" fill="none">
+        <!-- one continuous diagonal: upper-left → center → lower-right -->
+        <path d="M 35 20 Q 105 74 175 128" stroke="#c9956b" stroke-width="1.4" stroke-dasharray="5 4" opacity="0.35"/>
+        <polygon points="173,118 180,130 168,126" fill="#c9956b" opacity="0.4"/>
+        <text x="140" y="144" fill="rgba(201,149,107,0.55)" font-size="7" font-family="Arial">→ continues</text>
+      </svg>
+      <div class="chip anim-flw"></div>
+      <div class="chip anim-flw b"></div>
+      <div class="chip anim-flw c"></div>
+    </div>
+    <div class="info">
+      <div class="badge b-opt">Option · C</div>
+      <h3>Continuous Flow</h3>
+      <p>Redesign exit slots to continue the diagonal downward-right. Cards travel one direction only — true conveyor loop. Requires slot geometry rethink.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="hint">Click a card to select · Then tell me in the terminal</p>
+
+</body>
+</html>

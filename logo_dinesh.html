@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOLV — Editorial Mark</title>
+<style>
+:root {
+  --paper: #f2e9da;
+  --ink:   #060402;
+  --page:  #090705;
+  --mat:   #120f0a;
+  --label: rgba(255,255,255,0.15);
+  --label-dim: rgba(255,255,255,0.06);
+  --gold:  rgba(210,170,110,0.55);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { color-scheme: dark; }
+
+body {
+  min-height: 100vh;
+  background: var(--page);
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Grain overlay ─────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: -100%;
+  width: 300%;
+  height: 300%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.042;
+  pointer-events: none;
+  z-index: 9000;
+  animation: grain 12s steps(8) infinite;
+}
+
+@keyframes grain {
+  0%   { transform: translate(0%,    0%)   }
+  12%  { transform: translate(-2.5%, -3.5%)}
+  25%  { transform: translate(3.5%,  1.5%) }
+  37%  { transform: translate(-1.5%, 4%)   }
+  50%  { transform: translate(4%,    -2%)  }
+  62%  { transform: translate(-3.5%, 2.5%) }
+  75%  { transform: translate(2%,    -4.5%)}
+  87%  { transform: translate(-1%,   3%)   }
+  100% { transform: translate(0%,    0%)   }
+}
+
+/* Radial vignette on page background */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 40%, rgba(0,0,0,0.55) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ─── Stage ─────────────────────────────────────────────────── */
+.stage {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 18px;
+}
+
+/* ─── Header row ─────────────────────────────────────────────── */
+.header-row {
+  width: min(1560px, 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  opacity: 0;
+  animation: fade-up 0.8s 0.75s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+.header-title {
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--label);
+}
+
+.header-mark {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--label-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Mat board ──────────────────────────────────────────────── */
+.mat {
+  position: relative;
+  width: min(1560px, 100%);
+  background: var(--mat);
+  padding: 32px;
+  border: 1px solid rgba(255,255,255,0.038);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.9),
+    0 60px 120px rgba(0,0,0,0.75),
+    0 120px 240px rgba(0,0,0,0.45);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: rise 1.3s 0.1s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+/* Registration corner marks on mat */
+.reg {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border-style: solid;
+  border-color: rgba(255,255,255,0.055);
+}
+.reg.tl { top: 9px;  left: 9px;  border-width: 1px 0 0 1px; }
+.reg.tr { top: 9px;  right: 9px; border-width: 1px 1px 0 0; }
+.reg.bl { bottom: 9px; left: 9px;  border-width: 0 0 1px 1px; }
+.reg.br { bottom: 9px; right: 9px; border-width: 0 1px 1px 0; }
+
+/* Hairline rule above artboard */
+.mat-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.06) 80%, transparent);
+  margin-bottom: 20px;
+}
+
+/* ─── Artboard ───────────────────────────────────────────────── */
+.artboard {
+  position: relative;
+  width: 1336px;
+  height: 340px;
+  max-width: 100%;
+  margin: 0 auto;
+  background: var(--paper);
+  overflow: hidden;
+  aspect-ratio: 1336 / 340;
+  /* Paper texture — very subtle inner shadow */
+  box-shadow:
+    inset 0 0 100px rgba(0,0,0,0.045),
+    inset 1px 1px 0 rgba(255,255,255,0.6),
+    inset -1px -1px 0 rgba(0,0,0,0.04);
+}
+
+/* ─── Mark — wordmark ────────────────────────────────────────── */
+.wordmark {
+  position: absolute;
+  left: 58px;
+  top: 34px;
+  color: var(--ink);
+  font-family: Didot, 'Bodoni 72', 'Bodoni MT', Georgia, serif;
+  font-size: 250px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.038em;
+  white-space: nowrap;
+}
+
+/* Divider band — same paper color to "cut through" letterforms */
+.divider {
+  position: absolute;
+  left: 98px;
+  top: 143px;
+  width: 1100px;
+  height: 18px;
+  background: var(--paper);
+  z-index: 1;
+}
+
+/* Restore the V through the divider band via clip-path */
+.v-restore {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  clip-path: inset(34px 376px 56px 900px);
+}
+
+/* Full words inside the divider band */
+.word {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink);
+  font-family: Didot, 'Bodoni 72', 'Bodoni MT', Georgia, serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  z-index: 3;
+}
+.house  { left: 49px; }
+.of     { left: 256px; }
+.lights { left: 360px; width: 84px; text-align: center; }
+.vows   { left: 548px; width: 84px; text-align: center; }
+
+/* ─── Proof line (below artboard, inside mat) ────────────────── */
+.proof-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+  padding: 0 2px;
+}
+
+.proof-spec {
+  font-size: 8px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.09);
+}
+
+.proof-swatches {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.swatch-ink   { background: #060402; }
+.swatch-paper {
+  background: #f2e9da;
+  outline: 1px solid rgba(255,255,255,0.12);
+  outline-offset: 0;
+}
+
+/* ─── Footer row ─────────────────────────────────────────────── */
+.footer-row {
+  width: min(1560px, 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  opacity: 0;
+  animation: fade-up 0.8s 0.95s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+.footer-note {
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--label-dim);
+}
+
+/* ─── Keyframes ──────────────────────────────────────────────── */
+@keyframes rise {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .mat, .header-row, .footer-row {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  body::before { animation: none; }
+}
+
+/* ─── Responsive tweaks ──────────────────────────────────────── */
+@media (max-width: 1600px) {
+  .mat { padding: 22px; }
+}
+@media (max-width: 900px) {
+  .mat { padding: 14px; }
+  .stage { padding: 32px 16px; gap: 12px; }
+}
+@media (max-width: 600px) {
+  .mat { padding: 10px; }
+  .mat-rule { margin-bottom: 12px; }
+  .reg { display: none; }
+  .stage { padding: 24px 12px; }
+  .header-row, .footer-row { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- ── Header row ─────────────────────────────────── -->
+  <div class="header-row" aria-hidden="true">
+    <span class="header-title">House of Lights Vows — Editorial Mark</span>
+    <span class="header-mark">Mark&#8202;/&#8202;01</span>
+  </div>
+
+  <!-- ── Mat board ──────────────────────────────────── -->
+  <main class="mat">
+
+    <!-- Registration corner marks -->
+    <div class="reg tl" aria-hidden="true"></div>
+    <div class="reg tr" aria-hidden="true"></div>
+    <div class="reg bl" aria-hidden="true"></div>
+    <div class="reg br" aria-hidden="true"></div>
+
+    <!-- Top hairline -->
+    <div class="mat-rule" aria-hidden="true"></div>
+
+    <!-- Artboard -->
+    <section class="artboard" aria-label="HOLV editorial mark — House of Lights Vows">
+
+      <span class="wordmark">HOLV</span>
+
+      <div class="divider" aria-hidden="true">
+        <span class="word house">House</span>
+        <span class="word of">of</span>
+        <span class="word lights">Lights</span>
+        <span class="word vows">Vows</span>
+      </div>
+
+      <div class="v-restore" aria-hidden="true">
+        <span class="wordmark">HOLV</span>
+      </div>
+
+    </section>
+
+    <!-- Proof spec line -->
+    <div class="proof-bar" aria-hidden="true">
+      <span class="proof-spec">1336 &times; 340 &nbsp;&middot;&nbsp; Primary Wordmark &nbsp;&middot;&nbsp; Serif</span>
+      <div class="proof-swatches">
+        <div class="swatch swatch-ink"   title="Ink #060402"></div>
+        <div class="swatch swatch-paper" title="Paper #f2e9da"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Footer row ─────────────────────────────────── -->
+  <div class="footer-row" aria-hidden="true">
+    <span class="footer-note">Aakaara Studios NYC</span>
+    <span class="footer-note">Didot &middot; Bodoni 72 &middot; Serif</span>
+  </div>
+
+</div>
+
+</body>
+</html>
