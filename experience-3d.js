@@ -2,11 +2,13 @@ import * as THREE from 'three';
 
 function initExperience3D() {
   const container = document.querySelector('.ae-canvas');
-  if (!container) return;
-  if (window.matchMedia('(max-width: 768px)').matches) return;
+  if (!container) return null;
+  if (window.matchMedia('(max-width: 768px)').matches) return null;
 
   const W = container.offsetWidth;
   const H = container.offsetHeight;
+
+  if (W === 0 || H === 0) return null;
 
   // Renderer — transparent background so section's #F7F2EA shows through
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -14,9 +16,14 @@ function initExperience3D() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.setClearColor(0x000000, 0);
 
-  const cvs = renderer.domElement;
-  cvs.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;';
-  container.insertBefore(cvs, container.firstChild);
+  const canvas = renderer.domElement;
+  canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;';
+  container.insertBefore(canvas, container.firstChild);
+
+  canvas.addEventListener('webglcontextlost', e => {
+    e.preventDefault();
+    cancelAnimationFrame(raf);
+  });
 
   // Scene + camera
   const scene = new THREE.Scene();
@@ -31,17 +38,17 @@ function initExperience3D() {
   key.position.set(4, 8, 10);
   scene.add(key);
 
-  const pl1 = new THREE.PointLight(0xc9956b, 10, 50);
-  pl1.position.set(-6, 4, -10);
-  scene.add(pl1);
+  const rimLight = new THREE.PointLight(0xc9956b, 10, 50);
+  rimLight.position.set(-6, 4, -10);
+  scene.add(rimLight);
 
-  const pl2 = new THREE.PointLight(0xff9944, 6, 30);
-  pl2.position.set(7, -4, 6);
-  scene.add(pl2);
+  const fillLight = new THREE.PointLight(0xff9944, 6, 30);
+  fillLight.position.set(7, -4, 6);
+  scene.add(fillLight);
 
-  const pl3 = new THREE.PointLight(0xffd580, 5, 20);
-  pl3.position.set(0, 2, 14);
-  scene.add(pl3);
+  const frontLight = new THREE.PointLight(0xffd580, 5, 20);
+  frontLight.position.set(0, 2, 14);
+  scene.add(frontLight);
 
   // S-curve: starts top-left far, inflects at center, exits bottom-right close
   const curve = new THREE.CatmullRomCurve3([
@@ -55,17 +62,17 @@ function initExperience3D() {
     new THREE.Vector3( 7, -6,   18),
   ]);
 
-  const SEGS = 500, R = 24;
+  const SEGS = 500, TUBE_RADIAL_SEGMENTS = 24;
 
   // Layer 1: shadow base (thick, rough)
   scene.add(new THREE.Mesh(
-    new THREE.TubeGeometry(curve, SEGS, 0.14, R, false),
+    new THREE.TubeGeometry(curve, SEGS, 0.14, TUBE_RADIAL_SEGMENTS, false),
     new THREE.MeshStandardMaterial({ color: 0x2a1000, metalness: 0.3, roughness: 1 })
   ));
 
   // Layer 2: main gold metallic tube
   scene.add(new THREE.Mesh(
-    new THREE.TubeGeometry(curve, SEGS, 0.09, R, false),
+    new THREE.TubeGeometry(curve, SEGS, 0.09, TUBE_RADIAL_SEGMENTS, false),
     new THREE.MeshStandardMaterial({
       color: 0xc07840,
       metalness: 0.95,
@@ -128,18 +135,18 @@ function initExperience3D() {
   });
 
   // Particles scattered around the curve
-  const N = 700;
-  const pos = new Float32Array(N * 3);
-  for (let i = 0; i < N; i++) {
+  const PARTICLE_COUNT = 700;
+  const particlePositions = new Float32Array(PARTICLE_COUNT * 3);
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
     const p = curve.getPointAt(Math.random());
     const a = Math.random() * Math.PI * 2;
     const r = 0.4 + Math.random() * 3;
-    pos[i * 3]     = p.x + Math.cos(a) * r;
-    pos[i * 3 + 1] = p.y + Math.sin(a) * r;
-    pos[i * 3 + 2] = p.z + (Math.random() - 0.5) * 3;
+    particlePositions[i * 3]     = p.x + Math.cos(a) * r;
+    particlePositions[i * 3 + 1] = p.y + Math.sin(a) * r;
+    particlePositions[i * 3 + 2] = p.z + (Math.random() - 0.5) * 3;
   }
   const partGeo = new THREE.BufferGeometry();
-  partGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  partGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
   scene.add(new THREE.Points(
     partGeo,
     new THREE.PointsMaterial({ color: 0xc9956b, size: 0.055, transparent: true, opacity: 0.25 })
@@ -149,26 +156,45 @@ function initExperience3D() {
   let raf, tick = 0;
   function animate() {
     raf = requestAnimationFrame(animate);
-    tick += 0.0025;
+    tick = (tick + 0.0025) % (Math.PI * 400);
     camera.position.x = Math.sin(tick * 0.5) * 0.4;
     camera.position.y = Math.cos(tick * 0.35) * 0.3;
     camera.lookAt(0, 0, 0);
-    pl1.intensity = 9   + Math.sin(tick * 2)   * 2.5;
-    pl2.intensity = 5   + Math.cos(tick * 1.7)  * 2;
-    pl3.intensity = 4.5 + Math.sin(tick * 3)   * 1.5;
+    rimLight.intensity = 9   + Math.sin(tick * 2)   * 2.5;
+    fillLight.intensity = 5   + Math.cos(tick * 1.7)  * 2;
+    frontLight.intensity = 4.5 + Math.sin(tick * 3)   * 1.5;
     renderer.render(scene, camera);
   }
   animate();
 
   // Resize with container
-  const ro = new ResizeObserver(() => {
+  const resizeObserver = new ResizeObserver(() => {
     const w = container.offsetWidth;
     const h = container.offsetHeight;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
   });
-  ro.observe(container);
+  resizeObserver.observe(container);
+
+  return {
+    destroy() {
+      cancelAnimationFrame(raf);
+      resizeObserver.disconnect();
+      scene.traverse(obj => {
+        obj.geometry?.dispose();
+        if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
+        else obj.material?.dispose();
+      });
+      renderer.dispose();
+    }
+  };
 }
 
-document.addEventListener('DOMContentLoaded', initExperience3D);
+let cleanup = null;
+document.addEventListener('DOMContentLoaded', () => {
+  cleanup = initExperience3D();
+});
+window.addEventListener('pagehide', () => {
+  if (cleanup) cleanup.destroy();
+});
