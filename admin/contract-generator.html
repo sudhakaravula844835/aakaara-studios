@@ -576,18 +576,8 @@
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
-<div class="login-screen" id="loginScreen">
-  <div class="login-box">
-    <div class="logo-text">Aakaara Studios</div>
-    <div class="logo-sub">Contract Generator</div>
-    <input type="password" id="loginPass" placeholder="Enter access code"/>
-    <div class="login-error" id="loginError">Incorrect access code</div>
-  </div>
-</div>
-
 <!-- MAIN APP -->
-<div class="app" id="app">
+<div class="app visible" id="app">
 <div class="page-wrap">
   <!-- HEADER -->
   <header>
@@ -601,6 +591,7 @@
   <!-- TOP BAR -->
   <div class="topbar">
     <button onclick="resetForm()">New Contract</button>
+    <button type="button" onclick="window.location.href='/admin/logout'">Sign Out</button>
   </div>
 
   <!-- FORM -->
@@ -826,22 +817,6 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ── LOGIN ──
-const ACCESS_CODE = 'aakaara2026';
-
-function doLogin() {
-  if (document.getElementById('loginPass').value === ACCESS_CODE) {
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('app').classList.add('visible');
-  } else {
-    document.getElementById('loginError').classList.add('show');
-    setTimeout(() => document.getElementById('loginError').classList.remove('show'), 2000);
-  }
-}
-document.getElementById('loginPass').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
-
 // ── DAY BLOCKS ──
 let dayCounter = 0; // monotonic counter for unique IDs
 function addDay() {

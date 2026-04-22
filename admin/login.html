@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Aakaara Studios — Admin Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=DM+Mono:wght@300;400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="quote-generator.css">
+</head>
+<body>
+<main class="login-screen login-screen--standalone">
+  <form class="login-box" method="post" action="/admin/login" autocomplete="off">
+    <div class="logo-text">Aakaara Studios</div>
+    <div class="logo-sub">Admin Access</div>
+    <input type="password" name="password" placeholder="Enter access code" autocomplete="current-password" required autofocus>
+    <input type="hidden" name="next" id="nextPath" value="/admin/quote-generator.html">
+    <div class="login-error" id="loginError" role="alert">Incorrect access code</div>
+  </form>
+</main>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const next = params.get('next');
+  if (next && next.startsWith('/admin/')) {
+    document.getElementById('nextPath').value = next;
+  }
+  if (params.get('error') === '1') {
+    document.getElementById('loginError').classList.add('show');
+  }
+</script>
+</body>
+</html>

@@ -11,18 +11,8 @@
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="login-screen" id="loginScreen">
-  <div class="login-box">
-    <div class="logo-text">Aakaara Studios</div>
-    <div class="logo-sub">Quote Generator</div>
-    <input type="password" id="loginPass" placeholder="Enter access code">
-    <div class="login-error" id="loginError">Incorrect access code</div>
-  </div>
-</div>
-
 <!-- APP -->
-<div class="app" id="app">
+<div class="app visible" id="app">
 
   <!-- Top bar -->
   <div class="topbar">
@@ -34,6 +24,7 @@
     <div class="topbar-actions">
       <button type="button" class="btn btn-ghost btn-small" onclick="resetForm()">New Quote</button>
       <a href="dashboard.html" class="btn btn-ghost btn-small" style="text-decoration: none;">Dashboard</a>
+      <a href="/admin/logout" class="btn btn-ghost btn-small" style="text-decoration: none;">Sign Out</a>
     </div>
   </div>
 

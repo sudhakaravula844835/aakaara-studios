@@ -1,7 +1,5 @@
 const APP_SETTINGS = {
-  accessCode: 'aakaara2026',
   draftStorageKey: 'aakaaraQuoteDraft:v2',
-  loginSessionKey: 'aakaaraQuoteGeneratorUnlocked:v1',
   dashboardStorageKey: 'aakaaraQuotes',
   draftSaveDelay: 240
 };
@@ -155,42 +153,6 @@ function showToast(message) {
   toast.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-function showApp({ persistSession = true } = {}) {
-  $('loginScreen').classList.add('hidden');
-  $('app').classList.add('visible');
-  if (persistSession) {
-    writeStorage(sessionStorage, APP_SETTINGS.loginSessionKey, '1');
-  }
-}
-
-function doLogin() {
-  const password = $('loginPass').value;
-  if (password === APP_SETTINGS.accessCode) {
-    $('loginError').classList.remove('show');
-    showApp();
-  } else {
-    $('loginError').classList.add('show');
-    setTimeout(() => $('loginError').classList.remove('show'), 2000);
-  }
-}
-
-function initializeLogin() {
-  if (readStorage(sessionStorage, APP_SETTINGS.loginSessionKey) === '1') {
-    showApp({ persistSession: false });
-  }
-
-  $('loginPass').addEventListener('keydown', event => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      doLogin();
-    }
-  });
-
-  $('loginPass').addEventListener('input', () => {
-    $('loginError').classList.remove('show');
-  });
 }
 
 function titleCaseWords(value) {
@@ -1558,7 +1520,6 @@ function initializeEventBindings() {
 }
 
 function initializeApp() {
-  initializeLogin();
   initializeEventBindings();
 
   const restoredDraft = loadDraftFromStorage();

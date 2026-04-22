@@ -365,6 +365,25 @@
       filter: brightness(0.95) saturate(0.92);
     }
 
+    .proof-image-wrap.is-missing {
+      display: grid;
+      place-items: center;
+      min-height: 220px;
+      background:
+        radial-gradient(circle at 28% 18%, rgba(201, 149, 107, 0.2), transparent 28%),
+        linear-gradient(145deg, rgba(22, 20, 18, 0.96), rgba(9, 9, 9, 0.96));
+    }
+
+    .proof-image-wrap.is-missing::before {
+      content: "Insights image unavailable";
+      position: relative;
+      z-index: 1;
+      color: rgba(243, 237, 229, 0.58);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
     .proof-image-wrap::after {
       content: "";
       position: absolute;
@@ -674,7 +693,7 @@
                   <span>Proof from the dashboard</span>
                 </div>
                 <div class="proof-image-wrap">
-                  <img src="./assets/instagram-insights.jpg" alt="Instagram professional dashboard showing 3.5M views">
+                  <img src="./assets/instagram-insights.jpg" alt="Instagram professional dashboard showing 3.5M views" onerror="this.closest('.proof-image-wrap').classList.add('is-missing'); this.remove();">
                 </div>
                 <div class="proof-foot">
                   <span class="editable" contenteditable="true">Shareable, real, and straight from the page.</span>
