@@ -57,6 +57,42 @@
       color: rgba(255,255,255,0.4);
       pointer-events: none;
     }
+
+    #webglFallback {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 20% 18%, rgba(201, 149, 107, 0.24), transparent 24%),
+        radial-gradient(circle at 78% 68%, rgba(122, 59, 78, 0.24), transparent 30%),
+        linear-gradient(145deg, #050505 0%, #17110e 48%, #050505 100%);
+    }
+
+    #webglFallback::before,
+    #webglFallback::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(88vw, 980px);
+      height: min(88vw, 980px);
+      border: 1px solid rgba(201, 149, 107, 0.22);
+      border-radius: 48% 52% 44% 56%;
+      transform: translate(-50%, -50%) rotate(18deg);
+      animation: fallbackOrbit 22s linear infinite;
+    }
+
+    #webglFallback::after {
+      width: min(62vw, 680px);
+      height: min(62vw, 680px);
+      border-color: rgba(242, 230, 217, 0.12);
+      animation-duration: 30s;
+      animation-direction: reverse;
+    }
+
+    @keyframes fallbackOrbit {
+      to { transform: translate(-50%, -50%) rotate(378deg); }
+    }
   </style>
 </head>
 <body>
@@ -112,8 +148,41 @@
       max: 8.0,
     };
 
+    function hasUsableWebGL() {
+      try {
+        const canvas = document.createElement('canvas');
+        return !!(
+          window.WebGLRenderingContext &&
+          (canvas.getContext('webgl2') ||
+            canvas.getContext('webgl') ||
+            canvas.getContext('experimental-webgl'))
+        );
+      } catch {
+        return false;
+      }
+    }
+
+    function showWebGLFallback() {
+      document.body.classList.add('webgl-fallback');
+      const fallback = document.createElement('div');
+      fallback.id = 'webglFallback';
+      fallback.setAttribute('aria-hidden', 'true');
+      document.body.prepend(fallback);
+    }
+
     // ─── Renderer / Scene / Camera ──────────────────────────────────────────────
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    let renderer = null;
+    if (hasUsableWebGL()) {
+      try {
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      } catch {
+        renderer = null;
+      }
+    }
+
+    if (!renderer) {
+      showWebGLFallback();
+    } else {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.prepend(renderer.domElement);
@@ -389,6 +458,7 @@
     }
 
     animate();
+    }
   </script>
 </body>
 </html>

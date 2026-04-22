@@ -193,7 +193,7 @@ function initExperience3D() {
       new THREE.LineDashedMaterial({ color: 0xc9956b, dashSize: 0.2, gapSize: 0.15, opacity: 0.5, transparent: true })
     );
     tickLine.computeLineDistances();
-    scene.add(tick);
+    scene.add(tickLine);
   });
 
   // Particles scattered around the curve

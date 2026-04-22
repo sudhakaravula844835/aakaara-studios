@@ -1,9 +1,41 @@
 import * as THREE from 'three';
 
+function hasUsableWebGL() {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext('webgl2') ||
+        canvas.getContext('webgl') ||
+        canvas.getContext('experimental-webgl'))
+    );
+  } catch {
+    return false;
+  }
+}
+
+function showExperienceFallback(container) {
+  if (container.querySelector('.ae-webgl-fallback')) return null;
+  container.classList.add('ae-canvas--fallback');
+
+  const fallback = document.createElement('div');
+  fallback.className = 'ae-webgl-fallback';
+  fallback.setAttribute('aria-hidden', 'true');
+  fallback.innerHTML = `
+    <span></span>
+    <span></span>
+    <span></span>
+  `;
+  container.insertBefore(fallback, container.firstChild);
+  return { destroy() { fallback.remove(); container.classList.remove('ae-canvas--fallback'); } };
+}
+
 function initExperience3D() {
   const container = document.querySelector('.ae-canvas');
   if (!container) return null;
+  if (container.dataset.curveDisabled === 'true') return null;
   if (window.matchMedia('(max-width: 768px)').matches) return null;
+  if (!hasUsableWebGL()) return showExperienceFallback(container);
 
   const W = container.offsetWidth;
   const H = container.offsetHeight;
@@ -11,7 +43,12 @@ function initExperience3D() {
   if (W === 0 || H === 0) return null;
 
   // Renderer — transparent background so section's #F7F2EA shows through
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  } catch {
+    return showExperienceFallback(container);
+  }
   renderer.setSize(W, H);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.setClearColor(0x000000, 0);
