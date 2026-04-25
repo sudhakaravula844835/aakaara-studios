@@ -3306,15 +3306,6 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   color: rgba(201,149,107,0.38);
 }
 
-@media (max-width: 768px) {
-  .vfr-stage { height: 260px; }
-  .vfr-card { width: 140px; }
-  .vfr-info { flex-direction: column; align-items: flex-start; padding: 0 20px; gap: 16px; }
-  .vfr-desc { display: none; }
-  .vfr-controls { width: 100%; }
-  .vfr-watch-btn { flex: 1; text-align: center; }
-}
-
 /* ── Cinematic Play button ── */
 .vw-play-wrap {
   position: absolute; top: 50%; left: 50%;
@@ -3545,6 +3536,27 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
     white-space: nowrap;
     scroll-snap-align: start;
   }
+}
+
+@media (max-width: 768px) {
+  .vfr-stage { height: 260px; }
+  .vfr-card { width: 140px; }
+  .vfr-info { flex-direction: column; align-items: flex-start; padding: 0 20px; gap: 16px; }
+  .vfr-desc { display: none; }
+  .vfr-controls { width: 100%; }
+  .vfr-watch-btn { flex: 1; text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vfr-amb-img,
+  .vfr-card,
+  .vfr-text { transition: none; }
+  .vfr-text.vfr-enter { animation: none; opacity: 1; transform: none; }
+}
+
+@media (hover: none) {
+  .vfr-ctrl-btn:hover { background: transparent; color: rgba(250,246,241,0.45); }
+  .vfr-watch-btn:hover { opacity: 1; }
 }
 
 /* ── NYFW mobile ── */
