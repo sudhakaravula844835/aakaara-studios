@@ -2711,6 +2711,12 @@ let portfolioCarousel, videoCarousel;
     });
     videoCarousel.rebuild();
   }
+
+  // 3. Instantiate VideoFocusRail
+  const vfrEl = document.getElementById('videoFocusRail');
+  if (vfrEl) {
+    window.videoFocusRail = new VideoFocusRail(vfrEl);
+  }
 })();
 
 // ═══════ PORTFOLIO SECTION - CINEMATIC INTRO ═══════
