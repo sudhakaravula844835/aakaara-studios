@@ -3,7 +3,7 @@ const { defineConfig, devices } = require('@playwright/test');
 module.exports = defineConfig({
   testDir: './',
   testMatch: '*.spec.js',
-  testIgnore: ['**/.claude/**'],
+  testIgnore: [],
   fullyParallel: true,
   reporter: 'html',
   use: {
