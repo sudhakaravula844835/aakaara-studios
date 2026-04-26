@@ -2519,6 +2519,8 @@ class VideoFocusRail {
     this._nextBtn = container.querySelector('.vfr-next');
     this._watchBtn = container.querySelector('.vfr-watch-btn');
 
+    this._keydownHandler = null;
+
     this.render();
     this.updateAmbience(true);
     this.updateInfo(true);
@@ -2634,13 +2636,16 @@ class VideoFocusRail {
       });
     });
 
-    // Keyboard — only fires when video modal is closed
-    document.addEventListener('keydown', (e) => {
+    // Keyboard — in-viewport guard prevents conflict with EtherealCarousel arrow keys
+    this._keydownHandler = (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
       const modal = document.getElementById('videoModal');
       if (modal && modal.classList.contains('vm-open')) return;
-      if (e.key === 'ArrowLeft')  this.prev();
-      if (e.key === 'ArrowRight') this.next();
-    });
+      const rect = this.container.getBoundingClientRect();
+      if (rect.top >= window.innerHeight || rect.bottom <= 0) return;
+      e.key === 'ArrowLeft' ? this.prev() : this.next();
+    };
+    document.addEventListener('keydown', this._keydownHandler);
 
     // Mouse wheel — debounced 400ms
     this.container.addEventListener('wheel', (e) => {
@@ -2668,6 +2673,12 @@ class VideoFocusRail {
       if (Math.abs(dx) > 60) { dx < 0 ? this.next() : this.prev(); }
       setTimeout(() => { this.isDragging = false; }, 50);
     });
+  }
+
+  destroy() {
+    if (this._keydownHandler) {
+      document.removeEventListener('keydown', this._keydownHandler);
+    }
   }
 }
 
