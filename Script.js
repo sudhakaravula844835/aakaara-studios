@@ -2201,14 +2201,24 @@ class EtherealCarousel {
         item.style.transform = `translate(-50%, -50%) translateZ(${centerZ}px) scale(1) rotateY(0deg)`;
         item.style.pointerEvents = 'auto';
       } else if (offset === 1) {
-        // Right side — tilts back into depth
+        // Right side ±1 — tilts back into depth
         item.setAttribute('data-ec-offset', '1');
         item.style.transform = `translate(calc(-50% + ${offsetPx}px), -50%) translateZ(${sideZ}px) scale(${sideScale}) rotateY(-${sideRot}deg)`;
         item.style.pointerEvents = 'auto';
       } else if (offset === -1) {
-        // Left side — tilts back into depth
+        // Left side ±1 — tilts back into depth
         item.setAttribute('data-ec-offset', '-1');
         item.style.transform = `translate(calc(-50% - ${offsetPx}px), -50%) translateZ(${sideZ}px) scale(${sideScale}) rotateY(${sideRot}deg)`;
+        item.style.pointerEvents = 'auto';
+      } else if (isVideoCarousel && offset === 2) {
+        // Video carousel only — far right card (FocusRail ±2)
+        item.setAttribute('data-ec-offset', '2');
+        item.style.transform = `translate(calc(-50% + ${offsetPx * 1.75}px), -50%) translateZ(${sideZ * 1.8}px) scale(${sideScale * 0.88}) rotateY(-${sideRot * 0.7}deg)`;
+        item.style.pointerEvents = 'auto';
+      } else if (isVideoCarousel && offset === -2) {
+        // Video carousel only — far left card (FocusRail ±2)
+        item.setAttribute('data-ec-offset', '-2');
+        item.style.transform = `translate(calc(-50% - ${offsetPx * 1.75}px), -50%) translateZ(${sideZ * 1.8}px) scale(${sideScale * 0.88}) rotateY(${sideRot * 0.7}deg)`;
         item.style.pointerEvents = 'auto';
       } else {
         // Off-screen — deep in background
@@ -2222,6 +2232,7 @@ class EtherealCarousel {
     this._updateCounter();
     this._updateNav();
     this._triggerLazyLoad();
+    this.container.dispatchEvent(new CustomEvent('ec:change', { bubbles: true }));
   }
 
   _updateCounter() {
@@ -2712,11 +2723,43 @@ let portfolioCarousel, videoCarousel;
     videoCarousel.rebuild();
   }
 
-  // 3. Instantiate VideoFocusRail
-  const vfrEl = document.getElementById('videoFocusRail');
-  if (vfrEl) {
-    window.videoFocusRail = new VideoFocusRail(vfrEl);
-  }
+  // 3. Wire full-section ambience to active videoCarousel card
+  (function() {
+    const ambience = document.getElementById('vwAmbience');
+    if (!ambience || !videoCarousel) return;
+    const imgA = ambience.querySelector('.vfr-amb-a');
+    const imgB = ambience.querySelector('.vfr-amb-b');
+    if (!imgA || !imgB) return;
+    let useA = true;
+    let lastPoster = '';
+
+    function updateAmbience() {
+      const center = document.querySelector('#vwGrid .vw-card[data-ec-offset="0"]');
+      const poster = center ? (center.dataset.poster || '') : '';
+      if (!poster || poster === lastPoster) return;
+      lastPoster = poster;
+      const next = useA ? imgA : imgB;
+      const prev = useA ? imgB : imgA;
+      next.src = poster;
+      next.onload = () => {
+        next.classList.add('vfr-amb-active');
+        prev.classList.remove('vfr-amb-active');
+        useA = !useA;
+      };
+    }
+
+    // Run on carousel navigation
+    const carouselEl = document.getElementById('videoCarousel');
+    if (carouselEl) {
+      carouselEl.addEventListener('ec:change', updateAmbience);
+    }
+    // Also run after filters change (videoCarousel.rebuild resets the grid)
+    document.querySelectorAll('.vw-filters button').forEach(btn => {
+      btn.addEventListener('click', () => setTimeout(updateAmbience, 50));
+    });
+    // Initial
+    setTimeout(updateAmbience, 100);
+  })();
 })();
 
 // ═══════ PORTFOLIO SECTION - CINEMATIC INTRO ═══════

@@ -1296,7 +1296,9 @@ body.intro-active #heroScroll { opacity: 0; }
 }
 .ethereal-carousel .vw-card[data-ec-offset="0"],
 .ethereal-carousel .vw-card[data-ec-offset="1"],
-.ethereal-carousel .vw-card[data-ec-offset="-1"] {
+.ethereal-carousel .vw-card[data-ec-offset="-1"],
+#videoCarousel .vw-card[data-ec-offset="2"],
+#videoCarousel .vw-card[data-ec-offset="-2"] {
   will-change: transform, opacity, filter;
   contain: layout paint;
   backface-visibility: hidden;
@@ -1333,7 +1335,19 @@ body.intro-active #heroScroll { opacity: 0; }
   box-shadow: 0 15px 40px rgba(0,0,0,0.4);
 }
 
-/* ── Hidden (beyond ±1) ── */
+/* ── Offset ±2 — visible only in video carousel (FocusRail mode) ── */
+#videoCarousel .vw-card[data-ec-offset="2"],
+#videoCarousel .vw-card[data-ec-offset="-2"] {
+  z-index: 1;
+  opacity: 0.25;
+  filter: blur(3px) brightness(0.5) saturate(0.4);
+  cursor: pointer;
+  border: 1px solid rgba(250,246,241,0.03);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* ── Hidden (beyond ±1 for gallery, beyond ±2 for video) ── */
 .ethereal-carousel .gallery-item[data-ec-offset="hidden"],
 .ethereal-carousel .vw-card[data-ec-offset="hidden"] {
   opacity: 0;
@@ -3086,13 +3100,11 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .vw-gi-8 { background-image: linear-gradient(135deg, #1a1612, #3a2a1e, #c9956b, #e8c4a8); }
 
 /* ── VIDEO FOCUS RAIL ── */
-.vfr-wrap {
+/* .vfr-wrap removed — ambience now lives at section level */
+
+#video-works {
   position: relative;
-  background: var(--noir);
-  border-radius: 16px;
   overflow: hidden;
-  padding: 40px 0 32px;
-  margin-bottom: 40px;
 }
 
 .vfr-ambience {
