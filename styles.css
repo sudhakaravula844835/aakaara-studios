@@ -3125,18 +3125,18 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .vfr-stage {
   position: relative;
   z-index: 1;
-  height: 340px;
+  height: 420px;
   display: flex;
   align-items: center;
   justify-content: center;
-  perspective: 1200px;
+  perspective: 1800px;
   margin-bottom: 28px;
 }
 
 .vfr-card {
   position: absolute;
-  width: 180px;
-  aspect-ratio: 3 / 4;
+  width: 640px;
+  aspect-ratio: 16 / 9;
   border-radius: 14px;
   border-top: 1px solid rgba(255,255,255,0.15);
   overflow: hidden;
@@ -3539,8 +3539,8 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 }
 
 @media (max-width: 768px) {
-  .vfr-stage { height: 260px; }
-  .vfr-card { width: 140px; }
+  .vfr-stage { height: 240px; }
+  .vfr-card { width: 320px; }
   .vfr-info { flex-direction: column; align-items: flex-start; padding: 0 20px; gap: 16px; }
   .vfr-desc { display: none; }
   .vfr-controls { width: 100%; }
