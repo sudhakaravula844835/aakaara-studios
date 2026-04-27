@@ -2195,37 +2195,64 @@ class EtherealCarousel {
     // Position filtered items
     filtered.forEach((item, i) => {
       const offset = i - ci;
-      if (offset === 0) {
-        // Center card — pops forward
-        item.setAttribute('data-ec-offset', '0');
-        item.style.transform = `translate(-50%, -50%) translateZ(${centerZ}px) scale(1) rotateY(0deg)`;
-        item.style.pointerEvents = 'auto';
-      } else if (offset === 1) {
-        // Right side ±1 — tilts back into depth
-        item.setAttribute('data-ec-offset', '1');
-        item.style.transform = `translate(calc(-50% + ${offsetPx}px), -50%) translateZ(${sideZ}px) scale(${sideScale}) rotateY(-${sideRot}deg)`;
-        item.style.pointerEvents = 'auto';
-      } else if (offset === -1) {
-        // Left side ±1 — tilts back into depth
-        item.setAttribute('data-ec-offset', '-1');
-        item.style.transform = `translate(calc(-50% - ${offsetPx}px), -50%) translateZ(${sideZ}px) scale(${sideScale}) rotateY(${sideRot}deg)`;
-        item.style.pointerEvents = 'auto';
-      } else if (isVideoCarousel && offset === 2) {
-        // Video carousel only — far right card (FocusRail ±2)
-        item.setAttribute('data-ec-offset', '2');
-        item.style.transform = `translate(calc(-50% + ${offsetPx * 1.75}px), -50%) translateZ(${sideZ * 1.8}px) scale(${sideScale * 0.88}) rotateY(-${sideRot * 0.7}deg)`;
-        item.style.pointerEvents = 'auto';
-      } else if (isVideoCarousel && offset === -2) {
-        // Video carousel only — far left card (FocusRail ±2)
-        item.setAttribute('data-ec-offset', '-2');
-        item.style.transform = `translate(calc(-50% - ${offsetPx * 1.75}px), -50%) translateZ(${sideZ * 1.8}px) scale(${sideScale * 0.88}) rotateY(${sideRot * 0.7}deg)`;
-        item.style.pointerEvents = 'auto';
+
+      if (isVideoCarousel) {
+        // ── FocusRail formula for video carousel ──────────────────────────
+        const dist = Math.abs(offset);
+        const visible = dist <= 2;
+        item.setAttribute('data-ec-offset', visible ? String(offset) : 'hidden');
+        if (!visible) {
+          const dir = offset > 0 ? 1 : -1;
+          item.style.transform = `translate(-50%, -50%) translateX(${dir * 480 * 2.5}px) translateZ(-500px) scale(0.4)`;
+          item.style.opacity = '0';
+          item.style.filter = 'blur(8px) brightness(0.3)';
+          item.style.zIndex = '0';
+          item.style.pointerEvents = 'none';
+        } else {
+          const xPx     = offset * 480;
+          const zPx     = -dist * 220;
+          const rotY    = offset * -12;
+          const scale   = offset === 0 ? 1 : 0.82;
+          const opacity = offset === 0 ? 1 : Math.max(0.15, 1 - dist * 0.45);
+          const blur    = offset === 0 ? 0 : dist * 4;
+          item.style.transform = `translate(-50%, -50%) translateX(${xPx}px) translateZ(${zPx}px) rotateY(${rotY}deg) scale(${scale})`;
+          item.style.opacity   = String(opacity);
+          item.style.filter    = `blur(${blur}px) brightness(${offset === 0 ? 1 : 0.55})`;
+          item.style.zIndex    = String(offset === 0 ? 5 : 5 - dist);
+          item.style.pointerEvents = 'auto';
+        }
       } else {
-        // Off-screen — deep in background
-        item.setAttribute('data-ec-offset', 'hidden');
-        const dir = offset > 0 ? 1 : -1;
-        item.style.transform = `translate(calc(-50% + ${dir * offsetPx * 2}px), -50%) translateZ(-200px) scale(0.5)`;
-        item.style.pointerEvents = 'none';
+        // ── Original EtherealCarousel formula for portfolio ───────────────
+        if (offset === 0) {
+          item.setAttribute('data-ec-offset', '0');
+          item.style.transform = `translate(-50%, -50%) translateZ(${centerZ}px) scale(1) rotateY(0deg)`;
+          item.style.opacity = '';
+          item.style.filter = '';
+          item.style.zIndex = '';
+          item.style.pointerEvents = 'auto';
+        } else if (offset === 1) {
+          item.setAttribute('data-ec-offset', '1');
+          item.style.transform = `translate(calc(-50% + ${offsetPx}px), -50%) translateZ(${sideZ}px) scale(${sideScale}) rotateY(-${sideRot}deg)`;
+          item.style.opacity = '';
+          item.style.filter = '';
+          item.style.zIndex = '';
+          item.style.pointerEvents = 'auto';
+        } else if (offset === -1) {
+          item.setAttribute('data-ec-offset', '-1');
+          item.style.transform = `translate(calc(-50% - ${offsetPx}px), -50%) translateZ(${sideZ}px) scale(${sideScale}) rotateY(${sideRot}deg)`;
+          item.style.opacity = '';
+          item.style.filter = '';
+          item.style.zIndex = '';
+          item.style.pointerEvents = 'auto';
+        } else {
+          item.setAttribute('data-ec-offset', 'hidden');
+          const dir = offset > 0 ? 1 : -1;
+          item.style.transform = `translate(calc(-50% + ${dir * offsetPx * 2}px), -50%) translateZ(-200px) scale(0.5)`;
+          item.style.opacity = '';
+          item.style.filter = '';
+          item.style.zIndex = '';
+          item.style.pointerEvents = 'none';
+        }
       }
     });
 

@@ -1292,7 +1292,13 @@ body.intro-active #heroScroll { opacity: 0; }
 .ethereal-carousel .vw-card.wide {
   grid-column: unset;
   aspect-ratio: 16/9;
-  width: 760px;
+  width: 640px; /* normalise wide cards to match standard for FocusRail layout */
+}
+
+/* Video carousel — FocusRail perspective & height */
+#videoCarousel {
+  perspective: 1800px;
+  height: 440px;
 }
 .ethereal-carousel .vw-card[data-ec-offset="0"],
 .ethereal-carousel .vw-card[data-ec-offset="1"],
@@ -1322,11 +1328,9 @@ body.intro-active #heroScroll { opacity: 0; }
     0 0 120px rgba(201,149,107,0.1) !important;
 }
 
-/* ── Offset ±1 (side cards) — visible recessed depth ── */
+/* ── Offset ±1 (side cards) — portfolio carousel only ── */
 .ethereal-carousel .gallery-item[data-ec-offset="1"],
-.ethereal-carousel .gallery-item[data-ec-offset="-1"],
-.ethereal-carousel .vw-card[data-ec-offset="1"],
-.ethereal-carousel .vw-card[data-ec-offset="-1"] {
+.ethereal-carousel .gallery-item[data-ec-offset="-1"] {
   z-index: 3;
   opacity: 0.5;
   filter: blur(1.5px) brightness(0.7) saturate(0.6);
@@ -1334,15 +1338,14 @@ body.intro-active #heroScroll { opacity: 0; }
   border: 1px solid rgba(250,246,241,0.05);
   box-shadow: 0 15px 40px rgba(0,0,0,0.4);
 }
-
-/* ── Offset ±2 — visible only in video carousel (FocusRail mode) ── */
+/* Video carousel side cards — opacity/filter/z-index fully controlled by JS */
+#videoCarousel .vw-card[data-ec-offset="1"],
+#videoCarousel .vw-card[data-ec-offset="-1"],
 #videoCarousel .vw-card[data-ec-offset="2"],
 #videoCarousel .vw-card[data-ec-offset="-2"] {
-  z-index: 1;
-  opacity: 0.25;
-  filter: blur(3px) brightness(0.5) saturate(0.4);
   cursor: pointer;
-  border: 1px solid rgba(250,246,241,0.03);
+  border: 1px solid rgba(250,246,241,0.05);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
   pointer-events: auto;
   visibility: visible;
 }
