@@ -2209,16 +2209,17 @@ class EtherealCarousel {
           item.style.zIndex = '0';
           item.style.pointerEvents = 'none';
         } else {
-          // Exact FocusRail values — xOffset scaled for 640px cards (orig 280px × 320px spacing → 640px × 730px)
-          const xPx     = offset * 730;
-          const zPx     = -dist * 180;
-          const rotY    = offset * -20;
-          const scale   = offset === 0 ? 1 : 0.85;
-          const opacity = offset === 0 ? 1 : Math.max(0.1, 1 - dist * 0.5);
-          const blur    = offset === 0 ? 0 : dist * 6;
+          // Side cards visible like portfolio carousel — tight spacing, clear content, dimmed
+          const xPx        = offset * 420;
+          const zPx        = -dist * 160;
+          const rotY       = offset * -18;
+          const scale      = offset === 0 ? 1 : dist === 1 ? 0.78 : 0.62;
+          const opacity    = offset === 0 ? 1 : dist === 1 ? 0.75 : 0.4;
+          const blur       = offset === 0 ? 0 : dist === 1 ? 2 : 4;
+          const brightness = offset === 0 ? 1 : dist === 1 ? 0.55 : 0.35;
           item.style.transform = `translate(-50%, -50%) translateX(${xPx}px) translateZ(${zPx}px) rotateY(${rotY}deg) scale(${scale})`;
           item.style.opacity   = String(opacity);
-          item.style.filter    = `blur(${blur}px) brightness(${offset === 0 ? 1 : 0.55})`;
+          item.style.filter    = `blur(${blur}px) brightness(${brightness})`;
           item.style.zIndex    = String(offset === 0 ? 5 : 5 - dist);
           item.style.pointerEvents = 'auto';
         }
