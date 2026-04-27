@@ -3138,12 +3138,18 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   transition: opacity 0.8s ease;
 }
 
-.vfr-amb-img.vfr-amb-active { opacity: 0.35; }
+.vfr-amb-img.vfr-amb-active { opacity: 0.6; }
 
 .vfr-amb-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, var(--noir) 15%, rgba(9,8,11,0.5) 60%, transparent);
+  /* Tight radial spotlight — glow only behind center card, edges fall to noir */
+  background:
+    radial-gradient(ellipse 55% 70% at 50% 42%, transparent 0%, rgba(9,8,11,0.82) 75%),
+    linear-gradient(to top,    var(--noir) 8%,  transparent 35%),
+    linear-gradient(to bottom, var(--noir) 0%,  transparent 25%),
+    linear-gradient(to left,   var(--noir) 0%,  transparent 20%),
+    linear-gradient(to right,  var(--noir) 0%,  transparent 20%);
 }
 
 .vfr-stage {
