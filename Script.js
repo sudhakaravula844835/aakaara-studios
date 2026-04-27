@@ -2209,12 +2209,13 @@ class EtherealCarousel {
           item.style.zIndex = '0';
           item.style.pointerEvents = 'none';
         } else {
-          const xPx     = offset * 480;
-          const zPx     = -dist * 220;
-          const rotY    = offset * -12;
-          const scale   = offset === 0 ? 1 : 0.82;
-          const opacity = offset === 0 ? 1 : Math.max(0.15, 1 - dist * 0.45);
-          const blur    = offset === 0 ? 0 : dist * 4;
+          // Exact FocusRail values — xOffset scaled for 640px cards (orig 280px × 320px spacing → 640px × 730px)
+          const xPx     = offset * 730;
+          const zPx     = -dist * 180;
+          const rotY    = offset * -20;
+          const scale   = offset === 0 ? 1 : 0.85;
+          const opacity = offset === 0 ? 1 : Math.max(0.1, 1 - dist * 0.5);
+          const blur    = offset === 0 ? 0 : dist * 6;
           item.style.transform = `translate(-50%, -50%) translateX(${xPx}px) translateZ(${zPx}px) rotateY(${rotY}deg) scale(${scale})`;
           item.style.opacity   = String(opacity);
           item.style.filter    = `blur(${blur}px) brightness(${offset === 0 ? 1 : 0.55})`;
