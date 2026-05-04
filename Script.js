@@ -2159,18 +2159,20 @@ class EtherealCarousel {
     const isTablet = window.innerWidth <= 1024;
     const isVideoCarousel = this.container.id === 'videoCarousel';
     
-    // Adjust offset based on active card width (Wide cards need different spacing factor)
-    let offsetPx = activeW * 0.9; 
-    if (activeW > 600) offsetPx = activeW * 0.65; // Wide card (760px) needs more absolute space
-    
-    if (isMobile) offsetPx = activeW * (isVideoCarousel ? 0.62 : 0.72);
-    else if (isTablet) offsetPx = activeW * (isVideoCarousel ? 0.81 : 0.87);
+    // Portfolio cards need more breathing room and a clearer twist so the
+    // side planes feel intentionally behind the hero frame.
+    let offsetPx = activeW * (isVideoCarousel ? 0.82 : 0.9);
+    if (activeW > 600) offsetPx = activeW * (isVideoCarousel ? 0.6 : 0.64);
 
-    // 3D depth values — reduced on mobile for cleaner look inside overflow:hidden
-    let sideZ = isMobile ? -60 : -120;
-    let sideRot = isMobile ? 18 : 35;
-    let sideScale = isMobile ? 0.8 : 0.75;
-    let centerZ = isMobile ? 30 : 60;
+    if (isMobile) offsetPx = activeW * (isVideoCarousel ? 0.62 : 0.72);
+    else if (isTablet) offsetPx = activeW * (isVideoCarousel ? 0.81 : 0.84);
+
+    // 3D depth values — keep video rail as-is, but give portfolio side cards
+    // a little more depth and yaw so the stack feels more sculpted.
+    let sideZ = isMobile ? (isVideoCarousel ? -28 : -42) : (isVideoCarousel ? -74 : -104);
+    let sideRot = isMobile ? (isVideoCarousel ? 10 : 14) : (isVideoCarousel ? 18 : 24);
+    let sideScale = isMobile ? (isVideoCarousel ? 0.86 : 0.84) : (isVideoCarousel ? 0.82 : 0.79);
+    let centerZ = isMobile ? 20 : (isVideoCarousel ? 42 : 52);
 
     if (isVideoCarousel && isMobile) {
       sideZ = -42;
