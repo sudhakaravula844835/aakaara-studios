@@ -2159,18 +2159,20 @@ class EtherealCarousel {
     const isTablet = window.innerWidth <= 1024;
     const isVideoCarousel = this.container.id === 'videoCarousel';
     
-    // Adjust offset based on active card width (Wide cards need different spacing factor)
-    let offsetPx = activeW * 0.9; 
-    if (activeW > 600) offsetPx = activeW * 0.65; // Wide card (760px) needs more absolute space
-    
-    if (isMobile) offsetPx = activeW * (isVideoCarousel ? 0.62 : 0.72);
-    else if (isTablet) offsetPx = activeW * (isVideoCarousel ? 0.81 : 0.87);
+    // Portfolio cards need more breathing room and a clearer twist so the
+    // side planes feel intentionally behind the hero frame.
+    let offsetPx = activeW * (isVideoCarousel ? 0.82 : 0.9);
+    if (activeW > 600) offsetPx = activeW * (isVideoCarousel ? 0.6 : 0.64);
 
-    // 3D depth values — reduced on mobile for cleaner look inside overflow:hidden
-    let sideZ = isMobile ? -60 : -120;
-    let sideRot = isMobile ? 18 : 35;
-    let sideScale = isMobile ? 0.8 : 0.75;
-    let centerZ = isMobile ? 30 : 60;
+    if (isMobile) offsetPx = activeW * (isVideoCarousel ? 0.62 : 0.72);
+    else if (isTablet) offsetPx = activeW * (isVideoCarousel ? 0.81 : 0.84);
+
+    // 3D depth values — keep video rail as-is, but give portfolio side cards
+    // a little more depth and yaw so the stack feels more sculpted.
+    let sideZ = isMobile ? (isVideoCarousel ? -28 : -42) : (isVideoCarousel ? -74 : -104);
+    let sideRot = isMobile ? (isVideoCarousel ? 10 : 14) : (isVideoCarousel ? 18 : 24);
+    let sideScale = isMobile ? (isVideoCarousel ? 0.86 : 0.84) : (isVideoCarousel ? 0.82 : 0.79);
+    let centerZ = isMobile ? 20 : (isVideoCarousel ? 42 : 52);
 
     if (isVideoCarousel && isMobile) {
       sideZ = -42;
@@ -2195,33 +2197,73 @@ class EtherealCarousel {
     // Position filtered items
     filtered.forEach((item, i) => {
       const offset = i - ci;
-      if (offset === 0) {
-        // Center card — pops forward
-        item.setAttribute('data-ec-offset', '0');
-        item.style.transform = `translate(-50%, -50%) translateZ(${centerZ}px) scale(1) rotateY(0deg)`;
-        item.style.pointerEvents = 'auto';
-      } else if (offset === 1) {
-        // Right side — tilts back into depth
-        item.setAttribute('data-ec-offset', '1');
-        item.style.transform = `translate(calc(-50% + ${offsetPx}px), -50%) translateZ(${sideZ}px) scale(${sideScale}) rotateY(-${sideRot}deg)`;
-        item.style.pointerEvents = 'auto';
-      } else if (offset === -1) {
-        // Left side — tilts back into depth
-        item.setAttribute('data-ec-offset', '-1');
-        item.style.transform = `translate(calc(-50% - ${offsetPx}px), -50%) translateZ(${sideZ}px) scale(${sideScale}) rotateY(${sideRot}deg)`;
-        item.style.pointerEvents = 'auto';
+
+      if (isVideoCarousel) {
+        // ── FocusRail formula for video carousel ──────────────────────────
+        const dist = Math.abs(offset);
+        const visible = dist <= 2;
+        item.setAttribute('data-ec-offset', visible ? String(offset) : 'hidden');
+        if (!visible) {
+          const dir = offset > 0 ? 1 : -1;
+          item.style.transform = `translate(-50%, -50%) translateX(${dir * 480 * 2.5}px) translateZ(-500px) scale(0.4)`;
+          item.style.opacity = '0';
+          item.style.filter = 'blur(8px) brightness(0.3)';
+          item.style.zIndex = '0';
+          item.style.pointerEvents = 'none';
+        } else {
+          // Side cards visible like portfolio carousel — tight spacing, clear content, dimmed
+          const xPx        = offset * 420;
+          const zPx        = -dist * 160;
+          const rotY       = offset * -18;
+          const scale      = offset === 0 ? 1 : dist === 1 ? 0.78 : 0.62;
+          const opacity    = offset === 0 ? 1 : dist === 1 ? 0.75 : 0.4;
+          const blur       = offset === 0 ? 0 : dist === 1 ? 2 : 4;
+          const brightness = offset === 0 ? 1 : dist === 1 ? 0.55 : 0.35;
+          item.style.transform = `translate(-50%, -50%) translateX(${xPx}px) translateZ(${zPx}px) rotateY(${rotY}deg) scale(${scale})`;
+          item.style.opacity   = String(opacity);
+          item.style.filter    = `blur(${blur}px) brightness(${brightness})`;
+          item.style.zIndex    = String(offset === 0 ? 5 : 5 - dist);
+          item.style.pointerEvents = 'auto';
+        }
       } else {
-        // Off-screen — deep in background
-        item.setAttribute('data-ec-offset', 'hidden');
-        const dir = offset > 0 ? 1 : -1;
-        item.style.transform = `translate(calc(-50% + ${dir * offsetPx * 2}px), -50%) translateZ(-200px) scale(0.5)`;
-        item.style.pointerEvents = 'none';
+        // ── Original EtherealCarousel formula for portfolio ───────────────
+        if (offset === 0) {
+          item.setAttribute('data-ec-offset', '0');
+          item.style.transform = `translate(-50%, -50%) translateZ(${centerZ}px) scale(1) rotateY(0deg)`;
+          item.style.opacity = '';
+          item.style.filter = '';
+          item.style.zIndex = '';
+          item.style.pointerEvents = 'auto';
+        } else if (offset === 1) {
+          item.setAttribute('data-ec-offset', '1');
+          item.style.transform = `translate(calc(-50% + ${offsetPx}px), -50%) translateZ(${sideZ}px) scale(${sideScale}) rotateY(-${sideRot}deg)`;
+          item.style.opacity = '';
+          item.style.filter = '';
+          item.style.zIndex = '';
+          item.style.pointerEvents = 'auto';
+        } else if (offset === -1) {
+          item.setAttribute('data-ec-offset', '-1');
+          item.style.transform = `translate(calc(-50% - ${offsetPx}px), -50%) translateZ(${sideZ}px) scale(${sideScale}) rotateY(${sideRot}deg)`;
+          item.style.opacity = '';
+          item.style.filter = '';
+          item.style.zIndex = '';
+          item.style.pointerEvents = 'auto';
+        } else {
+          item.setAttribute('data-ec-offset', 'hidden');
+          const dir = offset > 0 ? 1 : -1;
+          item.style.transform = `translate(calc(-50% + ${dir * offsetPx * 2}px), -50%) translateZ(-200px) scale(0.5)`;
+          item.style.opacity = '';
+          item.style.filter = '';
+          item.style.zIndex = '';
+          item.style.pointerEvents = 'none';
+        }
       }
     });
 
     this._updateCounter();
     this._updateNav();
     this._triggerLazyLoad();
+    this.container.dispatchEvent(new CustomEvent('ec:change', { bubbles: true }));
   }
 
   _updateCounter() {
@@ -2463,6 +2505,225 @@ function lazyLoadGalleryItem(item) {
   }
 }
 
+// ═══════ VIDEO FOCUS RAIL ═══════
+
+function vfrWrap(n, count) {
+  return ((n % count) + count) % count;
+}
+
+function vfrCardStyle(offset) {
+  const dist = Math.abs(offset);
+  const xPx = offset * 480;
+  const zPx = -dist * 220;
+  const rotY = offset * -12;
+  const scale = offset === 0 ? 1 : 0.82;
+  const opacity = offset === 0 ? 1 : Math.max(0.1, 1 - dist * 0.5);
+  const blur = offset === 0 ? 0 : dist * 4;
+  const brightness = offset === 0 ? 1 : 0.5;
+  return {
+    transform: `translateX(${xPx}px) translateZ(${zPx}px) rotateY(${rotY}deg) scale(${scale})`,
+    opacity,
+    filter: `blur(${blur}px) brightness(${brightness})`,
+    zIndex: offset === 0 ? 5 : 5 - dist,
+  };
+}
+
+class VideoFocusRail {
+  constructor(container) {
+    this.container = container;
+    this.cards = Array.from(container.querySelectorAll('.vfr-card'));
+    this.count = this.cards.length;
+    this.activeIndex = 0;
+    this.isDragging = false;
+    this.dragStartX = 0;
+    this.lastWheelTime = 0;
+
+    // Inject poster <img> and sheen overlay into each card
+    this.cards.forEach(card => {
+      const img = document.createElement('img');
+      img.src = card.dataset.poster || '';
+      img.alt = card.dataset.title || '';
+      card.appendChild(img);
+      const sheen = document.createElement('div');
+      sheen.className = 'vfr-card-sheen';
+      card.appendChild(sheen);
+    });
+
+    this._ambA    = container.querySelector('.vfr-amb-a');
+    this._ambB    = container.querySelector('.vfr-amb-b');
+    this._ambSlot = 'a';
+    this._text    = container.querySelector('.vfr-text');
+    this._meta    = container.querySelector('.vfr-meta');
+    this._titleEl = container.querySelector('.vfr-title');
+    this._descEl  = container.querySelector('.vfr-desc');
+    this._countEl = container.querySelector('.vfr-count');
+    this._prevBtn = container.querySelector('.vfr-prev');
+    this._nextBtn = container.querySelector('.vfr-next');
+    this._watchBtn = container.querySelector('.vfr-watch-btn');
+
+    this._keydownHandler = null;
+
+    this.render();
+    this.updateAmbience(true);
+    this.updateInfo(true);
+    this.bindEvents();
+  }
+
+  render() {
+    this.cards.forEach((card, i) => {
+      let offset = i - this.activeIndex;
+      if (offset > Math.floor(this.count / 2))  offset -= this.count;
+      if (offset < -Math.floor(this.count / 2)) offset += this.count;
+
+      const visible = Math.abs(offset) <= 2;
+      if (!visible) {
+        card.style.opacity = '0';
+        card.style.pointerEvents = 'none';
+        card.classList.remove('is-center');
+        card._vfrOffset = null;
+        return;
+      }
+
+      const s = vfrCardStyle(offset);
+      card.style.transform     = s.transform;
+      card.style.opacity       = s.opacity;
+      card.style.filter        = s.filter;
+      card.style.zIndex        = s.zIndex;
+      card.style.pointerEvents = 'auto';
+      card.classList.toggle('is-center', offset === 0);
+      card._vfrOffset = offset;
+    });
+  }
+
+  updateAmbience(immediate = false) {
+    const poster = this.cards[this.activeIndex].dataset.poster;
+    if (!poster) return;
+    const incoming = this._ambSlot === 'a' ? this._ambB : this._ambA;
+    const outgoing = this._ambSlot === 'a' ? this._ambA : this._ambB;
+
+    if (immediate) {
+      incoming.src = poster;
+      incoming.classList.add('vfr-amb-active');
+      outgoing.classList.remove('vfr-amb-active');
+      this._ambSlot = incoming === this._ambA ? 'a' : 'b';
+      return;
+    }
+
+    incoming.src = poster;
+    incoming.onload = () => {
+      incoming.classList.add('vfr-amb-active');
+      outgoing.classList.remove('vfr-amb-active');
+      this._ambSlot = incoming === this._ambA ? 'a' : 'b';
+    };
+  }
+
+  updateInfo(immediate = false) {
+    const card = this.cards[this.activeIndex];
+    const doUpdate = () => {
+      this._meta.textContent    = card.dataset.type  || '';
+      this._titleEl.textContent = card.dataset.title || '';
+      this._descEl.textContent  = card.dataset.desc  || '';
+      this._countEl.textContent = `${this.activeIndex + 1} / ${this.count}`;
+    };
+
+    if (immediate) { doUpdate(); return; }
+
+    this._text.classList.add('vfr-exit');
+    setTimeout(() => {
+      doUpdate();
+      this._text.classList.remove('vfr-exit');
+      this._text.classList.add('vfr-enter');
+      setTimeout(() => this._text.classList.remove('vfr-enter'), 350);
+    }, 220);
+  }
+
+  prev() {
+    this.activeIndex = vfrWrap(this.activeIndex - 1, this.count);
+    this.render();
+    this.updateAmbience();
+    this.updateInfo();
+  }
+
+  next() {
+    this.activeIndex = vfrWrap(this.activeIndex + 1, this.count);
+    this.render();
+    this.updateAmbience();
+    this.updateInfo();
+  }
+
+  goTo(offset) {
+    this.activeIndex = vfrWrap(this.activeIndex + offset, this.count);
+    this.render();
+    this.updateAmbience();
+    this.updateInfo();
+  }
+
+  openActive() {
+    if (typeof openModal === 'function') {
+      openModal(this.cards[this.activeIndex]);
+    }
+  }
+
+  bindEvents() {
+    this._prevBtn.addEventListener('click', () => this.prev());
+    this._nextBtn.addEventListener('click', () => this.next());
+    this._watchBtn.addEventListener('click', () => this.openActive());
+
+    this.cards.forEach(card => {
+      card.addEventListener('click', () => {
+        if (this.isDragging) return;
+        const offset = card._vfrOffset;
+        if (offset === 0) { this.openActive(); }
+        else if (offset !== null && offset !== undefined) { this.goTo(offset); }
+      });
+    });
+
+    // Keyboard — in-viewport guard prevents conflict with EtherealCarousel arrow keys
+    this._keydownHandler = (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      const modal = document.getElementById('videoModal');
+      if (modal && modal.classList.contains('vm-open')) return;
+      const rect = this.container.getBoundingClientRect();
+      if (rect.top >= window.innerHeight || rect.bottom <= 0) return;
+      e.key === 'ArrowLeft' ? this.prev() : this.next();
+    };
+    document.addEventListener('keydown', this._keydownHandler);
+
+    // Mouse wheel — debounced 400ms
+    this.container.addEventListener('wheel', (e) => {
+      const now = Date.now();
+      if (now - this.lastWheelTime < 400) return;
+      const isHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+      const delta = isHorizontal ? e.deltaX : e.deltaY;
+      if (Math.abs(delta) > 20) {
+        delta > 0 ? this.next() : this.prev();
+        this.lastWheelTime = now;
+      }
+    }, { passive: true });
+
+    // Pointer drag / swipe
+    this.container.addEventListener('pointerdown', (e) => {
+      this.isDragging = false;
+      this.dragStartX = e.clientX;
+    });
+    this.container.addEventListener('pointermove', (e) => {
+      if (Math.abs(e.clientX - this.dragStartX) > 5) this.isDragging = true;
+    });
+    this.container.addEventListener('pointerup', (e) => {
+      if (!this.isDragging) return;
+      const dx = e.clientX - this.dragStartX;
+      if (Math.abs(dx) > 60) { dx < 0 ? this.next() : this.prev(); }
+      setTimeout(() => { this.isDragging = false; }, 50);
+    });
+  }
+
+  destroy() {
+    if (this._keydownHandler) {
+      document.removeEventListener('keydown', this._keydownHandler);
+    }
+  }
+}
+
 // Global references
 let portfolioCarousel, videoCarousel;
 
@@ -2492,6 +2753,44 @@ let portfolioCarousel, videoCarousel;
     });
     videoCarousel.rebuild();
   }
+
+  // 3. Wire full-section ambience to active videoCarousel card
+  (function() {
+    const ambience = document.getElementById('vwAmbience');
+    if (!ambience || !videoCarousel) return;
+    const imgA = ambience.querySelector('.vfr-amb-a');
+    const imgB = ambience.querySelector('.vfr-amb-b');
+    if (!imgA || !imgB) return;
+    let useA = true;
+    let lastPoster = '';
+
+    function updateAmbience() {
+      const center = document.querySelector('#vwGrid .vw-card[data-ec-offset="0"]');
+      const poster = center ? (center.dataset.poster || '') : '';
+      if (!poster || poster === lastPoster) return;
+      lastPoster = poster;
+      const next = useA ? imgA : imgB;
+      const prev = useA ? imgB : imgA;
+      next.src = poster;
+      next.onload = () => {
+        next.classList.add('vfr-amb-active');
+        prev.classList.remove('vfr-amb-active');
+        useA = !useA;
+      };
+    }
+
+    // Run on carousel navigation
+    const carouselEl = document.getElementById('videoCarousel');
+    if (carouselEl) {
+      carouselEl.addEventListener('ec:change', updateAmbience);
+    }
+    // Also run after filters change (videoCarousel.rebuild resets the grid)
+    document.querySelectorAll('.vw-filters button').forEach(btn => {
+      btn.addEventListener('click', () => setTimeout(updateAmbience, 50));
+    });
+    // Initial
+    setTimeout(updateAmbience, 100);
+  })();
 })();
 
 // ═══════ PORTFOLIO SECTION - CINEMATIC INTRO ═══════
