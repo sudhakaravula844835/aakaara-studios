@@ -1264,6 +1264,15 @@ body.intro-active #heroScroll { opacity: 0; }
   filter: brightness(0.84);
 }
 
+#videoCarousel.is-native-scroll .vw-card[data-ec-offset="0"] .vw-poster {
+  filter: grayscale(0%) brightness(0.86);
+}
+
+#videoCarousel.is-native-scroll .vw-card[data-ec-offset="1"] .vw-poster,
+#videoCarousel.is-native-scroll .vw-card[data-ec-offset="-1"] .vw-poster {
+  filter: grayscale(100%) brightness(0.72) contrast(1.05);
+}
+
 #videoCarousel.is-native-scroll .vw-play-icon,
 #videoCarousel.is-native-scroll .vw-duration,
 #videoCarousel.is-native-scroll .ec-nav {
@@ -1337,6 +1346,10 @@ body.intro-active #heroScroll { opacity: 0; }
     0 0 120px rgba(201,149,107,0.1) !important;
 }
 
+#videoCarousel .vw-card[data-ec-offset="0"] .vw-poster {
+  filter: grayscale(0%) brightness(0.86);
+}
+
 /* ── Offset ±1 (side cards) — portfolio carousel only ── */
 #portfolioCarousel .gallery-item[data-ec-offset="1"],
 #portfolioCarousel .gallery-item[data-ec-offset="-1"] {
@@ -1364,6 +1377,13 @@ body.intro-active #heroScroll { opacity: 0; }
   box-shadow: 0 15px 40px rgba(0,0,0,0.4);
   pointer-events: auto;
   visibility: visible;
+}
+
+#videoCarousel .vw-card[data-ec-offset="1"] .vw-poster,
+#videoCarousel .vw-card[data-ec-offset="-1"] .vw-poster,
+#videoCarousel .vw-card[data-ec-offset="2"] .vw-poster,
+#videoCarousel .vw-card[data-ec-offset="-2"] .vw-poster {
+  filter: grayscale(100%) brightness(0.72) contrast(1.05);
 }
 
 /* ── Hidden (beyond ±1 for gallery, beyond ±2 for video) ── */
@@ -3648,7 +3668,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .vw-card .vw-duration { opacity: 0; }
   .vw-card .vw-play-wrap { transform: translate(-50%, -50%) scale(0.94); }
   .vw-card .vw-play-ring { transform: scale(1); opacity: 0.18; }
-  .vw-card .vw-poster { filter: grayscale(0%) brightness(0.85); }
+  .vw-card .vw-poster { filter: grayscale(100%) brightness(0.72) contrast(1.05); }
   /* Carousel touch overrides */
   .ethereal-carousel .gallery-item[data-ec-offset="0"] .gi-overlay { opacity: 1; }
   .ethereal-carousel .gallery-item[data-ec-offset="0"] .gi-overlay > div { transform: translateY(0); }
@@ -3656,6 +3676,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .ethereal-carousel .vw-card[data-ec-offset="0"] .vw-overlay { opacity: 1; }
   .ethereal-carousel .vw-card[data-ec-offset="0"] .vw-overlay > * { transform: translateY(0); }
   .ethereal-carousel .vw-card[data-ec-offset="0"] .vw-duration { opacity: 1; }
+  .ethereal-carousel .vw-card[data-ec-offset="0"] .vw-poster { filter: grayscale(0%) brightness(0.86); }
   .ethereal-carousel .vw-card[data-ec-offset="1"] .vw-overlay,
   .ethereal-carousel .vw-card[data-ec-offset="-1"] .vw-overlay { opacity: 0; }
   .ethereal-carousel .vw-card[data-ec-offset="1"] .vw-duration,

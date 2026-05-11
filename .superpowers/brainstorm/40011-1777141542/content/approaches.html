@@ -1,0 +1,46 @@
+<h2>3 Approaches for FocusRail in Video Works</h2>
+<p class="subtitle">All three keep the filterable grid below. The difference is how the FocusRail itself is built.</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Clean Vanilla JS Port <span style="font-size:0.7em;color:#a3e635;font-weight:400;margin-left:6px">★ Recommended</span></h3>
+      <p>Write a new self-contained <code>VideoFocusRail</code> class in <code>Script.js</code> that mirrors FocusRail's behavior — 3D coverflow transforms via JS, CSS transitions for spring-like physics, blurred poster ambience background, drag/swipe/keyboard/wheel input. Clicking center card calls the existing <code>openVideoModal()</code>. The EtherealCarousel stays untouched for the portfolio section.</p>
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>Pros</h4><ul><li>Zero new dependencies</li><li>Fits existing code style</li><li>No build step needed</li><li>Portfolio carousel unaffected</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Spring physics less precise than framer-motion</li><li>~150 lines of new JS</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>CSS-first with thin JS driver</h3>
+      <p>Define all 3D transforms in CSS using <code>--offset</code> custom properties per card. JS only updates one number per card on navigation. Smoother on low-end devices; animation entirely GPU-driven. Background ambience still done in JS.</p>
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>Pros</h4><ul><li>Most performant option</li><li>Cleanest JS (~80 lines)</li><li>Easy to tweak in DevTools</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Per-card CSS rules get verbose</li><li>Harder to add per-card dynamic values (blur, brightness)</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Extend EtherealCarousel with a "focusRail" mode</h3>
+      <p>Add a <code>mode: 'focusRail'</code> option to the existing <code>EtherealCarousel</code> class. When active, the class applies FocusRail-style 3D offsets instead of its current flat offset logic. One class, two modes.</p>
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>Pros</h4><ul><li>Least new code overall</li><li>Reuses existing input handling</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Risks destabilising the portfolio carousel</li><li>Mixed concerns in one class</li><li>Harder to reason about</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:24px;padding:16px;background:rgba(163,230,53,0.07);border:1px solid rgba(163,230,53,0.2);border-radius:8px">
+  <p style="margin:0;color:#d4d4d4;font-size:0.9em"><strong style="color:#a3e635">My recommendation: A.</strong> It's the safest and most maintainable path — a purpose-built class that mirrors exactly what FocusRail does, without touching any existing code. The physics approximation with CSS easing is imperceptible to end users.</p>
+</div>

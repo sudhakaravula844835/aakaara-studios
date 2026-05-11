@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Works — Layout Design</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #09080b; color: #faf6f1; font-family: 'Outfit', system-ui, sans-serif; padding: 32px 24px; }
+
+  .section-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #c9956b; margin-bottom: 8px; }
+  .section-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(1.8rem, 4vw, 2.6rem); color: #faf6f1; font-weight: 400; margin-bottom: 32px; }
+
+  /* ── FOCUS RAIL ── */
+  .focus-rail-hero {
+    background: #09080b;
+    border: 1px dashed rgba(201,149,107,0.25);
+    border-radius: 16px;
+    padding: 32px 0 24px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ambience-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,149,107,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .rail-label { text-align:center; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(201,149,107,0.5); margin-bottom: 20px; position:relative;z-index:1; }
+
+  /* Card stage */
+  .card-stage {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    height: 280px; perspective: 1200px;
+    margin-bottom: 24px;
+  }
+
+  .card-mock {
+    position: absolute;
+    width: 160px; height: 220px;
+    border-radius: 12px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+  }
+  .card-mock img { width:100%; height:100%; object-fit:cover; }
+  .card-mock .card-sheen { position:absolute;inset:0;background:linear-gradient(to bottom,rgba(255,255,255,0.08),transparent);border-radius:12px; }
+
+  .card-c  { transform: translateX(0)   scale(1)    rotateY(0deg);   z-index:5; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+  .card-l1 { transform: translateX(-185px) scale(0.85) rotateY(20deg);  z-index:4; filter: blur(1px) brightness(0.55); }
+  .card-r1 { transform: translateX( 185px) scale(0.85) rotateY(-20deg); z-index:4; filter: blur(1px) brightness(0.55); }
+  .card-l2 { transform: translateX(-330px) scale(0.72) rotateY(30deg);  z-index:3; filter: blur(3px) brightness(0.35); }
+  .card-r2 { transform: translateX( 330px) scale(0.72) rotateY(-30deg); z-index:3; filter: blur(3px) brightness(0.35); }
+
+  /* Info row */
+  .info-row {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px;
+    gap: 16px;
+  }
+  .info-text { flex: 1; }
+  .film-meta { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #c9956b; margin-bottom: 6px; }
+  .film-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 400; color: #faf6f1; margin-bottom: 4px; }
+  .film-desc { font-size: 13px; color: rgba(250,246,241,0.5); max-width: 320px; line-height: 1.5; }
+
+  .controls { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .ctrl-pill {
+    display: flex; align-items: center; gap: 2px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px;
+    padding: 4px;
+    backdrop-filter: blur(8px);
+  }
+  .ctrl-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; color: rgba(250,246,241,0.5);
+    font-size: 16px;
+  }
+  .ctrl-count { font-size: 11px; font-family: monospace; color: rgba(250,246,241,0.35); min-width: 36px; text-align: center; }
+  .watch-btn {
+    padding: 10px 20px; border-radius: 999px;
+    background: #c9956b; color: #09080b;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  /* ── DIVIDER ── */
+  .section-divider {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 24px;
+  }
+  .divider-line { flex: 1; height: 1px; background: rgba(201,149,107,0.12); }
+  .divider-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(201,149,107,0.4); }
+
+  /* ── FILTER PILLS ── */
+  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .pill {
+    padding: 6px 16px; border-radius: 999px; font-size: 12px;
+    border: 1px solid rgba(201,149,107,0.25); color: rgba(250,246,241,0.5);
+    cursor: pointer;
+  }
+  .pill.active { background: #c9956b; color: #09080b; border-color: #c9956b; font-weight: 600; }
+
+  /* ── GRID ── */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .grid-card {
+    background: rgba(30,26,22,0.8);
+    border-radius: 10px; overflow: hidden;
+    aspect-ratio: 16/9;
+    position: relative;
+    border: 1px solid rgba(201,149,107,0.08);
+  }
+  .grid-card img { width:100%; height:100%; object-fit:cover; opacity:0.7; }
+  .grid-badge {
+    position: absolute; bottom: 8px; left: 8px;
+    font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase;
+    background: rgba(201,149,107,0.9); color: #09080b; font-weight: 600;
+    padding: 3px 8px; border-radius: 999px;
+  }
+
+  .annotation {
+    font-size: 11px; color: rgba(201,149,107,0.6);
+    border: 1px dashed rgba(201,149,107,0.2);
+    border-radius: 6px; padding: 6px 10px;
+    margin-top: 8px; display: inline-block;
+  }
+</style>
+</head>
+<body>
+
+<div class="section-label">Films</div>
+<div class="section-title">Video Works</div>
+
+<!-- ══ FOCUS RAIL HERO ══ -->
+<div class="focus-rail-hero">
+  <div class="ambience-bg"></div>
+  <div class="rail-label">Featured Films — drag, scroll, or use arrow keys</div>
+
+  <div class="card-stage">
+    <div class="card-mock card-l2">
+      <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=320&q=60" alt="">
+      <div class="card-sheen"></div>
+    </div>
+    <div class="card-mock card-l1">
+      <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=320&q=60" alt="">
+      <div class="card-sheen"></div>
+    </div>
+    <div class="card-mock card-c">
+      <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=320&q=60" alt="">
+      <div class="card-sheen"></div>
+    </div>
+    <div class="card-mock card-r1">
+      <img src="https://images.unsplash.com/photo-1529634806980-85c3dd6d34ac?w=320&q=60" alt="">
+      <div class="card-sheen"></div>
+    </div>
+    <div class="card-mock card-r2">
+      <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=320&q=60" alt="">
+      <div class="card-sheen"></div>
+    </div>
+  </div>
+
+  <div class="info-row">
+    <div class="info-text">
+      <div class="film-meta">Wedding Film</div>
+      <div class="film-title">Pooja &amp; Amit</div>
+      <div class="film-desc">A timeless wedding story told through light, motion, and quiet ceremony.</div>
+    </div>
+    <div class="controls">
+      <div class="ctrl-pill">
+        <div class="ctrl-btn">‹</div>
+        <div class="ctrl-count">1 / 6</div>
+        <div class="ctrl-btn">›</div>
+      </div>
+      <div class="watch-btn">Watch Film ▶</div>
+    </div>
+  </div>
+</div>
+<div class="annotation">↑ New: VideoFocusRail — 6 curated hero films, 3D coverflow, blurred poster ambience</div>
+
+<br>
+
+<!-- ══ DIVIDER ══ -->
+<div class="section-divider">
+  <div class="divider-line"></div>
+  <div class="divider-label">All Films</div>
+  <div class="divider-line"></div>
+</div>
+
+<!-- ══ FILTERS ══ -->
+<div class="filter-row">
+  <div class="pill active">All</div>
+  <div class="pill">Wedding</div>
+  <div class="pill">Pre-Wedding</div>
+  <div class="pill">Engagement</div>
+  <div class="pill">Housewarming</div>
+  <div class="pill">Celebrations</div>
+  <div class="pill">Conceptual</div>
+</div>
+
+<!-- ══ GRID ══ -->
+<div class="video-grid">
+  <div class="grid-card">
+    <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=50" alt="">
+    <div class="grid-badge">Wedding</div>
+  </div>
+  <div class="grid-card">
+    <img src="https://images.unsplash.com/photo-1529634806980-85c3dd6d34ac?w=400&q=50" alt="">
+    <div class="grid-badge">Engagement</div>
+  </div>
+  <div class="grid-card">
+    <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&q=50" alt="">
+    <div class="grid-badge">Pre-Wedding</div>
+  </div>
+  <div class="grid-card">
+    <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=50" alt="">
+    <div class="grid-badge">Pre-Wedding</div>
+  </div>
+  <div class="grid-card" style="background:rgba(30,26,22,0.5); display:flex;align-items:center;justify-content:center;">
+    <span style="font-size:11px;color:rgba(250,246,241,0.2)">+ 14 more</span>
+  </div>
+</div>
+<div class="annotation">↑ Unchanged: existing filterable grid (all 18 videos)</div>
+
+</body>
+</html>
