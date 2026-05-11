@@ -74,7 +74,7 @@ function loadScriptOnce(src, globalName) {
 }
 
 function ensureHlsLibrary() {
-  return loadScriptOnce('https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js', 'Hls');
+  return loadScriptOnce('https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js', 'Hls');
 }
 
 function ensureFlatpickrLibrary() {
@@ -976,6 +976,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   /* ── Smart media loader — video → image → gradient fallback ── */
   var videos = panels.map(function(p) { return p.querySelector('.cs-video'); });
   var serviceHlsInstances = []; // Audit Fix: Track instances for memory management
+  var serviceVideoPausedForModal = false;
 
   function parseTimestamp(val) {
     if (!val) return null;
@@ -994,6 +995,10 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       hls.loadSource(videoSrc);
       hls.attachMedia(vid);
       hls.on(HlsCtor.Events.MANIFEST_PARSED, function() {
+        if (serviceVideoPausedForModal) {
+          hls.stopLoad();
+          return;
+        }
         onReady();
         vid.play().catch(function(){});
       });
@@ -1030,7 +1035,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       vid.addEventListener('canplay',        function() { showVideo(); }, { once: true });
       vid.addEventListener('loadedmetadata', function() {
         if (startTime > 0) vid.currentTime = startTime;
-        vid.play().catch(function(){});
+        if (!serviceVideoPausedForModal) vid.play().catch(function(){});
       }, { once: true });
 
       /* Loop between start and end if data-end is set */
@@ -1073,6 +1078,11 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
         // Stop HLS buffering to save memory/bandwidth when section is hidden
         serviceHlsInstances.forEach(function(h) { h.stopLoad(); });
       } else {
+        if (serviceVideoPausedForModal) {
+          pauseAllVideos();
+          serviceHlsInstances.forEach(function(h) { h.stopLoad(); });
+          return;
+        }
         // Resume loading when section becomes visible
         serviceHlsInstances.forEach(function(h) { h.startLoad(); });
         ensurePanelMedia(lastActive);
@@ -1085,7 +1095,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
 
   /* Play active panel video(s), pause others */
   function syncVideos(idx1, idx2) {
-    if (!isVisible) {
+    if (!isVisible || serviceVideoPausedForModal) {
       pauseAllVideos();
       return;
     }
@@ -1102,6 +1112,19 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       }
     });
   }
+
+  document.addEventListener('aakaara:modal-video-open', function() {
+    serviceVideoPausedForModal = true;
+    pauseAllVideos();
+    serviceHlsInstances.forEach(function(h) { h.stopLoad(); });
+  });
+
+  document.addEventListener('aakaara:modal-video-close', function() {
+    serviceVideoPausedForModal = false;
+    if (!isVisible) return;
+    serviceHlsInstances.forEach(function(h) { h.startLoad(); });
+    requestAnimationFrame(render);
+  });
 
   /* Show first slide immediately */
   slides[0].classList.add('cs-slide-active');
@@ -1334,26 +1357,28 @@ function filterVideos(cat, btn) {
   document.querySelectorAll('.vw-card').forEach(card => posterObserver.observe(card));
 })();
 
-// Hover muted preview — preloaded on viewport entry, plays instantly on hover
+// Hover muted preview — delayed so modal playback is not competing with preloads
 // Exclusive playback: only one card plays at a time (prevents audio overlap on swipe)
 (function() {
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
   const cardControllers = new Map();
+  window.aakaaraStopVideoWorkPreviews = function(options = {}) {
+    cardControllers.forEach(ctrl => ctrl.pause(true, Boolean(options.unload)));
+  };
 
   document.querySelectorAll('.vw-card').forEach(card => {
     const src = card.dataset.video;
     if (!src) return;
     const poster = card.querySelector('.vw-poster');
     let vid = null;
+    let hoverTimer = null;
 
-    // Pre-create the video element when the card enters the viewport
-    // so it's ready to play instantly on hover
     const preload = () => {
       if (vid) return;
       vid = document.createElement('video');
       vid.muted = true; vid.loop = true;
-      vid.playsInline = true; vid.preload = 'auto';
+      vid.playsInline = true; vid.preload = 'metadata';
       vid.src = src;
       vid.load();
       poster.appendChild(vid);
@@ -1366,28 +1391,32 @@ function filterVideos(cat, btn) {
       poster.classList.add('active');
     };
 
-    const pause = (reset = false) => {
+    const pause = (reset = false, unload = false) => {
+      if (hoverTimer) {
+        clearTimeout(hoverTimer);
+        hoverTimer = null;
+      }
       if (vid) {
         vid.pause();
         vid.muted = true;
         if (reset) vid.currentTime = 0;
+        if (unload) {
+          vid.removeAttribute('src');
+          vid.load();
+          vid.remove();
+          vid = null;
+        }
       }
       poster.classList.remove('active');
     };
 
     cardControllers.set(card, { play, pause });
 
-    // Preload video as soon as the card scrolls into view
-    const preloadObserver = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) { preload(); preloadObserver.disconnect(); } });
-    }, { threshold: 0.1 });
-    preloadObserver.observe(card);
-
     // Desktop: Hover — pause all other cards first, then play this one
     card.addEventListener('mouseenter', () => {
       if (window.matchMedia('(hover: none)').matches) return;
       cardControllers.forEach((ctrl, c) => { if (c !== card) ctrl.pause(true); });
-      play();
+      hoverTimer = window.setTimeout(play, 250);
     });
 
     card.addEventListener('mouseleave', () => {
@@ -1470,10 +1499,38 @@ function filterVideos(cat, btn) {
       const HlsCtor = await ensureHlsLibrary();
       if (requestId !== modalRequestId || !HlsCtor || !HlsCtor.isSupported()) return;
 
-      activeHls = new HlsCtor();
+      activeHls = new HlsCtor({
+        maxBufferLength: 60,
+        maxMaxBufferLength: 600,
+        fragLoadingMaxRetry: 6,
+        fragLoadingRetryDelay: 1000,
+        fragLoadingMaxRetryTimeout: 64000,
+        levelLoadingMaxRetry: 4,
+        manifestLoadingMaxRetry: 3,
+        abrEwmaDefaultEstimate: 1500000,
+      });
       activeHls.loadSource(src);
       activeHls.attachMedia(videoEl);
       activeHls.on(HlsCtor.Events.MANIFEST_PARSED, function() { videoEl.play().catch(function(){}); });
+      activeHls.on(HlsCtor.Events.ERROR, function(event, data) {
+        var hls = activeHls;
+        if (!hls) return;
+        if (!data.fatal) {
+          // Non-fatal buffer stall: nudge playback position to unblock decoder
+          if (data.details === 'bufferStalledError' && !videoEl.paused) {
+            videoEl.currentTime += 0.1;
+          }
+          return;
+        }
+        if (data.type === HlsCtor.ErrorTypes.NETWORK_ERROR) {
+          hls.startLoad();
+        } else if (data.type === HlsCtor.ErrorTypes.MEDIA_ERROR) {
+          hls.recoverMediaError();
+        } else {
+          activeHls = null;
+          hls.destroy();
+        }
+      });
       return;
     }
 
@@ -1539,6 +1596,10 @@ function filterVideos(cat, btn) {
   async function openModal(card) {
     const src = card.dataset.video;
     const requestId = ++modalRequestId;
+    if (typeof window.aakaaraStopVideoWorkPreviews === 'function') {
+      window.aakaaraStopVideoWorkPreviews({ unload: true });
+    }
+    document.dispatchEvent(new CustomEvent('aakaara:modal-video-open'));
     modalLastFocusedEl = document.activeElement instanceof HTMLElement ? document.activeElement : card;
     vmTitle.textContent = card.dataset.title || '';
     vmSub.textContent   = card.dataset.type  || '';
@@ -1583,6 +1644,7 @@ function filterVideos(cat, btn) {
     document.body.style.right = '';
     document.body.style.width = '';
     restoreModalScroll(modalScrollY);
+    document.dispatchEvent(new CustomEvent('aakaara:modal-video-close'));
     syncPlayToggle();
     syncMuteToggle();
     if (modalLastFocusedEl && document.contains(modalLastFocusedEl)) {
