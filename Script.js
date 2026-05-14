@@ -130,15 +130,67 @@ function ensureFlatpickrLibrary() {
   t(300, () => { mark.style.transition = 'opacity 1s cubic-bezier(0.16,1,0.3,1), transform 1s cubic-bezier(0.16,1,0.3,1)'; mark.style.opacity = '1'; mark.style.transform = 'scale(1)'; });
   petals.forEach((p, i) => { t(500 + i * 280, () => { p.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.16,1,0.3,1)'; p.style.strokeDashoffset = '0'; }); });
   t(1100, () => { if (outerRing) { outerRing.style.transition = 'opacity 0.8s cubic-bezier(0.16,1,0.3,1)'; outerRing.style.opacity = '0.18'; } });
-  t(1200, () => { centerDot.style.transition = 'r 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.6s'; centerDot.setAttribute('r', '5'); centerDot.style.opacity = '0.85'; });
-  letters.forEach((l, i) => { t(1800 + i * 90, () => { l.style.transition = 'opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1), filter 0.9s cubic-bezier(0.25,0.46,0.45,0.94)'; l.style.opacity = '1'; l.style.transform = 'translateY(0) scale(1)'; l.style.filter = 'blur(0px)'; }); });
-  
+  t(1200, () => { centerDot.style.transition = 'r 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.6s cubic-bezier(0.16,1,0.3,1)'; centerDot.setAttribute('r', '5'); centerDot.style.opacity = '0.85'; });
+  // Script-cycling letter reveal starts with the petals and resolves before the copy appears.
+  t(500, () => {
+    const WORD     = ['A','a','k','a','a','r','a'];
+    const VARIANTS = { A: ['అ','अ','அ','α','А','أ','あ','A'], a: ['అ','अ','அ','α','А','أ','あ','a'], k: ['క','क','க','κ','К','ك','か','k'], r: ['ర','र','ர','ρ','р','ر','ら','r'] };
+    const cycleMs = Math.floor(2040 / (WORD.length * 7)); // ~41ms
+
+    // Lock each letter to its natural English width so non-Latin glyphs do not reflow the layout.
+    letters.forEach(el => {
+      const w = el.getBoundingClientRect().width;
+      if (w > 0) el.style.width = w + 'px';
+    });
+
+    // Reset CSS defaults so cycling starts clean.
+    letters.forEach(el => { el.style.transition = 'none'; el.style.transform = 'translateY(8px)'; el.style.filter = 'none'; el.style.opacity = '0'; });
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    async function cycleLetter(el, char) {
+      const vars = VARIANTS[char] || [char];
+      el.style.transition = 'opacity 0.2s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1)';
+      el.style.opacity = '1'; el.style.transform = 'translateY(0)';
+      for (let i = 0; i < vars.length - 1; i++) { el.textContent = vars[i]; await sleep(cycleMs); }
+      el.textContent = char;
+    }
+
+    // Letters cycle sequentially; dots appear when last letter locks
+    (async () => {
+      for (let i = 0; i < WORD.length; i++) await cycleLetter(letters[i], WORD[i]);
+      dots.style.transition = 'opacity 0.55s cubic-bezier(0.16,1,0.3,1), transform 0.55s cubic-bezier(0.16,1,0.3,1)';
+      dots.style.opacity = '1'; dots.style.transform = 'scale(1)';
+    })();
+  });
+
+  t(2900, () => {
+    // Subtitle: letter-spacing expands from 0 to full after the name resolves.
+    sub.style.letterSpacing = '0em';
+    sub.style.opacity = '0';
+    sub.style.transition = 'none';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      sub.style.transition = 'letter-spacing 1.5s cubic-bezier(0.16,1,0.3,1), opacity 0.9s cubic-bezier(0.16,1,0.3,1)';
+      sub.style.letterSpacing = '0.6em';
+      sub.style.opacity = '1';
+    }));
+  });
+
+  t(3200, () => {
+    // Tagline: reveal as a complete line so the phrase never reads as broken.
+    tag.textContent = 'Every story deserves its own canvas.';
+    tag.style.opacity = '0';
+    tag.style.transform = 'translateY(6px)';
+    tag.style.transition = 'none';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      tag.style.transition = 'opacity 0.65s cubic-bezier(0.16,1,0.3,1), transform 0.65s cubic-bezier(0.16,1,0.3,1)';
+      tag.style.opacity = '1';
+      tag.style.transform = 'translateY(0)';
+    }));
+  });
+
   // MOB-03 FIX: Reveal hero content earlier (at 2.6s instead of 4.2s) to satisfy LCP
   t(2600, () => { const hc = document.getElementById('heroContent'); if(hc) hc.style.opacity = '0.4'; });
-
-  t(2600, () => { dots.style.transition = 'opacity 0.5s'; dots.style.opacity = '1'; });
-  t(2900, () => { sub.style.transition = 'opacity 0.8s'; sub.style.opacity = '1'; });
-  t(3200, () => { tag.style.transition = 'opacity 0.8s'; tag.style.opacity = '1'; });
   t(4200, () => {
     const introGroup = document.getElementById('introGroup');
     navbar.style.transition = 'none'; navbar.style.opacity = '0'; navbar.style.transform = 'translateY(0)'; navbar.offsetHeight;
@@ -149,17 +201,17 @@ function ensureFlatpickrLibrary() {
     const dy = navRect.top + navRect.height / 2 - (groupRect.top + groupRect.height / 2);
     const scale = 0.22;
     navbar.style.opacity = ''; navbar.style.transform = ''; navbar.style.transition = '';
-    sub.style.transition = 'opacity 0.3s'; sub.style.opacity = '0';
-    tag.style.transition = 'opacity 0.3s'; tag.style.opacity = '0';
+    sub.style.transition = 'opacity 0.4s cubic-bezier(0.16,1,0.3,1)'; sub.style.opacity = '0';
+    tag.style.transition = 'opacity 0.4s cubic-bezier(0.16,1,0.3,1)'; tag.style.opacity = '0';
     t(350, () => {
       mark.style.transition = 'margin 0.9s cubic-bezier(0.16,1,0.3,1)'; mark.style.marginBottom = '0.3rem';
       introGroup.style.transition = 'transform 1.1s cubic-bezier(0.16,1,0.3,1)';
       introGroup.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
       intro.classList.add('fade-out'); document.body.classList.remove('intro-active');
       const hc = document.getElementById('heroContent'); hc.style.transition = 'opacity 1.2s cubic-bezier(0.16,1,0.3,1)'; hc.style.opacity = '1';
-      const hs = document.getElementById('heroScroll'); t(500, () => { hs.style.transition = 'opacity 1s'; hs.style.opacity = '1'; });
+      const hs = document.getElementById('heroScroll'); t(500, () => { hs.style.transition = 'opacity 1s cubic-bezier(0.16,1,0.3,1)'; hs.style.opacity = '1'; });
     });
-    t(1500, () => { introGroup.style.transition = 'opacity 0.35s'; introGroup.style.opacity = '0'; navbar.classList.add('visible'); });
+    t(1500, () => { introGroup.style.transition = 'opacity 0.5s cubic-bezier(0.16,1,0.3,1)'; introGroup.style.opacity = '0'; navbar.classList.add('visible'); });
     t(2300, () => { intro.classList.add('hidden'); });
   });
 })();

@@ -85,24 +85,29 @@ button { border: none; cursor: pointer; font-family: inherit; background: none; 
 }
 .intro-title .v-dots {
   position: absolute;
-  top: 0.30em;
-  left: 1.05em;
+  top: 0.45em;
+  left: 1.08em;
   display: flex;
   gap: 0.16em;
   opacity: 0;
+  transform: scale(0.5);
   pointer-events: none;
 }
 .intro-title .v-dots span {
-  width: 0.12em;
-  height: 0.12em;
+  width: 0.10em;
+  height: 0.10em;
   border-radius: 50%;
   background: var(--rose);
   opacity: 0.85;
 }
 .intro-title .letter {
   display: inline-block; opacity: 0;
-  filter: blur(12px);
-  transform: translateY(10px) scale(0.95);
+  text-align: center;
+  overflow: visible;
+  background: linear-gradient(160deg, #f5e4b0 0%, #e0b87a 25%, #c9956b 55%, #dbb08a 80%, #f5e4b0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 .intro-subtitle {
   font-size: 0.6rem; letter-spacing: 0.6em; text-transform: uppercase;
