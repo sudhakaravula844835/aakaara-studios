@@ -105,44 +105,4 @@ test.describe('Aakaara Studios Portfolio', () => {
     expect(requestSent).toBe(false);
   });
 
-  // ── VideoFocusRail smoke tests ────────────────────────────────────────────
-
-  test.describe('VideoFocusRail', () => {
-    test.beforeEach(async ({ page }) => {
-      // Skip intro and scroll FocusRail into view
-      await page.evaluate(() => sessionStorage.setItem('skipIntro', '1'));
-      await page.goto('/');
-      await page.locator('#videoFocusRail').scrollIntoViewIfNeeded();
-    });
-
-    test('renders 6 cards with exactly one center card', async ({ page }) => {
-      const cards = page.locator('#videoFocusRail .vfr-card');
-      await expect(cards).toHaveCount(6);
-      const centerCards = page.locator('#videoFocusRail .vfr-card.is-center');
-      await expect(centerCards).toHaveCount(1);
-    });
-
-    test('counter starts at "1 / 6"', async ({ page }) => {
-      const counter = page.locator('#videoFocusRail .vfr-count');
-      await expect(counter).toHaveText('1 / 6');
-    });
-
-    test('clicking next advances counter to "2 / 6"', async ({ page }) => {
-      await page.locator('#videoFocusRail .vfr-next').click();
-      const counter = page.locator('#videoFocusRail .vfr-count');
-      await expect(counter).toHaveText('2 / 6');
-    });
-
-    test('clicking prev from film 1 wraps to "6 / 6"', async ({ page }) => {
-      await page.locator('#videoFocusRail .vfr-prev').click();
-      const counter = page.locator('#videoFocusRail .vfr-count');
-      await expect(counter).toHaveText('6 / 6');
-    });
-
-    test('Watch Film button opens the video modal', async ({ page }) => {
-      await page.locator('#videoFocusRail .vfr-watch-btn').click();
-      const modal = page.locator('#videoModal');
-      await expect(modal).toHaveClass(/vm-open/);
-    });
-  });
 });

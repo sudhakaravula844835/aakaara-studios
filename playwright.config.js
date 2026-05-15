@@ -3,7 +3,7 @@ const { defineConfig, devices } = require('@playwright/test');
 module.exports = defineConfig({
   testDir: './',
   testMatch: '*.spec.js',
-  testIgnore: [],
+  testIgnore: ['**/.claude/**', '**/node_modules/**', '**/gallery-preview/**'],
   fullyParallel: true,
   reporter: 'html',
   use: {
@@ -14,7 +14,7 @@ module.exports = defineConfig({
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
   ],
   webServer: {
-    command: './node_modules/.bin/http-server . -p 5173',
+    command: 'python3 -m http.server 5173',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
   },
