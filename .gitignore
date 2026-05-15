@@ -20,3 +20,7 @@ tools/aakaara-business-card-print.pdf
 
 # Local Netlify folder
 .netlify
+
+# AI brainstorm/planning working files
+.superpowers/
+docs/superpowers/
