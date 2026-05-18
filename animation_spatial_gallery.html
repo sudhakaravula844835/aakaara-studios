@@ -207,7 +207,7 @@
       <div class="helix-field" id="helixField">
 
         <article class="gallery-card"
-          style="background-image: linear-gradient(180deg, rgba(12,8,8,0.02), rgba(12,8,8,0.32)), url('/images/couple-portraits/karthik-sowmya/1.jpg')">
+          style="background-image: linear-gradient(180deg, rgba(12,8,8,0.02), rgba(12,8,8,0.32)), url('/images/couple-portraits/karthik-Sunayana/1.jpg')">
           <div class="gallery-card__copy">
             <p class="gallery-card__eyebrow">Frame 01</p>
             <h3 class="gallery-card__title">Weddings</h3>
@@ -738,6 +738,7 @@
   var targetProgress = 0;
   var lerpedProgress = 0;
   var scrollLocked   = true;    // true = hijack active
+  var s1InView       = false;
 
   /* ─── Render ──────────────────────────────────────────────────── */
   function applyFrame() {
@@ -761,6 +762,7 @@
 
   /* ─── Scroll hijack ───────────────────────────────────────────── */
   window.addEventListener('wheel', function (e) {
+    if (!s1InView) return;
     var dy = e.deltaMode === 1 ? e.deltaY * 20 : e.deltaY;
 
     if (!scrollLocked) {
@@ -816,6 +818,14 @@
         tick();
       }, loopDelay);
     }, 220);
+  }
+
+  /* ─── In-view tracking for section 1 ────────────────────────── */
+  var studyS1 = field.closest('.study');
+  if (studyS1) {
+    new IntersectionObserver(function (entries) {
+      s1InView = entries[0].intersectionRatio >= 0.5;
+    }, { threshold: [0.3, 0.5] }).observe(studyS1);
   }
 
   /* ─── Boot ────────────────────────────────────────────────────── */
