@@ -2687,7 +2687,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .sw-gallery-img { position: absolute; inset: -5%; background-size: cover; background-position: center; background-repeat: no-repeat; will-change: transform; transition: background-image 0s; }
 .sw-gallery-img.sw-img-enter { animation: swImgIn 0.72s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .sw-gallery-img.sw-img-exit  { animation: swImgOut 0.3s cubic-bezier(0.87, 0, 0.13, 1) both; }
-@keyframes swImgIn  { from { opacity: 0; filter: blur(5px) brightness(0.65); transform: scale(1.05); } to { opacity: 1; filter: blur(0) brightness(1); transform: scale(1); } }
+@keyframes swImgIn  { from { opacity: 0; transform: scale(1.05); } to { opacity: 1; transform: scale(1); } }
 @keyframes swImgOut { from { opacity: 1; } to { opacity: 0; transform: scale(0.975); } }
 .sw-gallery-stage::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 38%; background: linear-gradient(to top, rgba(9,8,11,0.92), transparent); z-index: 2; pointer-events: none; }
 .sw-gallery-stage.sw-bg-anim::before { animation: swBgZoom 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
