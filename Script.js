@@ -88,9 +88,10 @@ function ensureFlatpickrLibrary() {
   const heroScroll = document.getElementById('heroScroll');
   const navbar = document.getElementById('navbar');
   const shouldSkipIntro =
-    window.matchMedia('(max-width: 768px)').matches ||
     window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
     Boolean(navigator.connection && navigator.connection.saveData);
+
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
   function revealHeroImmediately() {
     intro.classList.add('hidden');
