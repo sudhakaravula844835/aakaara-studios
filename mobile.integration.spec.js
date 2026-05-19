@@ -62,8 +62,8 @@ for (const [label, device] of touchDevices) {
       await page.goto('/');
     });
 
-    test('shows the hero immediately without overflowing the wordmark', async ({ page }) => {
-      await expect(page.locator('#intro')).toBeHidden({ timeout: 1500 });
+    test('completes mobile intro animation and shows hero without overflowing the wordmark', async ({ page }) => {
+      await expect(page.locator('#intro')).toBeHidden({ timeout: 4500 });
       await expect(page.locator('#heroContent')).toBeVisible();
       await expect(page.locator('.hero-tagline')).toHaveText('Every story deserves its own canvas.');
 
@@ -73,6 +73,19 @@ for (const [label, device] of touchDevices) {
       expect(viewport).not.toBeNull();
       expect(box.x).toBeGreaterThanOrEqual(0);
       expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
+    });
+
+    test('plays the mobile intro animation then reveals hero and navbar', async ({ page }) => {
+      await expect(page.locator('#intro')).toBeVisible();
+
+      const heroOpacityBefore = await page.locator('#heroContent').evaluate(
+        el => getComputedStyle(el).opacity
+      );
+      expect(Number(heroOpacityBefore)).toBeLessThan(1);
+
+      await expect(page.locator('#intro')).toBeHidden({ timeout: 5000 });
+      await expect(page.locator('#heroContent')).toBeVisible();
+      await expect(page.locator('#navbar')).toHaveClass(/visible/);
     });
 
     test('uses the cinematic coverflow carousel and exposes touch-safe video controls', async ({ page }) => {
