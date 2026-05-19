@@ -219,12 +219,11 @@ function ensureFlatpickrLibrary() {
     return;
   }
 
-  // Mobile users should land directly on the hero so the primary message paints
-  // immediately instead of waiting through the cinematic intro timeline.
   if (shouldSkipIntro) {
     revealHeroImmediately();
     return;
   }
+  if (isMobile) { runMobileIntro(); return; }
 
   const mark = document.getElementById('introMark');
   const petals = [document.getElementById('petal1'), document.getElementById('petal2'), document.getElementById('petal3'), document.getElementById('petal4')];
