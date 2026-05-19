@@ -101,6 +101,113 @@ function ensureFlatpickrLibrary() {
     if (navbar) navbar.classList.add('visible');
   }
 
+  function runMobileIntro() {
+    const mark = document.getElementById('introMark');
+    const petals = [
+      document.getElementById('petal1'),
+      document.getElementById('petal2'),
+      document.getElementById('petal3'),
+      document.getElementById('petal4')
+    ];
+    const outerRing = document.getElementById('outerRing');
+    const centerDot = document.getElementById('centerDot');
+    const letters = document.querySelectorAll('#introTitle .letter');
+    const dots = document.getElementById('introDots');
+    const t = (delay, fn) => setTimeout(fn, delay);
+
+    t(200, () => {
+      mark.style.transition = 'opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1)';
+      mark.style.opacity = '1';
+      mark.style.transform = 'scale(1)';
+    });
+
+    petals.forEach((p, i) => {
+      t(250 + i * 150, () => {
+        p.style.transition = 'stroke-dashoffset 0.8s cubic-bezier(0.16,1,0.3,1)';
+        p.style.strokeDashoffset = '0';
+      });
+    });
+
+    t(550, () => {
+      if (outerRing) {
+        outerRing.style.transition = 'opacity 0.5s cubic-bezier(0.16,1,0.3,1)';
+        outerRing.style.opacity = '0.18';
+      }
+    });
+
+    t(600, () => {
+      centerDot.style.transition = 'r 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.4s cubic-bezier(0.16,1,0.3,1)';
+      centerDot.setAttribute('r', '5');
+      centerDot.style.opacity = '0.85';
+    });
+
+    t(700, () => {
+      const WORD     = ['A','a','k','a','a','r','a'];
+      const VARIANTS = { A: ['అ','अ','அ','A'], a: ['అ','अ','அ','a'], k: ['క','क','க','k'], r: ['ర','र','ர','r'] };
+      const cycleMs  = 55;
+
+      letters.forEach(el => {
+        const w = el.getBoundingClientRect().width;
+        if (w > 0) el.style.width = w + 'px';
+      });
+      letters.forEach(el => {
+        el.style.transition = 'none';
+        el.style.transform = 'translateY(8px)';
+        el.style.opacity = '0';
+      });
+
+      function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+      async function cycleLetter(el, char) {
+        const vars = VARIANTS[char] || [char];
+        el.style.transition = 'opacity 0.18s cubic-bezier(0.16,1,0.3,1), transform 0.38s cubic-bezier(0.16,1,0.3,1)';
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+        for (let i = 0; i < vars.length - 1; i++) {
+          el.textContent = vars[i];
+          await sleep(cycleMs);
+        }
+        el.textContent = char;
+      }
+
+      (async () => {
+        for (let i = 0; i < WORD.length; i++) await cycleLetter(letters[i], WORD[i]);
+        dots.style.transition = 'opacity 0.55s cubic-bezier(0.16,1,0.3,1), transform 0.55s cubic-bezier(0.16,1,0.3,1)';
+        dots.style.opacity = '1';
+        dots.style.transform = 'scale(1)';
+      })();
+    });
+
+    t(2000, () => {
+      const introGroup = document.getElementById('introGroup');
+      const navLogo = document.querySelector('.nav-logo');
+      if (!introGroup || !navLogo) return;
+      const navRect = navLogo.getBoundingClientRect();
+      const groupRect = introGroup.getBoundingClientRect();
+      const dx = navRect.left + navRect.width / 2 - (groupRect.left + groupRect.width / 2);
+      const dy = navRect.top + navRect.height / 2 - (groupRect.top + groupRect.height / 2);
+      introGroup.style.transition = 'transform 1.0s cubic-bezier(0.16,1,0.3,1)';
+      introGroup.style.transform = `translate(${dx}px, ${dy}px) scale(0.22)`;
+      intro.classList.add('fade-out');
+      document.body.classList.remove('intro-active');
+      const hc = document.getElementById('heroContent');
+      if (hc) { hc.style.transition = 'opacity 1.2s cubic-bezier(0.16,1,0.3,1)'; hc.style.opacity = '1'; }
+      const hs = document.getElementById('heroScroll');
+      if (hs) t(500, () => { hs.style.transition = 'opacity 1s cubic-bezier(0.16,1,0.3,1)'; hs.style.opacity = '1'; });
+    });
+
+    t(2900, () => {
+      const introGroup = document.getElementById('introGroup');
+      if (introGroup) {
+        introGroup.style.transition = 'opacity 0.5s cubic-bezier(0.16,1,0.3,1)';
+        introGroup.style.opacity = '0';
+      }
+      navbar.classList.add('visible');
+    });
+
+    t(3600, () => { intro.classList.add('hidden'); });
+  }
+
   // Skip intro when returning from a sub-page (e.g. couple-portraits)
   if (sessionStorage.getItem('skipIntro') === '1') {
     const savedY = parseInt(sessionStorage.getItem('returnScrollY') || '0', 10);
