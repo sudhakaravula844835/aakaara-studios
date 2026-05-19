@@ -745,39 +745,25 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       if (i === index) t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     });
 
-    const img = new Image();
-    
     if (isFirst) {
-        img.onload = () => {
-            galleryImg.style.backgroundImage = `url('${url}')`;
-            galleryImg.style.backgroundSize = "contain";
-            galleryImg.classList.add('sw-img-enter');
-        };
-        img.src = url;
+        galleryImg.style.backgroundImage = `url('${url}')`;
+        galleryImg.style.backgroundSize = "contain";
+        galleryImg.classList.add('sw-img-enter');
         return;
     }
 
-    // Navigation: Exit current -> Load new -> Enter new
+    // Navigation: Exit current -> Enter new immediately after exit animation
     galleryImg.classList.remove('sw-img-enter');
     galleryImg.classList.add('sw-img-exit');
 
-    let animDone = false;
-    let imgLoaded = false;
-
-    const trySwap = () => {
-        if (animDone && imgLoaded) {
-            if (swImages[swIndex] !== url) return; // Prevent race conditions
-            galleryImg.style.backgroundImage = `url('${url}')`;
-            galleryImg.style.backgroundSize = "contain";
-            galleryImg.classList.remove('sw-img-exit');
-            void galleryImg.offsetWidth; // Force reflow
-            galleryImg.classList.add('sw-img-enter');
-        }
-    };
-
-    galleryImg.addEventListener('animationend', () => { animDone = true; trySwap(); }, { once: true });
-    img.onload = () => { imgLoaded = true; trySwap(); };
-    img.src = url;
+    galleryImg.addEventListener('animationend', () => {
+        if (swImages[swIndex] !== url) return; // Prevent race conditions
+        galleryImg.style.backgroundImage = `url('${url}')`;
+        galleryImg.style.backgroundSize = "contain";
+        galleryImg.classList.remove('sw-img-exit');
+        void galleryImg.offsetWidth; // Force reflow
+        galleryImg.classList.add('sw-img-enter');
+    }, { once: true });
   }
 
   function renderSwStrip() {
