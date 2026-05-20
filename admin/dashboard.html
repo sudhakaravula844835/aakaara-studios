@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard — Aakaara Studios</title>
+    <title>Client CRM — Aakaara Studios</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Outfit:wght@200;300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="dashboard.css">
@@ -13,51 +13,166 @@
     <header class="dashboard-header">
         <div>
             <div class="brand">Aakaara Studios</div>
-            <h1>Quote Dashboard</h1>
+            <h1>Client CRM</h1>
         </div>
         <div class="header-nav-links">
-            <a href="quote-generator.html">‹ Quote Generator</a>
-            <a href="../index.html">Main Site ›</a>
+            <a href="quote-generator.html">&#8249; Quote Generator</a>
+            <a href="../index.html">Main Site &#8250;</a>
         </div>
     </header>
 
-    <main class="container">
-        <div class="section">
-            <div class="section-header">Active Quotes</div>
-            <div style="overflow-x: auto;">
-                <table class="quote-table" id="quoteTable">
-                    <thead>
-                        <tr>
-                            <th>Client</th>
-                            <th>Event Date</th>
-                            <th>Status</th>
-                            <th>Quoted</th>
-                            <th>Confirmed Price</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- JS will render rows here -->
-                    </tbody>
-                </table>
+    <main class="crm-container">
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-card" id="statTotal">
+                <div class="stat-label">Total Clients</div>
+                <div class="stat-value">&#8212;</div>
+                <div class="stat-sub">All time</div>
+            </div>
+            <div class="stat-card stat-green" id="statConfirmed">
+                <div class="stat-label">Confirmed</div>
+                <div class="stat-value">&#8212;</div>
+                <div class="stat-sub">Booked</div>
+            </div>
+            <div class="stat-card stat-amber" id="statPending">
+                <div class="stat-label">Awaiting Reply</div>
+                <div class="stat-value">&#8212;</div>
+                <div class="stat-sub">Quotes sent</div>
+            </div>
+            <div class="stat-card stat-rose" id="statRevenue">
+                <div class="stat-label">Confirmed Revenue</div>
+                <div class="stat-value">&#8212;</div>
+                <div class="stat-sub" id="statRevenueSub"></div>
             </div>
         </div>
 
-        <div class="section">
+        <!-- Toolbar -->
+        <div class="crm-toolbar">
+            <div class="crm-search-wrap">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" id="crmSearch" placeholder="Search clients, dates, notes&#8230;" autocomplete="off" aria-label="Search clients">
+            </div>
+            <div class="crm-filter-pills" id="filterPills" role="group" aria-label="Filter clients"></div>
+            <button class="crm-add-btn" id="addClientBtn" aria-label="Add new client">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Client
+            </button>
+            <button class="crm-export-btn" onclick="exportToExcel()" aria-label="Export clients to CSV">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export CSV
+            </button>
+        </div>
+
+        <!-- Cards Grid -->
+        <div class="crm-cards" id="crmCards" role="list"></div>
+
+        <!-- Availability Calendar -->
+        <div class="section crm-calendar-section">
             <div class="section-header">Availability Calendar</div>
             <div class="section-body">
                 <div class="calendar-header">
-                    <button id="prevMonth">‹</button>
+                    <button id="prevMonth" aria-label="Previous month">&#8249;</button>
                     <div id="calendarMonthYear"></div>
-                    <button id="nextMonth">›</button>
+                    <button id="nextMonth" aria-label="Next month">&#8250;</button>
                 </div>
-                <div class="calendar-grid" id="calendarWeekdays"></div>
-                <div class="calendar-grid" id="calendarDays"></div>
+                <div class="calendar-grid" id="calendarWeekdays" role="row"></div>
+                <div class="calendar-grid" id="calendarDays" role="grid"></div>
             </div>
         </div>
+
     </main>
 
-<script src="dashboard.js"></script>
+    <!-- Quick-Add / Edit Modal -->
+    <div class="modal-backdrop" id="modalBackdrop" role="presentation">
+        <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">New Client</div>
+                <button class="modal-close" id="modalClose" aria-label="Close modal">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <form class="modal-form" id="clientForm" novalidate>
+                <input type="hidden" id="fId">
+                <div class="modal-grid">
+                    <div class="form-group form-full">
+                        <label class="form-label" for="fName">Client Name *</label>
+                        <input class="form-input" type="text" id="fName" placeholder="Priya &amp; Rohan" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fEmail">Email</label>
+                        <input class="form-input" type="email" id="fEmail" placeholder="client@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fPhone">Phone</label>
+                        <input class="form-input" type="tel" id="fPhone" placeholder="+1 917-555-0100">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fEventDate">Event Date *</label>
+                        <input class="form-input" type="date" id="fEventDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fEventDateTo">End Date (multi-day)</label>
+                        <input class="form-input" type="date" id="fEventDateTo">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fShootType">Shoot Type</label>
+                        <select class="form-input" id="fShootType">
+                            <option value="">&#8212; Select &#8212;</option>
+                            <option value="Wedding">Wedding</option>
+                            <option value="Engagement">Engagement</option>
+                            <option value="Maternity">Maternity</option>
+                            <option value="Graduation">Graduation</option>
+                            <option value="Birthday">Birthday</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group form-full">
+                        <label class="form-label" for="fLocation">Location / Venue</label>
+                        <input class="form-input" type="text" id="fLocation" placeholder="The Pierre Hotel, NYC">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fQuotedPrice">Quoted Price ($)</label>
+                        <input class="form-input" type="number" id="fQuotedPrice" placeholder="4500" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fStatus">Status</label>
+                        <select class="form-input" id="fStatus">
+                            <option value="sent">Sent</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="confirmedPriceGroup">
+                        <label class="form-label" for="fConfirmedPrice">Confirmed Price ($)</label>
+                        <input class="form-input" type="number" id="fConfirmedPrice" placeholder="4500" min="0">
+                    </div>
+                    <div class="form-group" id="depositGroup">
+                        <label class="form-label" for="fDepositPaid">Deposit</label>
+                        <select class="form-input" id="fDepositPaid">
+                            <option value="">&#8212; Not set &#8212;</option>
+                            <option value="true">Paid</option>
+                            <option value="false">Unpaid</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fFollowUpDate">Follow-up Date</label>
+                        <input class="form-input" type="date" id="fFollowUpDate">
+                    </div>
+                    <div class="form-group form-full">
+                        <label class="form-label" for="fNotes">Notes</label>
+                        <textarea class="form-input form-textarea" id="fNotes" placeholder="Shot list, special requests, next steps&#8230;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" id="modalCancel">Cancel</button>
+                    <button type="submit" class="btn-modal-save">Save Client &#8250;</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script type="module" src="dashboard.js"></script>
 
 </body>
 </html>
