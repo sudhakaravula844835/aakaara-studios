@@ -1,240 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aakaara Studios — Quote Generator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="quote-generator.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quote Generator — Aakaara Studios</title>
+  <link rel="stylesheet" href="quote-generator.css">
 </head>
 <body>
 
-<!-- APP -->
-<div class="app visible" id="app">
-
-  <!-- Top bar -->
-  <div class="topbar">
-    <div>
-      <div class="topbar-brand">Aakaara Studios</div>
-      <div class="topbar-title">Quote Generator</div>
-      <div class="draft-indicator" id="draftIndicator" aria-live="polite">Local draft ready</div>
-    </div>
-    <div class="topbar-actions">
-      <button type="button" class="btn btn-ghost btn-small" onclick="resetForm()">New Quote</button>
-      <a href="dashboard.html" class="btn btn-ghost btn-small" style="text-decoration: none;">Dashboard</a>
-      <a href="/admin/logout" class="btn btn-ghost btn-small" style="text-decoration: none;">Sign Out</a>
-    </div>
+<div id="topbar">
+  <div class="topbar-brand">Aakaara Studios</div>
+  <div class="topbar-center">
+    <span class="topbar-ref" id="quoteRefDisplay"></span>
+    <span class="topbar-saved" id="draftIndicator">Draft saved</span>
   </div>
+  <div class="topbar-actions">
+    <button type="button" id="newQuoteBtn">New Quote</button>
+    <button type="button" id="dashboardBtn">Dashboard</button>
+    <button type="button" id="topbarPreviewBtn" class="btn-gold">Preview PDF</button>
+  </div>
+</div>
 
-  <div class="container">
+<main id="qgMain">
 
-    <!-- CLIENT INFO -->
-    <div class="section">
-      <div class="section-label">01 — Client Information</div>
-      <div class="import-card">
-        <div class="import-header">
-          <div>
-            <div class="import-title">Quick Import</div>
-            <div class="import-copy">Paste rough event notes and auto-fill the schedule, location, and email.</div>
-          </div>
-          <button type="button" class="btn btn-ghost btn-small" onclick="importBrief()">Import Details</button>
-        </div>
-        <div class="form-row single" style="margin-top:12px;">
-          <div class="form-group">
-            <label class="form-label">Paste Event Brief</label>
-            <textarea class="form-textarea import-textarea" id="quickImportText" placeholder="July 4th engagement (4 hours)
-14th Sangeet (4 hours)
-Aug 15th Haldi (4 hours)
-Aug 15th Peli Koduku, Peli Kuthuru (3 hours)
-Aug 16th Marriage Wedding (6 hours)
+  <section id="sectionClient" class="qg-section">
+    <h2 class="section-label">01 — Client Information</h2>
 
-Charlotte, North Carolina
-client@example.com"></textarea>
-          </div>
-        </div>
-        <div class="import-status" id="importStatus">Dates, hours, and repeated-day events will be grouped automatically.</div>
+    <div class="quick-import-card">
+      <label class="field-label" for="quickImportText">Quick Import — paste brief text</label>
+      <textarea id="quickImportText" rows="3" placeholder="Paste client details, dates, event names…"></textarea>
+      <button type="button" id="importBtn">Import</button>
+      <div id="importStatus" class="import-status"></div>
+    </div>
+
+    <div class="field-row field-row-3">
+      <div class="field-group">
+        <label class="field-label" for="clientName">Client Name(s)</label>
+        <input type="text" id="clientName" autocomplete="off">
       </div>
-      <div class="form-row three">
-        <div class="form-group">
-          <label class="form-label">Client Name(s)</label>
-          <input class="form-input" id="clientName" placeholder="e.g. Asrita & Varun">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Client Email</label>
-          <input class="form-input" type="email" id="clientEmail" placeholder="client@example.com">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Event Type</label>
-          <select class="form-select" id="eventType">
-            <option value="Wedding Photography">Wedding</option>
-            <option value="Engagement Photography">Engagement</option>
-            <option value="Gender Reveal Photography">Gender Reveal</option>
-            <option value="Birthday Photography">Birthday</option>
-            <option value="Baby Shower Photography">Baby Shower</option>
-            <option value="House Warming Photography">House Warming</option>
-            <option value="Event Photography">Other Event</option>
-          </select>
+      <div class="field-group">
+        <label class="field-label" for="clientEmail">Email</label>
+        <input type="email" id="clientEmail" autocomplete="off">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="clientPhone">Phone</label>
+        <input type="tel" id="clientPhone" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="field-row field-row-3">
+      <div class="field-group">
+        <label class="field-label" for="eventType">Event Type</label>
+        <select id="eventType">
+          <option value="">Select…</option>
+          <option value="Wedding">Wedding</option>
+          <option value="Engagement">Engagement</option>
+          <option value="Portrait">Portrait</option>
+          <option value="Maternity">Maternity</option>
+          <option value="Newborn">Newborn</option>
+          <option value="Family">Family</option>
+          <option value="Corporate">Corporate</option>
+          <option value="Event">Event</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="venueName">Venue / Location</label>
+        <input type="text" id="venueName" autocomplete="off" placeholder="The Pierre Hotel">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="location">City</label>
+        <input type="text" id="location" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="field-row field-row-3">
+      <div class="field-group">
+        <label class="field-label" for="quoteDate">Quote Date</label>
+        <input type="date" id="quoteDate">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="quoteRef">Reference #</label>
+        <input type="text" id="quoteRef" placeholder="AAS-2026-001">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="referralSource">Referred By</label>
+        <select id="referralSource">
+          <option value="">Select…</option>
+          <option value="Instagram">Instagram</option>
+          <option value="Google">Google</option>
+          <option value="Referral">Referral</option>
+          <option value="Wedding Wire">Wedding Wire</option>
+          <option value="The Knot">The Knot</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <section id="sectionSchedule" class="qg-section">
+    <h2 class="section-label">02 — Event Schedule</h2>
+    <div id="daysContainer"></div>
+    <button type="button" id="addDayBtn" class="btn-ghost">+ Add Day</button>
+  </section>
+
+  <section id="sectionDeliverables" class="qg-section">
+    <h2 class="section-label">03 — Deliverables</h2>
+
+    <div class="deliverables-grid">
+      <label class="del-check"><input type="checkbox" id="delEdited"> Edited Photos</label>
+      <label class="del-check"><input type="checkbox" id="delRaw"> Raw Images</label>
+      <label class="del-check"><input type="checkbox" id="delGallery"> Online Gallery</label>
+      <label class="del-check"><input type="checkbox" id="delSneakPeek"> Sneak Peek (48hr)</label>
+      <label class="del-check"><input type="checkbox" id="delTeaser"> Teaser Reel</label>
+      <label class="del-check"><input type="checkbox" id="delDoc"> Documentary Video</label>
+      <label class="del-check"><input type="checkbox" id="delTraditional"> Traditional Video</label>
+      <label class="del-check"><input type="checkbox" id="delHighlight"> Highlight Video</label>
+      <label class="del-check"><input type="checkbox" id="delDrone"> Drone Coverage</label>
+      <label class="del-check"><input type="checkbox" id="delLive"> Livestream</label>
+      <label class="del-check"><input type="checkbox" id="delSecondShooter"> Second Shooter</label>
+    </div>
+
+    <div class="addon-card">
+      <div class="addon-card-label">Add-ons &amp; Upgrades</div>
+
+      <div class="addon-row">
+        <label class="del-check"><input type="checkbox" id="delEngagement"> Engagement / Pre-Wedding Session</label>
+        <input type="text" id="delEngagementNotes" class="addon-notes hidden" placeholder="Session details…">
+      </div>
+
+      <div class="addon-row">
+        <label class="del-check"><input type="checkbox" id="delAddlHours"> Additional Hours</label>
+        <div class="addon-rate hidden" id="delAddlHoursRateWrap">
+          <span>Overtime rate</span>
+          <input type="number" id="delAddlHoursRate" min="0" step="25" placeholder="0">
+          <span>$/hr</span>
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Location</label>
-          <input class="form-input" id="location" placeholder="e.g. San Antonio, Texas">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Quote Date</label>
-          <input class="form-input" type="date" id="quoteDate">
+
+      <div class="addon-row">
+        <label class="del-check"><input type="checkbox" id="delRush"> Rush / Priority Delivery</label>
+        <div class="addon-rate hidden" id="delRushFeeWrap">
+          <span>Rush fee</span>
+          <input type="number" id="delRushFee" min="0" step="50" placeholder="0">
+          <span>$</span>
         </div>
       </div>
     </div>
 
-    <!-- EVENT DAYS -->
-    <div class="section">
-      <div class="section-label">02 — Event Schedule</div>
-      <div id="daysContainer"></div>
-      <button type="button" class="add-btn" id="addDayBtn" onclick="addDay()">+ Add Day</button>
+    <div class="field-row field-row-2" style="margin-top:16px;">
+      <div class="field-group">
+        <label class="field-label" for="timeline">Delivery Timeline</label>
+        <input type="text" id="timeline" placeholder="6–8 weeks after event">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="customNotes">Custom Deliverable Notes</label>
+        <input type="text" id="customNotes" placeholder="Any custom items…">
+      </div>
     </div>
+  </section>
 
-    <!-- DELIVERABLES -->
-    <div class="section">
-      <div class="section-label">03 — Deliverables</div>
-      <div class="deliverables-grid">
-        <label class="form-checkbox"><input type="checkbox" id="delEdited" checked><span>Edited Photos</span></label>
-        <label class="form-checkbox"><input type="checkbox" id="delRaw" checked><span>Raw Images</span></label>
-        <label class="form-checkbox"><input type="checkbox" id="delGallery" checked><span>Online Gallery</span></label>
-        <label class="form-checkbox"><input type="checkbox" id="delSneakPeek"><span>Sneak Peek Reels</span></label>
-        <label class="form-checkbox"><input type="checkbox" id="delTeaser"><span>Wedding Teaser (2-3 min)</span></label>
-        <label class="form-checkbox"><input type="checkbox" id="delDoc"><span>Documentary Film (10 min)</span></label>
-        <label class="form-checkbox"><input type="checkbox" id="delTraditional"><span>Traditional Video (Full)</span></label>
-        <label class="form-checkbox"><input type="checkbox" id="delHighlight"><span>Highlight Video (2-3 min)</span></label>
-        <label class="form-checkbox"><input type="checkbox" id="delDrone"><span>Drone Footage</span></label>
-        <label class="form-checkbox"><input type="checkbox" id="delLive"><span>Live Wedding Coverage</span></label>
-        <label class="form-checkbox"><input type="checkbox" id="delSecondShooter"><span>Second Shooter</span></label>
+  <section id="sectionPricing" class="qg-section">
+    <h2 class="section-label">04 — Pricing</h2>
+
+    <div class="field-row field-row-2">
+      <div class="field-group">
+        <label class="field-label" for="pricingModel">Pricing Model</label>
+        <select id="pricingModel">
+          <option value="hourly">Hourly Rate</option>
+          <option value="flat">Package / Flat Rate</option>
+        </select>
       </div>
-      <div class="form-row" style="margin-top:12px;">
-        <div class="form-group">
-          <label class="form-label">Total Edited Photos</label>
-          <input class="form-input" type="number" id="editedCount" placeholder="e.g. 500" value="200">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Delivery Timeline</label>
-          <input class="form-input" id="timeline" placeholder="e.g. 6-8 weeks" value="6-8 weeks">
-        </div>
+      <div class="field-group" id="hourlyRateGroup">
+        <label class="field-label" for="hourlyRate">Hourly Rate ($)</label>
+        <input type="number" id="hourlyRate" min="0" step="25">
       </div>
-      <div class="form-row single" style="margin-top:4px;">
-        <div class="form-group">
-          <label class="form-label">Custom Deliverable Notes (optional)</label>
-          <textarea class="form-textarea" id="customNotes" placeholder="Any extra notes about deliverables..."></textarea>
-        </div>
+      <div class="field-group hidden" id="flatRateGroup">
+        <label class="field-label" for="flatRate">Package Price ($)</label>
+        <input type="number" id="flatRate" min="0" step="100">
       </div>
     </div>
 
-    <!-- PRICING -->
-    <div class="section">
-      <div class="section-label">04 — Pricing</div>
-      <div class="form-row three">
-        <div class="form-group">
-          <label class="form-label">Pricing Model</label>
-          <select class="form-select" id="pricingModel">
-            <option value="hourly">Hourly Rate</option>
-            <option value="flat">Flat Package</option>
-          </select>
-        </div>
-        <div class="form-group" id="hourlyRateGroup">
-          <label class="form-label">Hourly Rate ($)</label>
-          <input class="form-input" type="number" id="hourlyRate" value="300">
-        </div>
-        <div class="form-group" id="flatRateGroup" style="display:none;">
-          <label class="form-label">Package Price ($)</label>
-          <input class="form-input" type="number" id="flatRate" placeholder="e.g. 1200">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Travel & Accommodation</label>
-          <select class="form-select" id="travelType">
-            <option value="separate">Calculated Separately</option>
-            <option value="included">Included in Price</option>
-            <option value="fixed">Fixed Amount</option>
-            <option value="none">N/A (Local)</option>
-          </select>
-        </div>
+    <div class="field-row field-row-2">
+      <div class="field-group">
+        <label class="field-label" for="travelType">Travel &amp; Accommodation</label>
+        <select id="travelType">
+          <option value="none">Not Applicable</option>
+          <option value="fixed">Fixed Amount</option>
+          <option value="separate">Billed Separately</option>
+          <option value="included">Included</option>
+        </select>
       </div>
-      <div class="form-row" id="travelFixedRow" style="display:none;">
-        <div class="form-group">
-          <label class="form-label">Travel Amount ($)</label>
-          <input class="form-input" type="number" id="travelAmount" placeholder="e.g. 500">
-        </div>
+      <div class="field-group hidden" id="travelAmountGroup">
+        <label class="field-label" for="travelAmount">Travel Amount ($)</label>
+        <input type="number" id="travelAmount" min="0" step="50">
       </div>
-      <div class="form-row">
-        <label class="form-checkbox">
-          <input type="checkbox" id="showIntro">
-          <span>Show as Introductory/Special Rate</span>
+    </div>
+
+    <div class="field-row field-row-2">
+      <div class="field-group">
+        <label class="field-label" for="retainerFee">Retainer / Booking Fee ($)</label>
+        <input type="number" id="retainerFee" min="0" step="100" placeholder="Optional">
+      </div>
+      <div class="field-group">
+        <label class="field-label intro-label">
+          <input type="checkbox" id="showIntro"> Show as Introductory Rate
         </label>
-        <div class="form-group" id="standardRateGroup" style="display:none;">
-          <label class="form-label">Standard Rate (strikethrough)</label>
-          <input class="form-input" id="standardRate" placeholder="e.g. $1,200">
-        </div>
-      </div>
-
-      <!-- Live preview -->
-      <div class="preview-summary" id="pricingPreview"></div>
-    </div>
-
-    <!-- ADDITIONAL NOTES -->
-    <div class="section">
-      <div class="section-label">05 — Additional Terms</div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Deposit Requirement</label>
-          <input class="form-input" id="deposit" value="50% deposit required to secure dates">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Quote Validity</label>
-          <input class="form-input" id="validity" value="30 days">
-        </div>
-      </div>
-      <div class="form-row single">
-        <div class="form-group">
-          <label class="form-label">Extra Notes (optional)</label>
-          <textarea class="form-textarea" id="extraNotes" placeholder="e.g. Multi-day discount applied, package can be customized..."></textarea>
-        </div>
+        <input type="text" id="standardRate" class="hidden" placeholder="Standard Rate (e.g. $3,500)">
       </div>
     </div>
 
+    <div id="pricingPreview" class="pricing-preview"></div>
+  </section>
+
+  <section id="sectionTerms" class="qg-section">
+    <h2 class="section-label">05 — Additional Terms</h2>
+
+    <div class="field-row field-row-3">
+      <div class="field-group">
+        <label class="field-label" for="deposit">Deposit Requirement</label>
+        <input type="text" id="deposit" placeholder="50% to secure the date">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="validity">Quote Validity</label>
+        <input type="text" id="validity" placeholder="Valid for 14 days">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="balanceDue">Balance Due Date</label>
+        <input type="text" id="balanceDue" placeholder="30 days before event">
+      </div>
+    </div>
+
+    <div class="field-group" style="margin-top:12px;">
+      <label class="field-label" for="extraNotes">Extra Notes</label>
+      <textarea id="extraNotes" rows="3" placeholder="Any other terms or notes for the client…"></textarea>
+    </div>
+  </section>
+
+</main>
+
+<div id="generateBar">
+  <div class="gen-bar-total">
+    <div class="gen-bar-label">Estimated Total</div>
+    <div id="totalDisplay" class="gen-bar-amount">$0</div>
+    <div id="totalMeta" class="gen-bar-meta"></div>
   </div>
-
-  <!-- Sticky generate bar -->
-  <div class="generate-bar">
-    <div>
-      <div class="total-label">Estimated Total</div>
-      <div class="total-display" id="totalDisplay">$0</div>
-    </div>
-    <div style="display:flex;gap:10px;">
-      <button type="button" class="btn btn-danger btn-small" onclick="resetForm()">Reset</button>
-      <button type="button" class="btn btn-primary" onclick="generatePDF('preview')">
-        Preview Quote
-      </button>
-    </div>
+  <div class="gen-bar-actions">
+    <button type="button" id="resetBtn">Reset</button>
+    <button type="button" id="previewBtn" class="btn-gold">Preview Quote</button>
   </div>
-
 </div>
 
-<div class="toast" id="toast"></div>
-
-<!-- PREVIEW MODAL -->
-<div class="preview-modal" id="previewModal">
-  <div class="preview-header">
-    <div class="preview-title">Quote Preview</div>
-    <div style="display:flex;gap:10px;">
-      <button type="button" class="btn btn-ghost btn-small" onclick="closePreview()">Close</button>
-      <button type="button" class="btn btn-primary btn-small" onclick="sendQuoteEmail()">Confirm & Send</button>
+<div id="previewModal" class="hidden">
+  <div class="preview-overlay" id="previewOverlay"></div>
+  <div class="preview-container">
+    <div class="preview-header">
+      <span>Quote Preview</span>
+      <div class="preview-header-actions">
+        <button type="button" id="confirmSendBtn" class="btn-gold">Confirm &amp; Send</button>
+        <button type="button" id="closePreviewBtn">Close</button>
+      </div>
     </div>
+    <iframe id="previewFrame" title="Quote PDF Preview"></iframe>
   </div>
-  <div class="preview-body"><iframe id="previewFrame" class="preview-frame"></iframe></div>
 </div>
 
-<script src="quote-generator.js"></script>
+<template id="dayTemplate">
+  <div class="day-block" data-day-id="">
+    <div class="day-header">
+      <span class="day-label"></span>
+      <button type="button" class="day-remove btn-ghost-sm" data-action="removeDay">Remove</button>
+    </div>
+    <div class="field-row field-row-2 day-meta-row">
+      <div class="field-group">
+        <label class="field-label">Date</label>
+        <input type="date" data-field="date">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Total Hours</label>
+        <input type="number" data-field="hours" min="0" step="0.5" placeholder="Auto">
+      </div>
+    </div>
+    <div class="events-container"></div>
+    <div class="day-footer">
+      <span class="day-photo-total"></span>
+      <button type="button" class="btn-ghost-sm" data-action="addEvent">+ Add Event</button>
+    </div>
+  </div>
+</template>
 
+<template id="eventTemplate">
+  <div class="event-item" data-event-item>
+    <div class="event-num"></div>
+    <div class="event-fields">
+      <div class="field-group">
+        <label class="field-label">Name</label>
+        <input type="text" data-field="eventName">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Duration</label>
+        <input type="text" data-field="eventDuration" placeholder="e.g. 3 Hours">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Photos</label>
+        <input type="number" data-field="eventPhotos" min="0" step="10" placeholder="Optional">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Notes</label>
+        <input type="text" data-field="eventNotes">
+      </div>
+    </div>
+    <button type="button" class="event-remove btn-icon" data-action="removeEvent" aria-label="Remove event">x</button>
+  </div>
+</template>
+
+<script src="lib/jspdf.umd.min.js"></script>
+<script type="module" src="quote-generator.js"></script>
 </body>
 </html>
