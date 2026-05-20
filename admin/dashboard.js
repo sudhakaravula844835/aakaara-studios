@@ -7,7 +7,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const stored = localStorage.getItem('aakaaraQuotes');
 
     if (stored) {
-        quotes = JSON.parse(stored).map(migrateQuote);
+        try {
+            quotes = JSON.parse(stored).map(migrateQuote);
+        } catch (err) {
+            console.error('aakaaraQuotes corrupted; backing up and resetting.', err);
+            localStorage.setItem('aakaaraQuotes.corrupt.' + Date.now(), stored);
+            quotes = [];
+        }
     } else {
         quotes = [
             { id: 1, clientName: 'Priya & Rohan', clientEmail: 'priya.r@example.com', eventDate: '2024-09-14', eventDateTo: '2024-09-15', status: 'sent', quotedPrice: 4500, confirmedPrice: null, phone: '', shootType: 'Wedding', depositPaid: null, followUpDate: null, location: '', notes: '' },
@@ -16,11 +22,16 @@ document.addEventListener('DOMContentLoaded', function () {
             { id: 4, clientName: 'Meera Desai', clientEmail: 'meera.d@example.com', eventDate: '2024-11-02', eventDateTo: '2024-11-02', status: 'rejected', quotedPrice: 1800, confirmedPrice: null, phone: '', shootType: '', depositPaid: null, followUpDate: null, location: '', notes: '' },
             { id: 5, clientName: 'Arjun & Diya', clientEmail: 'arjun.d@example.com', eventDate: '2024-10-06', eventDateTo: '2024-10-06', status: 'confirmed', quotedPrice: 7500, confirmedPrice: 7000, phone: '', shootType: 'Wedding', depositPaid: false, followUpDate: null, location: '', notes: '' },
         ];
-        localStorage.setItem('aakaaraQuotes', JSON.stringify(quotes));
+        saveQuotes();
     }
 
     function saveQuotes() {
-        localStorage.setItem('aakaaraQuotes', JSON.stringify(quotes));
+        try {
+            localStorage.setItem('aakaaraQuotes', JSON.stringify(quotes));
+        } catch (err) {
+            console.error('localStorage quota exceeded.', err);
+            alert('Unable to save: storage is full. Export your data first.');
+        }
     }
 
     // 2. STATE
@@ -210,11 +221,16 @@ document.addEventListener('DOMContentLoaded', function () {
             emailBtn.appendChild(document.createTextNode(' Copy Email'));
             emailBtn.addEventListener('click', () => {
                 if (!q.clientEmail) return;
-                navigator.clipboard.writeText(q.clientEmail).then(() => {
-                    const orig = emailBtn.innerHTML;
-                    emailBtn.textContent = 'Copied!';
-                    setTimeout(() => { emailBtn.innerHTML = orig; }, 2000);
-                });
+                const origHTML = emailBtn.innerHTML;
+                navigator.clipboard.writeText(q.clientEmail)
+                    .then(() => {
+                        emailBtn.textContent = 'Copied!';
+                        setTimeout(() => { emailBtn.innerHTML = origHTML; }, 2000);
+                    })
+                    .catch(() => {
+                        emailBtn.textContent = 'Copy failed';
+                        setTimeout(() => { emailBtn.innerHTML = origHTML; }, 2000);
+                    });
             });
 
             const editBtn = document.createElement('button');
@@ -227,13 +243,15 @@ document.addEventListener('DOMContentLoaded', function () {
             deleteBtn.className = 'card-btn btn-delete';
             deleteBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>`;
             deleteBtn.appendChild(document.createTextNode(' Delete'));
+            const deleteBtnOrigHTML = deleteBtn.innerHTML + ' Delete';
             deleteBtn.addEventListener('click', () => {
                 if (!deleteBtn.classList.contains('confirm-state')) {
                     deleteBtn.classList.add('confirm-state');
                     deleteBtn.textContent = 'Sure?';
                     deleteBtn._revertTimeout = setTimeout(() => {
+                        if (!deleteBtn.isConnected) return;
                         deleteBtn.classList.remove('confirm-state');
-                        renderCards();
+                        deleteBtn.innerHTML = deleteBtnOrigHTML;
                     }, 5000);
                 } else {
                     clearTimeout(deleteBtn._revertTimeout);
@@ -267,15 +285,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const year = currentCalendarDate.getFullYear();
         calendarMonthYear.textContent = `${currentCalendarDate.toLocaleString('default', { month: 'long' })} ${year}`;
 
+        // Build a list of events per date so double-bookings surface as conflicts
         const eventsByDate = {};
         quotes.forEach(q => {
             if (q.status === 'rejected' || !q.eventDate) return;
             const startDate = new Date(q.eventDate + 'T00:00:00');
-            const endDate = q.eventDateTo ? new Date(q.eventDateTo + 'T00:00:00') : startDate;
+            if (isNaN(startDate)) return;
+            const rawEnd = q.eventDateTo ? new Date(q.eventDateTo + 'T00:00:00') : startDate;
+            const endDate = rawEnd >= startDate ? rawEnd : startDate;
             for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
                 const key = d.toISOString().split('T')[0];
-                if (eventsByDate[key] && eventsByDate[key].status === 'confirmed' && q.status !== 'confirmed') continue;
-                eventsByDate[key] = { clientName: q.clientName, status: q.status };
+                if (!eventsByDate[key]) eventsByDate[key] = [];
+                eventsByDate[key].push({ clientName: q.clientName, status: q.status });
             }
         });
 
@@ -298,12 +319,16 @@ document.addEventListener('DOMContentLoaded', function () {
             el.className = 'calendar-day';
             el.textContent = i;
             const key = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-            const event = eventsByDate[key];
-            if (event) {
-                el.classList.add(event.status === 'confirmed' ? 'occupied' : 'pending');
+            const events = eventsByDate[key];
+            if (events) {
+                const hasConfirmed = events.some(e => e.status === 'confirmed');
+                const isConflict = events.length > 1 && hasConfirmed;
+                el.classList.add(isConflict ? 'conflict' : hasConfirmed ? 'occupied' : 'pending');
                 const tip = document.createElement('div');
                 tip.className = 'tooltip';
-                tip.textContent = `${event.status === 'confirmed' ? 'Occupied' : 'Pending'}: ${event.clientName}`;
+                tip.textContent = isConflict
+                    ? `Double-booked: ${events.map(e => e.clientName).join(', ')}`
+                    : `${hasConfirmed ? 'Occupied' : 'Pending'}: ${events[0].clientName}`;
                 el.appendChild(tip);
             }
             calendarDays.appendChild(el);
@@ -364,9 +389,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!name || !eventDate) return;
 
         const depositVal = document.getElementById('fDepositPaid').value;
-        const editId = document.getElementById('fId').value;
+        const editIdStr = document.getElementById('fId').value;
+        // Preserve original ID type (numeric or string) to ensure map comparison matches
+        const existingQuote = editIdStr ? quotes.find(q => String(q.id) === editIdStr) : null;
         const record = {
-            id: editId ? parseInt(editId) : generateId(quotes),
+            id: existingQuote ? existingQuote.id : generateId(quotes),
             clientName: name,
             clientEmail: document.getElementById('fEmail').value.trim(),
             phone: document.getElementById('fPhone').value.trim(),
@@ -382,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function () {
             notes: document.getElementById('fNotes').value.trim(),
         };
 
-        if (editId) {
+        if (existingQuote) {
             quotes = quotes.map(q => q.id === record.id ? record : q);
         } else {
             quotes.push(record);
@@ -405,18 +432,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 200);
     });
 
-    // 9. CALENDAR NAV
+    // 9. CALENDAR NAV — pin to day=1 to avoid month-overflow (e.g. May 31 + 1 month = July 1)
     document.getElementById('prevMonth').addEventListener('click', () => {
-        currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+        currentCalendarDate = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() - 1, 1);
         renderCalendar();
     });
     document.getElementById('nextMonth').addEventListener('click', () => {
-        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+        currentCalendarDate = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1);
         renderCalendar();
     });
 
-    // 10. CSV EXPORT
-    window.exportToExcel = function () {
+    // 10. CSV EXPORT — UTF-8 BOM ensures Excel renders non-ASCII names correctly
+    function exportToExcel() {
         const sorted = [...quotes].sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
         const headers = ['ID','Name','Email','Phone','Event Date','End Date','Shoot Type','Location','Status','Quoted Price','Confirmed Price','Deposit Paid','Notes'];
         const csvRows = sorted.map(q => {
@@ -432,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function () {
             ];
             return cells.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',');
         });
-        const csv = [headers.join(','), ...csvRows].join('\n');
+        const csv = '﻿' + [headers.join(','), ...csvRows].join('\r\n');
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -440,12 +467,13 @@ document.addEventListener('DOMContentLoaded', function () {
         a.download = 'aakaara-clients.csv';
         a.click();
         URL.revokeObjectURL(url);
-    };
+    }
 
     // 11. INIT
     renderStats();
     renderFilterPills();
     renderCards();
     renderCalendar();
+    document.getElementById('crmExportBtn').addEventListener('click', exportToExcel);
 
 });

@@ -390,8 +390,17 @@ body {
     z-index: 10;
     border: 1px solid rgba(201,149,107,0.2);
 }
+.calendar-day.conflict {
+    background: rgba(201,80,80,0.15);
+    border: 1px solid rgba(201,80,80,0.35);
+    color: #e07070;
+    border-radius: 4px;
+    position: relative;
+    cursor: help;
+}
 .calendar-day.occupied:hover .tooltip,
-.calendar-day.pending:hover .tooltip { display: block; }
+.calendar-day.pending:hover .tooltip,
+.calendar-day.conflict:hover .tooltip { display: block; }
 
 /* Modal */
 .modal-backdrop {
