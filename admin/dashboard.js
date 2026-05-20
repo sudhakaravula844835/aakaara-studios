@@ -42,16 +42,22 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 4. FILTER PILLS
+    const FIXED_PILLS = [
+        { key: 'all', label: 'All' },
+        { key: 'confirmed', label: 'Confirmed' },
+        { key: 'sent', label: 'Sent' },
+        { key: 'rejected', label: 'Rejected' },
+        { key: 'Wedding', label: 'Wedding' },
+        { key: 'Engagement', label: 'Engagement' },
+        { key: 'Maternity', label: 'Maternity' },
+        { key: 'Graduation', label: 'Graduation' },
+        { key: 'Birthday', label: 'Birthday' },
+        { key: 'Other', label: 'Other' },
+    ];
+
     function renderFilterPills() {
         const pills = document.getElementById('filterPills');
-        const shootTypes = [...new Set(quotes.map(q => q.shootType).filter(Boolean))].sort();
-        const defs = [
-            { key: 'all', label: 'All' },
-            { key: 'confirmed', label: 'Confirmed' },
-            { key: 'sent', label: 'Pending' },
-            { key: 'rejected', label: 'Rejected' },
-            ...shootTypes.map(t => ({ key: t, label: t })),
-        ];
+        const defs = FIXED_PILLS;
         pills.innerHTML = defs.map(({ key, label }) =>
             `<button class="filter-pill${activeFilter === key ? ' active' : ''}" data-filter="${escapeHtml(key)}">${escapeHtml(label)}</button>`
         ).join('');
@@ -151,9 +157,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const prices = document.createElement('div');
             prices.className = 'card-prices';
-            prices.innerHTML =
-                `<div><div class="price-lbl">Quoted</div><div class="price-val">$${(q.quotedPrice || 0).toLocaleString()}</div></div>` +
-                `<div><div class="price-lbl">Confirmed</div><div class="price-val">${q.confirmedPrice ? '$' + q.confirmedPrice.toLocaleString() : '—'}</div></div>`;
+            function priceCell(label, value) {
+                const cell = document.createElement('div');
+                const lbl = document.createElement('div');
+                lbl.className = 'price-lbl';
+                lbl.textContent = label;
+                const val = document.createElement('div');
+                val.className = 'price-val';
+                val.textContent = value;
+                cell.appendChild(lbl);
+                cell.appendChild(val);
+                return cell;
+            }
+            prices.appendChild(priceCell('Quoted', '$' + (q.quotedPrice || 0).toLocaleString()));
+            prices.appendChild(priceCell('Confirmed', q.confirmedPrice ? '$' + q.confirmedPrice.toLocaleString() : '—'));
             priceRow.appendChild(prices);
 
             if (q.depositPaid === true || q.depositPaid === false) {
@@ -401,17 +418,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // 10. CSV EXPORT
     window.exportToExcel = function () {
         const sorted = [...quotes].sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
-        const headers = ['Client Name','Wedding Date','Wedding Date (End)','Status','Email','Phone','Shoot Type','Location','Quoted ($)','Confirmed ($)','Deposit','Follow-up Date','Notes'];
+        const headers = ['ID','Name','Email','Phone','Event Date','End Date','Shoot Type','Location','Status','Quoted Price','Confirmed Price','Deposit Paid','Notes'];
         const csvRows = sorted.map(q => {
             const start = formatDate(q.eventDate);
             const end = q.eventDateTo && q.eventDateTo !== q.eventDate ? formatDate(q.eventDateTo) : start;
             const cells = [
-                q.clientName, start, end,
+                q.id, q.clientName, q.clientEmail || '', q.phone || '',
+                start, end, q.shootType || '', q.location || '',
                 q.status.charAt(0).toUpperCase() + q.status.slice(1),
-                q.clientEmail || '', q.phone || '', q.shootType || '', q.location || '',
                 q.quotedPrice || '', q.confirmedPrice || '',
                 q.depositPaid === true ? 'Paid' : q.depositPaid === false ? 'Unpaid' : '',
-                q.followUpDate || '', q.notes || '',
+                q.notes || '',
             ];
             return cells.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',');
         });
@@ -429,5 +446,6 @@ document.addEventListener('DOMContentLoaded', function () {
     renderStats();
     renderFilterPills();
     renderCards();
+    renderCalendar();
 
 });
