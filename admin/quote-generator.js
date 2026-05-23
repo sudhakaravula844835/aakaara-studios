@@ -171,6 +171,7 @@ function recalcDayPhotos(dayBlock) {
 // ── PRICING ───────────────────────────────────────────────────────
 function getDays() {
   return [...$('daysContainer').querySelectorAll('.day-block')].map(block => ({
+    date: block.querySelector('[data-field="date"]').value,
     hours: parseFloat(block.querySelector('[data-field="hours"]').value) || 0,
     events: [...block.querySelectorAll('[data-event-item]')].map(item => ({
       photos: item.querySelector('[data-field="eventPhotos"]').value,
@@ -832,6 +833,7 @@ function init() {
       scheduleDraftSave();
     }
     if (e.target.dataset.field === 'date') scheduleDraftSave();
+    if (e.target.type === 'checkbox' && e.target.closest('#qgMain')) scheduleDraftSave();
   });
 
   // Event delegation on days container
@@ -856,7 +858,11 @@ function init() {
     clearDraft();
     $('daysContainer').textContent = '';
     dayCount = 0;
-    DRAFT_VALUE_FIELD_IDS.forEach(id => { const el = $(id); if (el) el.value = ''; });
+    DRAFT_VALUE_FIELD_IDS.forEach(id => {
+      const el = $(id);
+      if (!el) return;
+      if (el.tagName === 'SELECT') { el.selectedIndex = 0; } else { el.value = ''; }
+    });
     DRAFT_CHECK_FIELD_IDS.forEach(id => { const el = $(id); if (el) el.checked = false; });
     DRAFT_ADDON_FIELDS.forEach(id => { const el = $(id); if (el) el.value = ''; });
     addDay();

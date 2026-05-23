@@ -35,7 +35,11 @@ export function calculatePricingSummary(days, { model, hourlyRate, flatRate, tra
   const dayBreakdown = days.map((day, i) => {
     const hours = parseFloat(day.hours) || 0;
     const amount = model === 'hourly' ? hours * rate : 0;
-    return { label: `Day ${i + 1}`, hours, amount };
+    let label = `Day ${i + 1}`;
+    if (day.date) {
+      try { label = new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); } catch {}
+    }
+    return { label, hours, amount };
   });
 
   const totalHours = dayBreakdown.reduce((s, d) => s + d.hours, 0);
