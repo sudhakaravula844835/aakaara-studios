@@ -490,7 +490,7 @@ function generatePDF(action) {
     sd(...BORD); doc.setLineWidth(0.4);
     doc.line(mL, H - 50, W - mL, H - 50);
     doc.setFontSize(7); doc.setFont('helvetica', 'normal'); sc(...GREY);
-    doc.text('aakaarastudiosnyc.com  │  info@aakaarastudiosnyc.com  │  +1 (475) 332-2020', W / 2, H - 20, { align: 'center' });
+    doc.text('aakaarastudiosnyc.com  |  info@aakaarastudiosnyc.com  |  +1 (475) 332-2020', W / 2, H - 20, { align: 'center' });
   }
 
   function drawPageHeader(pageNum) {
@@ -681,18 +681,19 @@ function generatePDF(action) {
     doc.setFontSize(9); doc.setFont('helvetica', 'normal'); sc(...GREY);
     doc.text('/ hour', mL + 14 + rateW, y + 46);
 
-    // Right: breakdown
-    const bxL = mL + rateBoxW + 16;
+    // Right: breakdown — two explicit columns inside the right half
+    const bxL  = mL + rateBoxW + 16;
+    const amtX = W - mR - 12;   // right-align anchor with safe inner padding
     let bY = y + 16;
     pricing.dayBreakdown.forEach(d => {
       doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-      sc(...CREAM); doc.text(`${d.label}: ${d.hours} hrs × $${pricing.hourlyRate.toLocaleString()}`, bxL, bY);
-      sc(...COPPER); doc.text(`$${d.amount.toLocaleString()}`, W - mR, bY, { align: 'right' });
+      sc(...GREY);  doc.text(`${d.label}: ${d.hours} hrs × $${pricing.hourlyRate.toLocaleString()}`, bxL, bY);
+      sc(...CREAM); doc.text(`$${d.amount.toLocaleString()}`, amtX, bY, { align: 'right' });
       bY += 14;
     });
     doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
     sc(...CREAM); doc.text('Coverage Total', bxL, bY);
-    sc(...COPPER); doc.text(`$${pricing.baseTotal.toLocaleString()}`, W - mR, bY, { align: 'right' });
+    sc(...COPPER); doc.text(`$${pricing.baseTotal.toLocaleString()}`, amtX, bY, { align: 'right' });
     y += 76;
   } else if (pricing.model === 'flat') {
     sf(...PANEL); doc.roundedRect(mL, y, cW, 30, 3, 3, 'F');
