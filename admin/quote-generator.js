@@ -929,14 +929,21 @@ function loadFromUrlParams() {
 
   if (p.get('live') === 'yes') {
     const events = p.get('liveEvents');
-    $('customNotes').value = events
+    const notesText = events
       ? `Live streaming required: ${events}`
       : 'Live streaming required';
+    // Set textContent so the value is reflected in both .value and DOM text content
+    $('customNotes').textContent = notesText;
   }
 
   let days = [];
   try { days = JSON.parse(p.get('days') || '[]'); } catch {}
-  days.forEach(day => addDay(day));
+  if (days.length > 0) {
+    // Clear any default day(s) added during init before adding URL-param days
+    $('daysContainer').textContent = '';
+    dayCount = 0;
+    days.forEach(day => addDay(day));
+  }
 
   const banner = document.createElement('div');
   banner.className   = 'intake-prefill-banner';
