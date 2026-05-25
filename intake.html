@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tell Us About Your Day — Aakaara Studios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Outfit:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="intake.css">
+</head>
+<body>
+
+<header class="intake-header">
+  <div class="intake-logo">
+    <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="50" cy="30" rx="12" ry="28" fill="#c9956b" opacity="0.85" transform="rotate(0 50 50)"/>
+      <ellipse cx="50" cy="30" rx="12" ry="28" fill="#c9956b" opacity="0.55" transform="rotate(90 50 50)"/>
+      <ellipse cx="50" cy="30" rx="12" ry="28" fill="#c9956b" opacity="0.35" transform="rotate(45 50 50)"/>
+      <ellipse cx="50" cy="30" rx="12" ry="28" fill="#c9956b" opacity="0.2" transform="rotate(135 50 50)"/>
+    </svg>
+    <span class="intake-brand">Aakaara Studios</span>
+  </div>
+</header>
+
+<main class="intake-main">
+  <div class="intake-hero">
+    <p class="intake-eyebrow">Let's get started</p>
+    <h1 class="intake-title">Tell us about your day</h1>
+    <p class="intake-subtitle">Fill in the details below and we'll have a personalised quote ready for you.</p>
+  </div>
+
+  <div class="intake-progress" aria-label="Form progress">
+    <div class="progress-step active" data-step="1">
+      <span class="step-num">01</span><span class="step-label">Details</span>
+    </div>
+    <div class="progress-divider"></div>
+    <div class="progress-step" data-step="2">
+      <span class="step-num">02</span><span class="step-label">Event</span>
+    </div>
+    <div class="progress-divider"></div>
+    <div class="progress-step" data-step="3">
+      <span class="step-num">03</span><span class="step-label">Pre-Wedding</span>
+    </div>
+    <div class="progress-divider"></div>
+    <div class="progress-step" data-step="4">
+      <span class="step-num">04</span><span class="step-label">Schedule</span>
+    </div>
+  </div>
+
+  <form id="intakeForm" novalidate>
+    <!-- Honeypot — bots fill this, humans don't -->
+    <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="display:none">
+
+    <!-- Hidden fields populated by JS before Formspree submit -->
+    <input type="hidden" name="_subject"      id="fs_subject">
+    <input type="hidden" name="schedule_text" id="fs_schedule">
+    <input type="hidden" name="prefill_link"  id="fs_link">
+
+    <!-- 01 Your Details -->
+    <section class="intake-section" id="step1">
+      <div class="section-accent"></div>
+      <h2 class="section-title"><span class="section-num">01</span> Your Details</h2>
+
+      <div class="field-group">
+        <label class="field-label" for="clientName">Full name(s)</label>
+        <input type="text" id="clientName" name="client_name" required autocomplete="name" placeholder="e.g. Priya &amp; Arjun Mehta">
+        <span class="field-error" id="err-clientName"></span>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="clientEmail">Email</label>
+          <input type="email" id="clientEmail" name="client_email" required autocomplete="email" placeholder="your@email.com">
+          <span class="field-error" id="err-clientEmail"></span>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="clientPhone">Phone</label>
+          <input type="tel" id="clientPhone" name="client_phone" required autocomplete="tel" placeholder="+1 (917) 555-0123">
+          <span class="field-error" id="err-clientPhone"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 Your Event -->
+    <section class="intake-section" id="step2">
+      <div class="section-accent"></div>
+      <h2 class="section-title"><span class="section-num">02</span> Your Event</h2>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="eventType">Event type</label>
+          <select id="eventType" name="event_type" required>
+            <option value="">Select…</option>
+            <option value="Wedding">Wedding</option>
+            <option value="Engagement">Engagement</option>
+            <option value="Portrait">Portrait</option>
+            <option value="Maternity">Maternity</option>
+            <option value="Family">Family</option>
+            <option value="Other">Other</option>
+          </select>
+          <span class="field-error" id="err-eventType"></span>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="eventDate">Event date</label>
+          <input type="date" id="eventDate" name="event_date" required>
+          <span class="field-error" id="err-eventDate"></span>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="venue">Venue / Location name</label>
+          <input type="text" id="venue" name="venue" autocomplete="off" placeholder="e.g. The Pierre Hotel">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="city">City</label>
+          <input type="text" id="city" name="city" required autocomplete="off" placeholder="e.g. New York">
+          <span class="field-error" id="err-city"></span>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Will any events require live streaming?</label>
+        <div class="radio-group">
+          <label class="radio-label"><input type="radio" name="live" value="no" checked> No</label>
+          <label class="radio-label"><input type="radio" name="live" value="yes"> Yes</label>
+        </div>
+      </div>
+      <div class="field-group conditional" id="liveEventsField" hidden>
+        <label class="field-label" for="liveEvents">Which event(s) need live coverage?</label>
+        <input type="text" id="liveEvents" name="live_events" placeholder="e.g. Wedding Ceremony, Sangeet">
+      </div>
+    </section>
+
+    <!-- 03 Pre-Wedding Shoot -->
+    <section class="intake-section" id="step3">
+      <div class="section-accent"></div>
+      <h2 class="section-title"><span class="section-num">03</span> Pre-Wedding Shoot</h2>
+      <p class="section-description">A pre-wedding session is a wonderful way to get comfortable in front of the camera before your big day — and creates beautiful images for invitations or décor.</p>
+      <div class="field-group">
+        <label class="field-label">Are you interested in a pre-wedding shoot?</label>
+        <div class="radio-group">
+          <label class="radio-label"><input type="radio" name="prewed" value="no" checked> Not for us</label>
+          <label class="radio-label"><input type="radio" name="prewed" value="maybe"> Not sure yet</label>
+          <label class="radio-label"><input type="radio" name="prewed" value="yes"> Yes, interested</label>
+        </div>
+      </div>
+      <div class="field-group conditional" id="prewedDetails" hidden>
+        <label class="field-label" for="prewedVibe">Preferred vibe or location <span class="optional">(optional)</span></label>
+        <input type="text" id="prewedVibe" name="prewed_vibe" placeholder="e.g. Golden hour in Central Park">
+        <label class="field-label" for="prewedDates" style="margin-top:12px">Preferred date range <span class="optional">(optional)</span></label>
+        <input type="text" id="prewedDates" name="prewed_dates" placeholder="e.g. September 2026">
+      </div>
+    </section>
+
+    <!-- 04 Your Schedule -->
+    <section class="intake-section" id="step4">
+      <div class="section-accent"></div>
+      <h2 class="section-title"><span class="section-num">04</span> Your Schedule</h2>
+      <p class="section-description">Tell us how many days your celebration spans and what happens each day.</p>
+      <div class="field-group">
+        <label class="field-label">How many days does your event span?</label>
+        <div class="day-pills" id="dayPills">
+          <button type="button" class="day-pill active" data-days="1">1</button>
+          <button type="button" class="day-pill" data-days="2">2</button>
+          <button type="button" class="day-pill" data-days="3">3</button>
+          <button type="button" class="day-pill" data-days="4">4</button>
+          <button type="button" class="day-pill" data-days="5">5</button>
+        </div>
+      </div>
+      <div id="daysBuilder"></div>
+    </section>
+
+    <div class="intake-submit-area">
+      <button type="submit" id="submitBtn" class="btn-submit">Send My Details</button>
+      <p class="submit-note">We'll review your details and send a personalised quote within 24 hours.</p>
+    </div>
+
+    <div id="successMessage" class="success-message" hidden>
+      <div class="success-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h3 class="success-title">Thank you!</h3>
+      <p class="success-body">We've received your details and will be in touch within 24 hours. We can't wait to be part of your day.</p>
+    </div>
+  </form>
+</main>
+
+<footer class="intake-footer">
+  <p>© 2026 Aakaara Studios NYC &nbsp;·&nbsp; <a href="/">Back to site</a></p>
+</footer>
+
+<script type="module" src="intake.js"></script>
+</body>
+</html>
