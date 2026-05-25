@@ -912,6 +912,40 @@ function initQuoteRef() {
   $('quoteRefDisplay').textContent = $('quoteRef').value;
 }
 
+// ── URL PARAM PRE-FILL ────────────────────────────────────────────
+function loadFromUrlParams() {
+  const p = new URLSearchParams(location.search);
+  if (!p.has('name')) return;
+
+  $('clientName').value  = p.get('name')  || '';
+  $('clientEmail').value = p.get('email') || '';
+  $('clientPhone').value = p.get('phone') || '';
+
+  const et = p.get('eventType');
+  if (et) $('eventType').value = et;
+
+  $('venueName').value = p.get('venue') || '';
+  $('location').value  = p.get('city')  || '';
+
+  if (p.get('live') === 'yes') {
+    const events = p.get('liveEvents');
+    $('customNotes').value = events
+      ? `Live streaming required: ${events}`
+      : 'Live streaming required';
+  }
+
+  let days = [];
+  try { days = JSON.parse(p.get('days') || '[]'); } catch {}
+  days.forEach(day => addDay(day));
+
+  const banner = document.createElement('div');
+  banner.className   = 'intake-prefill-banner';
+  banner.textContent = 'Pre-filled from client intake';
+  $('qgMain').insertBefore(banner, $('qgMain').firstChild);
+
+  scheduleDraftSave();
+}
+
 // ── INIT ──────────────────────────────────────────────────────────
 function init() {
   const draft = readStorage(APP_SETTINGS.draftStorageKey);
@@ -1009,6 +1043,7 @@ function init() {
   });
   $('dashboardBtn').addEventListener('click', () => { window.location.href = 'dashboard.html'; });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
+  loadFromUrlParams();
 }
 
 init();

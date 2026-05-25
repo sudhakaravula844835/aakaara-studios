@@ -489,3 +489,14 @@ input[data-field="hours"].hours-auto {
   .event-fields { grid-template-columns: 1fr; }
   .deliverables-grid { grid-template-columns: 1fr; }
 }
+
+.intake-prefill-banner {
+  background: rgba(201, 149, 107, 0.12);
+  border: 1px solid rgba(201, 149, 107, 0.35);
+  color: #dbb08a;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 16px;
+}
