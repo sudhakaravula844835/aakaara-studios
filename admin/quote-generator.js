@@ -932,8 +932,7 @@ function loadFromUrlParams() {
     const notesText = events
       ? `Live streaming required: ${events}`
       : 'Live streaming required';
-    // Set textContent so the value is reflected in both .value and DOM text content
-    $('customNotes').textContent = notesText;
+    $('customNotes').value = notesText;
   }
 
   let days = [];

@@ -58,7 +58,7 @@ test.describe('Quote generator pre-fill', () => {
     await expect(page.locator('#clientName')).toHaveValue('Test Client');
     await expect(page.locator('#clientEmail')).toHaveValue('test@example.com');
     await expect(page.locator('#location')).toHaveValue('New York');
-    await expect(page.locator('#customNotes')).toContainText('Ceremony');
+    await expect(page.locator('#customNotes')).toHaveValue(/Ceremony/);
     await expect(page.locator('.intake-prefill-banner')).toBeVisible();
     await expect(page.locator('.day-block')).toHaveCount(1);
   });
