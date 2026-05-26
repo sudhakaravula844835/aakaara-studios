@@ -363,6 +363,7 @@ select option { background: var(--umber); }
   color: rgba(250, 246, 241, 0.25);
 }
 
-/* Input field */
+/* Input fields — cursor + hide the hidden original when altInput is active */
 #eventDate { cursor: pointer; }
+.flatpickr-alt-input { cursor: pointer; }
 #eventDate + .flatpickr-input { display: none; }

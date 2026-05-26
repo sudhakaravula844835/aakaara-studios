@@ -175,11 +175,20 @@ function buildDayCard(dayNum) {
   dateLabel.textContent = 'Date';
 
   const dateInput = document.createElement('input');
-  dateInput.type      = 'date';
-  dateInput.className = 'day-date';
+  dateInput.type        = 'text';
+  dateInput.className   = 'day-date';
+  dateInput.placeholder = 'Select a date…';
+  dateInput.readOnly    = true;
 
   dateGroup.appendChild(dateLabel);
   dateGroup.appendChild(dateInput);
+
+  flatpickr(dateInput, {
+    dateFormat:    'Y-m-d',
+    altInput:      true,
+    altFormat:     'F j, Y',
+    disableMobile: false,
+  });
 
   const eventsList = document.createElement('div');
   eventsList.className = 'events-list';
