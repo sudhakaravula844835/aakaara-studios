@@ -126,7 +126,8 @@ function initIntakeForm() {
       });
 
       if (res.ok) {
-        window.location.href = '/intake-thank-you.html';
+        const eventType = document.getElementById('eventType').value || 'Wedding';
+        window.location.href = `/intake-thank-you.html?event=${encodeURIComponent(eventType)}`;
       } else {
         submitBtn.disabled    = false;
         submitBtn.textContent = 'Send My Details';
