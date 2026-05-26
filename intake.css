@@ -210,7 +210,10 @@ select option { background: var(--umber); }
 }
 
 /* ── Flatpickr — Aakaara dark cinematic palette ───────────────────── */
-.flatpickr-calendar {
+/* Note: dark.css loads BEFORE intake.css in <head>, so all rules here win */
+
+.flatpickr-calendar,
+.flatpickr-calendar.dark {
   background: var(--noir);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -218,6 +221,7 @@ select option { background: var(--umber); }
   font-family: var(--font-body);
   padding: 16px;
   width: 308px;
+  color: var(--ivory);
 }
 .flatpickr-calendar.open { animation: fpFadeIn 0.18s var(--ease); }
 @keyframes fpFadeIn {
@@ -225,14 +229,19 @@ select option { background: var(--umber); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Month header */
+/* Month header — override dark.css blue-grey */
+.flatpickr-calendar.dark .flatpickr-months,
 .flatpickr-months {
   background: var(--noir);
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border);
   margin-bottom: 8px;
 }
-.flatpickr-months .flatpickr-month { background: var(--noir); color: var(--ivory); }
+.flatpickr-calendar.dark .flatpickr-month,
+.flatpickr-months .flatpickr-month {
+  background: var(--noir);
+  color: var(--ivory);
+}
 .flatpickr-current-month {
   font-family: var(--font-display);
   font-size: 1.15rem;
@@ -255,11 +264,15 @@ select option { background: var(--umber); }
   padding-right: 2px;
   cursor: pointer;
 }
+.flatpickr-current-month .flatpickr-monthDropdown-months option {
+  background: var(--umber);
+}
 .flatpickr-current-month input.cur-year {
   color: var(--rose-light);
   font-family: var(--font-display);
   font-size: 1.1rem;
   font-weight: 300;
+  background: transparent;
 }
 .flatpickr-current-month input.cur-year:focus { outline: none; }
 .numInputWrapper span { display: none; }
@@ -273,13 +286,16 @@ select option { background: var(--umber); }
   fill: var(--rose);
 }
 .flatpickr-months .flatpickr-prev-month:hover,
-.flatpickr-months .flatpickr-next-month:hover { color: var(--ivory); }
+.flatpickr-months .flatpickr-next-month:hover { color: var(--ivory); fill: var(--ivory); }
 .flatpickr-months .flatpickr-prev-month svg,
 .flatpickr-months .flatpickr-next-month svg { fill: currentColor; }
 
 /* Weekday labels */
-.flatpickr-weekdays { margin-top: 8px; }
+.flatpickr-calendar.dark .flatpickr-weekdays,
+.flatpickr-weekdays { background: var(--noir); margin-top: 8px; }
+.flatpickr-calendar.dark span.flatpickr-weekday,
 .flatpickr-weekday {
+  background: var(--noir);
   color: var(--rose);
   font-size: 0.65rem;
   font-weight: 400;
@@ -289,7 +305,13 @@ select option { background: var(--umber); }
 }
 
 /* Day grid */
+.flatpickr-calendar.dark .flatpickr-days,
+.flatpickr-days { background: var(--noir); border-color: transparent; }
+.flatpickr-calendar.dark .dayContainer,
+.dayContainer { background: var(--noir); border-color: transparent; }
+
 .flatpickr-day {
+  background: var(--noir);
   color: var(--ivory);
   border-radius: 8px;
   border-color: transparent;
@@ -341,6 +363,6 @@ select option { background: var(--umber); }
   color: rgba(250, 246, 241, 0.25);
 }
 
-/* Input field — calendar icon tint */
+/* Input field */
 #eventDate { cursor: pointer; }
 #eventDate + .flatpickr-input { display: none; }
