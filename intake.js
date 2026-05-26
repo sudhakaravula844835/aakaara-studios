@@ -110,7 +110,7 @@ function initIntakeForm() {
     document.getElementById('fs_link').value     = window.location.origin + buildPreFillUrl(data);
 
     try {
-      const res = await fetch('https://formspree.io/f/YOUR_FORMSPREE_ID', {
+      const res = await fetch('https://formspree.io/f/meedrjaj', {
         method:  'POST',
         body:    new FormData(form),
         headers: { Accept: 'application/json' },
