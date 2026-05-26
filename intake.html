@@ -45,11 +45,11 @@
     </div>
     <div class="progress-divider"></div>
     <div class="progress-step" data-step="3">
-      <span class="step-num">03</span><span class="step-label">Pre-Wedding</span>
+      <span class="step-num">03</span><span class="step-label">Schedule</span>
     </div>
     <div class="progress-divider"></div>
     <div class="progress-step" data-step="4">
-      <span class="step-num">04</span><span class="step-label">Schedule</span>
+      <span class="step-num">04</span><span class="step-label">Pre-Wedding</span>
     </div>
   </div>
 
@@ -135,10 +135,28 @@
       </div>
     </section>
 
-    <!-- 03 Pre-Wedding Shoot -->
+    <!-- 03 Your Schedule -->
     <section class="intake-section" id="step3">
       <div class="section-accent"></div>
-      <h2 class="section-title"><span class="section-num">03</span> Pre-Wedding Shoot</h2>
+      <h2 class="section-title"><span class="section-num">03</span> Your Schedule</h2>
+      <p class="section-description">Tell us how many days your celebration spans and what happens each day.</p>
+      <div class="field-group">
+        <label class="field-label">How many days does your event span?</label>
+        <div class="day-pills" id="dayPills">
+          <button type="button" class="day-pill active" data-days="1">1</button>
+          <button type="button" class="day-pill" data-days="2">2</button>
+          <button type="button" class="day-pill" data-days="3">3</button>
+          <button type="button" class="day-pill" data-days="4">4</button>
+          <button type="button" class="day-pill" data-days="5">5</button>
+        </div>
+      </div>
+      <div id="daysBuilder"></div>
+    </section>
+
+    <!-- 04 Pre-Wedding Shoot -->
+    <section class="intake-section" id="step4">
+      <div class="section-accent"></div>
+      <h2 class="section-title"><span class="section-num">04</span> Pre-Wedding Shoot</h2>
       <p class="section-description">A pre-wedding session is a wonderful way to get comfortable in front of the camera before your big day — and creates beautiful images for invitations or décor.</p>
       <div class="field-group">
         <label class="field-label">Are you interested in a pre-wedding shoot?</label>
@@ -154,24 +172,6 @@
         <label class="field-label" for="prewedDates" style="margin-top:12px">Preferred date range <span class="optional">(optional)</span></label>
         <input type="text" id="prewedDates" name="prewed_dates" placeholder="e.g. September 2026">
       </div>
-    </section>
-
-    <!-- 04 Your Schedule -->
-    <section class="intake-section" id="step4">
-      <div class="section-accent"></div>
-      <h2 class="section-title"><span class="section-num">04</span> Your Schedule</h2>
-      <p class="section-description">Tell us how many days your celebration spans and what happens each day.</p>
-      <div class="field-group">
-        <label class="field-label">How many days does your event span?</label>
-        <div class="day-pills" id="dayPills">
-          <button type="button" class="day-pill active" data-days="1">1</button>
-          <button type="button" class="day-pill" data-days="2">2</button>
-          <button type="button" class="day-pill" data-days="3">3</button>
-          <button type="button" class="day-pill" data-days="4">4</button>
-          <button type="button" class="day-pill" data-days="5">5</button>
-        </div>
-      </div>
-      <div id="daysBuilder"></div>
     </section>
 
     <div class="intake-submit-area">
