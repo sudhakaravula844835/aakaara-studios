@@ -126,8 +126,7 @@ function initIntakeForm() {
       });
 
       if (res.ok) {
-        document.querySelector('.intake-submit-area').hidden = true;
-        document.getElementById('successMessage').hidden     = false;
+        window.location.href = '/intake-thank-you.html';
       } else {
         submitBtn.disabled    = false;
         submitBtn.textContent = 'Send My Details';
