@@ -50,6 +50,15 @@ if (typeof document !== 'undefined') {
 }
 
 function initIntakeForm() {
+  // Date picker
+  flatpickr('#eventDate', {
+    minDate: 'today',
+    dateFormat: 'Y-m-d',
+    altInput: true,
+    altFormat: 'F j, Y',
+    disableMobile: false,
+  });
+
   // Conditional: live streaming
   document.querySelectorAll('input[name="live"]').forEach(radio => {
     radio.addEventListener('change', () => {

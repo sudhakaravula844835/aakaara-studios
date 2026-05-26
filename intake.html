@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Outfit:wght@200;300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="intake.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
 </head>
 <body>
 
@@ -102,7 +103,7 @@
         </div>
         <div class="field-group">
           <label class="field-label" for="eventDate">Event date</label>
-          <input type="date" id="eventDate" name="event_date" required>
+          <input type="text" id="eventDate" name="event_date" required placeholder="Select a date…" autocomplete="off" readonly>
           <span class="field-error" id="err-eventDate"></span>
         </div>
       </div>
@@ -190,6 +191,7 @@
   <p>© 2026 Aakaara Studios NYC &nbsp;·&nbsp; <a href="/">Back to site</a></p>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script type="module" src="intake.js"></script>
 </body>
 </html>
