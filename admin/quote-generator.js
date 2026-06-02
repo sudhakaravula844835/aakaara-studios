@@ -39,6 +39,7 @@ let draftSaveTimer = null;
 let isApplyingDraft = false;
 let previewObjectUrl = null;
 let toastTimer = null;
+let quoteDatePicker = null;
 
 // ── STORAGE ───────────────────────────────────────────────────────
 function readStorage(key) {
@@ -67,6 +68,11 @@ function addDay(dayData) {
   }
   $('daysContainer').appendChild(block);
   const addedBlock = $('daysContainer').lastElementChild;
+  flatpickr(addedBlock.querySelector('[data-field="date"]'), {
+    dateFormat: 'Y-m-d',
+    altInput: true,
+    altFormat: 'F j, Y',
+  });
   const events = (dayData && dayData.events) ? dayData.events : [{}];
   events.forEach(ev => addEvent(addedBlock, ev));
   recalcDayPhotos(addedBlock);
@@ -278,6 +284,7 @@ function collectDraftState() {
 function applyDraftState(state) {
   isApplyingDraft = true;
   DRAFT_VALUE_FIELD_IDS.forEach(id => { const el = $(id); if (el && state[id] !== undefined) el.value = state[id]; });
+  if (quoteDatePicker && state.quoteDate) quoteDatePicker.setDate(state.quoteDate, false);
   DRAFT_CHECK_FIELD_IDS.forEach(id => { const el = $(id); if (el && state[id] !== undefined) el.checked = state[id]; });
   DRAFT_ADDON_FIELDS.forEach(id => { const el = $(id); if (el && state[id] !== undefined) el.value = state[id]; });
   toggleAddonFields();
@@ -396,10 +403,6 @@ function getDeliverableRows() {
     const fee = parseFloat($('delRushFee').value);
     rows.push({ label: 'Rush Delivery', detail: fee ? `$${fee} priority fee` : 'Fee TBD' });
   }
-  const custom = $('customNotes').value.trim();
-  if (custom) rows.push({ label: custom, detail: '' });
-  const timeline = $('timeline').value.trim();
-  if (timeline) rows.push({ label: 'Delivery Timeline', detail: timeline });
 
   return rows;
 }
@@ -669,94 +672,154 @@ function generatePDF(action) {
 
   sectionHeader('INVESTMENT');
 
+  const amtX = W - mR - 12;
+
+  // ── Base Coverage ──────────────────────────────────────────────
   if (pricing.model === 'hourly' && pricing.hourlyRate > 0) {
-    // Left: large hourly rate display
     const rateBoxW = cW * 0.38;
-    sf(...PANEL); doc.roundedRect(mL, y, rateBoxW, 64, 3, 3, 'F');
+    const bxL = mL + rateBoxW + 20;
+    const breakdownH = Math.max(64, pricing.dayBreakdown.length * 16 + 36);
+    sf(...PANEL); doc.roundedRect(mL, y, cW, breakdownH, 3, 3, 'F');
+
+    // Left: hourly rate
     doc.setFontSize(7); doc.setFont('helvetica', 'normal'); sc(...GREY);
     doc.text('HOURLY RATE', mL + 12, y + 16);
-    doc.setFontSize(28); doc.setFont('helvetica', 'bold'); sc(...WHITE);
-    doc.text(`$${pricing.hourlyRate}`, mL + 12, y + 46);
-    const rateW = doc.getTextWidth(`$${pricing.hourlyRate}`);
+    doc.setFontSize(26); doc.setFont('helvetica', 'bold'); sc(...WHITE);
+    doc.text(`$${pricing.hourlyRate.toLocaleString()}`, mL + 12, y + 44);
+    const rateW = doc.getTextWidth(`$${pricing.hourlyRate.toLocaleString()}`);
     doc.setFontSize(9); doc.setFont('helvetica', 'normal'); sc(...GREY);
-    doc.text('/ hour', mL + 14 + rateW, y + 46);
+    doc.text('/ hr', mL + 14 + rateW, y + 44);
 
-    // Right: breakdown — two explicit columns inside the right half
-    const bxL  = mL + rateBoxW + 16;
-    const amtX = W - mR - 12;   // right-align anchor with safe inner padding
+    // Vertical divider
+    sd(...BORD); doc.setLineWidth(0.3);
+    doc.line(mL + rateBoxW, y + 12, mL + rateBoxW, y + breakdownH - 12);
+
+    // Right: per-day breakdown
     let bY = y + 16;
     pricing.dayBreakdown.forEach(d => {
       doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-      sc(...GREY);  doc.text(`${d.label}: ${d.hours} hrs × $${pricing.hourlyRate.toLocaleString()}`, bxL, bY);
+      sc(...GREY);  doc.text(`${d.label}  (${d.hours} hrs × $${pricing.hourlyRate.toLocaleString()})`, bxL, bY);
       sc(...CREAM); doc.text(`$${d.amount.toLocaleString()}`, amtX, bY, { align: 'right' });
-      bY += 14;
+      bY += 16;
     });
+    sd(...BORD); doc.setLineWidth(0.3);
+    doc.line(bxL, bY + 2, amtX - 2, bY + 2);
+    bY += 12;
     doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
-    sc(...CREAM); doc.text('Coverage Total', bxL, bY);
+    sc(...GREY);   doc.text('Coverage Total', bxL, bY);
     sc(...COPPER); doc.text(`$${pricing.baseTotal.toLocaleString()}`, amtX, bY, { align: 'right' });
-    y += 76;
+    y += breakdownH + 12;
+
   } else if (pricing.model === 'flat') {
-    sf(...PANEL); doc.roundedRect(mL, y, cW, 30, 3, 3, 'F');
+    sf(...PANEL); doc.roundedRect(mL, y, cW, 38, 3, 3, 'F');
     doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-    sc(...GREY); doc.text('Package Rate', mL + 12, y + 19);
-    sc(...COPPER); doc.text(`$${pricing.baseTotal.toLocaleString()}`, W - mR - 12, y + 19, { align: 'right' });
-    y += 40;
+    sc(...GREY); doc.text('Package Rate', mL + 12, y + 13);
+    doc.setFontSize(7); sc(...GREY);
+    doc.text('all-inclusive coverage', mL + 12, y + 26);
+    doc.setFontSize(11); doc.setFont('helvetica', 'bold'); sc(...COPPER);
+    doc.text(`$${pricing.baseTotal.toLocaleString()}`, amtX, y + 22, { align: 'right' });
+    y += 48;
   }
 
-  // Travel row
-  if (travelType === 'separate' || travelType === 'included' || travelType === 'fixed') {
-    sf(36, 30, 22); doc.roundedRect(mL, y, cW, 22, 2, 2, 'F');
+  // ── Add-ons ──────────────────────────────────────────────────
+  const hasRush     = $('delRush').checked;
+  const hasOvertime = $('delAddlHours').checked;
+  const hasEngmt    = $('delEngagement').checked;
+  if (hasRush || hasOvertime || hasEngmt) {
+    doc.setFontSize(7); doc.setFont('helvetica', 'bold'); sc(...GREY);
+    doc.text('ADD-ONS', mL + 2, y + 10);
+    y += 18;
+    if (hasRush) {
+      const fee = parseFloat($('delRushFee').value);
+      doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+      sc(...GREY);  doc.text('Rush / Priority Delivery', mL + 12, y);
+      sc(...CREAM); doc.text(fee > 0 ? `$${fee.toLocaleString()}` : 'Fee TBD', amtX, y, { align: 'right' });
+      y += 14;
+    }
+    if (hasOvertime) {
+      const rate = parseFloat($('delAddlHoursRate').value);
+      doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+      sc(...GREY);  doc.text('Additional Hours (Overtime Rate)', mL + 12, y);
+      sc(...CREAM); doc.text(rate > 0 ? `$${rate.toLocaleString()}/hr` : 'Rate TBD', amtX, y, { align: 'right' });
+      y += 14;
+    }
+    if (hasEngmt) {
+      const engNotes = $('delEngagementNotes').value.trim();
+      doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+      sc(...GREY); doc.text('Engagement / Pre-Wedding Session', mL + 12, y);
+      if (engNotes) { sc(...CREAM); doc.text(engNotes, amtX, y, { align: 'right' }); }
+      y += 14;
+    }
+    y += 8;
+  }
+
+  // ── Travel & Accommodation ────────────────────────────────────
+  if (travelType !== 'none') {
+    sf(36, 30, 22); doc.roundedRect(mL, y, cW, 26, 2, 2, 'F');
     doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-    sc(...GREY); doc.text('TRAVEL & ACCOMMODATION', mL + 12, y + 14);
+    sc(...GREY); doc.text('Travel & Accommodation', mL + 12, y + 16);
     const travelVal = travelType === 'fixed'    ? `$${pricing.travelAmount.toLocaleString()}`
                     : travelType === 'separate' ? 'Calculated separately'
                     : 'Included in quoted price';
-    sc(...CREAM); doc.text(travelVal, W - mR - 12, y + 14, { align: 'right' });
-    y += 30;
+    sc(...CREAM); doc.text(travelVal, amtX, y + 16, { align: 'right' });
+    y += 34;
   }
 
-  // Retainer
-  if (pricing.retainerFee > 0) {
-    doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-    sc(...GREY); doc.text('Retainer / Booking Fee', mL + 12, y);
-    sc(...COPPER); doc.text(`$${pricing.retainerFee.toLocaleString()}`, W - mR - 12, y, { align: 'right' });
-    y += 16;
-  }
-
-  // Total — prominent box with copper border accent
-  sf(...PANEL); doc.roundedRect(mL, y, cW, 52, 3, 3, 'F');
-  sf(...COPPER); doc.roundedRect(mL, y, 4, 52, 1, 1, 'F');
+  // ── Estimated Total Investment ──────────────────────────────
+  sf(...PANEL); doc.roundedRect(mL, y, cW, 54, 3, 3, 'F');
+  sf(...COPPER); doc.roundedRect(mL, y, 4, 54, 1, 1, 'F');
   sd(...COPPER); doc.setLineWidth(0.5);
   doc.line(mL + 16, y + 36, W - mR - 12, y + 36);
   doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); sc(...GREY);
-  doc.text('ESTIMATED COVERAGE TOTAL', mL + 16, y + 18);
+  doc.text('ESTIMATED TOTAL INVESTMENT', mL + 16, y + 20);
   doc.setFontSize(30); doc.setFont(CG, 'normal'); sc(...COPPER);
-  doc.text(`$${pricing.total.toLocaleString()}`, W - mR - 12, y + 46, { align: 'right' });
-  y += 64;
+  doc.text(`$${pricing.total.toLocaleString()}`, amtX, y + 48, { align: 'right' });
+  y += 66;
 
-  // Additional Information
-  const infoRows = [];
-  if (deposit)   infoRows.push(['Deposit',   deposit]);
-  if (validity)  infoRows.push(['Timeline',  validity]);
-  if (balanceDue) infoRows.push(['Balance Due', balanceDue]);
-  if (infoRows.length > 0 || extraNotes) {
-    sectionHeader('ADDITIONAL INFORMATION');
-    infoRows.forEach(([lbl, val]) => {
-      doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-      sc(...GREY);  doc.text(lbl, mL + 12, y);
-      sc(...CREAM); doc.text(val, mL + 130, y);
-      y += 14;
-    });
-    if (extraNotes) {
-      doc.setFontSize(8); doc.setFont('helvetica', 'normal'); sc(...GREY);
-      const wrapped = doc.splitTextToSize(extraNotes, cW - 24);
-      doc.text(wrapped, mL + 12, y);
-      y += wrapped.length * 12 + 4;
-    }
-    y += 6;
+  // ── Retainer / Booking Fee ────────────────────────────────────
+  if (pricing.retainerFee > 0) {
+    sf(42, 36, 24); doc.roundedRect(mL, y, cW, 28, 2, 2, 'F');
+    doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+    sc(...GREY);   doc.text('Retainer / Booking Fee to Confirm Dates', mL + 12, y + 17);
+    sc(...COPPER); doc.text(`$${pricing.retainerFee.toLocaleString()}`, amtX, y + 17, { align: 'right' });
+    y += 38;
   }
 
-  // Custom deliverable notes
+  y += 10;
+
+  // ── Booking Terms ──────────────────────────────────────────
+  const timeline    = $('timeline').value.trim();
+  const termRows = [];
+  if (deposit)    termRows.push(['Deposit Required',  deposit]);
+  if (balanceDue) termRows.push(['Balance Due',       balanceDue]);
+  if (timeline)   termRows.push(['Delivery Timeline', timeline]);
+  if (validity)   termRows.push(['Quote Valid For',   validity]);
+
+  if (termRows.length > 0 || extraNotes) {
+    sectionHeader('BOOKING TERMS');
+    const extraWrapped = extraNotes ? doc.splitTextToSize(extraNotes, cW - 24) : [];
+    const termBoxH = termRows.length * 22 + (extraWrapped.length > 0 ? extraWrapped.length * 12 + 20 : 0) + 18;
+    sf(...PANEL); doc.roundedRect(mL, y, cW, termBoxH, 3, 3, 'F');
+    let tY = y + 18;
+    termRows.forEach(([lbl, val]) => {
+      doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+      sc(...GREY);  doc.text(lbl,  mL + 12, tY);
+      sc(...CREAM); doc.text(val,  mL + 180, tY);
+      tY += 22;
+    });
+    if (extraWrapped.length > 0) {
+      if (termRows.length > 0) {
+        sd(...BORD); doc.setLineWidth(0.3);
+        doc.line(mL + 12, tY - 4, W - mR - 12, tY - 4);
+        tY += 8;
+      }
+      doc.setFontSize(8); doc.setFont('helvetica', 'normal'); sc(...GREY);
+      doc.text(extraWrapped, mL + 12, tY);
+    }
+    y += termBoxH + 16;
+  }
+
+  // ── Custom Deliverable Notes ──────────────────────────────────
   if (customNotes) {
     sectionHeader('CUSTOM DELIVERABLE NOTES');
     customNotes.split('\n').forEach(line => {
@@ -765,14 +828,6 @@ function generatePDF(action) {
       doc.text(line.trim(), mL + 12, y);
       y += 14;
     });
-    y += 6;
-  }
-
-  // Validity note
-  if (validity) {
-    sf(36, 30, 22); doc.roundedRect(mL, y, cW, 22, 2, 2, 'F');
-    doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); sc(...GREY);
-    doc.text(`This quote is valid for ${validity} from the date above.`, W / 2, y + 14, { align: 'center' });
   }
 
   // ── PAGE 4: CLOSING (no header bar — personal letter feel) ────────
@@ -871,7 +926,22 @@ function sendQuoteEmail() {
   writeStorage(APP_SETTINGS.dashboardStorageKey, quotes);
   clearDraft();
   generatePDF('download');
-  showToast('Quote sent and saved to CRM');
+
+  const clientName  = $('clientName').value.trim();
+  const clientEmail = $('clientEmail').value.trim();
+  const eventType   = $('eventType').value.trim();
+  const firstName   = clientName.split(' ')[0] || clientName;
+  const subject = encodeURIComponent(`Aakaara Studios — ${eventType} Quote for ${clientName}`);
+  const body = encodeURIComponent(
+    `Hi ${firstName},\n\n` +
+    `Thank you so much for reaching out to Aakaara Studios! Please find the quote attached for your upcoming ${eventType.toLowerCase()}.\n\n` +
+    `Feel free to review it and let me know if you have any questions — I'd love to be part of your special day!\n\n` +
+    `With warmth,\nSudhakar Avula\nAakaara Studios NYC\navala.sudhakar@gmail.com\n+1 (475) 332-2020`
+  );
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(clientEmail)}&su=${subject}&body=${body}`;
+  setTimeout(() => { window.open(gmailUrl, '_blank'); }, 800);
+
+  showToast('PDF downloaded — attach it in Gmail and send');
   setTimeout(closePreview, 600);
 }
 
@@ -954,6 +1024,12 @@ function loadFromUrlParams() {
 
 // ── INIT ──────────────────────────────────────────────────────────
 function init() {
+  quoteDatePicker = flatpickr('#quoteDate', {
+    dateFormat: 'Y-m-d',
+    altInput: true,
+    altFormat: 'F j, Y',
+  });
+
   const draft = readStorage(APP_SETTINGS.draftStorageKey);
   if (draft) {
     applyDraftState(draft);
