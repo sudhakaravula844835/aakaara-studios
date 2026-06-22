@@ -92,7 +92,13 @@ function addEvent(dayBlock, eventData) {
   updatePhotoPill(addedItem);
 }
 
+function destroyDayFlatpickr(dayBlock) {
+  const fp = dayBlock.querySelector('[data-field="date"]')?._flatpickr;
+  if (fp) fp.destroy();
+}
+
 function removeDay(dayBlock) {
+  destroyDayFlatpickr(dayBlock);
   dayBlock.remove();
   renumberDays();
   recalcTotal();
@@ -147,7 +153,7 @@ function recalcDayHours(dayBlock) {
   const total = [...dayBlock.querySelectorAll('[data-field="eventDuration"]')]
     .reduce((s, inp) => s + parseDurationToHours(inp.value), 0);
   if (total > 0) {
-    hoursInput.value = total;
+    hoursInput.value = Math.round(total * 100) / 100;
     hoursInput.classList.add('hours-auto');
   } else {
     hoursInput.value = '';
@@ -290,6 +296,7 @@ function applyDraftState(state) {
   toggleAddonFields();
   togglePricingFields();
 
+  $('daysContainer').querySelectorAll('.day-block').forEach(destroyDayFlatpickr);
   $('daysContainer').textContent = '';
   dayCount = 0;
   const days = (state.days || []).map(migrateEventDay);
@@ -458,7 +465,10 @@ function generatePDF(action) {
   const city       = $('location').value.trim();
   const locationStr = [venueName, city].filter(Boolean).join(', ');
   const dateRange  = formatDateRange();
-  const quoteDate  = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const quoteDateRaw = $('quoteDate').value;
+  const quoteDate  = quoteDateRaw
+    ? new Date(quoteDateRaw + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    : new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   const ref        = $('quoteRef').value;
   const pricing    = calculatePricingSummary(getDays(), getPricingInputs());
   const days       = getDays();
@@ -486,7 +496,8 @@ function generatePDF(action) {
   if ($('delSecondShooter').checked) scopeItems.push('Second photographer for full coverage');
   if ($('delEngagement').checked)   scopeItems.push($('delEngagementNotes').value || 'Engagement session — pre-wedding couple shoot');
 
-  const totalPgs = 4;
+  let currentPage = 1;
+  const SAFE_Y = H - 60;
 
   function drawFooter() {
     sf(...PANEL); doc.rect(0, H - 50, W, 50, 'F');
@@ -502,7 +513,7 @@ function generatePDF(action) {
     doc.line(mL, 46, W - mL, 46);
     doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
     sc(...COPPER); doc.text('AAKAARA STUDIOS', mL, 27);
-    sc(...GREY); doc.text(`${String(pageNum).padStart(2, '0')} / ${String(totalPgs).padStart(2, '0')}`, W / 2, 27, { align: 'center' });
+    sc(...GREY); doc.text(String(pageNum).padStart(2, '0'), W / 2, 27, { align: 'center' });
     if (ref) { sc(...COPPER); doc.text(ref, W - mR, 27, { align: 'right' }); }
     y = 68;
   }
@@ -514,6 +525,19 @@ function generatePDF(action) {
     sd(...BORD); doc.setLineWidth(0.4);
     doc.line(mL, y, W - mR, y);
     y += 16;
+  }
+
+  function addContentPage() {
+    currentPage++;
+    doc.addPage();
+    sf(...DARK); doc.rect(0, 0, W, H, 'F');
+    drawTopStripe();
+    drawPageHeader(currentPage);
+    drawFooter();
+  }
+
+  function checkPageBreak(neededH) {
+    if (y + neededH > SAFE_Y) addContentPage();
   }
 
   // ── PAGE 1: COVER ──────────────────────────────────────────────────
@@ -573,10 +597,7 @@ function generatePDF(action) {
   drawFooter();
 
   // ── PAGE 2: EVENT SCHEDULE + SCOPE OF COVERAGE ────────────────────
-  doc.addPage();
-  sf(...DARK); doc.rect(0, 0, W, H, 'F');
-  drawTopStripe();
-  drawPageHeader(2); drawFooter();
+  addContentPage();
 
   sectionHeader('EVENT SCHEDULE');
 
@@ -587,6 +608,7 @@ function generatePDF(action) {
       : `DAY ${di + 1}`;
     const hrs = parseFloat(block.querySelector('[data-field="hours"]').value) || 0;
 
+    checkPageBreak(44);
     doc.setFontSize(7.5); doc.setFont('helvetica', 'bold'); sc(...COPPER);
     doc.text(`DAY ${di + 1}  —  ${dateLabel}`, mL, y);
     y += 14;
@@ -598,6 +620,7 @@ function generatePDF(action) {
       if (!name && !dur) return;
 
       const cardH = notes ? 40 : 28;
+      checkPageBreak(cardH + 8);
       sf(...PANEL); doc.roundedRect(mL, y, cW, cardH, 2, 2, 'F');
       // Copper left accent bar
       sf(...COPPER); doc.roundedRect(mL, y, 3, cardH, 1, 1, 'F');
@@ -616,6 +639,7 @@ function generatePDF(action) {
     });
 
     // Day total bar
+    checkPageBreak(30);
     sf(38, 32, 24); doc.roundedRect(mL, y, cW, 22, 2, 2, 'F');
     doc.setFontSize(8); doc.setFont('helvetica', 'normal');
     sc(...GREY);   doc.text(`Day ${di + 1} Total`, mL + 12, y + 14);
@@ -626,8 +650,10 @@ function generatePDF(action) {
   y += 10;
 
   if (scopeItems.length > 0) {
+    checkPageBreak(40);
     sectionHeader('SCOPE OF COVERAGE');
     scopeItems.forEach(item => {
+      checkPageBreak(14);
       doc.setFontSize(8); doc.setFont('helvetica', 'normal');
       sf(...COPPER); doc.circle(mL + 5, y - 2.5, 2, 'F');
       sc(...CREAM); doc.text(item, mL + 16, y);
@@ -636,24 +662,21 @@ function generatePDF(action) {
   }
 
   // ── PAGE 3: DELIVERABLES + INVESTMENT + ADDITIONAL INFO ───────────
-  doc.addPage();
-  sf(...DARK); doc.rect(0, 0, W, H, 'F');
-  drawTopStripe();
-  drawPageHeader(3); drawFooter();
+  addContentPage();
 
   sectionHeader('DELIVERABLES SUMMARY');
 
   const delRows = getDeliverableRows();
   // Table header row
+  const dataRows = delRows.filter(r => r.label !== '__divider__');
+  const panelH = dataRows.length * 22 + 10;
+  checkPageBreak(20 + panelH + 16);
   sf(40, 34, 26); doc.rect(mL, y, cW, 20, 'F');
   doc.setFontSize(7.5); doc.setFont('helvetica', 'bold');
   sc(...COPPER); doc.text('ITEM', mL + 12, y + 13);
   doc.text('DETAILS', W - mR - 12, y + 13, { align: 'right' });
   y += 20;
 
-  // Count non-divider rows to size the panel
-  const dataRows = delRows.filter(r => r.label !== '__divider__');
-  const panelH = dataRows.length * 22 + 10;
   sf(...PANEL); doc.rect(mL, y, cW, panelH, 'F');
   let delY = y + 10;
   delRows.forEach(row => {
@@ -670,6 +693,7 @@ function generatePDF(action) {
   });
   y = delY + 16;
 
+  checkPageBreak(40);
   sectionHeader('INVESTMENT');
 
   const amtX = W - mR - 12;
@@ -679,6 +703,7 @@ function generatePDF(action) {
     const rateBoxW = cW * 0.38;
     const bxL = mL + rateBoxW + 20;
     const breakdownH = Math.max(64, pricing.dayBreakdown.length * 16 + 36);
+    checkPageBreak(breakdownH + 12);
     sf(...PANEL); doc.roundedRect(mL, y, cW, breakdownH, 3, 3, 'F');
 
     // Left: hourly rate
@@ -711,6 +736,7 @@ function generatePDF(action) {
     y += breakdownH + 12;
 
   } else if (pricing.model === 'flat') {
+    checkPageBreak(48);
     sf(...PANEL); doc.roundedRect(mL, y, cW, 38, 3, 3, 'F');
     doc.setFontSize(8); doc.setFont('helvetica', 'normal');
     sc(...GREY); doc.text('Package Rate', mL + 12, y + 13);
@@ -726,6 +752,8 @@ function generatePDF(action) {
   const hasOvertime = $('delAddlHours').checked;
   const hasEngmt    = $('delEngagement').checked;
   if (hasRush || hasOvertime || hasEngmt) {
+    const addonsH = 18 + (hasRush ? 14 : 0) + (hasOvertime ? 14 : 0) + (hasEngmt ? 14 : 0) + 8;
+    checkPageBreak(addonsH);
     doc.setFontSize(7); doc.setFont('helvetica', 'bold'); sc(...GREY);
     doc.text('ADD-ONS', mL + 2, y + 10);
     y += 18;
@@ -755,6 +783,7 @@ function generatePDF(action) {
 
   // ── Travel & Accommodation ────────────────────────────────────
   if (travelType !== 'none') {
+    checkPageBreak(34);
     sf(36, 30, 22); doc.roundedRect(mL, y, cW, 26, 2, 2, 'F');
     doc.setFontSize(8); doc.setFont('helvetica', 'normal');
     sc(...GREY); doc.text('Travel & Accommodation', mL + 12, y + 16);
@@ -766,6 +795,7 @@ function generatePDF(action) {
   }
 
   // ── Estimated Total Investment ──────────────────────────────
+  checkPageBreak(66);
   sf(...PANEL); doc.roundedRect(mL, y, cW, 54, 3, 3, 'F');
   sf(...COPPER); doc.roundedRect(mL, y, 4, 54, 1, 1, 'F');
   sd(...COPPER); doc.setLineWidth(0.5);
@@ -778,6 +808,7 @@ function generatePDF(action) {
 
   // ── Retainer / Booking Fee ────────────────────────────────────
   if (pricing.retainerFee > 0) {
+    checkPageBreak(38);
     sf(42, 36, 24); doc.roundedRect(mL, y, cW, 28, 2, 2, 'F');
     doc.setFontSize(8); doc.setFont('helvetica', 'normal');
     sc(...GREY);   doc.text('Retainer / Booking Fee to Confirm Dates', mL + 12, y + 17);
@@ -796,9 +827,10 @@ function generatePDF(action) {
   if (validity)   termRows.push(['Quote Valid For',   validity]);
 
   if (termRows.length > 0 || extraNotes) {
-    sectionHeader('BOOKING TERMS');
     const extraWrapped = extraNotes ? doc.splitTextToSize(extraNotes, cW - 24) : [];
     const termBoxH = termRows.length * 22 + (extraWrapped.length > 0 ? extraWrapped.length * 12 + 20 : 0) + 18;
+    checkPageBreak(40 + termBoxH);
+    sectionHeader('BOOKING TERMS');
     sf(...PANEL); doc.roundedRect(mL, y, cW, termBoxH, 3, 3, 'F');
     let tY = y + 18;
     termRows.forEach(([lbl, val]) => {
@@ -821,9 +853,11 @@ function generatePDF(action) {
 
   // ── Custom Deliverable Notes ──────────────────────────────────
   if (customNotes) {
+    checkPageBreak(40);
     sectionHeader('CUSTOM DELIVERABLE NOTES');
     customNotes.split('\n').forEach(line => {
       if (!line.trim()) return;
+      checkPageBreak(14);
       doc.setFontSize(8); doc.setFont('helvetica', 'normal'); sc(...CREAM);
       doc.text(line.trim(), mL + 12, y);
       y += 14;
@@ -1098,6 +1132,7 @@ function init() {
   $('resetBtn').addEventListener('click', () => {
     if (!confirm('Reset all fields? This cannot be undone.')) return;
     clearDraft();
+    $('daysContainer').querySelectorAll('.day-block').forEach(destroyDayFlatpickr);
     $('daysContainer').textContent = '';
     dayCount = 0;
     DRAFT_VALUE_FIELD_IDS.forEach(id => {
