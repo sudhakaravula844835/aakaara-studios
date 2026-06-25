@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- SEO FIX: sitemap corrected — intake.html and share-your-experience.html removed because
+     both carry meta robots="noindex,nofollow". Including noindex pages in a sitemap sends
+     a contradictory signal to Googlebot and should be avoided per Google's own guidance.
+     Only genuinely indexable pages are listed here. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Homepage — primary landing page -->
   <url>
     <loc>https://aakaarastudiosnyc.com/</loc>
+    <lastmod>2026-06-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Couple Portraits — dedicated gallery page, strong secondary keyword target -->
   <url>
     <loc>https://aakaarastudiosnyc.com/couple-portraits.html</loc>
+    <lastmod>2026-06-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+
 </urlset>

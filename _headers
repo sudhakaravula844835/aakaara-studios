@@ -4,6 +4,28 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 
+# PERF FIX: photography images are content-addressed by folder/number.jpg path and
+# do not change once published. 30-day cache eliminates repeat fetches on revisit.
+/images/*
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+
+# PERF FIX: video poster/cover images — same content-addressed naming, 30-day cache.
+/videos/*
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+
+# PERF FIX: styles.css and Script.js are deployed atomically with the site.
+# 1-day cache + stale-while-revalidate lets repeat visitors load instantly while
+# ensuring they pick up updates within 24 h without a hard-purge requirement.
+/styles.css
+  Cache-Control: public, max-age=86400, stale-while-revalidate=3600
+
+/Script.js
+  Cache-Control: public, max-age=86400, stale-while-revalidate=3600
+
+# PERF FIX: SVG favicon is stable; 7-day cache.
+/favicon.svg
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
 /tools/*
   X-Robots-Tag: noindex, nofollow
 

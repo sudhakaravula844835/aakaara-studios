@@ -77,7 +77,20 @@ function ensureHlsLibrary() {
   return loadScriptOnce('https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js', 'Hls');
 }
 
+// PERF FIX: lazy-inject a <link rel="stylesheet"> once; subsequent calls are no-ops
+function loadCssOnce(href) {
+  if (document.querySelector(`link[href="${href}"]`)) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = href;
+  document.head.appendChild(link);
+}
+
 function ensureFlatpickrLibrary() {
+  // PERF FIX: Flatpickr CSS injected here (lazily on first date-field focus) instead of
+  // blocking the initial render via a <link> in <head>. Saves one cross-origin stylesheet
+  // request on every page load for users who never touch the contact form date pickers.
+  loadCssOnce('https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css');
   return loadScriptOnce('https://cdn.jsdelivr.net/npm/flatpickr', 'flatpickr');
 }
 // ═══════ CINEMATIC INTRO ANIMATION ═══════
@@ -327,22 +340,41 @@ function ensureFlatpickrLibrary() {
 (function() {
   const navToggle = document.querySelector('.nav-toggle');
   const navLinks = document.getElementById('navLinks');
+  const nav = document.getElementById('navbar');
 
-  if (navToggle && navLinks) {
-    navToggle.addEventListener('click', () => {
-      const isOpen = navLinks.classList.toggle('show');
-      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-    });
+  if (!navToggle || !navLinks) return;
 
-    // Good practice: close menu when a link is clicked on mobile
-    navLinks.addEventListener('click', (e) => {
-      // Check if the clicked element is a link inside the nav
-      if (e.target.tagName === 'A' && navLinks.classList.contains('show')) {
-        navLinks.classList.remove('show');
-        navToggle.setAttribute('aria-expanded', 'false');
-      }
-    });
+  function closeMenu() {
+    navLinks.classList.remove('show');
+    navToggle.setAttribute('aria-expanded', 'false');
   }
+
+  navToggle.addEventListener('click', () => {
+    const isOpen = navLinks.classList.toggle('show');
+    navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+
+  // Close menu when a nav link is tapped on mobile
+  navLinks.addEventListener('click', (e) => {
+    if (e.target.tagName === 'A' && navLinks.classList.contains('show')) {
+      closeMenu();
+    }
+  });
+
+  // MOBILE FIX: close menu when tapping anywhere outside the nav bar
+  document.addEventListener('click', (e) => {
+    if (navLinks.classList.contains('show') && nav && !nav.contains(e.target)) {
+      closeMenu();
+    }
+  }, { passive: true });
+
+  // MOBILE FIX: close menu on Escape key for keyboard/switch-access users
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && navLinks.classList.contains('show')) {
+      closeMenu();
+      navToggle.focus();
+    }
+  });
 })();
 
 
@@ -382,6 +414,13 @@ function ensureFlatpickrLibrary() {
   }, { passive: true });
   window.addEventListener('resize', updateHeroSpacing, { passive: true });
 })();
+
+// QA FIX: auto-assign aria-label to gallery items missing one for screen-reader accessibility
+document.querySelectorAll('.gallery-item:not([aria-label])').forEach(function(item) {
+  var title = item.dataset.title || '';
+  var type  = item.dataset.type  || '';
+  if (title) item.setAttribute('aria-label', type ? type + ': ' + title : title);
+});
 
 // ═══════ REVEAL ON SCROLL ═══════
 const revealObs = new IntersectionObserver((entries) => {
@@ -1090,6 +1129,9 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
 (function () {
   var wrapper    = document.querySelector('.cs-wrapper');
   if (!wrapper) return;
+  // QA FIX: skip HLS init and scroll handlers when services section is hidden (display:none)
+  var servicesSection = document.getElementById('services');
+  if (servicesSection && window.getComputedStyle(servicesSection).display === 'none') return;
 
   var panels     = Array.from(document.querySelectorAll('.cs-panel'));
   var PANEL_COUNT = panels.length;
