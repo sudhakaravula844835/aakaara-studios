@@ -30,7 +30,19 @@
 <!-- SEO FIX: twitter:description updated to include "South Asian" and "videographer" -->
 <meta name="twitter:description" content="Cinematic South Asian wedding photography &amp; videography in New York City &amp; New Jersey. Weddings, couples, maternity, celebrations.">
 <meta name="twitter:image" content="https://aakaarastudiosnyc.com/images/og-cover.jpg">
+<!-- GSC FIX: Google Search Console ownership verification.
+     STEPS: 1. Go to https://search.google.com/search-console
+              2. Add property → URL prefix → https://aakaarastudiosnyc.com
+              3. Choose "HTML tag" verification method
+              4. Copy the content="..." value and replace PASTE_YOUR_GSC_TOKEN_HERE below
+              5. Deploy to Netlify → click Verify in Search Console
+     DO NOT remove this tag after verification — GSC re-checks it periodically. -->
+<meta name="google-site-verification" content="4ltFZQGXizITBe3xIKg2keM6-nKqlkUW3D3l8BITBrc">
 <link rel="canonical" href="https://aakaarastudiosnyc.com/">
+<!-- GA4 + GTM preconnect: pre-warms the connection to Google Tag Manager and Analytics
+     so the async scripts load faster when the browser resolves them -->
+<link rel="preconnect" href="https://www.googletagmanager.com">
+<link rel="dns-prefetch" href="https://www.google-analytics.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- PERF FIX: preconnect for jsDelivr (hls.js + flatpickr loaded on demand) saves
@@ -98,6 +110,35 @@
     ]
   }
 }
+</script>
+<!-- GA4 FIX: Google Analytics 4 global site tag.
+     STEPS: 1. Go to https://analytics.google.com
+              2. Create new GA4 property: "Aakaara Studios NYC"
+              3. Add Web data stream → https://aakaarastudiosnyc.com
+              4. Copy Measurement ID (format: G-72E9BMSGN3)
+              5. Replace BOTH occurrences of G-72E9BMSGN3 below with your real ID
+              6. Deploy to Netlify → check GA4 Realtime report to confirm pageview fires
+     The async attribute ensures this script never blocks page rendering. -->
+<!-- NOTE: SRI (integrity="sha384-...") is intentionally omitted from this script tag.
+     googletagmanager.com/gtag/js is dynamically generated per Measurement ID and is
+     updated continuously by Google. A fixed hash would break on every Google-side
+     release. See: https://developers.google.com/tag-platform/security/guides/csp
+     Mitigations instead: strict-origin-when-cross-origin Referrer-Policy (already
+     set in _headers), and CSP script-src can restrict to 'https://www.googletagmanager.com'
+     if a Content Security Policy is added in a future pass. -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-72E9BMSGN3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-72E9BMSGN3', {
+    page_title: document.title,
+    page_location: window.location.href,
+    send_page_view: true,
+    // GA4 FIX: link_attribution enables "Page Analytics" mode and better
+    // cross-page session stitching when GSC is linked to this GA4 property
+    link_attribution: true
+  });
 </script>
 <noscript><style>.reveal { opacity: 1 !important; transform: none !important; }</style></noscript>
 </head>

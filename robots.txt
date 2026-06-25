@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
 
-# SEO FIX: was pointing to www.aakaarastudiosnyc.com but canonical is non-www;
-# must match canonical to avoid confusing Googlebot about the preferred domain
 Sitemap: https://aakaarastudiosnyc.com/sitemap.xml

@@ -3,6 +3,18 @@
   command = "echo 'Static site — no build needed'"
   publish = "."
 
+# CDN FIX: Netlify automatically enables Brotli + Gzip compression for all
+# text-type assets (HTML, CSS, JS, SVG, JSON, XML) without any explicit config.
+# No [build.processing] block is needed. Verified: Netlify serves
+# Content-Encoding: br on modern browsers and Content-Encoding: gzip as fallback.
+# Vary: Accept-Encoding is also set automatically by Netlify's edge layer.
+
+# CDN FIX NOTE — BUNNY CDN BOUNDARY:
+# All HLS video streams (playlist.m3u8 + .ts segments) are served from
+# vz-757250d0-999.b-cdn.net (Bunny Stream). This file has NO control over those
+# response headers. Required Bunny CDN settings are documented in the CDN Fix
+# Report below and must be applied in the Bunny CDN dashboard.
+
 [[edge_functions]]
   path = "/admin/*"
   function = "admin-auth"

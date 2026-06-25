@@ -439,6 +439,16 @@ function filterGallery(cat, btn) {
   document.querySelectorAll('.portfolio-filters button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 
+  // GA4 FIX: track which portfolio categories users navigate to most.
+  // Reveals which service types drive the most browsing intent.
+  if (typeof gtag === 'function') {
+    gtag('event', 'portfolio_filter', {
+      event_category: 'Navigation',
+      event_label: btn.textContent.trim(),
+      filter_value: cat
+    });
+  }
+
   // Disable gallery-item transitions so category switch feels instant
   const allItems = document.querySelectorAll('.gallery-item');
   allItems.forEach(item => { item.style.transition = 'none'; });
@@ -841,7 +851,18 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     swIndex = 0;
     galleryTitle.textContent = work.dataset.title || '';
     gallerySubtitle.textContent = work.dataset.type || '';
-    
+
+    // GA4 FIX: fire gallery_open event — tracks which collections get the most interest.
+    // cat maps to the portfolio filter category (wedding, couple, maternity, etc.)
+    if (typeof gtag === 'function') {
+      gtag('event', 'gallery_open', {
+        event_category: 'Gallery',
+        event_label: work.dataset.title || 'Unknown',
+        gallery_type: work.dataset.cat || 'Unknown',
+        is_coming_soon: (work.dataset.comingSoon === 'true')
+      });
+    }
+
     gallery.classList.add('sw-open', 'sw-gallery-enter');
     if (isStatic) gallery.classList.add('sw-static');
     
@@ -1485,6 +1506,17 @@ function filterVideos(cat, btn) {
   document.querySelectorAll('.vw-filters button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 
+  // GA4 FIX: track video section filter navigation alongside portfolio_filter.
+  // Same event name so both filter types appear together in GA4 reports.
+  if (typeof gtag === 'function') {
+    gtag('event', 'portfolio_filter', {
+      event_category: 'Navigation',
+      event_label: btn.textContent.trim(),
+      filter_value: cat,
+      filter_section: 'video'
+    });
+  }
+
   // Disable transitions so category switch feels instant
   const allCards = document.querySelectorAll('.vw-card');
   allCards.forEach(c => { c.style.transition = 'none'; });
@@ -1790,6 +1822,18 @@ function filterVideos(cat, btn) {
     modalLastFocusedEl = document.activeElement instanceof HTMLElement ? document.activeElement : card;
     vmTitle.textContent = card.dataset.title || '';
     vmSub.textContent   = card.dataset.type  || '';
+
+    // GA4 FIX: fire video_play event — marks this as an engagement conversion in GA4.
+    // video_type matches the card badge (Wedding Film, Pre-Wedding Film, etc.)
+    if (typeof gtag === 'function') {
+      gtag('event', 'video_play', {
+        event_category: 'Video',
+        event_label: card.dataset.title || 'Unknown',
+        video_type: card.dataset.type  || 'Unknown',
+        video_category: card.dataset.vcat || 'Unknown'
+      });
+    }
+
     modalScrollY = window.scrollY || window.pageYOffset || 0;
     vmVideo.muted = true;
     vmVideo.volume = 1;
@@ -2161,6 +2205,18 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
       if (response.ok) {
         form.reset();
+        // GA4 FIX: fire contact_form_submit — this is the PRIMARY CONVERSION event.
+        // Mark this as a Conversion in GA4: Admin → Events → contact_form_submit → toggle Conversion.
+        // value:1 lets you sum conversions in reports; event_type captures the selected service.
+        if (typeof gtag === 'function') {
+          const eventTypeEl = document.getElementById('contactEventType');
+          gtag('event', 'contact_form_submit', {
+            event_category: 'Lead',
+            event_label: 'Contact Form',
+            event_type: eventTypeEl ? eventTypeEl.value : 'Unknown',
+            value: 1
+          });
+        }
         window.location.href = 'thank-you.html';
       } else {
         const responseData = await response.json();
@@ -3454,4 +3510,32 @@ let portfolioCarousel, videoCarousel;
     });
   }, { threshold: 0.3 });
   nameObserver.observe(aboutNameWrapper);
+})();
+
+// ═══════ GA4 — SERVICES SECTION VIEWED ═══════
+// GA4 FIX: fires once when #services-overview scrolls into view (50% visible).
+// Signals high-intent browsing — users who reach pricing/services are more likely
+// to enquire. Use this in GA4 to build a retargeting audience:
+//   Admin → Audiences → "Viewed Services, No Form Submit"
+//   Condition: services_viewed AND NOT contact_form_submit
+(function() {
+  const servicesSection = document.getElementById('services-overview');
+  if (!servicesSection || typeof IntersectionObserver === 'undefined') return;
+
+  const servicesObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        if (typeof gtag === 'function') {
+          gtag('event', 'services_viewed', {
+            event_category: 'Engagement',
+            event_label: 'Services Overview Section',
+            value: 1
+          });
+        }
+        servicesObserver.unobserve(entry.target); // fire once per session
+      }
+    });
+  }, { threshold: 0.5 });
+
+  servicesObserver.observe(servicesSection);
 })();
