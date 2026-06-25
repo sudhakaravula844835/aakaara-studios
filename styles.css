@@ -27,6 +27,10 @@
   --story-line-color: rgba(232, 196, 168, 0.88);
 }
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+/* MOBILE FIX: suppress iOS/Android blue tap-highlight flash on all interactive elements */
+a, button, [role="button"], input, select, textarea, label {
+  -webkit-tap-highlight-color: transparent;
+}
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 80px;
@@ -2454,7 +2458,8 @@ body.intro-active #heroScroll { opacity: 0; }
   align-items: center;
   justify-content: center;
   gap: 0.65rem;
-  min-height: 2.65rem;
+  /* MOBILE FIX: was 2.65rem (~42px) — raised to 2.75rem (44px) touch-target minimum */
+  min-height: 2.75rem;
   margin-top: 0.05rem;
   padding: 0.76rem 1.15rem;
   border-radius: 4px;
@@ -2681,7 +2686,8 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .sw-gallery-subtitle { font-size: 0.52rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--rose); opacity: 0.7; margin-top: 0.2rem; }
 .sw-gallery-bar-right { display: flex; align-items: center; gap: 1.5rem; flex-shrink: 0; padding-left: 1.5rem; }
 .sw-gallery-counter { font-family: var(--font-display); font-size: 1.1rem; color: rgba(250,246,241,0.2); letter-spacing: 0.1em; white-space: nowrap; }
-.sw-gallery-close { display: flex; align-items: center; gap: 0.5rem; font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(250,246,241,0.4); cursor: pointer; transition: color 0.3s; background: none; border: none; font-family: var(--font-body); white-space: nowrap; }
+/* MOBILE FIX: added min-height/padding so close button meets 44px touch target on all devices */
+.sw-gallery-close { display: flex; align-items: center; gap: 0.5rem; font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(250,246,241,0.4); cursor: pointer; transition: color 0.3s; background: none; border: none; font-family: var(--font-body); white-space: nowrap; min-height: 44px; padding-inline: 0.25rem; }
 .sw-gallery-close:hover { color: var(--rose); }
 .sw-gallery-stage { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .sw-gallery-img { position: absolute; inset: -5%; background-size: cover; background-position: center; background-repeat: no-repeat; will-change: transform; transition: background-image 0s; }
@@ -3069,7 +3075,16 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   nav { padding: 1rem 1.5rem; }
   nav.scrolled { padding: 0.6rem 1.5rem; }
   .nav-links { display: none; }
-  .nav-toggle { display: flex; }
+  /* MOBILE FIX: hamburger was ~30×22px — Apple HIG + WCAG require 44×44px minimum touch target */
+  .nav-toggle {
+    display: flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin-right: -0.5rem; /* compensate for added width so nav edge stays flush */
+  }
   .section { padding: var(--section-space-tablet) var(--page-gutter-tablet); }
   .about-grid, .contact-grid { grid-template-columns: 1fr; grid-template-rows: auto; gap: 2rem; }
   .contact-info { position: static; padding-top: 0; }
@@ -3125,6 +3140,8 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
     font-size: 0.52rem;
     padding: 0.45rem 0.9rem;
     white-space: nowrap;
+    /* MOBILE FIX: computed height was ~23px at this font-size; enforce 44px WCAG touch target */
+    min-height: 44px;
   }
 
   .sw-gallery-bar { padding: 1rem 1.2rem; align-items: flex-start; }
@@ -3133,14 +3150,15 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .sw-gallery-counter { font-size: 0.75rem; }
   .sw-gallery-prev { left: 0.8rem; }
   .sw-gallery-next { right: 0.8rem; }
-  .sw-gallery-nav { width: 40px; height: 40px; }
+  /* MOBILE FIX: gallery nav arrows were 40×40px — raised to 44×44px touch-target minimum */
+  .sw-gallery-nav { width: 44px; height: 44px; }
   .sw-gallery-strip { padding: 1rem 1.5rem 1.5rem; gap: 0.4rem; }
   /* Portfolio tools: stack vertically on mobile */
   .portfolio-tools { flex-direction: column; align-items: flex-start; gap: 1rem; }
   .portfolio-actions { width: 100%; flex-direction: column; align-items: flex-start; gap: 0.8rem; }
   .portfolio-select, .portfolio-search { min-width: unset; width: 100%; }
-  /* Filmstrip thumbs slightly larger on mobile for easier tapping */
-  .sw-strip-thumb { width: 52px; height: 40px; }
+  /* MOBILE FIX: filmstrip thumbs at 768px were 40px tall — raised to 44px touch target minimum */
+  .sw-strip-thumb { width: 52px; height: 44px; }
   .sw-strip-thumb.active { width: 78px; }
   /* Hero 3D float — reduce bob amplitude on mobile */
   .hero-title-float { animation: heroTitleFloat 8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; }
@@ -3164,7 +3182,8 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
     width: min(380px, 85vw);
     aspect-ratio: 16 / 9;
   }
-  .ec-nav { width: 38px; height: 38px; }
+  /* MOBILE FIX: was 38×38px — raised to 44×44px touch-target minimum */
+  .ec-nav { width: 44px; height: 44px; }
   .ec-prev { left: 0.5rem; }
   .ec-next { right: 0.5rem; }
 
@@ -3241,7 +3260,9 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   }
   .section-title { font-size: clamp(1.4rem, 6vw, 1.8rem); }
   .section { padding: var(--section-space-mobile) var(--page-gutter-mobile); }
-  .sw-strip-thumb { width: 44px; height: 34px; }
+  /* MOBILE FIX: thumb height was 34px — raised to 44px so each filmstrip thumbnail
+     meets the minimum touch-target height at ≤480px (iPhone SE / small Android) */
+  .sw-strip-thumb { width: 44px; height: 44px; }
   .sw-strip-thumb.active { width: 62px; }
   .ethereal-carousel { height: 340px; }
 }
@@ -3628,8 +3649,11 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .video-modal.vm-open .vm-player { transform: translateY(0) scale(1); }
+/* MOBILE FIX: added flex-wrap so title + close button don't overflow at 375px;
+   min-width:0 on vm-title lets flexbox shrink the title instead of overflowing */
 .vm-header {
   display: flex; justify-content: space-between; align-items: flex-end;
+  flex-wrap: wrap; gap: 0.25rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(201,149,107,0.08);
   margin-bottom: 1.2rem;
@@ -3637,17 +3661,22 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .vm-title {
   font-family: var(--font-display); font-weight: 300;
   font-size: 1.4rem; color: var(--ivory); letter-spacing: 0.04em;
+  min-width: 0;
 }
 .vm-subtitle {
   font-size: 0.49rem; letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--rose); opacity: 0.75; margin-top: 0.3rem;
 }
+/* MOBILE FIX: vm-close had no minimum tap size — the only close control on touch devices.
+   Added min-height and padding so the button reliably registers 44px touch target. */
 .vm-close {
   display: flex; align-items: center; gap: 0.45rem;
   font-size: 0.52rem; letter-spacing: 0.2em; text-transform: uppercase;
   color: rgba(250,246,241,0.35); cursor: pointer;
   transition: color 0.3s; background: none; border: none;
   font-family: var(--font-body); white-space: nowrap;
+  min-height: 44px; padding-inline: 0.5rem; margin-right: -0.5rem;
+  flex-shrink: 0;
 }
 .vm-close:hover { color: var(--rose); }
 .vm-stage {
@@ -3682,7 +3711,13 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   opacity: 0; transition: opacity 0.3s;
 }
 .vm-stage:hover .vm-controls { opacity: 1; }
-.vm-ctrl-btn { color: var(--ivory); opacity: 0.8; transition: opacity 0.3s; display: flex; align-items: center; }
+/* MOBILE FIX: give each control button an explicit 44×44px touch target — icons are only 16–18px
+   without this, all play/skip/mute/fullscreen buttons are untappable on small screens */
+.vm-ctrl-btn {
+  color: var(--ivory); opacity: 0.8; transition: opacity 0.3s;
+  display: flex; align-items: center; justify-content: center;
+  min-width: 44px; min-height: 44px;
+}
 .vm-ctrl-btn:hover { opacity: 1; color: var(--rose); }
 @media (hover: none) {
   .vm-controls {
@@ -3765,7 +3800,8 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
     font-size: 0.5rem;
     letter-spacing: 0.18em;
     padding: 0.56rem 0.95rem;
-    min-height: 38px;
+    /* MOBILE FIX: was 38px — raised to 44px to meet WCAG 2.5.5 touch-target minimum */
+    min-height: 44px;
     white-space: nowrap;
     scroll-snap-align: start;
   }
@@ -4189,7 +4225,8 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .back-to-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
 .back-to-top:hover { background: var(--rose); color: var(--noir); border-color: var(--rose); transform: translateY(-3px); }
 @media (max-width: 768px) {
-  .back-to-top { bottom: 1.5rem; right: 1.5rem; width: 38px; height: 38px; }
+  /* MOBILE FIX: was 38×38px — raised to 44×44px to meet touch-target minimum */
+  .back-to-top { bottom: 1.5rem; right: 1.5rem; width: 44px; height: 44px; }
 }
 
 /* Specific filter for Abhinav & Megha in Weddings */

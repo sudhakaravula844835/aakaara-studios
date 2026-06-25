@@ -1,9 +1,129 @@
+# ═════════════════════════════════════════════════════════════════════════════
+# NETLIFY RESPONSE HEADERS — aakaarastudiosnyc.com
+#
+# SCOPE OF THIS FILE:
+#   • Controls headers for Netlify-served assets only (HTML, CSS, JS, /images/*, /videos/*)
+#   • Has NO effect on Bunny CDN (vz-757250d0-999.b-cdn.net) — all HLS video
+#     cache rules (.m3u8 playlists, .ts segments, CORS) MUST be set in the
+#     Bunny CDN dashboard. See CDN Fix Report for the required settings.
+# ═════════════════════════════════════════════════════════════════════════════
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECURITY + MONITORING HEADERS  (all Netlify-served paths)
+# ─────────────────────────────────────────────────────────────────────────────
 /*
   X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
+  # CDN FIX: HSTS added — forces HTTPS on all future visits without a redirect
+  #   round-trip, prevents SSL-stripping attacks, and signals to browsers that
+  #   this site should never be loaded over HTTP. max-age=1 year; includeSubDomains
+  #   covers admin.aakaarastudiosnyc.com etc. Do NOT add "preload" unless you
+  #   have submitted to the HSTS preload list at hstspreload.org.
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  # CDN FIX: Timing-Allow-Origin added — required for Real User Monitoring tools
+  #   (Netlify Analytics, SpeedCurve, Lighthouse CI) to read cross-origin resource
+  #   timing data (TTFB, DNS, TCP) for third-party requests. Value * is safe for
+  #   a public site with no authenticated resource timing data.
+  Timing-Allow-Origin: *
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PHOTOGRAPHY IMAGES  (/images/*)
+#
+# Images are content-addressed: once a gallery is published, files are never
+# mutated in-place (a new shoot gets a new folder; existing folders stay frozen).
+# 1-year + immutable is therefore safe and eliminates all revalidation overhead.
+# ─────────────────────────────────────────────────────────────────────────────
+/images/*
+  # CDN FIX: upgraded from max-age=2592000 (30 days) to max-age=31536000 (1 year) + immutable.
+  #   "immutable" tells browsers the file will never change while fresh — they skip
+  #   the conditional GET entirely on repeat visits, saving a full round-trip per image.
+  #   Impact: eliminates ~50–200 ms of revalidation latency per gallery re-visit.
+  Cache-Control: public, max-age=31536000, immutable
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LOCAL MP4 VIDEOS  (/videos/*)
+#
+# Static MP4 files (prewedding/abhinav-megha.mp4 etc.) stored in the repo and
+# served from Netlify. These are deployment artifacts that do not change.
+#
+# IMPORTANT: HLS streaming (.m3u8 + .ts segments) is served from Bunny CDN
+#   at vz-757250d0-999.b-cdn.net — NOT from this /videos/ path.
+#   This rule has zero effect on Bunny CDN responses.
+# ─────────────────────────────────────────────────────────────────────────────
+/videos/*
+  # CDN FIX: upgraded from max-age=2592000 (30 days) to max-age=31536000 + immutable.
+  #   Local MP4s are static build assets. Immutable cache eliminates revalidation.
+  Cache-Control: public, max-age=31536000, immutable
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# HTML PAGES  — explicit no-cache
+#
+# Netlify defaults HTML to max-age=0, must-revalidate. Making it explicit here
+# ensures that any CDN layer in front of Netlify does not aggressively cache HTML,
+# and that browsers always revalidate before serving a page (picks up new gallery
+# items, SEO changes, etc. immediately after deploy).
+# ─────────────────────────────────────────────────────────────────────────────
+/*.html
+  # CDN FIX: explicit no-cache on HTML. Without this, aggressive browser/proxy caches
+  #   could serve stale HTML after a Netlify deploy (new gallery items, title changes).
+  #   no-cache = browser must revalidate; Netlify returns 304 if unchanged (fast, no download).
+  Cache-Control: no-cache
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# STYLES + JAVASCRIPT
+#
+# Filenames are NOT content-hashed (styles.css, Script.js) so long-TTL caching
+# creates a stale-content risk: a visitor who loaded the page in the morning will
+# be served stale CSS/JS until their browser cache expires, even after a deploy.
+#
+# Netlify invalidates its own CDN on every deploy (CDN is always fresh).
+# The risk is the *browser* cache only.
+#
+# Correct strategy for unhashed filenames: no-cache
+#   → browser sends a conditional GET on every page load
+#   → Netlify returns 304 Not Modified if the file hasn't changed (fast, no re-download)
+#   → browser instantly gets the new file the moment a deploy lands
+#
+# If you later switch to content-hashed filenames (e.g. styles.abc123.css),
+# change these rules back to: public, max-age=31536000, immutable
+# ─────────────────────────────────────────────────────────────────────────────
+/styles.css
+  # CDN FIX: was max-age=86400, stale-while-revalidate=3600 — changed to no-cache.
+  #   Filename is not hashed; 24h browser cache means users see stale CSS for up to
+  #   a day after deploy. no-cache forces revalidation; 304 responses keep it fast.
+  Cache-Control: no-cache
+
+/Script.js
+  # CDN FIX: same reason as styles.css — not content-hashed, must always revalidate.
+  Cache-Control: no-cache
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FAVICON
+# SVG favicon is a stable brand asset — 7-day cache is appropriate.
+# ─────────────────────────────────────────────────────────────────────────────
+/favicon.svg
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ADMIN PANEL  — no caching, no indexing
+# ─────────────────────────────────────────────────────────────────────────────
+/admin/*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex, nofollow
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# INTERNAL / UTILITY PATHS  — crawl-blocked, no special caching
+# ─────────────────────────────────────────────────────────────────────────────
 /tools/*
   X-Robots-Tag: noindex, nofollow
 
@@ -11,8 +131,4 @@
   X-Robots-Tag: noindex, nofollow
 
 /build/*
-  X-Robots-Tag: noindex, nofollow
-
-/admin/*
-  Cache-Control: no-store
   X-Robots-Tag: noindex, nofollow

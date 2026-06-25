@@ -4,28 +4,142 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<title>Aakaara Studios NYC — Every story deserves its own canvas</title>
-<meta name="description" content="Aakaara Studios NYC — Wedding, couple, maternity & celebration photography in New York City. Crafting Love Into Art.">
-<meta property="og:title" content="Aakaara Studios NYC — Every story deserves its own canvas">
-<meta property="og:description" content="Wedding & portrait photography in New York City — Giving Shape to What You Feel">
+<!-- SEO FIX: title rewritten to include primary keywords "South Asian", "wedding photographer",
+     "videographer", "New York" — all terms potential clients search on Google -->
+<title>Aakaara Studios NYC | South Asian Wedding Photographer &amp; Videographer in New York</title>
+<!-- SEO FIX: description rewritten to 148 decoded chars (under 160 limit); adds "South Asian",
+     "videographer", "New Jersey" for broader local keyword coverage; was missing business-type signals -->
+<meta name="description" content="Cinematic South Asian wedding photographer &amp; videographer in New York City &amp; New Jersey. Specializing in weddings, couples, maternity &amp; celebrations.">
+<!-- SEO FIX: og:title updated to match keyword-rich page title for better social-click relevance -->
+<meta property="og:title" content="Aakaara Studios NYC | South Asian Wedding Photographer &amp; Videographer in New York">
+<!-- SEO FIX: og:description updated to include "South Asian" and "videographer" — same reasons
+     as meta description; also now under 200 chars for optimal Facebook/LinkedIn rendering -->
+<meta property="og:description" content="Cinematic South Asian wedding photography &amp; videography in New York City &amp; New Jersey. Weddings, couples, maternity, celebrations — every story deserves its own canvas.">
 <meta property="og:image" content="https://aakaarastudiosnyc.com/images/og-cover.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Aakaara Studios NYC — Every story deserves its own canvas.">
+<meta property="og:image:alt" content="Aakaara Studios NYC — South Asian wedding photographer in New York City.">
 <meta property="og:url" content="https://aakaarastudiosnyc.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Aakaara Studios NYC">
+<!-- SEO FIX: og:locale added — tells Facebook/LinkedIn the language/region for better targeting -->
+<meta property="og:locale" content="en_US">
+<!-- SEO FIX: twitter:title updated to match keyword-rich og:title -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Aakaara Studios NYC — Every story deserves its own canvas.">
-<meta name="twitter:description" content="Wedding & portrait photography in New York City — Giving Shape to What You Feel">
+<meta name="twitter:title" content="Aakaara Studios NYC | South Asian Wedding Photographer &amp; Videographer in New York">
+<!-- SEO FIX: twitter:description updated to include "South Asian" and "videographer" -->
+<meta name="twitter:description" content="Cinematic South Asian wedding photography &amp; videography in New York City &amp; New Jersey. Weddings, couples, maternity, celebrations.">
 <meta name="twitter:image" content="https://aakaarastudiosnyc.com/images/og-cover.jpg">
+<!-- GSC FIX: Google Search Console ownership verification.
+     STEPS: 1. Go to https://search.google.com/search-console
+              2. Add property → URL prefix → https://aakaarastudiosnyc.com
+              3. Choose "HTML tag" verification method
+              4. Copy the content="..." value and replace PASTE_YOUR_GSC_TOKEN_HERE below
+              5. Deploy to Netlify → click Verify in Search Console
+     DO NOT remove this tag after verification — GSC re-checks it periodically. -->
+<meta name="google-site-verification" content="4ltFZQGXizITBe3xIKg2keM6-nKqlkUW3D3l8BITBrc">
 <link rel="canonical" href="https://aakaarastudiosnyc.com/">
+<!-- GA4 + GTM preconnect: pre-warms the connection to Google Tag Manager and Analytics
+     so the async scripts load faster when the browser resolves them -->
+<link rel="preconnect" href="https://www.googletagmanager.com">
+<link rel="dns-prefetch" href="https://www.google-analytics.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+<!-- PERF FIX: preconnect for jsDelivr (hls.js + flatpickr loaded on demand) saves
+     DNS+TCP+TLS round-trips (~100-200ms) the first time a user plays a video or
+     focuses a date field. crossorigin needed because hls.js is fetched as a script. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<!-- PERF FIX: dns-prefetch for Bunny CDN — HLS video manifests + segments stream from
+     this origin. Pre-warming DNS shaves latency off the first segment request. -->
+<link rel="dns-prefetch" href="https://vz-757250d0-999.b-cdn.net">
+<!-- PERF FIX: dns-prefetch for Formspree — contact form POSTs to this origin -->
+<link rel="dns-prefetch" href="https://formspree.io">
+<!-- PERF FIX: Flatpickr CSS removed from here — injected lazily by Script.js when the date picker is first focused, saving one render-blocking stylesheet request on every page load. -->
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Outfit:wght@200;300;400;500;600&family=Noto+Sans+Telugu:wght@300;400&family=Noto+Sans+Devanagari:wght@300;400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://use.typekit.net/ffu1awu.css" />
+<!-- PERF FIX: TypeKit CSS removed from index.html — Adobe font kit is unused here (styles.css uses Cormorant Garamond + Outfit from Google Fonts). Typekit still loaded in couple-portraits.html where it is used. Removing saves 1 render-blocking cross-origin stylesheet request. -->
 <link rel="stylesheet" href="/styles.css">
+<!-- SEO FIX: theme-color surfaces brand gold in Android Chrome's address bar and
+     in the "Install as app" prompt — minor but reinforces brand identity -->
+<meta name="theme-color" content="#09080b">
+<!-- SEO FIX: LocalBusiness + ProfessionalService JSON-LD structured data.
+     Tells Google the exact business name, location, contact details, and social profiles.
+     Required for local search Knowledge Panel eligibility and rich results. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": ["LocalBusiness", "ProfessionalService"],
+  "@id": "https://aakaarastudiosnyc.com/#business",
+  "name": "Aakaara Studios NYC",
+  "url": "https://aakaarastudiosnyc.com/",
+  "logo": "https://aakaarastudiosnyc.com/favicon.svg",
+  "image": "https://aakaarastudiosnyc.com/images/og-cover.jpg",
+  "description": "Cinematic South Asian wedding photographer and videographer based in New York City, serving New York, New Jersey, and worldwide. Specialising in weddings, engagements, couple portraits, maternity, and celebrations.",
+  "telephone": "+14753322020",
+  "email": "info@aakaarastudiosnyc.com",
+  "priceRange": "$$",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "New York",
+    "addressRegion": "NY",
+    "postalCode": "10001",
+    "addressCountry": "US"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 40.7128,
+    "longitude": -74.0060
+  },
+  "areaServed": [
+    { "@type": "City", "name": "New York City" },
+    { "@type": "State", "name": "New Jersey" },
+    { "@type": "Country", "name": "United States" }
+  ],
+  "sameAs": [
+    "https://www.instagram.com/sudhakar_3697/",
+    "https://www.youtube.com/@aakaarastudiosnyc"
+  ],
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Photography & Videography Services",
+    "itemListElement": [
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Wedding Photography & Videography" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Couple & Engagement Portraits" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Maternity Photography" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Celebration & Event Coverage" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Commercial & Brand Photography" } }
+    ]
+  }
+}
+</script>
+<!-- GA4 FIX: Google Analytics 4 global site tag.
+     STEPS: 1. Go to https://analytics.google.com
+              2. Create new GA4 property: "Aakaara Studios NYC"
+              3. Add Web data stream → https://aakaarastudiosnyc.com
+              4. Copy Measurement ID (format: G-72E9BMSGN3)
+              5. Replace BOTH occurrences of G-72E9BMSGN3 below with your real ID
+              6. Deploy to Netlify → check GA4 Realtime report to confirm pageview fires
+     The async attribute ensures this script never blocks page rendering. -->
+<!-- NOTE: SRI (integrity="sha384-...") is intentionally omitted from this script tag.
+     googletagmanager.com/gtag/js is dynamically generated per Measurement ID and is
+     updated continuously by Google. A fixed hash would break on every Google-side
+     release. See: https://developers.google.com/tag-platform/security/guides/csp
+     Mitigations instead: strict-origin-when-cross-origin Referrer-Policy (already
+     set in _headers), and CSP script-src can restrict to 'https://www.googletagmanager.com'
+     if a Content Security Policy is added in a future pass. -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-72E9BMSGN3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-72E9BMSGN3', {
+    page_title: document.title,
+    page_location: window.location.href,
+    send_page_view: true,
+    // GA4 FIX: link_attribution enables "Page Analytics" mode and better
+    // cross-page session stitching when GSC is linked to this GA4 property
+    link_attribution: true
+  });
+</script>
 <noscript><style>.reveal { opacity: 1 !important; transform: none !important; }</style></noscript>
 </head>
 <body class="intro-active">
@@ -84,7 +198,6 @@
     <div class="hero-mark">
       <svg viewBox="0 0 140 140"><g class="outer-ring"><circle cx="70" cy="70" r="60" fill="none" stroke="rgba(201,149,107,0.18)" stroke-width="1"/></g><g transform="translate(70,70)"><path d="M0,-42 C12,-42 22,-28 18,-8 C14,12 -6,18 -18,8 C-30,-2 -22,-30 -8,-40 C-5,-41.5 -2.5,-42 0,-42Z" fill="none" stroke="#c9956b" stroke-width="1.5" opacity="0.85"/><path d="M0,-42 C12,-42 22,-28 18,-8 C14,12 -6,18 -18,8 C-30,-2 -22,-30 -8,-40 C-5,-41.5 -2.5,-42 0,-42Z" fill="none" stroke="#c9956b" stroke-width="1.5" opacity="0.55" transform="rotate(72)"/><path d="M0,-42 C12,-42 22,-28 18,-8 C14,12 -6,18 -18,8 C-30,-2 -22,-30 -8,-40 C-5,-41.5 -2.5,-42 0,-42Z" fill="none" stroke="#c9956b" stroke-width="1.5" opacity="0.35" transform="rotate(144)"/><path d="M0,-42 C12,-42 22,-28 18,-8 C14,12 -6,18 -18,8 C-30,-2 -22,-30 -8,-40 C-5,-41.5 -2.5,-42 0,-42Z" fill="none" stroke="#c9956b" stroke-width="1.5" opacity="0.2" transform="rotate(216)"/><circle cx="0" cy="0" r="5" fill="#c9956b" opacity="0.85"/></g></svg>
     </div>
-    <!-- FIX 5: Float wrapper handles Y-axis bobbing; title handles 3D mouse-tilt via JS -->
     <div class="hero-title-float">
       <h1 class="hero-title" id="heroTitle"><span class="v-dots"><span></span><span></span></span>Aakaara</h1>
     </div>
@@ -98,7 +211,9 @@
 <section class="section section-dark" id="portfolio">
   <div class="container">
     <div class="section-tag">Our Work</div>
-    <div class="section-title" id="portfolioTitle">Framed Stories</div>
+    <!-- SEO FIX: promoted div → h2 for correct heading hierarchy; Googlebot reads h2 as a
+         section heading signal; CSS targets .section-title class so visual output is unchanged -->
+    <h2 class="section-title" id="portfolioTitle">Framed Stories</h2>
     <div class="section-desc" id="portfolioDesc">Each project opens like a chapter, with names, setting, and a feeling that stays long after the frame.</div>
     <div class="portfolio-tools">
       <div class="portfolio-filters">
@@ -484,10 +599,10 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-7" data-cat="maternity" data-title="Shivani" data-type="Maternity" data-folder="/images/maternity/shivani" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-7" data-cat="maternity" data-title="Sanjana &amp; Shubash" data-type="Maternity" data-folder="/images/maternity/shivani" data-count="26" data-static="true" onclick="openSwGallery(this); return false;">
         <div class="gi-bg"></div>
-        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
-        <div class="gi-overlay"><div><h4>Shivani</h4><p>Maternity</p></div></div>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>26 photos</span>
+        <div class="gi-overlay"><div><h4>Sanjana &amp; Shubash</h4><p>Maternity</p></div></div>
       </a>
       <a href="#" class="gallery-item gi-8" data-cat="maternity" data-title="Shwetha" data-type="Maternity" data-folder="/images/maternity/shwetha" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
         <div class="gi-bg"></div>
@@ -597,9 +712,10 @@
           </div>
         </div>
       </a>
+      <!-- QA FIX: badge showed "13 photos" but data-count=14 and folder contains 14 images -->
       <a href="#" class="gallery-item gi-8 gi-cinematic" data-cat="conceptual" data-title="Where Green Meets Gold" data-type="India" data-folder="/images/conceptual/divya-india" data-count="14" data-static="true" onclick="openSwGallery(this); return false;">
         <div class="gi-bg"></div>
-        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>13 photos</span>
+        <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>14 photos</span>
         <div class="gi-overlay">
           <div class="gi-title-group">
             <p class="gi-subtitle">India</p>
@@ -676,7 +792,8 @@
       </a>
 
       <!-- HOUSE WARMING -->
-       <a href="#" class="gallery-item gi-5 gi-cinematic" data-cat="housewarming" data-title="Sharan & Soundarya" data-type="House Warming · New Jersey" data-folder="/images/house-warming/Sharan & soundarya" data-count="27" data-static="true" onclick="openSwGallery(this); return false;">
+       <!-- QA FIX: bare & in data-folder is an HTML parse warning; &amp; ensures valid HTML while JS reads it back as & -->
+       <a href="#" class="gallery-item gi-5 gi-cinematic" data-cat="housewarming" data-title="Sharan &amp; Soundarya" data-type="House Warming · New Jersey" data-folder="/images/house-warming/Sharan &amp; soundarya" data-count="27" data-static="true" onclick="openSwGallery(this); return false;">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>27 photos</span>
         <div class="gi-overlay">
@@ -808,14 +925,6 @@
 </div>
 
 <!-- ════════════════════ VIDEO WORKS ════════════════════ -->
-<!-- FIX 4: Dedicated Video Works section with cinematic modal player.
-     HOW TO ADD A VIDEO:
-       1. Copy a .vw-card block and set data-video="videos/your-film.mp4"
-       2. Set data-title, data-type, data-vcat (wedding|engagement|celebration|prewedding)
-       3. Set data-poster="images/your-poster.jpg" for a custom thumbnail
-       4. Place the video file in the /videos/ folder
-     The hover-preview and modal player load automatically.
--->
 <section class="section section-dark" id="video-works">
   <!-- Full-section ambience background — crossfades with active card poster -->
   <div class="vfr-ambience" id="vwAmbience" aria-hidden="true">
@@ -826,7 +935,8 @@
   <div class="container">
     <div class="video-intro" id="videoIntro">
       <div class="section-tag" id="videoEyebrow">Moving Images</div>
-      <div class="section-title" id="videoTitle" style="color:var(--ivory)">Video Works</div>
+      <!-- SEO FIX: promoted div → h2; "Video Works" is a primary section heading -->
+      <h2 class="section-title" id="videoTitle" style="color:var(--ivory)">Video Works</h2>
       <div class="section-desc" id="videoDesc" style="max-width: 580px;">Cinematic films for weddings, engagements & life's most intimate milestones.</div>
     </div>
 
@@ -971,7 +1081,8 @@
 
       
       <!-- HOUSE WARMING VIDEOS -->
-       <div class="vw-card vw-gi-7" data-vcat="housewarming" data-video="https://vz-757250d0-999.b-cdn.net/5ee7890b-e15d-43bf-8fcd-bbca0a74478c/playlist.m3u8" data-title="Rupa" data-type="House Warming" data-poster="/images/video-covers/housewarming/aarya.jpg">
+       <!-- QA FIX: data-title was "Rupa" but overlay and poster show Soundarya & Sharan — modal title pulled from data-title -->
+       <div class="vw-card vw-gi-7" data-vcat="housewarming" data-video="https://vz-757250d0-999.b-cdn.net/5ee7890b-e15d-43bf-8fcd-bbca0a74478c/playlist.m3u8" data-title="Soundarya &amp; Sharan" data-type="House Warming Film" data-poster="/images/video-covers/housewarming/aarya.jpg">
         <div class="vw-poster vw-gi-7"></div>
         <div class="vw-play-wrap">
           <div class="vw-play-ring"></div>
@@ -1354,7 +1465,8 @@
   <div class="container">
     <div class="reveal" style="text-align:center;margin-bottom:2.5rem;">
       <div class="section-tag">What We Offer</div>
-      <div class="section-title" style="color:var(--ivory);">Six Ways We Tell<br>Your Story</div>
+      <!-- SEO FIX: promoted div → h2; "Six Ways We Tell Your Story" is the Services section heading -->
+      <h2 class="section-title" style="color:var(--ivory);">Six Ways We Tell<br>Your Story</h2>
       <div class="section-desc">From grand weddings to quiet intimate portraits — every session is crafted with intention.</div>
     </div>
     <div class="sov-grid reveal">

@@ -77,7 +77,20 @@ function ensureHlsLibrary() {
   return loadScriptOnce('https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js', 'Hls');
 }
 
+// PERF FIX: lazy-inject a <link rel="stylesheet"> once; subsequent calls are no-ops
+function loadCssOnce(href) {
+  if (document.querySelector(`link[href="${href}"]`)) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = href;
+  document.head.appendChild(link);
+}
+
 function ensureFlatpickrLibrary() {
+  // PERF FIX: Flatpickr CSS injected here (lazily on first date-field focus) instead of
+  // blocking the initial render via a <link> in <head>. Saves one cross-origin stylesheet
+  // request on every page load for users who never touch the contact form date pickers.
+  loadCssOnce('https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css');
   return loadScriptOnce('https://cdn.jsdelivr.net/npm/flatpickr', 'flatpickr');
 }
 // ═══════ CINEMATIC INTRO ANIMATION ═══════
@@ -327,22 +340,41 @@ function ensureFlatpickrLibrary() {
 (function() {
   const navToggle = document.querySelector('.nav-toggle');
   const navLinks = document.getElementById('navLinks');
+  const nav = document.getElementById('navbar');
 
-  if (navToggle && navLinks) {
-    navToggle.addEventListener('click', () => {
-      const isOpen = navLinks.classList.toggle('show');
-      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-    });
+  if (!navToggle || !navLinks) return;
 
-    // Good practice: close menu when a link is clicked on mobile
-    navLinks.addEventListener('click', (e) => {
-      // Check if the clicked element is a link inside the nav
-      if (e.target.tagName === 'A' && navLinks.classList.contains('show')) {
-        navLinks.classList.remove('show');
-        navToggle.setAttribute('aria-expanded', 'false');
-      }
-    });
+  function closeMenu() {
+    navLinks.classList.remove('show');
+    navToggle.setAttribute('aria-expanded', 'false');
   }
+
+  navToggle.addEventListener('click', () => {
+    const isOpen = navLinks.classList.toggle('show');
+    navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+
+  // Close menu when a nav link is tapped on mobile
+  navLinks.addEventListener('click', (e) => {
+    if (e.target.tagName === 'A' && navLinks.classList.contains('show')) {
+      closeMenu();
+    }
+  });
+
+  // MOBILE FIX: close menu when tapping anywhere outside the nav bar
+  document.addEventListener('click', (e) => {
+    if (navLinks.classList.contains('show') && nav && !nav.contains(e.target)) {
+      closeMenu();
+    }
+  }, { passive: true });
+
+  // MOBILE FIX: close menu on Escape key for keyboard/switch-access users
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && navLinks.classList.contains('show')) {
+      closeMenu();
+      navToggle.focus();
+    }
+  });
 })();
 
 
@@ -383,6 +415,13 @@ function ensureFlatpickrLibrary() {
   window.addEventListener('resize', updateHeroSpacing, { passive: true });
 })();
 
+// QA FIX: auto-assign aria-label to gallery items missing one for screen-reader accessibility
+document.querySelectorAll('.gallery-item:not([aria-label])').forEach(function(item) {
+  var title = item.dataset.title || '';
+  var type  = item.dataset.type  || '';
+  if (title) item.setAttribute('aria-label', type ? type + ': ' + title : title);
+});
+
 // ═══════ REVEAL ON SCROLL ═══════
 const revealObs = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
@@ -399,6 +438,16 @@ function filterGallery(cat, btn) {
   if (noResults) noResults.style.display = 'none';
   document.querySelectorAll('.portfolio-filters button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+
+  // GA4 FIX: track which portfolio categories users navigate to most.
+  // Reveals which service types drive the most browsing intent.
+  if (typeof gtag === 'function') {
+    gtag('event', 'portfolio_filter', {
+      event_category: 'Navigation',
+      event_label: btn.textContent.trim(),
+      filter_value: cat
+    });
+  }
 
   // Disable gallery-item transitions so category switch feels instant
   const allItems = document.querySelectorAll('.gallery-item');
@@ -802,7 +851,18 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     swIndex = 0;
     galleryTitle.textContent = work.dataset.title || '';
     gallerySubtitle.textContent = work.dataset.type || '';
-    
+
+    // GA4 FIX: fire gallery_open event — tracks which collections get the most interest.
+    // cat maps to the portfolio filter category (wedding, couple, maternity, etc.)
+    if (typeof gtag === 'function') {
+      gtag('event', 'gallery_open', {
+        event_category: 'Gallery',
+        event_label: work.dataset.title || 'Unknown',
+        gallery_type: work.dataset.cat || 'Unknown',
+        is_coming_soon: (work.dataset.comingSoon === 'true')
+      });
+    }
+
     gallery.classList.add('sw-open', 'sw-gallery-enter');
     if (isStatic) gallery.classList.add('sw-static');
     
@@ -1090,6 +1150,9 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
 (function () {
   var wrapper    = document.querySelector('.cs-wrapper');
   if (!wrapper) return;
+  // QA FIX: skip HLS init and scroll handlers when services section is hidden (display:none)
+  var servicesSection = document.getElementById('services');
+  if (servicesSection && window.getComputedStyle(servicesSection).display === 'none') return;
 
   var panels     = Array.from(document.querySelectorAll('.cs-panel'));
   var PANEL_COUNT = panels.length;
@@ -1443,6 +1506,17 @@ function filterVideos(cat, btn) {
   document.querySelectorAll('.vw-filters button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 
+  // GA4 FIX: track video section filter navigation alongside portfolio_filter.
+  // Same event name so both filter types appear together in GA4 reports.
+  if (typeof gtag === 'function') {
+    gtag('event', 'portfolio_filter', {
+      event_category: 'Navigation',
+      event_label: btn.textContent.trim(),
+      filter_value: cat,
+      filter_section: 'video'
+    });
+  }
+
   // Disable transitions so category switch feels instant
   const allCards = document.querySelectorAll('.vw-card');
   allCards.forEach(c => { c.style.transition = 'none'; });
@@ -1748,6 +1822,18 @@ function filterVideos(cat, btn) {
     modalLastFocusedEl = document.activeElement instanceof HTMLElement ? document.activeElement : card;
     vmTitle.textContent = card.dataset.title || '';
     vmSub.textContent   = card.dataset.type  || '';
+
+    // GA4 FIX: fire video_play event — marks this as an engagement conversion in GA4.
+    // video_type matches the card badge (Wedding Film, Pre-Wedding Film, etc.)
+    if (typeof gtag === 'function') {
+      gtag('event', 'video_play', {
+        event_category: 'Video',
+        event_label: card.dataset.title || 'Unknown',
+        video_type: card.dataset.type  || 'Unknown',
+        video_category: card.dataset.vcat || 'Unknown'
+      });
+    }
+
     modalScrollY = window.scrollY || window.pageYOffset || 0;
     vmVideo.muted = true;
     vmVideo.volume = 1;
@@ -2119,6 +2205,18 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
       if (response.ok) {
         form.reset();
+        // GA4 FIX: fire contact_form_submit — this is the PRIMARY CONVERSION event.
+        // Mark this as a Conversion in GA4: Admin → Events → contact_form_submit → toggle Conversion.
+        // value:1 lets you sum conversions in reports; event_type captures the selected service.
+        if (typeof gtag === 'function') {
+          const eventTypeEl = document.getElementById('contactEventType');
+          gtag('event', 'contact_form_submit', {
+            event_category: 'Lead',
+            event_label: 'Contact Form',
+            event_type: eventTypeEl ? eventTypeEl.value : 'Unknown',
+            value: 1
+          });
+        }
         window.location.href = 'thank-you.html';
       } else {
         const responseData = await response.json();
@@ -3412,4 +3510,32 @@ let portfolioCarousel, videoCarousel;
     });
   }, { threshold: 0.3 });
   nameObserver.observe(aboutNameWrapper);
+})();
+
+// ═══════ GA4 — SERVICES SECTION VIEWED ═══════
+// GA4 FIX: fires once when #services-overview scrolls into view (50% visible).
+// Signals high-intent browsing — users who reach pricing/services are more likely
+// to enquire. Use this in GA4 to build a retargeting audience:
+//   Admin → Audiences → "Viewed Services, No Form Submit"
+//   Condition: services_viewed AND NOT contact_form_submit
+(function() {
+  const servicesSection = document.getElementById('services-overview');
+  if (!servicesSection || typeof IntersectionObserver === 'undefined') return;
+
+  const servicesObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        if (typeof gtag === 'function') {
+          gtag('event', 'services_viewed', {
+            event_category: 'Engagement',
+            event_label: 'Services Overview Section',
+            value: 1
+          });
+        }
+        servicesObserver.unobserve(entry.target); // fire once per session
+      }
+    });
+  }, { threshold: 0.5 });
+
+  servicesObserver.observe(servicesSection);
 })();
