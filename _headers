@@ -46,6 +46,17 @@
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# FONTS  (/fonts/*)
+#
+# Self-hosted font files are content-addressed by filename and never mutated
+# in-place — a new font version gets a new filename. 1-year + immutable is
+# safe and eliminates revalidation overhead on repeat visits.
+# ─────────────────────────────────────────────────────────────────────────────
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # LOCAL MP4 VIDEOS  (/videos/*)
 #
 # Static MP4 files (prewedding/abhinav-megha.mp4 etc.) stored in the repo and
