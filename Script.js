@@ -668,8 +668,8 @@ const portfolioNarrativeLibrary = {
     story: 'Grace, anticipation, and the softness of a new chapter beginning.'
   },
   '/images/brand-collabs/mrga': {
-    scene: 'Editorial Brand Story',
-    story: 'Product, texture, and identity brought together with cinematic restraint.'
+    scene: 'Editorial Brand Story — The Met Museum, NYC',
+    story: 'Heritage woven with intention — photographed where the world keeps its most enduring art.'
   },
   '/images/house-warming/Sharan & soundarya': {
     story: 'Threshold rituals, gathered voices, and warmth settling into every room.'
