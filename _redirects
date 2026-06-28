@@ -1,4 +1,5 @@
 /the-experience.html   /couple-portraits.html   301
 /admin/*              /admin/:splat            200
 /tools/*              /tools/:splat            200
+/films/:slug          /films/watch.html?v=:slug  200
 /*                    /404.html                404
