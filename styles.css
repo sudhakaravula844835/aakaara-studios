@@ -3650,17 +3650,6 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 }
 .video-modal.vm-open .vm-player { transform: translateY(0) scale(1); }
 
-/* ── CINEMATIC IRIS TRANSITION ───────────────────────────────────────────────
-   Expands from the clicked card's centre like a camera aperture opening.
-   Sits above the modal (z 10010 > modal z 10002) so it covers the page
-   while the modal assembles beneath, then fades out to reveal it.          */
-#irisOverlay {
-  position: fixed; inset: 0; z-index: 10010;
-  background: #09080b;
-  clip-path: circle(0% at 50% 50%);
-  pointer-events: none;
-  will-change: clip-path, opacity;
-}
 /* MOBILE FIX: added flex-wrap so title + close button don't overflow at 375px;
    min-width:0 on vm-title lets flexbox shrink the title instead of overflowing */
 .vm-header {
