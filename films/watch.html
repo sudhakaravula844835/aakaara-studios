@@ -178,15 +178,43 @@ body::after {
 }
 .progress-rail {
   width: 100%; height: 2px;
-  background: rgba(250,246,241,0.12); border-radius: 2px;
+  background: rgba(250,246,241,0.1); border-radius: 2px;
   position: relative; transition: height 0.15s;
 }
 .progress-track:hover .progress-rail { height: 3px; }
+
+/* buffered ghost — shows how much has loaded */
+.progress-buffered {
+  position: absolute; top: 0; left: 0;
+  height: 100%; width: 0%;
+  background: rgba(250,246,241,0.18); border-radius: 2px;
+  pointer-events: none;
+}
+
+/* fill — gradient gold, glows on hover */
 .progress-fill {
   position: absolute; top: 0; left: 0;
   height: 100%; width: 0%;
-  background: var(--rose); border-radius: 2px;
+  background: linear-gradient(to right, #c9956b, #dba876);
+  border-radius: 2px; pointer-events: none;
+  transition: box-shadow 0.25s;
+}
+.progress-track:hover .progress-fill {
+  box-shadow: 0 0 6px rgba(201,149,107,0.5), 0 0 2px rgba(201,149,107,0.7);
+}
+
+/* playhead thumb — hidden until hover, then glows into view */
+.progress-thumb {
+  position: absolute; top: 50%; left: 0%;
+  width: 11px; height: 11px; border-radius: 50%;
+  background: #f0c896;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s;
   pointer-events: none;
+}
+.progress-track:hover .progress-thumb {
+  transform: translate(-50%, -50%) scale(1);
+  box-shadow: 0 0 0 3px rgba(201,149,107,0.18), 0 0 12px rgba(201,149,107,0.65);
 }
 
 .time-display {
@@ -472,7 +500,11 @@ if (!film) {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           </button>
           <div class="progress-track" id="progressTrack" role="slider" aria-label="Video progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-            <div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
+            <div class="progress-rail">
+              <div class="progress-buffered" id="progressBuffered"></div>
+              <div class="progress-fill" id="progressFill"></div>
+              <div class="progress-thumb" id="progressThumb"></div>
+            </div>
           </div>
           <div class="time-display" id="timeDisplay">0:00</div>
           <button class="ctrl-btn" id="muteBtn" aria-label="Toggle mute">
@@ -511,8 +543,10 @@ if (!film) {
   const muteBtn = document.getElementById('muteBtn');
   const fsBtn   = document.getElementById('fsBtn');
   const track   = document.getElementById('progressTrack');
-  const fill    = document.getElementById('progressFill');
-  const timeEl  = document.getElementById('timeDisplay');
+  const fill     = document.getElementById('progressFill');
+  const buffered = document.getElementById('progressBuffered');
+  const thumb    = document.getElementById('progressThumb');
+  const timeEl   = document.getElementById('timeDisplay');
 
   let started = false;
 
@@ -594,12 +628,27 @@ if (!film) {
   vid.addEventListener('play',  syncPlay);
   vid.addEventListener('pause', syncPlay);
 
+  function updateBuffered() {
+    if (!vid.buffered || !vid.duration) return;
+    let end = 0;
+    for (let i = 0; i < vid.buffered.length; i++) {
+      if (vid.buffered.start(i) <= vid.currentTime + 0.5) {
+        end = Math.max(end, vid.buffered.end(i));
+      }
+    }
+    buffered.style.width = `${(end / vid.duration) * 100}%`;
+  }
+
+  vid.addEventListener('progress', updateBuffered);
+
   vid.addEventListener('timeupdate', () => {
     if (!vid.duration) return;
     const pct = vid.currentTime / vid.duration;
-    fill.style.width = `${pct * 100}%`;
+    fill.style.width   = `${pct * 100}%`;
+    thumb.style.left   = `${pct * 100}%`;
     timeEl.textContent = fmt(vid.currentTime);
     track.setAttribute('aria-valuenow', Math.round(pct * 100));
+    updateBuffered();
   });
 
   // keyboard: Space/K play, ←/→ skip 5s, M mute, F fullscreen
