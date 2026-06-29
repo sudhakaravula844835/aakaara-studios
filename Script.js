@@ -2069,7 +2069,43 @@ function filterVideos(cat, btn) {
 
   document.addEventListener('keydown', handleModalKeydown);
 
-  document.querySelectorAll('.vw-card').forEach(c => c.addEventListener('click', () => openModal(c)));
+  const irisEl = document.getElementById('irisOverlay');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll('.vw-card').forEach(c => c.addEventListener('click', () => {
+    if (!irisEl || reducedMotion) { openModal(c); return; }
+
+    const rect = c.getBoundingClientRect();
+    const ox = (rect.left + rect.width  / 2).toFixed(1);
+    const oy = (rect.top  + rect.height / 2).toFixed(1);
+
+    // 1. Reset iris to collapsed at click origin
+    irisEl.style.transition = 'none';
+    irisEl.style.opacity    = '1';
+    irisEl.style.clipPath   = `circle(0% at ${ox}px ${oy}px)`;
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      // 2. Iris expands from card centre → covers screen (440ms)
+      irisEl.style.transition = 'clip-path 0.44s cubic-bezier(0.4, 0, 0.15, 1)';
+      irisEl.style.clipPath   = `circle(150% at ${ox}px ${oy}px)`;
+
+      // 3. At ~50% expansion the screen is dark — open modal behind the iris
+      setTimeout(() => openModal(c), 220);
+
+      // 4. After full expansion, fade iris out to reveal the waiting modal
+      setTimeout(() => {
+        irisEl.style.transition = 'opacity 0.38s ease';
+        irisEl.style.opacity    = '0';
+
+        // 5. Reset collapsed for next click
+        setTimeout(() => {
+          irisEl.style.transition = 'none';
+          irisEl.style.clipPath   = 'circle(0% at 50% 50%)';
+          irisEl.style.opacity    = '1';
+        }, 400);
+      }, 450);
+    }));
+  }));
   vmClose.addEventListener('click', closeModal);
   vmBg.addEventListener('click', closeModal);
 })();
