@@ -23,16 +23,15 @@
 <link rel="preconnect" href="https://videos.aakaarastudiosnyc.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --noir:    #09080b;
-  --umber:   #1e1a16;
-  --rose:    #c9956b;
-  --ivory:   #faf6f1;
+  --noir:         #09080b;
+  --rose:         #c9956b;
+  --ivory:        #faf6f1;
   --font-display: 'Cormorant Garamond', Georgia, serif;
   --font-body:    'Outfit', 'Helvetica Neue', sans-serif;
-  --ease:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease:         cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 html, body {
@@ -44,304 +43,281 @@ html, body {
   overflow-x: hidden;
 }
 
-/* ── GRAIN ── */
+/* ─── grain ─────────────────────────────────────────────────── */
 body::after {
   content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 999;
-  opacity: 0.028;
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 500;
+  opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 180px 180px;
 }
 
-/* ── NAV ── */
+/* ─── ambient bloom ──────────────────────────────────────────
+   The film's poster, blurred to nothing, becomes the room it
+   plays in. Mounika's forest greens breathe differently from
+   a warm Diwali hall or a pastel gender reveal. Pure black is
+   a neutral; this is the film's own atmosphere.               */
+.film-ambient {
+  position: fixed; inset: -25%;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(140px) saturate(0.6) brightness(0.15);
+  opacity: 0;
+  transition: opacity 3.2s ease;
+  pointer-events: none;
+  will-change: opacity;
+}
+.film-ambient.visible { opacity: 1; }
+
+/* ─── nav ────────────────────────────────────────────────── */
 .film-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
   padding: 1.25rem 2rem;
   background: linear-gradient(to bottom, rgba(9,8,11,0.88) 0%, transparent 100%);
 }
 
 .film-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  text-decoration: none;
-  color: var(--ivory);
+  display: flex; align-items: center; gap: 0.65rem;
+  text-decoration: none; color: var(--ivory);
 }
-
 .film-logo svg { width: 34px; height: 34px; flex-shrink: 0; }
-
 .film-logo-text {
   font-family: var(--font-display);
-  font-size: 0.92rem;
-  font-weight: 300;
-  letter-spacing: 0.22em;
-  color: var(--ivory);
+  font-size: 0.92rem; font-weight: 300; letter-spacing: 0.22em;
 }
 
 .film-back {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 0.48rem;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: rgba(250,246,241,0.38);
-  text-decoration: none;
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.46rem; letter-spacing: 0.32em; text-transform: uppercase;
+  color: rgba(250,246,241,0.32); text-decoration: none;
   transition: color 0.3s;
 }
 .film-back:hover { color: var(--rose); }
-.film-back svg { opacity: 0.6; transition: opacity 0.3s; }
-.film-back:hover svg { opacity: 1; }
 
-/* ── MAIN ── */
+/* ─── main ───────────────────────────────────────────────── */
 .film-wrap {
+  position: relative; z-index: 1;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 5.5rem 1.5rem 3.5rem;
-  gap: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 5.5rem 2rem 3.5rem;
 }
 
-/* ── PLAYER ── */
-.player-shell {
-  width: 100%;
-  max-width: 980px;
-}
+/* ─── player ─────────────────────────────────────────────── */
+.player-shell { width: 100%; max-width: 980px; }
 
 .player-stage {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  background: #0c0a0e;
-  border-radius: 8px;
-  overflow: hidden;
+  position: relative; width: 100%; aspect-ratio: 16/9;
+  background: #0c0a0e; border-radius: 6px; overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 40px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(250,246,241,0.04);
+  box-shadow: 0 32px 72px rgba(0,0,0,0.6), 0 0 0 1px rgba(250,246,241,0.04);
 }
-
 .player-stage video {
-  width: 100%; height: 100%;
-  object-fit: contain;
-  display: block;
+  width: 100%; height: 100%; object-fit: contain; display: block;
 }
 
-/* poster */
 .player-poster {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
   background-color: #0c0a0e;
-  transition: opacity 0.7s var(--ease);
+  transition: opacity 0.8s var(--ease);
   z-index: 2;
 }
 .player-poster.gone { opacity: 0; pointer-events: none; }
 
-/* big play */
 .player-big-play {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 3;
+  position: absolute; inset: 0; z-index: 3;
+  display: flex; align-items: center; justify-content: center;
   transition: opacity 0.4s;
 }
 .player-big-play.gone { opacity: 0; pointer-events: none; }
 
 .play-ring {
-  width: 76px; height: 76px;
-  border-radius: 50%;
-  border: 1px solid rgba(201,149,107,0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(9,8,11,0.45);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: transform 0.35s var(--ease), border-color 0.35s, background 0.35s;
+  width: 74px; height: 74px; border-radius: 50%;
+  border: 1px solid rgba(201,149,107,0.5);
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(9,8,11,0.4);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.4s var(--ease), border-color 0.3s, background 0.3s;
 }
 .play-ring:hover {
   transform: scale(1.1);
   border-color: var(--rose);
-  background: rgba(201,149,107,0.14);
+  background: rgba(201,149,107,0.12);
 }
-.play-ring svg { margin-left: 4px; color: var(--ivory); }
+.play-ring svg { margin-left: 4px; }
 
-/* controls bar */
 .player-controls {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  z-index: 4;
-  padding: 2.5rem 1.2rem 1rem;
-  background: linear-gradient(to top, rgba(9,8,11,0.96) 0%, rgba(9,8,11,0.4) 60%, transparent 100%);
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  opacity: 0;
-  transition: opacity 0.35s;
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 4;
+  padding: 3rem 1.1rem 0.85rem;
+  background: linear-gradient(to top, rgba(9,8,11,0.95) 0%, rgba(9,8,11,0.3) 60%, transparent 100%);
+  display: flex; align-items: center; gap: 0.6rem;
+  opacity: 0; transition: opacity 0.3s;
 }
-
 .player-stage:hover .player-controls,
 .player-stage.is-paused .player-controls { opacity: 1; }
 
 .ctrl-btn {
-  background: none; border: none;
-  color: rgba(250,246,241,0.7);
-  cursor: pointer;
-  padding: 0.3rem;
+  background: none; border: none; color: rgba(250,246,241,0.65);
+  cursor: pointer; padding: 0.3rem;
   display: flex; align-items: center; justify-content: center;
   transition: color 0.2s;
-  min-width: 36px; min-height: 36px;
-  flex-shrink: 0;
+  min-width: 36px; min-height: 36px; flex-shrink: 0;
 }
 .ctrl-btn:hover { color: var(--rose); }
 
+/* progress: large click target, thin visible rail */
 .progress-track {
-  flex: 1;
-  height: 2px;
-  background: rgba(250,246,241,0.12);
-  border-radius: 2px;
+  flex: 1; height: 20px;
+  display: flex; align-items: center;
   cursor: pointer;
-  position: relative;
-  padding: 8px 0;
-  margin: -8px 0;
 }
+.progress-rail {
+  width: 100%; height: 2px;
+  background: rgba(250,246,241,0.12); border-radius: 2px;
+  position: relative; transition: height 0.15s;
+}
+.progress-track:hover .progress-rail { height: 3px; }
 .progress-fill {
-  height: 2px;
-  background: var(--rose);
-  border-radius: 2px;
-  width: 0%;
+  position: absolute; top: 0; left: 0;
+  height: 100%; width: 0%;
+  background: var(--rose); border-radius: 2px;
   pointer-events: none;
-  position: relative;
-  top: 0;
 }
-.progress-track:hover .progress-fill { height: 3px; margin-top: -0.5px; }
 
 .time-display {
-  font-size: 0.58rem;
-  color: rgba(250,246,241,0.42);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.05em;
-  min-width: 38px;
-  text-align: right;
-  flex-shrink: 0;
+  font-size: 0.57rem; color: rgba(250,246,241,0.38);
+  font-variant-numeric: tabular-nums; letter-spacing: 0.05em;
+  min-width: 36px; text-align: right; flex-shrink: 0;
 }
 
-/* ── INFO ── */
+/* ─── info row ───────────────────────────────────────────── */
 .film-info {
-  width: 100%;
-  max-width: 980px;
-  margin-top: 1.75rem;
-  padding: 0 0.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  width: 100%; max-width: 980px;
+  margin-top: 1.6rem;
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 2rem;
+}
+
+.film-info-text { flex: 1; min-width: 0; }
+
+/* staggered entry */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.a1 { animation: slideUp 0.6s var(--ease) 0.06s both; }
+.a2 { animation: slideUp 0.6s var(--ease) 0.15s both; }
+.a3 { animation: slideUp 0.6s var(--ease) 0.22s both; }
+.a4 { animation: slideUp 0.6s var(--ease) 0.3s  both; }
+.a5 { animation: slideUp 0.6s var(--ease) 0.36s both; }
+.a6 { animation: slideUp 0.6s var(--ease) 0.2s  both; }
+@media (prefers-reduced-motion: reduce) {
+  .a1,.a2,.a3,.a4,.a5,.a6 { animation: none; }
 }
 
 .film-category {
-  font-size: 0.46rem;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--rose);
-  margin-bottom: 0.1rem;
+  font-size: 0.44rem; letter-spacing: 0.36em; text-transform: uppercase;
+  color: var(--rose); margin-bottom: 0.2rem;
 }
-
 .film-title {
   font-family: var(--font-display);
   font-size: clamp(1.5rem, 3.5vw, 2.1rem);
-  font-weight: 300;
-  color: var(--ivory);
-  letter-spacing: 0.02em;
-  line-height: 1.15;
+  font-weight: 300; color: var(--ivory);
+  letter-spacing: 0.02em; line-height: 1.15;
 }
-
 .film-type {
-  font-size: 0.48rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: rgba(250,246,241,0.3);
+  font-size: 0.45rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: rgba(250,246,241,0.27); margin-top: 0.2rem;
 }
-
 .film-rule {
-  width: 36px;
-  height: 1px;
-  background: rgba(201,149,107,0.25);
-  margin: 0.9rem 0 0.7rem;
+  width: 30px; height: 1px;
+  background: rgba(201,149,107,0.2);
+  margin: 0.9rem 0 0.65rem;
 }
-
 .film-studio {
-  font-size: 0.44rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: rgba(250,246,241,0.18);
+  font-size: 0.41rem; letter-spacing: 0.28em; text-transform: uppercase;
+  color: rgba(250,246,241,0.15);
 }
 
-/* ── NOT FOUND ── */
+/* ─── CTA ────────────────────────────────────────────────── */
+.film-cta {
+  flex-shrink: 0;
+  display: flex; flex-direction: column;
+  align-items: flex-end; gap: 0.4rem;
+  padding-top: 0.12rem; /* align baseline with category label */
+}
+.film-cta-label {
+  font-size: 0.41rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: rgba(250,246,241,0.2);
+}
+.film-cta-link {
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  padding: 0.65rem 1.15rem;
+  border: 1px solid rgba(201,149,107,0.28);
+  color: var(--rose); text-decoration: none;
+  font-size: 0.45rem; letter-spacing: 0.26em; text-transform: uppercase;
+  white-space: nowrap;
+  transition: background 0.3s var(--ease), border-color 0.3s;
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+}
+.film-cta-link:hover {
+  background: rgba(201,149,107,0.08);
+  border-color: rgba(201,149,107,0.55);
+}
+.film-cta-link svg { transition: transform 0.3s var(--ease); flex-shrink: 0; }
+.film-cta-link:hover svg { transform: translateX(3px); }
+
+/* ─── not found ──────────────────────────────────────────── */
 .not-found {
-  text-align: center;
-  padding: 3rem 2rem;
-  max-width: 480px;
+  position: relative; z-index: 1;
+  text-align: center; padding: 3rem 2rem; max-width: 440px;
 }
 .not-found h2 {
   font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 300;
-  color: var(--ivory);
-  letter-spacing: 0.02em;
-  margin-bottom: 0.75rem;
+  font-size: 2rem; font-weight: 300; color: var(--ivory);
+  letter-spacing: 0.02em; margin-bottom: 0.75rem;
 }
 .not-found p {
-  font-size: 0.82rem;
-  color: rgba(250,246,241,0.38);
-  line-height: 1.7;
-  margin-bottom: 2rem;
+  font-size: 0.82rem; color: rgba(250,246,241,0.38);
+  line-height: 1.7; margin-bottom: 2rem;
 }
 .not-found a {
-  font-size: 0.48rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--rose);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
+  font-size: 0.46rem; letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--rose); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.4rem;
 }
 
-/* ── MOBILE ── */
+/* ─── mobile ─────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .film-nav { padding: 1rem 1.25rem; }
   .film-logo-text { display: none; }
   .film-wrap { padding: 4rem 0 2.5rem; }
   .player-stage { border-radius: 0; box-shadow: none; }
-  .film-info { padding: 0 1.25rem; margin-top: 1.25rem; }
+  .film-info { flex-direction: column; gap: 1.25rem; padding: 0 1.25rem; }
+  .film-cta { align-items: flex-start; }
   .play-ring { width: 62px; height: 62px; }
 }
 </style>
 </head>
 <body>
 
+<!-- ambient bloom: filled by JS from film.poster -->
+<div class="film-ambient" id="filmAmbient"></div>
+
 <nav class="film-nav">
   <a href="/" class="film-logo">
-    <svg viewBox="0 0 60 60">
-      <g transform="translate(30,30)">
-        <path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.85"/>
-        <path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.55" transform="rotate(72)"/>
-        <path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.35" transform="rotate(144)"/>
-        <path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.2" transform="rotate(216)"/>
-        <circle cx="0" cy="0" r="2.5" fill="#c9956b" opacity="0.85"/>
-      </g>
-    </svg>
+    <svg viewBox="0 0 60 60"><g transform="translate(30,30)">
+      <path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.85"/>
+      <path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.55" transform="rotate(72)"/>
+      <path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.35" transform="rotate(144)"/>
+      <path d="M0,-22 C6,-22 11,-15 9,-4 C7,6 -3,9 -9,4 C-15,-1 -11,-16 -4,-21 C-3,-21.7 -1,-22 0,-22Z" fill="none" stroke="#c9956b" stroke-width="1.2" opacity="0.2" transform="rotate(216)"/>
+      <circle cx="0" cy="0" r="2.5" fill="#c9956b" opacity="0.85"/>
+    </g></svg>
     <span class="film-logo-text">Aakaara</span>
   </a>
   <a href="/#video-works" class="film-back">
@@ -353,7 +329,7 @@ body::after {
 <main class="film-wrap" id="filmWrap"></main>
 
 <script>
-// ─── VIDEO CATALOGUE ───────────────────────────────────────────────────────
+// ─── catalogue ─────────────────────────────────────────────────────────────
 const VIDEOS = {
   'pooja-amit-wedding': {
     title: 'Pooja & Amit', type: 'Wedding Film', category: 'Wedding',
@@ -452,27 +428,34 @@ const VIDEOS = {
   }
 };
 
-// ─── RESOLVE SLUG ──────────────────────────────────────────────────────────
-// Supports both /films/mounika-harsha (via Netlify rewrite) and ?v=mounika-harsha
-const pathSlug = location.pathname.replace(/^\/films\/?/, '').replace(/\.html$/, '') || '';
+// ─── resolve slug ───────────────────────────────────────────────────────────
+const pathSlug = location.pathname.replace(/^\/films\/?/, '').replace(/\.html$/, '');
 const paramSlug = new URLSearchParams(location.search).get('v') || '';
 const slug = (pathSlug && pathSlug !== 'watch') ? pathSlug : paramSlug;
 
-const wrap = document.getElementById('filmWrap');
-const film = VIDEOS[slug];
+const wrap    = document.getElementById('filmWrap');
+const ambient = document.getElementById('filmAmbient');
+const film    = VIDEOS[slug];
 
 if (!film) {
   wrap.innerHTML = `
     <div class="not-found">
       <h2>Film not found.</h2>
-      <p>This link may be incorrect, or the film hasn't been published yet. Head back to see everything we've made.</p>
+      <p>This link may be incorrect, or the film hasn't been published yet.</p>
       <a href="/#video-works">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         View all films
       </a>
     </div>`;
 } else {
+  // update page title
   document.title = `${film.title} — ${film.category} · Aakaara Studios NYC`;
+
+  // ambient bloom: the poster image becomes the room's atmosphere
+  if (film.poster) {
+    ambient.style.backgroundImage = `url('${film.poster}')`;
+    requestAnimationFrame(() => setTimeout(() => ambient.classList.add('visible'), 80));
+  }
 
   wrap.innerHTML = `
     <div class="player-shell">
@@ -489,7 +472,7 @@ if (!film) {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           </button>
           <div class="progress-track" id="progressTrack" role="slider" aria-label="Video progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-            <div class="progress-fill" id="progressFill"></div>
+            <div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
           </div>
           <div class="time-display" id="timeDisplay">0:00</div>
           <button class="ctrl-btn" id="muteBtn" aria-label="Toggle mute">
@@ -501,32 +484,40 @@ if (!film) {
         </div>
       </div>
     </div>
+
     <div class="film-info">
-      <div class="film-category">${film.category}</div>
-      <h1 class="film-title">${film.title}</h1>
-      <div class="film-type">${film.type}</div>
-      <div class="film-rule"></div>
-      <div class="film-studio">Aakaara Studios NYC &nbsp;·&nbsp; aakaarastudiosnyc.com</div>
+      <div class="film-info-text">
+        <div class="film-category a1">${film.category}</div>
+        <h1 class="film-title a2">${film.title}</h1>
+        <div class="film-type a3">${film.type}</div>
+        <div class="film-rule a4"></div>
+        <div class="film-studio a5">Aakaara Studios NYC &nbsp;·&nbsp; aakaarastudiosnyc.com</div>
+      </div>
+      <div class="film-cta a6">
+        <div class="film-cta-label">Aakaara Studios NYC</div>
+        <a href="/index.html#contact" class="film-cta-link">
+          Book a session
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
     </div>`;
 
-  // ─── PLAYER LOGIC ────────────────────────────────────────────────────────
-  const vid      = document.getElementById('vid');
-  const poster   = document.getElementById('poster');
-  const bigPlay  = document.getElementById('bigPlay');
-  const stage    = document.getElementById('stage');
-  const playBtn  = document.getElementById('playBtn');
-  const muteBtn  = document.getElementById('muteBtn');
-  const fsBtn    = document.getElementById('fsBtn');
-  const track    = document.getElementById('progressTrack');
-  const fill     = document.getElementById('progressFill');
-  const timeEl   = document.getElementById('timeDisplay');
+  // ─── player logic ─────────────────────────────────────────────────────────
+  const vid     = document.getElementById('vid');
+  const poster  = document.getElementById('poster');
+  const bigPlay = document.getElementById('bigPlay');
+  const stage   = document.getElementById('stage');
+  const playBtn = document.getElementById('playBtn');
+  const muteBtn = document.getElementById('muteBtn');
+  const fsBtn   = document.getElementById('fsBtn');
+  const track   = document.getElementById('progressTrack');
+  const fill    = document.getElementById('progressFill');
+  const timeEl  = document.getElementById('timeDisplay');
 
   let started = false;
-  let hlsInstance = null;
 
   function fmt(s) {
-    const m = Math.floor(s / 60);
-    return `${m}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+    return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
   }
 
   function syncPlay() {
@@ -560,16 +551,16 @@ if (!film) {
       s.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js';
       s.onload = () => {
         if (!Hls.isSupported()) return;
-        hlsInstance = new Hls({ maxBufferLength: 60 });
-        hlsInstance.loadSource(film.url);
-        hlsInstance.attachMedia(vid);
-        hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => vid.play().catch(() => {}));
+        const hls = new Hls({ maxBufferLength: 60 });
+        hls.loadSource(film.url);
+        hls.attachMedia(vid);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play().catch(() => {}));
       };
       document.head.appendChild(s);
     }
   }
 
-  // Click anywhere on stage to play/pause (but not on controls)
+  // click stage to play/pause; ignore clicks on the controls bar
   stage.addEventListener('click', (e) => {
     if (e.target.closest('#controls')) return;
     if (!started) { startPlayback(); return; }
@@ -591,9 +582,11 @@ if (!film) {
     }
   });
 
+  // robust progress click: use clientX so child elements don't skew offsetX
   track.addEventListener('click', (e) => {
     if (!vid.duration) return;
-    const pct = e.offsetX / track.offsetWidth;
+    const rect = track.getBoundingClientRect();
+    const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     vid.currentTime = pct * vid.duration;
     track.setAttribute('aria-valuenow', Math.round(pct * 100));
   });
@@ -603,24 +596,25 @@ if (!film) {
 
   vid.addEventListener('timeupdate', () => {
     if (!vid.duration) return;
-    const pct = (vid.currentTime / vid.duration) * 100;
-    fill.style.width = `${pct}%`;
+    const pct = vid.currentTime / vid.duration;
+    fill.style.width = `${pct * 100}%`;
     timeEl.textContent = fmt(vid.currentTime);
-    track.setAttribute('aria-valuenow', Math.round(pct));
+    track.setAttribute('aria-valuenow', Math.round(pct * 100));
   });
 
-  // Keyboard shortcuts (Space/K = play, ←/→ = skip 5s, M = mute, F = fullscreen)
+  // keyboard: Space/K play, ←/→ skip 5s, M mute, F fullscreen
   document.addEventListener('keydown', (e) => {
     if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
-    if (e.key === ' ' || e.key.toLowerCase() === 'k') {
+    const k = e.key;
+    if (k === ' ' || k.toLowerCase() === 'k') {
       e.preventDefault();
       if (!started) { startPlayback(); return; }
       vid.paused ? vid.play().catch(() => {}) : vid.pause();
     }
-    if (e.key === 'ArrowLeft'  && vid.duration) vid.currentTime = Math.max(0, vid.currentTime - 5);
-    if (e.key === 'ArrowRight' && vid.duration) vid.currentTime = Math.min(vid.duration, vid.currentTime + 5);
-    if (e.key.toLowerCase() === 'm') { vid.muted = !vid.muted; syncMute(); }
-    if (e.key.toLowerCase() === 'f') fsBtn.click();
+    if (k === 'ArrowLeft'  && vid.duration) vid.currentTime = Math.max(0, vid.currentTime - 5);
+    if (k === 'ArrowRight' && vid.duration) vid.currentTime = Math.min(vid.duration, vid.currentTime + 5);
+    if (k.toLowerCase() === 'm') { vid.muted = !vid.muted; syncMute(); }
+    if (k.toLowerCase() === 'f') fsBtn.click();
   });
 }
 </script>
