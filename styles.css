@@ -1616,7 +1616,8 @@ body.intro-active #heroScroll { opacity: 0; }
 .about-image::after { content: ''; position: absolute; inset: 8px; border: 1px solid rgba(250,246,241,0.06); border-radius: 3px; }
 .about-image-inner {
   position: absolute; inset: 0;
-  background-size: 100% 100%;
+  /* cover-equivalent for this photo's 0.8 aspect ratio inside the 3:4 (0.75) box (height-constrained); re-check if the photo changes */
+  background-size: auto 100%;
   background-position: center;
   background-repeat: no-repeat;
   filter: sepia(20%) contrast(1.1);
@@ -1624,8 +1625,8 @@ body.intro-active #heroScroll { opacity: 0; }
   animation: aboutKenBurns 9s ease-in-out infinite alternate;
 }
 @keyframes aboutKenBurns {
-  from { background-size: 100% 100%; background-position: center; }
-  to   { background-size: 108% 108%; background-position: center top; }
+  from { background-size: auto 100%; background-position: center; }
+  to   { background-size: auto 108%; background-position: center top; }
 }
 .about-panel { opacity: 0; transform: translateX(-24px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
 .about-panel.visible { opacity: 1; transform: translateX(0); }
