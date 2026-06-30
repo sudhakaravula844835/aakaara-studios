@@ -424,7 +424,17 @@ document.querySelectorAll('.gallery-item:not([aria-label])').forEach(function(it
 
 // ═══════ REVEAL ON SCROLL ═══════
 const revealObs = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
+  let panelStaggerIndex = 0;
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      if (e.target.classList.contains('about-panel')) {
+        e.target.style.transitionDelay = `${panelStaggerIndex * 0.15}s`;
+        panelStaggerIndex++;
+      }
+      e.target.classList.add('visible');
+      revealObs.unobserve(e.target);
+    }
+  });
 }, { threshold: 0.1 });
 document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 
