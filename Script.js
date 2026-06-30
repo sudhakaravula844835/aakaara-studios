@@ -1879,7 +1879,8 @@ function filterVideos(cat, btn) {
     syncPlayToggle();
     syncMuteToggle();
     if (modalLastFocusedEl && document.contains(modalLastFocusedEl)) {
-      requestAnimationFrame(() => modalLastFocusedEl.focus({ preventScroll: true }));
+      const elToFocus = modalLastFocusedEl;
+      requestAnimationFrame(() => elToFocus?.focus({ preventScroll: true }));
     }
 
     // Pause any hover-preview videos that may still be playing on .vw-card elements
