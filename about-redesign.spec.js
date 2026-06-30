@@ -63,7 +63,7 @@ test.describe('About the Founder — redesign', () => {
   test('copy reads in first person and mentions travel availability', async ({ page }) => {
     await expect(page.locator('.about-lead')).toContainText('the moments nobody choreographs are the ones worth keeping');
     await expect(page.locator('#about')).toContainText('I travel wherever your story takes place');
-    await expect(page.locator('.section-tag')).toHaveText('A Note From the Founder');
+    await expect(page.locator('#about .section-tag')).toHaveText('A Note From the Founder');
   });
 
   test('font override selector still targets bio paragraphs but not the symbol description', async ({ page }) => {
