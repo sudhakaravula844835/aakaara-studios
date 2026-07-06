@@ -52,8 +52,8 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <!-- PERF FIX: preconnect for Bunny CDN — HLS video manifests + segments stream from
      this origin. Pre-warming DNS+TCP+TLS shaves latency off the first segment request. -->
-<!-- FIX: Updated HLS domain to custom subdomain videos.aakaarastudiosnyc.com -->
-<link rel="preconnect" href="https://videos.aakaarastudiosnyc.com">
+<!-- WARN FIX 1: added crossorigin for CORS fetch reuse -->
+<link rel="preconnect" href="https://videos.aakaarastudiosnyc.com" crossorigin>
 <!-- PERF FIX: preconnect for Formspree — contact form POSTs to this origin -->
 <link rel="preconnect" href="https://formspree.io">
 <!-- PERF FIX: Flatpickr CSS removed from here — injected lazily by Script.js when the date picker is first focused, saving one render-blocking stylesheet request on every page load. -->
@@ -380,7 +380,7 @@
       </a>
 
       <!-- ENGAGEMENT -->
-      <a href="#" class="gallery-item gi-6 gi-cinematic" data-cat="engagement" data-title="Vyshnavi &amp; Daniel" data-type="Engagement · Philadelphia, Pennsylvania" data-folder="/images/engagement/vyshnavi-daniel" data-count="54" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-6 gi-cinematic" data-cat="engagement" data-title="Vyshnavi &amp; Daniel" data-type="Engagement · Philadelphia, Pennsylvania" data-folder="/images/engagement/vyshnavi-daniel" data-count="54" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Vyshnavi & Daniel — Engagement · Philadelphia, Pennsylvania">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>54 photos</span>
         <div class="gi-overlay">
@@ -398,7 +398,7 @@
       </a>
 
       <!-- COUPLE PORTRAITS -->
-       <a href="#" class="gallery-item gi-8 gi-cinematic" data-cat="couple" data-title="Anusha &amp; Akshay" data-type="Couple Portrait · Central Park, NYC" data-folder="/images/couple-portraits/anusha-akshay" data-count="30" data-static="true" onclick="openSwGallery(this); return false;">
+       <a href="#" class="gallery-item gi-8 gi-cinematic" data-cat="couple" data-title="Anusha &amp; Akshay" data-type="Couple Portrait · Central Park, NYC" data-folder="/images/couple-portraits/anusha-akshay" data-count="30" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Anusha & Akshay — Couple Portrait · Central Park, NYC">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>30 photos</span>
         <div class="gi-overlay">
@@ -414,7 +414,7 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-7 gi-cinematic" data-cat="couple" data-title="Abhinav &amp; Megha" data-type="Couple Portrait · New York City" data-folder="/images/couple-portraits/abhinav-megha" data-count="28" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-7 gi-cinematic" data-cat="couple" data-title="Abhinav &amp; Megha" data-type="Couple Portrait · New York City" data-folder="/images/couple-portraits/abhinav-megha" data-count="28" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Abhinav & Megha — Couple Portrait · New York City">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>28 photos</span>
         <div class="gi-overlay">
@@ -430,7 +430,7 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-7 gi-cinematic" data-cat="couple" data-title="Karthik &amp; Sunayana" data-type="Surprise Proposal · New Jersey" data-folder="/images/couple-portraits/karthik-Sunayana" data-count="22" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-7 gi-cinematic" data-cat="couple" data-title="Karthik &amp; Sunayana" data-type="Surprise Proposal · New Jersey" data-folder="/images/couple-portraits/karthik-Sunayana" data-count="22" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Karthik & Sunayana — Surprise Proposal · New Jersey">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>22 photos</span>
         <div class="gi-overlay">
@@ -446,7 +446,7 @@
           </div>
         </div>
       </a> 
-      <a href="#" class="gallery-item gi-8 gi-cinematic" data-cat="couple" data-title="Sripad &amp; Ritika" data-type="Surprise Proposal · Fort Tryon Park, NYC" data-folder="/images/couple-portraits/sripad-ritika" data-count="35" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-8 gi-cinematic" data-cat="couple" data-title="Sripad &amp; Ritika" data-type="Surprise Proposal · Fort Tryon Park, NYC" data-folder="/images/couple-portraits/sripad-ritika" data-count="35" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Sripad & Ritika — Surprise Proposal · Fort Tryon Park, NYC">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>35 photos</span>
         <div class="gi-overlay">
@@ -462,27 +462,27 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-1" data-cat="couple" data-title="Arvind &amp; Nikhila" data-type="Couple Portrait" data-folder="/images/couple-portraits/arvind-nikhila" data-count="21" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-1" data-cat="couple" data-title="Arvind &amp; Nikhila" data-type="Couple Portrait" data-folder="/images/couple-portraits/arvind-nikhila" data-count="21" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Arvind & Nikhila — Couple Portrait">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>21 photos</span>
         <div class="gi-overlay"><div><h4>Arvind & Nikhila</h4><p>Couple Portrait</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-1" data-cat="couple" data-title="Akhila &amp; Subhash" data-type="Couple Portrait" data-folder="/images/couple-portraits/akhila-subhash" data-count="30" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-1" data-cat="couple" data-title="Akhila &amp; Subhash" data-type="Couple Portrait" data-folder="/images/couple-portraits/akhila-subhash" data-count="30" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Akhila & Subhash — Couple Portrait">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>30 photos</span>
         <div class="gi-overlay"><div><h4>Akhila & Subhash</h4><p>Couple Portrait</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-2" data-cat="couple" data-title="Sachin &amp; Poojitha" data-type="Couple Portrait" data-folder="/images/couple-portraits/sachin-poojitha" data-count="25" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-2" data-cat="couple" data-title="Sachin &amp; Poojitha" data-type="Couple Portrait" data-folder="/images/couple-portraits/sachin-poojitha" data-count="25" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Sachin & Poojitha — Couple Portrait">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>25 photos</span>
         <div class="gi-overlay"><div><h4>Sachin & Poojitha</h4><p>Couple Portrait</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-3" data-cat="couple" data-title="Vivek &amp; Srujana" data-type="Couple Portrait" data-folder="/images/couple-portraits/vivek-srujana" data-count="56" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-3" data-cat="couple" data-title="Vivek &amp; Srujana" data-type="Couple Portrait" data-folder="/images/couple-portraits/vivek-srujana" data-count="56" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Vivek & Srujana — Couple Portrait">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>56 photos</span>
         <div class="gi-overlay"><div><h4>Vivek & Srujana</h4><p>Couple Portrait</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-4 gi-cinematic" data-cat="couple" data-title="Yogesh &amp; Supritha" data-type="Couple Portrait · Central Park, NYC" data-folder="/images/couple-portraits/yogesh-supritha" data-count="35" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-4 gi-cinematic" data-cat="couple" data-title="Yogesh &amp; Supritha" data-type="Couple Portrait · Central Park, NYC" data-folder="/images/couple-portraits/yogesh-supritha" data-count="35" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Yogesh & Supritha — Couple Portrait · Central Park, NYC">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>35 photos</span>
         <div class="gi-overlay">
@@ -498,12 +498,12 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-5" data-cat="couple" data-title="Deekshitha &amp; Varun" data-type="Couple Portrait" data-folder="/images/couple-portraits/deekshitha-varun" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-5" data-cat="couple" data-title="Deekshitha &amp; Varun" data-type="Couple Portrait" data-folder="/images/couple-portraits/deekshitha-varun" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="Deekshitha & Varun — Couple Portrait">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay"><div><h4>Deekshitha & Varun</h4><p>Couple Portrait</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-6 gi-cinematic" data-cat="couple" data-title="Sameeksha &amp; Aman" data-type="Surprise Proposal · Oheka Castle, Long Island" data-folder="/images/couple-portraits/sameeksha-aman" data-count="32" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-6 gi-cinematic" data-cat="couple" data-title="Sameeksha &amp; Aman" data-type="Surprise Proposal · Oheka Castle, Long Island" data-folder="/images/couple-portraits/sameeksha-aman" data-count="32" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Sameeksha & Aman — Surprise Proposal · Oheka Castle, Long Island">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>32 photos</span>
         <div class="gi-overlay">
@@ -519,34 +519,34 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-7" data-cat="couple" data-title="Suprith &amp; Pragnya" data-type="Couple Portrait" data-folder="/images/couple-portraits/suprith-pragnya" data-count="26" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-7" data-cat="couple" data-title="Suprith &amp; Pragnya" data-type="Couple Portrait" data-folder="/images/couple-portraits/suprith-pragnya" data-count="26" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Suprith & Pragnya — Couple Portrait">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>26 photos</span>
         <div class="gi-overlay"><div><h4>Suprith & Pragnya</h4><p>Couple Portrait</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-8" data-cat="couple" data-title="Vyshnavi &amp; Shiva" data-type="Couple Portrait" data-folder="/images/couple-portraits/vyshnavi-shiva" data-count="25" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-8" data-cat="couple" data-title="Vyshnavi &amp; Shiva" data-type="Couple Portrait" data-folder="/images/couple-portraits/vyshnavi-shiva" data-count="25" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Vyshnavi & Shiva — Couple Portrait">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>25 photos</span>
         <div class="gi-overlay"><div><h4>Vyshnavi & Shiva</h4><p>Couple Portrait</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-1" data-cat="couple" data-title="Anuradha &amp; Suresh" data-type="Couple Portrait" data-folder="/images/couple-portraits/anuradha-suresh" data-count="30" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-1" data-cat="couple" data-title="Anuradha &amp; Suresh" data-type="Couple Portrait" data-folder="/images/couple-portraits/anuradha-suresh" data-count="30" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Anuradha & Suresh — Couple Portrait">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>30 photos</span>
         <div class="gi-overlay"><div><h4>Anuradha & Suresh</h4><p>Couple Portrait</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-2" data-cat="couple" data-title="Sai Srinivas &amp; Akruthi" data-type="Couple Portrait" data-folder="/images/couple-portraits/sai-srinivas-akruthi" data-count="18" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-2" data-cat="couple" data-title="Sai Srinivas &amp; Akruthi" data-type="Couple Portrait" data-folder="/images/couple-portraits/sai-srinivas-akruthi" data-count="18" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Sai Srinivas & Akruthi — Couple Portrait">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>18 photos</span>
         <div class="gi-overlay"><div><h4>Sai Srinivas & Akruthi</h4><p>Couple Portrait</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-3" data-cat="couple" data-title="Sowmya &amp; Family" data-type="Couple Portrait" data-folder="/images/couple-portraits/sowmya-family" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-3" data-cat="couple" data-title="Sowmya &amp; Family" data-type="Couple Portrait" data-folder="/images/couple-portraits/sowmya-family" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="Sowmya & Family — Couple Portrait">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay"><div><h4>Sowmya & Family</h4><p>Couple Portrait</p></div></div>
       </a>
 
       <!-- GRADUATION -->
-      <a href="#" class="gallery-item gi-4 gi-cinematic" data-cat="graduation" data-title="Nicoli" data-type="Graduation · University of Bridgeport" data-folder="/images/graduation/Nicoli" data-count="16" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-4 gi-cinematic" data-cat="graduation" data-title="Nicoli" data-type="Graduation · University of Bridgeport" data-folder="/images/graduation/Nicoli" data-count="16" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Nicoli — Graduation · University of Bridgeport">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>16 photos</span>
         <div class="gi-overlay">
@@ -562,7 +562,7 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-4" data-cat="graduation" data-title="Nikhila" data-type="Graduation" data-folder="/images/graduation/nikhila" data-count="30" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-4" data-cat="graduation" data-title="Nikhila" data-type="Graduation" data-folder="/images/graduation/nikhila" data-count="30" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="Nikhila — Graduation">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>30 photos</span>
         <div class="gi-overlay"><div><h4>Nikhila</h4><p>Graduation</p></div></div>
@@ -585,7 +585,7 @@
       </a>
 
       <!-- MATERNITY -->
-      <a href="#" class="gallery-item gi-6 gi-cinematic" data-cat="maternity" data-title="Shreya" data-type="Maternity · New Jersey" data-folder="/images/maternity/shreya" data-count="15" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-6 gi-cinematic" data-cat="maternity" data-title="Shreya" data-type="Maternity · New Jersey" data-folder="/images/maternity/shreya" data-count="15" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Shreya — Maternity · New Jersey">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>15 photos</span>
         <div class="gi-overlay">
@@ -601,24 +601,24 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-7" data-cat="maternity" data-title="Sanjana &amp; Shubash" data-type="Maternity" data-folder="/images/maternity/shivani" data-count="26" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-7" data-cat="maternity" data-title="Sanjana &amp; Shubash" data-type="Maternity" data-folder="/images/maternity/shivani" data-count="26" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Sanjana & Shubash — Maternity">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>26 photos</span>
         <div class="gi-overlay"><div><h4>Sanjana &amp; Shubash</h4><p>Maternity</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-8" data-cat="maternity" data-title="Shwetha" data-type="Maternity" data-folder="/images/maternity/shwetha" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-8" data-cat="maternity" data-title="Shwetha" data-type="Maternity" data-folder="/images/maternity/shwetha" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="Shwetha — Maternity">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay"><div><h4>Shwetha</h4><p>Maternity</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-1" data-cat="maternity" data-title="Prithvi &amp; Family" data-type="Maternity" data-folder="/images/maternity/prithvi-family" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-1" data-cat="maternity" data-title="Prithvi &amp; Family" data-type="Maternity" data-folder="/images/maternity/prithvi-family" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="Prithvi & Family — Maternity">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay"><div><h4>Prithvi & Family</h4><p>Maternity</p></div></div>
       </a>
 
       <!-- CONCEPTUAL -->
-      <a href="#" class="gallery-item gi-2 gi-cinematic" data-cat="conceptual" data-title="Steel &amp; Silk" data-type="DUMBO, Brooklyn" data-folder="/images/conceptual/sameeksha-dumbo" data-count="16" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-2 gi-cinematic" data-cat="conceptual" data-title="Steel &amp; Silk" data-type="DUMBO, Brooklyn" data-folder="/images/conceptual/sameeksha-dumbo" data-count="16" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Steel & Silk — DUMBO, Brooklyn">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>16 photos</span>
         <div class="gi-overlay">
@@ -634,7 +634,7 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-3 gi-cinematic" data-cat="conceptual" data-title="The Silent Archive" data-type="New York Public Library" data-folder="/images/conceptual/sameeksha-nyc-library" data-count="20" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-3 gi-cinematic" data-cat="conceptual" data-title="The Silent Archive" data-type="New York Public Library" data-folder="/images/conceptual/sameeksha-nyc-library" data-count="20" data-static="true" onclick="openSwGallery(this); return false;" aria-label="The Silent Archive — New York Public Library">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>20 photos</span>
         <div class="gi-overlay">
@@ -650,7 +650,7 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-4 gi-cinematic" data-cat="conceptual" data-title="The Marble Dream" data-type="Akshardham, India" data-folder="/images/conceptual/oviya-akshardham" data-count="17" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-4 gi-cinematic" data-cat="conceptual" data-title="The Marble Dream" data-type="Akshardham, India" data-folder="/images/conceptual/oviya-akshardham" data-count="17" data-static="true" onclick="openSwGallery(this); return false;" aria-label="The Marble Dream — Akshardham, India">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>17 photos</span>
         <div class="gi-overlay">
@@ -666,7 +666,7 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-5 gi-cinematic" data-cat="conceptual" data-title="Salt &amp; Silence" data-type="By the Sea" data-folder="/images/conceptual/simran-beach" data-count="18" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-5 gi-cinematic" data-cat="conceptual" data-title="Salt &amp; Silence" data-type="By the Sea" data-folder="/images/conceptual/simran-beach" data-count="18" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Salt & Silence — By the Sea">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>18 photos</span>
         <div class="gi-overlay">
@@ -682,7 +682,7 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-6 gi-cinematic" data-cat="conceptual" data-title="The Last Hour" data-type="Golden Hour" data-folder="/images/conceptual/varsha-sunset" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-6 gi-cinematic" data-cat="conceptual" data-title="The Last Hour" data-type="Golden Hour" data-folder="/images/conceptual/varsha-sunset" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="The Last Hour — Golden Hour">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay">
@@ -698,7 +698,7 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-7 gi-cinematic" data-cat="conceptual" data-title="A Thousand Silences" data-type="India" data-folder="/images/conceptual/manasa-india" data-count="22" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-7 gi-cinematic" data-cat="conceptual" data-title="A Thousand Silences" data-type="India" data-folder="/images/conceptual/manasa-india" data-count="22" data-static="true" onclick="openSwGallery(this); return false;" aria-label="A Thousand Silences — India">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>22 photos</span>
         <div class="gi-overlay">
@@ -715,7 +715,7 @@
         </div>
       </a>
       <!-- QA FIX: badge showed "13 photos" but data-count=14 and folder contains 14 images -->
-      <a href="#" class="gallery-item gi-8 gi-cinematic" data-cat="conceptual" data-title="Where Green Meets Gold" data-type="India" data-folder="/images/conceptual/divya-india" data-count="14" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-8 gi-cinematic" data-cat="conceptual" data-title="Where Green Meets Gold" data-type="India" data-folder="/images/conceptual/divya-india" data-count="14" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Where Green Meets Gold — India">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>14 photos</span>
         <div class="gi-overlay">
@@ -731,7 +731,7 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-1 gi-cinematic" data-cat="conceptual" data-title="Wildflower" data-type="Texas" data-folder="/images/conceptual/bhavana-tx" data-count="15" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-1 gi-cinematic" data-cat="conceptual" data-title="Wildflower" data-type="Texas" data-folder="/images/conceptual/bhavana-tx" data-count="15" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Wildflower — Texas">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>15 photos</span>
         <div class="gi-overlay">
@@ -749,14 +749,14 @@
       </a>
 
       <!-- SPRING -->
-      <a href="#" class="gallery-item gi-2" data-cat="spring" data-title="Lilly" data-type="Spring" data-folder="/images/spring/lilly" data-count="10" data-static="true" data-hide-all="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-2" data-cat="spring" data-title="Lilly" data-type="Spring" data-folder="/images/spring/lilly" data-count="10" data-static="true" data-hide-all="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="Lilly — Spring">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay"><div><h4>Lilly</h4><p>Spring</p></div></div>
       </a>
 
       <!-- BRAND COLLABS -->
-       <a href="#" class="gallery-item gi-3" data-cat="brand" data-title="Sri Krishna Jwellery" data-type="Brand Collab" data-folder="/images/brand-collabs/sri-krishna-jwellery" data-count="7" data-static="true" onclick="openSwGallery(this); return false;">
+       <a href="#" class="gallery-item gi-3" data-cat="brand" data-title="Sri Krishna Jwellery" data-type="Brand Collab" data-folder="/images/brand-collabs/sri-krishna-jwellery" data-count="7" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Sri Krishna Jwellery — Brand Collab">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>07 photos</span>
         <div class="gi-overlay">
@@ -766,7 +766,7 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-3" data-cat="brand" data-title="Darzi Suits" data-type="Brand Collab" data-folder="/images/brand-collabs/darzi-suits" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-3" data-cat="brand" data-title="Darzi Suits" data-type="Brand Collab" data-folder="/images/brand-collabs/darzi-suits" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="Darzi Suits — Brand Collab">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay">
@@ -776,7 +776,7 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-4 gi-cinematic" data-cat="brand" data-title="Mrga" data-type="Brand Collab · The Met Museum, NYC" data-folder="/images/brand-collabs/mrga" data-count="13" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-4 gi-cinematic" data-cat="brand" data-title="Mrga" data-type="Brand Collab · The Met Museum, NYC" data-folder="/images/brand-collabs/mrga" data-count="13" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Mrga — Brand Collab · The Met Museum, NYC">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>13 photos</span>
         <div class="gi-overlay">
@@ -795,7 +795,7 @@
 
       <!-- HOUSE WARMING -->
        <!-- QA FIX: bare & in data-folder is an HTML parse warning; &amp; ensures valid HTML while JS reads it back as & -->
-       <a href="#" class="gallery-item gi-5 gi-cinematic" data-cat="housewarming" data-title="Sharan &amp; Soundarya" data-type="House Warming · New Jersey" data-folder="/images/house-warming/Sharan &amp; soundarya" data-count="27" data-static="true" onclick="openSwGallery(this); return false;">
+       <a href="#" class="gallery-item gi-5 gi-cinematic" data-cat="housewarming" data-title="Sharan &amp; Soundarya" data-type="House Warming · New Jersey" data-folder="/images/house-warming/Sharan &amp; soundarya" data-count="27" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Sharan & Soundarya — House Warming · New Jersey">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>27 photos</span>
         <div class="gi-overlay">
@@ -811,17 +811,17 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-5" data-cat="housewarming" data-title="Neha" data-type="House Warming" data-folder="/images/house-warming/neha" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-5" data-cat="housewarming" data-title="Neha" data-type="House Warming" data-folder="/images/house-warming/neha" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="Neha — House Warming">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay"><div><h4>Neha</h4><p>House Warming</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-6" data-cat="housewarming" data-title="Rupa" data-type="House Warming" data-folder="/images/house-warming/rupa" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-6" data-cat="housewarming" data-title="Rupa" data-type="House Warming" data-folder="/images/house-warming/rupa" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="Rupa — House Warming">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay"><div><h4>Rupa</h4><p>House Warming</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-7 gi-cinematic" data-cat="housewarming" data-title="Bhargavi" data-type="House Warming · Philadelphia, Pennsylvania" data-folder="/images/house-warming/bhargavi" data-count="19" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-7 gi-cinematic" data-cat="housewarming" data-title="Bhargavi" data-type="House Warming · Philadelphia, Pennsylvania" data-folder="/images/house-warming/bhargavi" data-count="19" data-static="true" onclick="openSwGallery(this); return false;" aria-label="Bhargavi — House Warming · Philadelphia, Pennsylvania">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>19 photos</span>
         <div class="gi-overlay">
@@ -837,41 +837,41 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-8" data-cat="housewarming" data-title="Pranusha" data-type="House Warming" data-folder="/images/house-warming/pranusha" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-8" data-cat="housewarming" data-title="Pranusha" data-type="House Warming" data-folder="/images/house-warming/pranusha" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="Pranusha — House Warming">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay"><div><h4>Pranusha</h4><p>House Warming</p></div></div>
       </a>
 
       <!-- EVENTS -->
-      <a href="#" class="gallery-item gi-1" data-cat="events" data-title="Karthik Concert" data-type="Event" data-folder="/images/events/karthik-concert" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-1" data-cat="events" data-title="Karthik Concert" data-type="Event" data-folder="/images/events/karthik-concert" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="Karthik Concert — Event">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay"><div><h4>Karthik Concert</h4><p>Event</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-2" data-cat="events" data-title="Holi Event" data-type="Event" data-folder="/images/events/holi-event" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-2" data-cat="events" data-title="Holi Event" data-type="Event" data-folder="/images/events/holi-event" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="Holi Event — Event">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay"><div><h4>Holi Event</h4><p>Event</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-3" data-cat="events" data-title="Noora Fatehi" data-type="Event" data-folder="/images/events/noora-fatehi" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-3" data-cat="events" data-title="Noora Fatehi" data-type="Event" data-folder="/images/events/noora-fatehi" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="Noora Fatehi — Event">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay"><div><h4>Noora Fatehi</h4><p>Event</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-4" data-cat="events" data-title="Ram Tour USA" data-type="Event" data-folder="/images/events/ram-tour-usa" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-4" data-cat="events" data-title="Ram Tour USA" data-type="Event" data-folder="/images/events/ram-tour-usa" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="Ram Tour USA — Event">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay"><div><h4>Ram Tour USA</h4><p>Event</p></div></div>
       </a>
-      <a href="#" class="gallery-item gi-5" data-cat="events" data-title="DSP" data-type="Event" data-folder="/images/events/dsp" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-5" data-cat="events" data-title="DSP" data-type="Event" data-folder="/images/events/dsp" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="DSP — Event">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay"><div><h4>DSP</h4><p>Event</p></div></div>
       </a>
 
       <!-- FIRST BIRTHDAY -->
-      <a href="#" class="gallery-item gi-6" data-cat="birthday" data-title="Goutham &amp; Family" data-type="First Birthday" data-folder="/images/first-birthday/goutham-family" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-6" data-cat="birthday" data-title="Goutham &amp; Family" data-type="First Birthday" data-folder="/images/first-birthday/goutham-family" data-count="10" data-static="true" data-coming-soon="true" onclick="openSwGallery(this); return false;" aria-label="Goutham & Family — First Birthday">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>10 photos</span>
         <div class="gi-overlay"><div><h4>Goutham & Family</h4><p>First Birthday</p></div></div>
@@ -930,8 +930,9 @@
 <section class="section section-dark" id="video-works">
   <!-- Full-section ambience background — crossfades with active card poster -->
   <div class="vfr-ambience" id="vwAmbience" aria-hidden="true">
-    <img class="vfr-amb-img vfr-amb-a" src="" alt="">
-    <img class="vfr-amb-img vfr-amb-b" src="" alt="">
+    <!-- WARN FIX 3: added width/height for CLS prevention -->
+    <img class="vfr-amb-img vfr-amb-a" src="" alt="" width="1920" height="1080">
+    <img class="vfr-amb-img vfr-amb-b" src="" alt="" width="1920" height="1080">
     <div class="vfr-amb-overlay"></div>
   </div>
   <div class="container">

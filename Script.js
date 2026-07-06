@@ -90,8 +90,9 @@ function ensureFlatpickrLibrary() {
   // PERF FIX: Flatpickr CSS injected here (lazily on first date-field focus) instead of
   // blocking the initial render via a <link> in <head>. Saves one cross-origin stylesheet
   // request on every page load for users who never touch the contact form date pickers.
-  loadCssOnce('https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css');
-  return loadScriptOnce('https://cdn.jsdelivr.net/npm/flatpickr', 'flatpickr');
+  // WARN FIX 2: pinned Flatpickr to @4.6.13
+  loadCssOnce('https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/themes/dark.css');
+  return loadScriptOnce('https://cdn.jsdelivr.net/npm/flatpickr@4.6.13', 'flatpickr');
 }
 // ═══════ CINEMATIC INTRO ANIMATION ═══════
 (function() {
