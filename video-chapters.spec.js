@@ -21,4 +21,14 @@ test.describe('Multi-chapter video projects', () => {
     // .vw-chapters is a hidden data source, not a visible grid element
     await expect(card.locator('.vw-chapters')).toBeHidden();
   });
+
+  test('shows an auto-computed "N Films" badge on multi-chapter projects', async ({ page }) => {
+    const card = page.locator('.vw-card[data-title="Wedding Weekend"]');
+    await expect(card.locator('.vw-badge-count')).toHaveText('3 Films');
+  });
+
+  test('does not show a films badge on single-video cards', async ({ page }) => {
+    const card = page.locator('.vw-card[data-title="Pooja & Amit"]');
+    await expect(card.locator('.vw-badge-count')).toHaveCount(0);
+  });
 });

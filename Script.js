@@ -1587,6 +1587,19 @@ function filterVideos(cat, btn) {
   document.querySelectorAll('.vw-card').forEach(card => posterObserver.observe(card));
 })();
 
+// Auto-compute "N Films" badge for multi-chapter video projects (Haldi/Sangeet/Wedding, etc.)
+// Count is derived from .vw-chapter children so it can't drift out of sync when a chapter is added.
+(function() {
+  document.querySelectorAll('.vw-card').forEach(card => {
+    const chapterCount = card.querySelectorAll('.vw-chapter').length;
+    if (chapterCount < 2) return;
+    const badge = document.createElement('div');
+    badge.className = 'vw-badge-count';
+    badge.textContent = `${chapterCount} Films`;
+    card.appendChild(badge);
+  });
+})();
+
 // Hover muted preview — delayed so modal playback is not competing with preloads
 // Exclusive playback: only one card plays at a time (prevents audio overlap on swipe)
 (function() {

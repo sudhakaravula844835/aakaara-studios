@@ -3647,6 +3647,17 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 /* Hidden data source for multi-chapter (Haldi/Sangeet/Wedding) projects — read by JS on modal open, never shown in the grid */
 .vw-chapters { display: none; }
 
+/* "N Films" badge for multi-chapter projects — always visible (unlike .vw-duration's hover-only reveal) */
+.vw-badge-count {
+  position: absolute; top: 1rem; left: 1rem; z-index: 5;
+  font-size: 0.49rem; letter-spacing: 0.08em;
+  color: rgba(250,246,241,0.8);
+  background: rgba(9,8,11,0.5);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(250,246,241,0.08);
+  padding: 0.25rem 0.65rem; border-radius: 20px;
+}
+
 /* ── Video Modal ── */
 .video-modal {
   position: fixed; inset: 0; z-index: 10002;
