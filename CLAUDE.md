@@ -187,6 +187,8 @@ Global functions exposed to inline HTML:
 
 **New video card:** Copy `<div class="vw-card">` inside `#vwGrid`, set `data-vcat`, `data-video` (HLS `.m3u8` or empty for "Coming Soon"), `data-poster`, `data-title`, `data-type`.
 
+**New multi-event wedding project (Haldi/Sangeet/Wedding, etc.):** Instead of one `.vw-card` per film, author a single `.vw-card` (its own `data-video`/`data-type` should point at the default/hero film) and add a nested `<div class="vw-chapters">` with one `<button class="vw-chapter" data-label="..." data-video="..." data-type="...">` per event. Mark exactly one chapter `active` to control which film plays by default when the modal opens. The grid tile auto-shows an "N Films" badge; the video modal auto-shows chapter tabs. See the "Wedding Weekend" placeholder card in `index.html` for a working example.
+
 **Gradient fallback classes:** Gallery `gi-1`–`gi-8`; video `vw-gi-1`–`vw-gi-8`. Defined in `styles.css`. Reuse or add following same pattern.
 
 ## CSS Conventions
@@ -270,6 +272,7 @@ Footer "Connect" links have inline SVG icons:
 - **Production header CTA**: Improved contrast for accessibility.
 - **Code refactoring**: Removed unused code, standardized structure, removed broken GitHub Actions (Netlify only).
 - **Testing infrastructure added**: Vitest unit tests + Playwright e2e tests.
+- **Multi-chapter video projects**: `.vw-card` can now group multiple films (Haldi/Sangeet/Wedding) under one grid tile via a nested `.vw-chapters` block, with in-modal tabs to switch between them and an auto-computed "N Films" badge.
 
 ## Known Constraints
 
