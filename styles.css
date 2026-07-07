@@ -3644,6 +3644,9 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 }
 .vw-card:hover .vw-duration { opacity: 1; }
 
+/* Hidden data source for multi-chapter (Haldi/Sangeet/Wedding) projects — read by JS on modal open, never shown in the grid */
+.vw-chapters { display: none; }
+
 /* ── Video Modal ── */
 .video-modal {
   position: fixed; inset: 0; z-index: 10002;
