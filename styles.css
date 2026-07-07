@@ -3697,6 +3697,27 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   font-size: 0.49rem; letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--rose); opacity: 0.75; margin-top: 0.3rem;
 }
+.vm-chapters {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin: -0.4rem 0 1.2rem;
+}
+/* Author rule above always beats the UA [hidden] rule on specificity/origin,
+   so the hidden attribute needs an explicit override to actually hide the row. */
+.vm-chapters[hidden] { display: none; }
+.vm-chapter-tab {
+  font-family: var(--font-body); font-size: 0.49rem;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(250,246,241,0.45);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(250,246,241,0.12);
+  padding: 0.4rem 0.9rem; border-radius: 999px;
+  cursor: pointer; transition: color 0.3s, border-color 0.3s, background 0.3s;
+}
+.vm-chapter-tab:hover { color: var(--ivory); }
+.vm-chapter-tab.active {
+  color: var(--rose); border-color: rgba(201,149,107,0.5);
+  background: rgba(201,149,107,0.08);
+}
 /* MOBILE FIX: vm-close had no minimum tap size — the only close control on touch devices.
    Added min-height and padding so the button reliably registers 44px touch target. */
 .vm-close {

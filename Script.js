@@ -1674,6 +1674,7 @@ function filterVideos(cat, btn) {
   const vmVideo  = document.getElementById('vmVideo');
   const vmTitle  = document.getElementById('vmTitle');
   const vmSub    = document.getElementById('vmSubtitle');
+  const vmChapters = document.getElementById('vmChapters');
   const vmClose  = document.getElementById('vmClose');
   const vmBg     = document.getElementById('vmBackdrop');
   const vmStage  = document.getElementById('vmStage');
@@ -1836,8 +1837,59 @@ function filterVideos(cat, btn) {
     }
   }
 
+  async function loadModalSrc(src, requestId) {
+    if (src) {
+      await attachHLS(vmVideo, src, requestId);
+      if (requestId !== modalRequestId) return;
+      vmStage.classList.add('vm-has-video');
+      syncPlayToggle();
+      if (vmFill) vmFill.style.width = '0%';
+    } else {
+      vmVideo.pause();
+      if (activeHls) { activeHls.destroy(); activeHls = null; }
+      vmVideo.src = '';
+      vmStage.classList.remove('vm-has-video');
+      syncPlayToggle();
+    }
+  }
+
+  function renderChapterTabs(chapters, defaultChapter) {
+    if (!vmChapters) return;
+    vmChapters.innerHTML = '';
+    if (chapters.length < 2) {
+      vmChapters.hidden = true;
+      return;
+    }
+    vmChapters.hidden = false;
+    chapters.forEach(chapter => {
+      const tab = document.createElement('button');
+      tab.type = 'button';
+      tab.className = 'vm-chapter-tab' + (chapter === defaultChapter ? ' active' : '');
+      tab.textContent = chapter.dataset.label || '';
+      tab.setAttribute('aria-pressed', chapter === defaultChapter ? 'true' : 'false');
+      tab.addEventListener('click', () => selectChapter(chapter, tab));
+      vmChapters.appendChild(tab);
+    });
+  }
+
+  async function selectChapter(chapter, tab) {
+    if (tab.classList.contains('active')) return;
+    Array.from(vmChapters.children).forEach(el => {
+      el.classList.remove('active');
+      el.setAttribute('aria-pressed', 'false');
+    });
+    tab.classList.add('active');
+    tab.setAttribute('aria-pressed', 'true');
+    vmSub.textContent = chapter.dataset.type || '';
+    const requestId = ++modalRequestId;
+    await loadModalSrc(chapter.dataset.video, requestId);
+  }
+
   async function openModal(card) {
-    const src = card.dataset.video;
+    const chapters = Array.from(card.querySelectorAll('.vw-chapter'));
+    const defaultChapter = chapters.find(ch => ch.classList.contains('active')) || chapters[0];
+    const src  = chapters.length ? defaultChapter.dataset.video : card.dataset.video;
+    const type = chapters.length ? (defaultChapter.dataset.type || '') : (card.dataset.type || '');
     const requestId = ++modalRequestId;
     if (typeof window.aakaaraStopVideoWorkPreviews === 'function') {
       window.aakaaraStopVideoWorkPreviews({ unload: true });
@@ -1845,15 +1897,16 @@ function filterVideos(cat, btn) {
     document.dispatchEvent(new CustomEvent('aakaara:modal-video-open'));
     modalLastFocusedEl = document.activeElement instanceof HTMLElement ? document.activeElement : card;
     vmTitle.textContent = card.dataset.title || '';
-    vmSub.textContent   = card.dataset.type  || '';
+    vmSub.textContent   = type;
+    renderChapterTabs(chapters, defaultChapter);
 
     // GA4 FIX: fire video_play event — marks this as an engagement conversion in GA4.
-    // video_type matches the card badge (Wedding Film, Pre-Wedding Film, etc.)
+    // video_type matches the playing chapter (or the card badge for single-video cards).
     if (typeof gtag === 'function') {
       gtag('event', 'video_play', {
         event_category: 'Video',
         event_label: card.dataset.title || 'Unknown',
-        video_type: card.dataset.type  || 'Unknown',
+        video_type: type || 'Unknown',
         video_category: card.dataset.vcat || 'Unknown'
       });
     }
@@ -1870,17 +1923,7 @@ function filterVideos(cat, btn) {
     lockModalScroll(modalScrollY);
     requestAnimationFrame(() => modal.focus({ preventScroll: true }));
 
-    if (src) {
-      await attachHLS(vmVideo, src, requestId);
-      if (requestId !== modalRequestId) return;
-      vmStage.classList.add('vm-has-video');
-      // Reset controls
-      syncPlayToggle();
-      if (vmFill) vmFill.style.width = '0%';
-    } else {
-      vmStage.classList.remove('vm-has-video');
-      syncPlayToggle();
-    }
+    await loadModalSrc(src, requestId);
   }
 
   function closeModal() {
