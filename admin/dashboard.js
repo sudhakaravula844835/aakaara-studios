@@ -22,7 +22,34 @@ document.addEventListener('DOMContentLoaded', function () {
             { id: 4, clientName: 'Meera Desai', clientEmail: 'meera.d@example.com', eventDate: '2024-11-02', eventDateTo: '2024-11-02', status: 'rejected', quotedPrice: 1800, confirmedPrice: null, phone: '', shootType: '', depositPaid: null, followUpDate: null, location: '', notes: '' },
             { id: 5, clientName: 'Arjun & Diya', clientEmail: 'arjun.d@example.com', eventDate: '2024-10-06', eventDateTo: '2024-10-06', status: 'confirmed', quotedPrice: 7500, confirmedPrice: 7000, phone: '', shootType: 'Wedding', depositPaid: false, followUpDate: null, location: '', notes: '' },
         ];
-        saveQuotes();
+    }
+
+    // One-time migration: an earlier build of quote-generator.js saved real
+    // quotes under a mismatched key ('aakaara_quotes') so they never reached
+    // this CRM. Pull any of those in now (renumbered so they don't collide
+    // with ids already here) and retire the legacy key.
+    quotes = migrateLegacyQuotes(quotes);
+    saveQuotes();
+
+    function migrateLegacyQuotes(current) {
+        const legacyRaw = localStorage.getItem('aakaara_quotes');
+        if (!legacyRaw) return current;
+
+        let legacyQuotes;
+        try {
+            legacyQuotes = JSON.parse(legacyRaw);
+        } catch (err) {
+            console.error('Legacy aakaara_quotes key corrupted; discarding.', err);
+            localStorage.removeItem('aakaara_quotes');
+            return current;
+        }
+
+        localStorage.removeItem('aakaara_quotes');
+        if (!Array.isArray(legacyQuotes) || !legacyQuotes.length) return current;
+
+        let nextId = current.reduce((m, q) => Math.max(m, q.id || 0), 0) + 1;
+        const migrated = legacyQuotes.map(migrateQuote).map(q => ({ ...q, id: nextId++ }));
+        return current.concat(migrated);
     }
 
     function saveQuotes() {
