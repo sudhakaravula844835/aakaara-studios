@@ -529,4 +529,8 @@ body {
     .crm-search-wrap { min-width: unset; }
     .modal-grid { grid-template-columns: 1fr; }
     .form-group.form-full { grid-column: 1; }
+
+    /* iOS Safari zooms the viewport on focus when an input's font-size is
+       below 16px — that zoom+scroll reads as a "random reload" while typing. */
+    .form-input, .crm-search-wrap input { font-size: 16px; }
 }

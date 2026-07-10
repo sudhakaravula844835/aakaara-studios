@@ -54,11 +54,11 @@
                 <input type="text" id="crmSearch" placeholder="Search clients, dates, notes&#8230;" autocomplete="off" aria-label="Search clients">
             </div>
             <div class="crm-filter-pills" id="filterPills" role="group" aria-label="Filter clients"></div>
-            <button class="crm-add-btn" id="addClientBtn" aria-label="Add new client">
+            <button type="button" class="crm-add-btn" id="addClientBtn" aria-label="Add new client">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Add Client
             </button>
-            <button class="crm-export-btn" id="crmExportBtn" aria-label="Export clients to CSV">
+            <button type="button" class="crm-export-btn" id="crmExportBtn" aria-label="Export clients to CSV">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Export CSV
             </button>
@@ -72,9 +72,9 @@
             <div class="section-header">Availability Calendar</div>
             <div class="section-body">
                 <div class="calendar-header">
-                    <button id="prevMonth" aria-label="Previous month">&#8249;</button>
+                    <button type="button" id="prevMonth" aria-label="Previous month">&#8249;</button>
                     <div id="calendarMonthYear"></div>
-                    <button id="nextMonth" aria-label="Next month">&#8250;</button>
+                    <button type="button" id="nextMonth" aria-label="Next month">&#8250;</button>
                 </div>
                 <div class="calendar-grid" id="calendarWeekdays" role="row"></div>
                 <div class="calendar-grid" id="calendarDays" role="grid"></div>
@@ -88,7 +88,7 @@
         <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
             <div class="modal-header">
                 <div class="modal-title" id="modalTitle">New Client</div>
-                <button class="modal-close" id="modalClose" aria-label="Close modal">
+                <button type="button" class="modal-close" id="modalClose" aria-label="Close modal">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
@@ -97,15 +97,15 @@
                 <div class="modal-grid">
                     <div class="form-group form-full">
                         <label class="form-label" for="fName">Client Name *</label>
-                        <input class="form-input" type="text" id="fName" placeholder="Priya &amp; Rohan" required>
+                        <input class="form-input" type="text" id="fName" autocomplete="name" placeholder="Priya &amp; Rohan" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="fEmail">Email</label>
-                        <input class="form-input" type="email" id="fEmail" placeholder="client@example.com">
+                        <input class="form-input" type="email" id="fEmail" autocomplete="email" placeholder="client@example.com">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="fPhone">Phone</label>
-                        <input class="form-input" type="tel" id="fPhone" placeholder="+1 917-555-0100">
+                        <input class="form-input" type="tel" id="fPhone" inputmode="tel" autocomplete="tel" placeholder="+1 917-555-0100">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="fEventDate">Event Date *</label>
@@ -133,7 +133,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="fQuotedPrice">Quoted Price ($)</label>
-                        <input class="form-input" type="number" id="fQuotedPrice" placeholder="4500" min="0">
+                        <input class="form-input" type="number" id="fQuotedPrice" inputmode="decimal" placeholder="4500" min="0">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="fStatus">Status</label>
@@ -145,7 +145,7 @@
                     </div>
                     <div class="form-group" id="confirmedPriceGroup">
                         <label class="form-label" for="fConfirmedPrice">Confirmed Price ($)</label>
-                        <input class="form-input" type="number" id="fConfirmedPrice" placeholder="4500" min="0">
+                        <input class="form-input" type="number" id="fConfirmedPrice" inputmode="decimal" placeholder="4500" min="0">
                     </div>
                     <div class="form-group" id="depositGroup">
                         <label class="form-label" for="fDepositPaid">Deposit</label>

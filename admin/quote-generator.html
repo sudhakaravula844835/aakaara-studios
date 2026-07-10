@@ -40,15 +40,15 @@
     <div class="field-row field-row-3">
       <div class="field-group">
         <label class="field-label" for="clientName">Client Name(s)</label>
-        <input type="text" id="clientName" autocomplete="off">
+        <input type="text" id="clientName" autocomplete="name">
       </div>
       <div class="field-group">
         <label class="field-label" for="clientEmail">Email</label>
-        <input type="email" id="clientEmail" autocomplete="off">
+        <input type="email" id="clientEmail" autocomplete="email">
       </div>
       <div class="field-group">
         <label class="field-label" for="clientPhone">Phone</label>
-        <input type="tel" id="clientPhone" autocomplete="off">
+        <input type="tel" id="clientPhone" inputmode="tel" autocomplete="tel">
       </div>
     </div>
 
@@ -137,7 +137,7 @@
         <label class="del-check"><input type="checkbox" id="delAddlHours"> Additional Hours</label>
         <div class="addon-rate hidden" id="delAddlHoursRateWrap">
           <span>Overtime rate</span>
-          <input type="number" id="delAddlHoursRate" min="0" step="25" placeholder="0">
+          <input type="number" id="delAddlHoursRate" inputmode="decimal" min="0" step="25" placeholder="0">
           <span>$/hr</span>
         </div>
       </div>
@@ -146,7 +146,7 @@
         <label class="del-check"><input type="checkbox" id="delRush"> Rush / Priority Delivery</label>
         <div class="addon-rate hidden" id="delRushFeeWrap">
           <span>Rush fee</span>
-          <input type="number" id="delRushFee" min="0" step="50" placeholder="0">
+          <input type="number" id="delRushFee" inputmode="decimal" min="0" step="50" placeholder="0">
           <span>$</span>
         </div>
       </div>
@@ -177,11 +177,11 @@
       </div>
       <div class="field-group" id="hourlyRateGroup">
         <label class="field-label" for="hourlyRate">Hourly Rate ($)</label>
-        <input type="number" id="hourlyRate" min="0" step="25">
+        <input type="number" id="hourlyRate" inputmode="decimal" min="0" step="25">
       </div>
       <div class="field-group hidden" id="flatRateGroup">
         <label class="field-label" for="flatRate">Package Price ($)</label>
-        <input type="number" id="flatRate" min="0" step="100">
+        <input type="number" id="flatRate" inputmode="decimal" min="0" step="100">
       </div>
     </div>
 
@@ -197,14 +197,14 @@
       </div>
       <div class="field-group hidden" id="travelAmountGroup">
         <label class="field-label" for="travelAmount">Travel Amount ($)</label>
-        <input type="number" id="travelAmount" min="0" step="50">
+        <input type="number" id="travelAmount" inputmode="decimal" min="0" step="50">
       </div>
     </div>
 
     <div class="field-row field-row-2">
       <div class="field-group">
         <label class="field-label" for="retainerFee">Retainer / Booking Fee ($)</label>
-        <input type="number" id="retainerFee" min="0" step="100" placeholder="Optional">
+        <input type="number" id="retainerFee" inputmode="decimal" min="0" step="100" placeholder="Optional">
       </div>
       <div class="field-group">
         <label class="field-label intro-label">
@@ -282,7 +282,7 @@
       </div>
       <div class="field-group">
         <label class="field-label">Total Hours</label>
-        <input type="number" data-field="hours" min="0" step="0.5" placeholder="Auto">
+        <input type="number" data-field="hours" inputmode="decimal" min="0" step="0.5" placeholder="Auto">
       </div>
     </div>
     <div class="events-container"></div>
@@ -307,7 +307,7 @@
       </div>
       <div class="field-group">
         <label class="field-label">Photos</label>
-        <input type="number" data-field="eventPhotos" min="0" step="10" placeholder="Optional">
+        <input type="number" data-field="eventPhotos" inputmode="decimal" min="0" step="10" placeholder="Optional">
       </div>
       <div class="field-group">
         <label class="field-label">Notes</label>

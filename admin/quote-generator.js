@@ -13,7 +13,7 @@ const { jsPDF } = window.jspdf;
 // ── SETTINGS ──────────────────────────────────────────────────────
 const APP_SETTINGS = {
   draftStorageKey: 'aakaaraQuoteDraft:v2',
-  dashboardStorageKey: 'aakaara_quotes',
+  dashboardStorageKey: 'aakaaraQuotes',
 };
 
 const DRAFT_VALUE_FIELD_IDS = [

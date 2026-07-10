@@ -482,6 +482,19 @@ input[data-field="hours"].hours-auto {
   .topbar-brand { font-size: 11px; }
   #generateBar { padding: 0 16px; }
   .gen-bar-amount { font-size: 16px; }
+
+  /* iOS Safari zooms the viewport on focus when an input's font-size is
+     below 16px — that zoom+scroll reads as a "random reload" while typing. */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="date"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 @media (max-width: 480px) {
   .field-row-3 { grid-template-columns: 1fr; }

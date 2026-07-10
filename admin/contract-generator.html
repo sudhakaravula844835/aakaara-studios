@@ -223,6 +223,11 @@
   @media(max-width: 580px) {
     .field-grid, .field-grid.cols-3 { grid-template-columns: 1fr; }
   }
+  /* iOS Safari zooms the viewport on focus when an input's font-size is
+     below 16px — that zoom+scroll reads as a "random reload" while typing. */
+  @media(max-width: 768px) {
+    input, select, textarea, .login-box input { font-size: 16px; }
+  }
   /* ── FIELD ── */
   .field {
     display: flex;
@@ -590,7 +595,7 @@
 
   <!-- TOP BAR -->
   <div class="topbar">
-    <button onclick="resetForm()">New Contract</button>
+    <button type="button" onclick="resetForm()">New Contract</button>
     <button type="button" onclick="window.location.href='/admin/logout'">Sign Out</button>
   </div>
 
@@ -602,15 +607,15 @@
       <div class="field-grid">
         <div class="field">
           <label>Full Name <span class="req">*</span></label>
-          <input type="text" id="clientName" placeholder="e.g. Priya & Karthik Sharma" required/>
+          <input type="text" id="clientName" autocomplete="name" placeholder="e.g. Priya & Karthik Sharma" required/>
         </div>
         <div class="field">
           <label>Email Address <span class="req">*</span></label>
-          <input type="email" id="clientEmail" placeholder="client@email.com" required/>
+          <input type="email" id="clientEmail" autocomplete="email" placeholder="client@email.com" required/>
         </div>
         <div class="field">
           <label>Phone Number</label>
-          <input type="text" id="clientPhone" placeholder="+1 (000) 000-0000"/>
+          <input type="tel" id="clientPhone" inputmode="tel" autocomplete="tel" placeholder="+1 (000) 000-0000"/>
         </div>
         <div class="field">
           <label>City / State</label>
@@ -725,15 +730,15 @@
         </div>
         <div class="field" id="flatField">
           <label>Total Contract Value (USD) <span class="req">*</span></label>
-          <input type="number" id="totalValue" placeholder="e.g. 3300" min="0" oninput="updatePayCalc()"/>
+          <input type="number" id="totalValue" inputmode="decimal" placeholder="e.g. 3300" min="0" oninput="updatePayCalc()"/>
         </div>
         <div class="field" id="hourlyRateField" style="display:none;">
           <label>Hourly Rate (USD/hr)</label>
-          <input type="number" id="hourlyRate" placeholder="e.g. 300" min="0" oninput="updatePayCalc()"/>
+          <input type="number" id="hourlyRate" inputmode="decimal" placeholder="e.g. 300" min="0" oninput="updatePayCalc()"/>
         </div>
         <div class="field" id="hourlyHoursField" style="display:none;">
           <label>Estimated Total Hours</label>
-          <input type="number" id="hourlyHours" placeholder="Auto from days" min="0" oninput="updatePayCalc()"/>
+          <input type="number" id="hourlyHours" inputmode="decimal" placeholder="Auto from days" min="0" oninput="updatePayCalc()"/>
         </div>
         <div class="field">
           <label>Travel &amp; Accommodation</label>
@@ -803,9 +808,9 @@
   <div class="preview-header">
     <div class="preview-header-title">Contract Preview</div>
     <div class="preview-actions">
-      <button onclick="closePreview()">Close</button>
-      <button onclick="downloadFromPreview()">Download PDF</button>
-      <button class="btn-primary-sm" onclick="sendToClient()">Send to Client</button>
+      <button type="button" onclick="closePreview()">Close</button>
+      <button type="button" onclick="downloadFromPreview()">Download PDF</button>
+      <button type="button" class="btn-primary-sm" onclick="sendToClient()">Send to Client</button>
     </div>
   </div>
   <div class="preview-body">
@@ -834,7 +839,7 @@ function addDay() {
       </div>
       <div class="field">
         <label>Coverage Hours</label>
-        <input type="number" class="day-hours" placeholder="e.g. 6" min="1" max="24" oninput="syncHourlyHours()"/>
+        <input type="number" class="day-hours" inputmode="decimal" placeholder="e.g. 6" min="1" max="24" oninput="syncHourlyHours()"/>
       </div>
       <div class="field span-2">
         <label>Events / Description</label>
@@ -843,6 +848,7 @@ function addDay() {
     </div>`;
   document.getElementById('dayBlocks').appendChild(div);
   renumberDays();
+  scheduleContractDraftSave();
 }
 
 function removeDay(n) {
@@ -850,6 +856,7 @@ function removeDay(n) {
   if (el) el.remove();
   renumberDays();
   syncHourlyHours();
+  scheduleContractDraftSave();
 }
 
 function renumberDays() {
@@ -874,13 +881,15 @@ function addDeliverable() {
   div.id = `del-${n}`;
   div.innerHTML = `
     <input type="text" class="del-name" placeholder="Event name (e.g. Pellikoduku)"/>
-    <input type="number" class="del-count" placeholder="Photos" min="0"/>
+    <input type="number" class="del-count" inputmode="decimal" placeholder="Photos" min="0"/>
     <button type="button" onclick="removeDel(${n})">&times;</button>`;
   document.getElementById('delRows').appendChild(div);
+  scheduleContractDraftSave();
 }
 function removeDel(n) {
   const el = document.getElementById(`del-${n}`);
   if (el) el.remove();
+  scheduleContractDraftSave();
 }
 
 // ── PAYMENT CALC ──
@@ -922,6 +931,112 @@ function updatePayCalc() {
     calc.style.display = 'none';
   }
 }
+
+// ── DRAFT AUTOSAVE ──
+// iOS Safari can discard and reload a backgrounded tab, or the input-zoom
+// viewport shift can feel like a reload — either way, unsaved contract data
+// was previously lost with no recovery. This mirrors quote-generator.js's
+// draft pattern, scoped to this form's own fields.
+const CONTRACT_STORAGE_KEY = 'aakaara_contract_draft';
+let contractDraftTimer = null;
+let isRestoringContractDraft = false;
+
+const CONTRACT_FIELD_IDS = [
+  'clientName', 'clientEmail', 'clientPhone', 'clientAddress',
+  'eventType', 'eventLocation', 'quoteDate',
+  'pricingMode', 'totalValue', 'hourlyRate', 'hourlyHours', 'travelMode',
+  'extraNotes',
+];
+const CONTRACT_CHECK_IDS = [
+  'svcPhoto', 'svcVideo', 'svcTeaser', 'svcDocfilm', 'svcRaw', 'svcGallery',
+  'svcNYC', 'svcStream', 'svcSameday', 'svcDrone',
+];
+
+function collectContractDraft() {
+  const state = {};
+  CONTRACT_FIELD_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) state[id] = el.value;
+  });
+  CONTRACT_CHECK_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) state[id] = el.checked;
+  });
+  state.days = [...document.querySelectorAll('#dayBlocks .day-block')].map(block => ({
+    date: block.querySelector('.day-date')?.value || '',
+    hours: block.querySelector('.day-hours')?.value || '',
+    desc: block.querySelector('.day-desc')?.value || '',
+  }));
+  state.deliverables = [...document.querySelectorAll('#delRows .deliverable-row')].map(row => ({
+    name: row.querySelector('.del-name')?.value || '',
+    count: row.querySelector('.del-count')?.value || '',
+  }));
+  return state;
+}
+
+function saveContractDraft() {
+  try { localStorage.setItem(CONTRACT_STORAGE_KEY, JSON.stringify(collectContractDraft())); } catch {}
+}
+
+function scheduleContractDraftSave() {
+  if (isRestoringContractDraft) return;
+  clearTimeout(contractDraftTimer);
+  contractDraftTimer = setTimeout(saveContractDraft, 800);
+}
+
+function clearContractDraft() {
+  try { localStorage.removeItem(CONTRACT_STORAGE_KEY); } catch {}
+}
+
+function restoreContractDraft() {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem(CONTRACT_STORAGE_KEY)); } catch { saved = null; }
+  if (!saved) return false;
+
+  isRestoringContractDraft = true;
+
+  CONTRACT_FIELD_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && saved[id] !== undefined) el.value = saved[id];
+  });
+  CONTRACT_CHECK_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && saved[id] !== undefined) el.checked = saved[id];
+  });
+
+  document.getElementById('dayBlocks').innerHTML = '';
+  dayCounter = 0;
+  const days = saved.days && saved.days.length ? saved.days : [{}, {}];
+  days.forEach(day => {
+    addDay();
+    const block = document.getElementById(`day-${dayCounter}`);
+    if (day.date) block.querySelector('.day-date').value = day.date;
+    if (day.hours) block.querySelector('.day-hours').value = day.hours;
+    if (day.desc) block.querySelector('.day-desc').value = day.desc;
+  });
+
+  document.getElementById('delRows').innerHTML = '';
+  delCounter = 0;
+  const deliverables = saved.deliverables && saved.deliverables.length ? saved.deliverables : [{}, {}, {}];
+  deliverables.forEach(del => {
+    addDeliverable();
+    const row = document.getElementById(`del-${delCounter}`);
+    if (del.name) row.querySelector('.del-name').value = del.name;
+    if (del.count) row.querySelector('.del-count').value = del.count;
+  });
+
+  updatePayCalc();
+  isRestoringContractDraft = false;
+  showToast('Draft restored from your last session');
+  return true;
+}
+
+document.addEventListener('input', e => {
+  if (e.target.closest('#contractForm')) scheduleContractDraftSave();
+});
+document.addEventListener('change', e => {
+  if (e.target.closest('#contractForm')) scheduleContractDraftSave();
+});
 
 // ── HELPERS ──
 function fmtDate(val) {
@@ -1555,6 +1670,7 @@ function generateContract(action) {
       window._currentPdfName = fileName;
     } else {
       doc.save(fileName);
+      clearContractDraft();
       showToast('Contract PDF downloaded');
     }
 
@@ -1572,6 +1688,7 @@ function closePreview() {
 function downloadFromPreview() {
   if (window._currentPdfDoc) {
     window._currentPdfDoc.save(window._currentPdfName || 'Aakaara_Contract.pdf');
+    clearContractDraft();
     showToast('Contract PDF downloaded');
   }
 }
@@ -1611,6 +1728,7 @@ function showToast(msg, warn) {
 
 // ── RESET ──
 function resetForm() {
+  clearContractDraft();
   document.getElementById('contractForm').reset();
   document.getElementById('dayBlocks').innerHTML = '';
   document.getElementById('delRows').innerHTML = '';
@@ -1629,6 +1747,7 @@ function resetForm() {
 
 // ── INIT ──
 window.addEventListener('DOMContentLoaded', () => {
+  if (restoreContractDraft()) return;
   document.getElementById('quoteDate').value = new Date().toISOString().split('T')[0];
   addDay();
   addDay();
