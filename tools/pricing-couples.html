@@ -342,7 +342,7 @@
 
     .addon-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 0.8rem;
     }
 
@@ -401,6 +401,85 @@
       color: var(--ivory);
     }
 
+    /* ── REEL REFERENCE ── */
+    .reel-ref {
+      padding: 0 0 3rem;
+    }
+
+    .reel-ref-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .reel-ref-header h2 {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: 1.8rem;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .reel-ref-header::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .reel-ref-grid {
+      display: flex;
+      align-items: stretch;
+      gap: 1rem;
+      height: 420px;
+    }
+
+    .reel-ref-card {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--card-bg);
+      height: 100%;
+    }
+
+    .reel-ref-card.vertical {
+      aspect-ratio: 9 / 16;
+      flex-shrink: 0;
+    }
+
+    .reel-ref-card.horizontal {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .reel-ref-card video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.85) saturate(0.92);
+      background: #000;
+    }
+
+    .reel-ref-label {
+      position: absolute;
+      top: 0.9rem;
+      left: 0.9rem;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid rgba(201, 149, 107, 0.3);
+      border-radius: 999px;
+      font-size: 0.5rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(12, 10, 13, 0.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 1;
+    }
+
     /* ── CINEMATIC SECTION ── */
     .cinematic {
       position: relative;
@@ -410,11 +489,12 @@
       border: 1px solid var(--line);
     }
 
-    .cinematic img {
+    .cinematic video {
       width: 100%;
       aspect-ratio: 680 / 280;
       object-fit: cover;
       filter: brightness(0.6) saturate(0.85);
+      background: #000;
     }
 
     .cinematic-overlay {
@@ -509,6 +589,9 @@
       .pkg-grid { grid-template-columns: 1fr; max-width: 480px; }
       .hero-overlay { padding: 2.5rem 2rem; }
       .hero { aspect-ratio: 16 / 9; }
+      .reel-ref-grid { flex-direction: column; height: auto; max-width: 420px; }
+      .reel-ref-card.vertical, .reel-ref-card.horizontal { height: auto; flex: none; width: 100%; }
+      .reel-ref-card.horizontal { aspect-ratio: 16 / 9; }
     }
 
     @media (max-width: 600px) {
@@ -577,7 +660,7 @@
             </ul>
             <div class="pkg-price">
               <span class="pkg-price-currency">$</span>
-              <span class="pkg-price-amount">300</span>
+              <span class="pkg-price-amount">350</span>
             </div>
           </div>
         </div>
@@ -599,7 +682,7 @@
             </ul>
             <div class="pkg-price">
               <span class="pkg-price-currency">$</span>
-              <span class="pkg-price-amount">500</span>
+              <span class="pkg-price-amount">600</span>
             </div>
           </div>
         </div>
@@ -621,7 +704,7 @@
             </ul>
             <div class="pkg-price">
               <span class="pkg-price-currency">$</span>
-              <span class="pkg-price-amount">700</span>
+              <span class="pkg-price-amount">850</span>
             </div>
           </div>
         </div>
@@ -641,32 +724,22 @@
 
       <div class="addon-grid">
         <div class="addon">
-          <p class="addon-duration">Short Reel</p>
-          <h4 class="addon-time">30 – 40 sec</h4>
+          <p class="addon-duration">Aesthetic Reel</p>
+          <h4 class="addon-time">Up to 90 sec</h4>
           <p class="addon-desc">Aesthetic reel with B-roll, color grading, and music sync</p>
           <div class="addon-price">
             <span class="addon-price-currency">$</span>
-            <span class="addon-price-amount">75</span>
-          </div>
-        </div>
-
-        <div class="addon">
-          <p class="addon-duration">Standard Reel</p>
-          <h4 class="addon-time">30 sec – 1 min</h4>
-          <p class="addon-desc">Stylized reel with transitions, cuts, and storytelling</p>
-          <div class="addon-price">
-            <span class="addon-price-currency">$</span>
-            <span class="addon-price-amount">100</span>
-          </div>
-        </div>
-
-        <div class="addon">
-          <p class="addon-duration">Extended Reel</p>
-          <h4 class="addon-time">2+ min</h4>
-          <p class="addon-desc">Multi-location story with mixed clips and cinematic edit</p>
-          <div class="addon-price">
-            <span class="addon-price-currency">$</span>
             <span class="addon-price-amount">150</span>
+          </div>
+        </div>
+
+        <div class="addon">
+          <p class="addon-duration">Pre-Wedding Video</p>
+          <h4 class="addon-time">2 – 3 min</h4>
+          <p class="addon-desc">Cinematic multi-location story with mixed clips and music sync</p>
+          <div class="addon-price">
+            <span class="addon-price-currency">$</span>
+            <span class="addon-price-amount">250</span>
           </div>
         </div>
       </div>
@@ -677,9 +750,33 @@
       </a>
     </div>
 
+    <!-- Reel Reference -->
+    <div class="reel-ref">
+      <div class="reel-ref-header">
+        <h2>Reel Reference</h2>
+      </div>
+      <div class="reel-ref-grid">
+        <div class="reel-ref-card vertical">
+          <span class="reel-ref-label">Vertical</span>
+          <video id="reelRefVertical" muted loop playsinline preload="metadata"></video>
+        </div>
+        <div class="reel-ref-card horizontal">
+          <span class="reel-ref-label">Horizontal</span>
+          <video id="reelRefHorizontal" muted loop playsinline preload="metadata"></video>
+        </div>
+      </div>
+    </div>
+
     <!-- Cinematic Video -->
     <div class="cinematic">
-      <img src="/images/couple-portraits/sameeksha-aman/5.jpg" alt="Cinematic NYC couple video">
+      <video
+        id="cinematicVideo"
+        poster="/images/couple-portraits/sameeksha-aman/5.jpg"
+        muted
+        loop
+        playsinline
+        preload="metadata"
+      ></video>
       <div class="cinematic-overlay">
         <span class="cinematic-tag">Premium Add-On</span>
         <h3>Full Cinematic Video</h3>
@@ -701,5 +798,47 @@
 
   </div>
 
+  <script>
+    (function () {
+      var sources = [
+        { id: 'cinematicVideo', url: 'https://vz-757250d0-999.b-cdn.net/ede4e777-1f11-42ee-935a-b5cd09d973b1/playlist.m3u8' },
+        { id: 'reelRefVertical', url: 'https://vz-757250d0-999.b-cdn.net/40d26a21-38a6-48f4-abcf-a263b644befd/playlist.m3u8' },
+        { id: 'reelRefHorizontal', url: 'https://vz-757250d0-999.b-cdn.net/7b56096c-bbfa-46ba-b6be-19fba1c223e2/playlist.m3u8' }
+      ];
+
+      var hlsScriptPromise = null;
+      function loadHlsScript() {
+        if (!hlsScriptPromise) {
+          hlsScriptPromise = new Promise(function (resolve) {
+            var s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js';
+            s.onload = resolve;
+            document.head.appendChild(s);
+          });
+        }
+        return hlsScriptPromise;
+      }
+
+      sources.forEach(function (source) {
+        var video = document.getElementById(source.id);
+        if (!video) return;
+
+        function play() { video.play().catch(function () {}); }
+
+        if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = source.url;
+          play();
+        } else {
+          loadHlsScript().then(function () {
+            if (!window.Hls || !Hls.isSupported()) return;
+            var hls = new Hls({ maxBufferLength: 60 });
+            hls.loadSource(source.url);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, play);
+          });
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
