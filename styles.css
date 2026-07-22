@@ -1024,12 +1024,12 @@ body.intro-active #heroScroll { opacity: 0; }
   overflow: hidden;
 }
 
-/* Image — smooth blur + dim on hover (like racking focus away) */
+/* Image — black & white at rest, blooms into color on hover */
 .gallery-item.gi-cinematic .gi-bg {
   transition: filter 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 8s var(--ease);
 }
 .gallery-item.gi-cinematic:hover .gi-bg {
-  filter: blur(8px) brightness(0.35) saturate(0.7);
+  filter: grayscale(0%) brightness(1.03) contrast(1);
   transform: scale(1.08);
 }
 
@@ -1468,15 +1468,15 @@ body.intro-active #heroScroll { opacity: 0; }
   opacity: 0.3;
 }
 
-/* ── Center card always in color ── */
+/* ── Center card: black & white at rest, blooms into color on hover ── */
 .ethereal-carousel .gallery-item[data-ec-offset="0"] .gi-bg {
-  filter: grayscale(0%) brightness(1) contrast(1);
+  filter: grayscale(100%) brightness(0.9) contrast(1.05);
 }
 /* ── Kill scroll parallax on ALL carousel cards — image stays still ── */
 .ethereal-carousel .gallery-item .gi-bg {
   transform: none !important;
 }
-/* ── But allow hover zoom on center card ── */
+/* ── But allow hover zoom + color reveal on center card ── */
 .ethereal-carousel .gallery-item[data-ec-offset="0"]:hover .gi-bg {
   transform: scale(1.06) !important;
   filter: grayscale(0%) brightness(1) contrast(1);
@@ -3895,7 +3895,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 }
 
 @media (hover: none) {
-  .gallery-item .gi-bg { filter: grayscale(0%) brightness(1) contrast(1); }
+  .gallery-item .gi-bg { filter: grayscale(0%) brightness(1) contrast(1) !important; }
   .gallery-item:hover { transform: none; box-shadow: none; }
   .gallery-item:active { transform: translateY(-5px); box-shadow: 0 24px 56px rgba(0,0,0,0.5); }
   .gallery-item .gi-overlay { opacity: 1; background: linear-gradient(to top, rgba(9,8,11,0.88) 0%, rgba(9,8,11,0.22) 48%, transparent 100%); }
@@ -4278,14 +4278,6 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 @media (max-width: 768px) {
   /* MOBILE FIX: was 38×38px — raised to 44×44px to meet touch-target minimum */
   .back-to-top { bottom: 1.5rem; right: 1.5rem; width: 44px; height: 44px; }
-}
-
-/* Specific filter for Abhinav & Megha in Weddings */
-.gallery-item[data-cat="wedding"][data-title="Abhinav & Megha"] .gi-bg {
-  filter: grayscale(100%) brightness(0.8) contrast(1.12);
-}
-.gallery-item[data-cat="wedding"][data-title="Abhinav & Megha"]:hover .gi-bg {
-  filter: grayscale(0%) brightness(1.03) contrast(1);
 }
 
 /* ═══════════════════════════════════════════════════════════
