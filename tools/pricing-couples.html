@@ -762,7 +762,7 @@
         </div>
         <div class="reel-ref-card horizontal">
           <span class="reel-ref-label">Horizontal</span>
-          <video id="reelRefHorizontal" muted loop playsinline preload="metadata"></video>
+          <video id="reelRefHorizontal" muted loop playsinline preload="metadata" poster="/images/video-covers/prewedding/akhila-subhash.jpg"></video>
         </div>
       </div>
     </div>
@@ -819,9 +819,19 @@
         return hlsScriptPromise;
       }
 
+      // Safety net for in-app browsers (e.g. Instagram) that silently block
+      // JS-triggered autoplay — a tap anywhere retries every video's play().
+      var pendingVideos = [];
+      function retryPendingPlay() {
+        pendingVideos.forEach(function (v) { v.play().catch(function () {}); });
+      }
+      document.addEventListener('touchstart', retryPendingPlay, { once: true, passive: true });
+      document.addEventListener('click', retryPendingPlay, { once: true });
+
       sources.forEach(function (source) {
         var video = document.getElementById(source.id);
         if (!video) return;
+        pendingVideos.push(video);
 
         function play() { video.play().catch(function () {}); }
 
