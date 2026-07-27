@@ -4,7 +4,7 @@ import {
   deriveWeddingDate, formatDate, compareProjectsByDate,
 } from './board-utils.js';
 import { showErrorToast, setCurrentProfile } from './board-shared.js';
-import { openProjectModal } from './project-modal.js';
+import { openProjectModal, openDetailPanel } from './project-modal.js';
 
 async function requireSession() {
   const { data } = await supabase.auth.getSession();
@@ -73,6 +73,7 @@ function renderCard(project) {
   card.addEventListener('dragstart', (e) => {
     e.dataTransfer.setData('text/plain', project.id);
   });
+  card.addEventListener('click', () => openDetailPanel(project));
 
   const name = document.createElement('div');
   name.className = 'card-client-name';
