@@ -124,6 +124,22 @@ export async function renderBoard() {
   });
 }
 
+let realtimeChannel = null;
+
+function subscribeToChanges() {
+  realtimeChannel = supabase
+    .channel('board-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => renderBoard())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'sub_events' }, () => renderBoard())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, () => renderBoard())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'activity_log' }, () => renderBoard())
+    .subscribe((status) => {
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        showErrorToast('Live updates disconnected — reconnecting…');
+      }
+    });
+}
+
 async function init() {
   const user = await requireSession();
   if (!user) return;
@@ -133,8 +149,10 @@ async function init() {
 
   renderColumns();
   await renderBoard();
+  subscribeToChanges();
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
+    if (realtimeChannel) supabase.removeChannel(realtimeChannel);
     await supabase.auth.signOut();
     window.location.href = 'login.html';
   });
