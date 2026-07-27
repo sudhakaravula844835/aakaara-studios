@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /board/
 
 Sitemap: https://aakaarastudiosnyc.com/sitemap.xml

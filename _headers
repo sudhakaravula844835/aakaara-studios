@@ -131,6 +131,13 @@
   Cache-Control: no-store
   X-Robots-Tag: noindex, nofollow
 
+# ─────────────────────────────────────────────────────────────────────────────
+# PROJECT BOARD  — internal Owner/PM tool, no caching, no indexing
+# ─────────────────────────────────────────────────────────────────────────────
+/board/*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex, nofollow
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # INTERNAL / UTILITY PATHS  — crawl-blocked, no special caching
