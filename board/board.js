@@ -177,6 +177,19 @@ function subscribeToChanges() {
 }
 
 async function init() {
+  // Wire up header button handlers before any network awaits below, so
+  // "+ New Project" / "Log Out" are never visible-but-inert. On a slow
+  // connection the projects fetch can take long enough for a real user
+  // (or an eager click right after paint) to hit these buttons before
+  // listeners were attached, silently swallowing the click.
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    if (realtimeChannel) supabase.removeChannel(realtimeChannel);
+    await supabase.auth.signOut();
+    window.location.href = 'login.html';
+  });
+
+  document.getElementById('addProjectBtn').addEventListener('click', () => openProjectModal(null));
+
   const user = await requireSession();
   if (!user) return;
 
@@ -186,14 +199,6 @@ async function init() {
   renderColumns();
   await renderBoard();
   subscribeToChanges();
-
-  document.getElementById('logoutBtn').addEventListener('click', async () => {
-    if (realtimeChannel) supabase.removeChannel(realtimeChannel);
-    await supabase.auth.signOut();
-    window.location.href = 'login.html';
-  });
-
-  document.getElementById('addProjectBtn').addEventListener('click', () => openProjectModal(null));
 }
 
 document.addEventListener('DOMContentLoaded', init);
