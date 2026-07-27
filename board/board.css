@@ -140,7 +140,12 @@ body {
 .modal-backdrop {
   display: none; position: fixed; inset: 0; background: rgba(9,8,11,0.82);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  z-index: 1000; align-items: center; justify-content: center; padding: 1.5rem;
+  /* Must stack above .detail-backdrop (z-index 1000): the detail panel's
+     Edit button (and the sub-event add/edit modal) can open a modal-backdrop
+     while the detail panel is still open underneath it. Without this, the
+     detail-panel DOM (which comes after .modal-backdrop in index.html)
+     would paint on top and intercept clicks on the modal's own buttons. */
+  z-index: 1100; align-items: center; justify-content: center; padding: 1.5rem;
 }
 .modal-backdrop.open { display: flex; }
 .modal-box {
@@ -199,12 +204,19 @@ body {
 .detail-title {
   font-family: var(--font-display); font-size: 1.6rem; font-weight: 300; color: var(--ivory);
 }
+.detail-header-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
 .detail-close {
   background: none; border: 1px solid rgba(201,149,107,0.15); color: rgba(250,246,241,0.4);
   border-radius: 4px; width: 30px; height: 30px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
 }
 .detail-close:hover { border-color: var(--rose); color: var(--rose); }
+.detail-edit {
+  background: none; border: 1px solid rgba(201,149,107,0.15); color: rgba(250,246,241,0.4);
+  border-radius: 4px; height: 30px; padding: 0 0.65rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 0.7rem;
+}
+.detail-edit:hover { border-color: var(--rose); color: var(--rose); }
 .detail-section { margin-bottom: 2rem; }
 .detail-section-title {
   font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--rose);
@@ -232,6 +244,11 @@ body {
   cursor: pointer; margin-top: 0.3rem; padding: 0; text-decoration: underline;
 }
 .timeline-edit-btn:hover { color: var(--rose); }
+.timeline-delete-btn {
+  background: none; border: none; color: rgba(250,246,241,0.35); font-size: 0.68rem;
+  cursor: pointer; margin-top: 0.3rem; margin-left: 0.75rem; padding: 0; text-decoration: underline;
+}
+.timeline-delete-btn:hover { color: #e07070; }
 .timeline-empty { color: rgba(250,246,241,0.25); font-size: 0.8rem; padding: 0.5rem 0; }
 .btn-add-subevent {
   margin-top: 0.5rem; background: none; border: 1px dashed rgba(201,149,107,0.25);

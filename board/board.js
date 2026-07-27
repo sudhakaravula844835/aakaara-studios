@@ -4,7 +4,10 @@ import {
   deriveWeddingDate, formatDate, compareProjectsByDate,
 } from './board-utils.js';
 import { showErrorToast, setCurrentProfile } from './board-shared.js';
-import { openProjectModal, openDetailPanel } from './project-modal.js';
+import {
+  openProjectModal, openDetailPanel, getCurrentDetailProjectId,
+  renderSubEventsTimeline, renderActivityFeed,
+} from './project-modal.js';
 
 async function requireSession() {
   const { data } = await supabase.auth.getSession();
@@ -22,8 +25,16 @@ async function fetchProfile(userId) {
     .eq('id', userId)
     .single();
   if (error) {
-    showErrorToast('Could not load your profile.');
-    return { full_name: '', role: 'pm' };
+    // Do NOT synthesize a fake-but-plausible profile here — that would
+    // silently mis-attribute every subsequent comment to a blank-named PM,
+    // permanently, in an audit-adjacent record. Leave currentProfile at its
+    // board-shared.js default (full_name: '') and disable the comment
+    // composer so authorship can't be forged. handleCommentSubmit also
+    // double-checks getCurrentProfile().full_name as defense in depth.
+    showErrorToast('Could not load your profile — comments are disabled.');
+    const commentSubmitBtn = document.querySelector('#commentForm button[type="submit"]');
+    if (commentSubmitBtn) commentSubmitBtn.disabled = true;
+    return null;
   }
   return data;
 }
@@ -31,7 +42,7 @@ async function fetchProfile(userId) {
 async function fetchProjects() {
   const { data, error } = await supabase
     .from('projects')
-    .select('*, sub_events(id, name, event_date, venue, photo_selection_status, photo_selected_count, photo_total_count)');
+    .select('id, client_name, client_email, client_phone, stage, video_editing_substatus, package_tier, hours_booked, quoted_price, confirmed_price, deposit_paid, balance_paid, contract_url, quote_pdf_url, sub_events(id, name, event_date, venue, photo_selection_status, photo_selected_count, photo_total_count)');
   if (error) {
     showErrorToast('Could not load projects.');
     return [];
@@ -116,7 +127,14 @@ async function handleDrop(e, newStage) {
   e.preventDefault();
   const projectId = e.dataTransfer.getData('text/plain');
   const card = document.querySelector(`.project-card[data-id="${projectId}"]`);
-  if (card) card.classList.add('card-pending');
+
+  if (card) {
+    // Same-column no-op guard: dropping a card back into the column it
+    // already lives in shouldn't hit Supabase at all.
+    const sourceColumn = card.closest('.board-column-cards');
+    if (sourceColumn && sourceColumn.dataset.stage === newStage) return;
+    card.classList.add('card-pending');
+  }
 
   const { error } = await supabase.from('projects').update({ stage: newStage }).eq('id', projectId);
 
@@ -139,11 +157,16 @@ async function handleDrop(e, newStage) {
   }, 3000);
 }
 
+let renderGeneration = 0;
+
 export async function renderBoard() {
+  const myGeneration = ++renderGeneration;
   const projects = await fetchProjects();
+  if (myGeneration !== renderGeneration) return; // a newer render started while we were fetching; abandon this stale one
 
   STAGE_COLUMNS.forEach(col => {
     const columnCardsEl = document.querySelector(`.board-column-cards[data-stage="${col.key}"]`);
+    if (!columnCardsEl) return;
     columnCardsEl.innerHTML = '';
 
     const columnProjects = projects.filter(p => p.stage === col.key).sort(compareProjectsByDate);
@@ -166,9 +189,26 @@ function subscribeToChanges() {
   realtimeChannel = supabase
     .channel('board-changes')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => renderBoard())
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'sub_events' }, () => renderBoard())
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, () => renderBoard())
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'activity_log' }, () => renderBoard())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'sub_events' }, (payload) => {
+      // Sub-event dates affect card display (deriveWeddingDate), so the
+      // board still needs a full redraw. Additionally, if the detail panel
+      // is open for the affected project, refresh its timeline in place so
+      // a second person's edit shows up without closing/reopening.
+      renderBoard();
+      const projectId = payload.new?.project_id ?? payload.old?.project_id;
+      if (projectId && getCurrentDetailProjectId() === projectId) renderSubEventsTimeline();
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, (payload) => {
+      // Nothing on a board card reads comments — do NOT redraw the whole
+      // board (that resets every column's scroll position). Only the open
+      // detail panel's activity feed, if any, cares about this.
+      const projectId = payload.new?.project_id ?? payload.old?.project_id;
+      if (projectId && getCurrentDetailProjectId() === projectId) renderActivityFeed();
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'activity_log' }, (payload) => {
+      const projectId = payload.new?.project_id ?? payload.old?.project_id;
+      if (projectId && getCurrentDetailProjectId() === projectId) renderActivityFeed();
+    })
     .subscribe((status) => {
       if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
         showErrorToast('Live updates disconnected — reconnecting…');
@@ -194,7 +234,7 @@ async function init() {
   if (!user) return;
 
   const profile = await fetchProfile(user.id);
-  setCurrentProfile(profile);
+  if (profile) setCurrentProfile(profile);
 
   renderColumns();
   await renderBoard();

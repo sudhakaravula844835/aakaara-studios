@@ -62,6 +62,14 @@ export function validateProjectForm(fields) {
   return { valid: Object.keys(errors).length === 0, errors };
 }
 
+export function validateSubEventForm(fields) {
+  const errors = {};
+  if (!fields.name || !fields.name.trim()) {
+    errors.name = 'Sub-event name is required.';
+  }
+  return { valid: Object.keys(errors).length === 0, errors };
+}
+
 export function photoSelectionLabel(selectedCount, totalCount) {
   if (!totalCount) return null;
   return `${selectedCount}/${totalCount} selected`;

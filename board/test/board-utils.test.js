@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   STAGE_COLUMNS, stageIndex, stageLabel, progressSegments,
   deriveWeddingDate, formatDate, compareProjectsByDate,
-  validateProjectForm, photoSelectionLabel, synthesizeActivityLine,
+  validateProjectForm, validateSubEventForm, photoSelectionLabel, synthesizeActivityLine,
 } from '../board-utils.js';
 
 describe('STAGE_COLUMNS', () => {
@@ -71,6 +71,20 @@ describe('validateProjectForm', () => {
   });
   it('rejects a whitespace-only client_name', () => {
     expect(validateProjectForm({ client_name: '   ' }).valid).toBe(false);
+  });
+});
+
+describe('validateSubEventForm', () => {
+  it('requires name', () => {
+    const result = validateSubEventForm({ name: '' });
+    expect(result.valid).toBe(false);
+    expect(result.errors.name).toBeTruthy();
+  });
+  it('passes with a name', () => {
+    expect(validateSubEventForm({ name: 'Haldi' }).valid).toBe(true);
+  });
+  it('rejects a whitespace-only name', () => {
+    expect(validateSubEventForm({ name: '   ' }).valid).toBe(false);
   });
 });
 

@@ -1,6 +1,15 @@
 import { supabase } from './supabase-client.js';
-import { validateProjectForm, formatDate, photoSelectionLabel, synthesizeActivityLine } from './board-utils.js';
+import {
+  validateProjectForm, validateSubEventForm, formatDate,
+  photoSelectionLabel, synthesizeActivityLine,
+} from './board-utils.js';
 import { showErrorToast, getCurrentProfile } from './board-shared.js';
+// Circular import: board.js imports openProjectModal/openDetailPanel/etc from
+// this module, and this module imports renderBoard from board.js. Safe here
+// because renderBoard is a hoisted function declaration and is only invoked
+// from inside an event handler (after a user submits the form), never at
+// module-evaluation time — by then both modules have finished initializing.
+import { renderBoard } from './board.js';
 
 export function openProjectModal(project) {
   const backdrop = document.getElementById('projectModalBackdrop');
@@ -63,7 +72,20 @@ async function handleProjectFormSubmit(e) {
     return;
   }
 
+  // If the detail panel is open for the project we just edited, refresh its
+  // in-memory snapshot too — otherwise re-opening Edit from the still-open
+  // panel (without closing/reopening it) would show stale pre-edit values,
+  // even though the save itself succeeded.
+  if (editId && currentDetailProject && currentDetailProject.id === editId) {
+    currentDetailProject = { ...currentDetailProject, ...fields };
+    document.getElementById('detailClientName').textContent = currentDetailProject.client_name;
+  }
+
   closeProjectModal();
+  // Don't rely solely on the realtime redraw — if realtime is ever silently
+  // down (this exact failure mode happened once before the publication was
+  // fixed), a user clicking Save should still see the project appear.
+  await renderBoard();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -79,6 +101,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let currentDetailProject = null;
 
+export function getCurrentDetailProjectId() {
+  return currentDetailProject?.id ?? null;
+}
+
 export async function openDetailPanel(project) {
   currentDetailProject = project;
   document.getElementById('detailClientName').textContent = project.client_name;
@@ -92,7 +118,7 @@ function closeDetailPanel() {
   currentDetailProject = null;
 }
 
-async function renderSubEventsTimeline() {
+export async function renderSubEventsTimeline() {
   const { data: subEvents, error } = await supabase
     .from('sub_events')
     .select('*')
@@ -150,6 +176,19 @@ async function renderSubEventsTimeline() {
     editBtn.addEventListener('click', () => openSubEventModal(se));
     content.appendChild(editBtn);
 
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'timeline-delete-btn';
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.addEventListener('click', async () => {
+      const { error } = await supabase.from('sub_events').delete().eq('id', se.id);
+      if (error) {
+        showErrorToast('Could not delete sub-event — please try again.');
+        return;
+      }
+      await renderSubEventsTimeline();
+    });
+    content.appendChild(deleteBtn);
+
     item.appendChild(content);
     container.appendChild(item);
   });
@@ -157,6 +196,7 @@ async function renderSubEventsTimeline() {
 
 function openSubEventModal(subEvent) {
   document.getElementById('subEventModalTitle').textContent = subEvent ? 'Edit Sub-Event' : 'New Sub-Event';
+  document.getElementById('seNameError').textContent = '';
   document.getElementById('seId').value = subEvent ? subEvent.id : '';
   document.getElementById('seName').value = subEvent ? subEvent.name : '';
   document.getElementById('seDate').value = subEvent ? (subEvent.event_date || '') : '';
@@ -176,6 +216,13 @@ async function handleSubEventFormSubmit(e) {
     event_date: document.getElementById('seDate').value || null,
     venue: document.getElementById('seVenue').value.trim() || null,
   };
+
+  const { valid, errors } = validateSubEventForm(fields);
+  if (!valid) {
+    document.getElementById('seNameError').textContent = errors.name || '';
+    return;
+  }
+
   const editId = document.getElementById('seId').value;
 
   const { error } = editId
@@ -193,6 +240,7 @@ async function handleSubEventFormSubmit(e) {
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('detailClose').addEventListener('click', closeDetailPanel);
+  document.getElementById('detailEditBtn').addEventListener('click', () => openProjectModal(currentDetailProject));
   document.getElementById('detailBackdrop').addEventListener('click', (e) => {
     if (e.target.id === 'detailBackdrop') closeDetailPanel();
   });
@@ -204,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ---- Activity & Comments Feed ----
 
-async function renderActivityFeed() {
+export async function renderActivityFeed() {
   const [{ data: comments, error: commentsError }, { data: activity, error: activityError }] = await Promise.all([
     supabase.from('comments').select('*').eq('project_id', currentDetailProject.id).order('created_at', { ascending: true }),
     supabase.from('activity_log').select('*').eq('project_id', currentDetailProject.id).order('created_at', { ascending: true }),
@@ -250,7 +298,7 @@ async function renderActivityFeed() {
 
       const authorName = document.createElement('span');
       authorName.className = 'feed-author-name';
-      authorName.textContent = entry.data.author_label;
+      authorName.textContent = entry.data.author_label || '?';
       authorLine.appendChild(authorName);
 
       if (entry.data.internal) {
@@ -291,6 +339,14 @@ async function handleCommentSubmit(e) {
 
   const internal = document.getElementById('commentInternal').checked;
   const profile = getCurrentProfile();
+
+  // Defense in depth: the submit button is disabled when the profile fetch
+  // fails (see board.js's fetchProfile), but double-check authorship here
+  // too so a comment can never be posted under a blank/unknown name.
+  if (!profile.full_name) {
+    showErrorToast('Your profile could not be loaded — comments are disabled.');
+    return;
+  }
 
   const { error } = await supabase.from('comments').insert({
     project_id: currentDetailProject.id,
