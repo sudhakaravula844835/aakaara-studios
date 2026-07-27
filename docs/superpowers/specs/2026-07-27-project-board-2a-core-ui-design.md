@@ -83,15 +83,19 @@ No sub-event fields here — those are added afterward from the detail panel. Sa
 
 Opens on card click (not drag — a `click` handler distinct from the drag lifecycle, so drag doesn't accidentally trigger it).
 
-**Sub-events section:** list of existing `sub_events` for the project (name, date, venue), with add/edit/delete. Each row also shows `photo_selected_count / photo_total_count` read-only (will be `0 / 0` for every sub-event until sub-project 3 ships the client photo-selection flow — that's expected, not a bug).
+**Sub-events section:** rendered as a vertical connected timeline (thin gold line, one dot per sub-event, name/date/venue beside each) rather than a plain list — the signature visual element for this panel. Dot fill state keys off `photo_selection_status`: hollow for `not_started`, ring-only for `in_progress`, solid gold for `complete`. Each event shows `photo_selected_count / photo_total_count` as a small label underneath when `photo_total_count > 0` (e.g. "12/40 selected"); otherwise no count is shown at all — displaying "0/0" for an event nobody's started selecting photos for yet reads as broken, not informative. Both counts stay read-only here regardless — they're populated by the client-facing flow in sub-project 3, not editable from this panel. Add/edit/delete controls cover only `name`, `event_date`, `venue`.
 
 **Comments/activity feed:** a single chronological list merging `comments` (manually posted, shown with author label) and `activity_log` (auto-generated, shown as plain "PM changed stage: Booked → Shoot Completed"-style lines) — read-only for the log half, with a text input, a "Hidden from client" checkbox, and a submit button to post a new comment.
 
 The checkbox defaults to **checked** (`internal: true`), not unchecked. Reasoning: no client-facing view exists until sub-project 3, so every comment posted through 2a is a PM/Owner jotting a working note with no client watching — that's the realistic default use, not the exception. If new comments defaulted to `internal: false`, ordinary day-to-day notes written today would silently become client-visible the moment sub-project 3 ships, with no record of which ones were meant to be private. Defaulting internal keeps that decision explicit and reversible (uncheck it when a comment is actually meant for the client) rather than accidentally leaking history later. Internal comments show a small "Internal" tag in the feed so it's visually clear which is which.
 
+Visual treatment distinguishes the two row types rather than rendering them identically: `comments` rows get an avatar (the author's first initial, gold-bordered circle, set in Cormorant Garamond) beside their full name and body text. `activity_log` rows render quieter — no avatar, a muted marker instead, monospace-free (per the font-family note below) synthesized text in `--font-body`. This makes it visually obvious at a glance which lines are a person talking and which are the system logging a change, without needing to read the text itself.
+
 ## Styling
 
 `board.css` reuses root `styles.css` CSS vars directly (`--noir: #09080b`, `--rose: #c9956b`, `--ivory`, `--font-display`, `--font-body`, `--ease`) — verified against the approved mockup, no drift. Layout patterns (card structure, modal chrome) adapt `admin/dashboard.css`'s existing card-grid/modal CSS rather than inventing new conventions. Mobile: columns become a horizontal-scroll strip, matching the existing portfolio/video filter-pill mobile pattern. Empty states ("No sub-events yet", "No comments yet") stay plain and direct — not apologetic, not cutesy — since an empty section is an invitation to act, not a mood moment.
+
+**Fonts:** the site uses exactly two font families site-wide (`--font-display`: Cormorant Garamond; `--font-body`: Outfit) — confirmed by grepping `styles.css`, no monospace family exists anywhere. Dates/timestamps in the board use `--font-body`, not a newly-introduced monospace font — a third family would break the site's established two-font convention for no real gain.
 
 ## Testing
 
