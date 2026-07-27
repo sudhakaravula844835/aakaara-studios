@@ -5,5 +5,6 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['**/*.test.js'],
     exclude: ['**/node_modules/**', '**/dist/**', '**/*.spec.js', '**/.claude/**'],
+    setupFiles: ['./board/test/vitest.setup.js'],
   },
 });

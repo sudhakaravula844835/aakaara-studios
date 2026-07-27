@@ -24,3 +24,7 @@ tools/aakaara-business-card-print.pdf
 # AI brainstorm/planning working files
 .superpowers/
 docs/superpowers/
+
+# Secrets (Supabase service-role key, etc.) — never commit
+.env
+board/.env
