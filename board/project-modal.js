@@ -1,6 +1,6 @@
 import { supabase } from './supabase-client.js';
-import { validateProjectForm, formatDate, photoSelectionLabel } from './board-utils.js';
-import { showErrorToast } from './board-shared.js';
+import { validateProjectForm, formatDate, photoSelectionLabel, synthesizeActivityLine } from './board-utils.js';
+import { showErrorToast, getCurrentProfile } from './board-shared.js';
 
 export function openProjectModal(project) {
   const backdrop = document.getElementById('projectModalBackdrop');
@@ -84,6 +84,7 @@ export async function openDetailPanel(project) {
   document.getElementById('detailClientName').textContent = project.client_name;
   document.getElementById('detailBackdrop').classList.add('open');
   await renderSubEventsTimeline();
+  await renderActivityFeed();
 }
 
 function closeDetailPanel() {
@@ -199,4 +200,116 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('subEventForm').addEventListener('submit', handleSubEventFormSubmit);
   document.getElementById('subEventModalClose').addEventListener('click', closeSubEventModal);
   document.getElementById('subEventModalCancel').addEventListener('click', closeSubEventModal);
+});
+
+// ---- Activity & Comments Feed ----
+
+async function renderActivityFeed() {
+  const [{ data: comments, error: commentsError }, { data: activity, error: activityError }] = await Promise.all([
+    supabase.from('comments').select('*').eq('project_id', currentDetailProject.id).order('created_at', { ascending: true }),
+    supabase.from('activity_log').select('*').eq('project_id', currentDetailProject.id).order('created_at', { ascending: true }),
+  ]);
+
+  const container = document.getElementById('activityFeed');
+  container.innerHTML = '';
+
+  if (commentsError || activityError) {
+    showErrorToast('Could not load activity.');
+    return;
+  }
+
+  const entries = [
+    ...comments.map(c => ({ type: 'comment', created_at: c.created_at, data: c })),
+    ...activity.map(a => ({ type: 'activity', created_at: a.created_at, data: a })),
+  ].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+  if (entries.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'feed-empty';
+    empty.textContent = 'No comments yet.';
+    container.appendChild(empty);
+    return;
+  }
+
+  entries.forEach(entry => {
+    const row = document.createElement('div');
+
+    if (entry.type === 'comment') {
+      row.className = 'feed-row feed-row-comment';
+
+      const avatar = document.createElement('div');
+      avatar.className = 'feed-avatar';
+      avatar.textContent = (entry.data.author_label || '?').charAt(0).toUpperCase();
+      row.appendChild(avatar);
+
+      const content = document.createElement('div');
+      content.className = 'feed-content';
+
+      const authorLine = document.createElement('div');
+      authorLine.className = 'feed-author-line';
+
+      const authorName = document.createElement('span');
+      authorName.className = 'feed-author-name';
+      authorName.textContent = entry.data.author_label;
+      authorLine.appendChild(authorName);
+
+      if (entry.data.internal) {
+        const tag = document.createElement('span');
+        tag.className = 'feed-internal-tag';
+        tag.textContent = 'Internal';
+        authorLine.appendChild(tag);
+      }
+      content.appendChild(authorLine);
+
+      const body = document.createElement('div');
+      body.className = 'feed-body';
+      body.textContent = entry.data.body;
+      content.appendChild(body);
+
+      row.appendChild(content);
+    } else {
+      row.className = 'feed-row feed-row-activity';
+
+      const marker = document.createElement('div');
+      marker.className = 'feed-marker';
+      row.appendChild(marker);
+
+      const text = document.createElement('div');
+      text.className = 'feed-activity-text';
+      text.textContent = synthesizeActivityLine(entry.data);
+      row.appendChild(text);
+    }
+
+    container.appendChild(row);
+  });
+}
+
+async function handleCommentSubmit(e) {
+  e.preventDefault();
+  const body = document.getElementById('commentBody').value.trim();
+  if (!body) return;
+
+  const internal = document.getElementById('commentInternal').checked;
+  const profile = getCurrentProfile();
+
+  const { error } = await supabase.from('comments').insert({
+    project_id: currentDetailProject.id,
+    author_role: profile.role,
+    author_label: profile.full_name,
+    body,
+    internal,
+  });
+
+  if (error) {
+    showErrorToast('Could not post comment — please try again.');
+    return;
+  }
+
+  document.getElementById('commentBody').value = '';
+  document.getElementById('commentInternal').checked = true;
+  await renderActivityFeed();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('commentForm').addEventListener('submit', handleCommentSubmit);
 });
