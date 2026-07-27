@@ -121,10 +121,20 @@ async function handleDrop(e, newStage) {
   if (error) {
     if (card) card.classList.remove('card-pending');
     showErrorToast('Could not move project — please try again.');
+    return;
   }
-  // On success, the realtime subscription's redraw (Task 5) is what actually
+
+  // On success, the realtime subscription's redraw (Task 5) is what normally
   // moves the card — no local DOM move happens here, per the design spec's
-  // explicit no-optimistic-update decision.
+  // explicit no-optimistic-update decision. Safety net: if a realtime event
+  // was missed (e.g. this drop happened before the channel finished
+  // subscribing on a freshly-loaded page), the card would otherwise stay
+  // stuck showing .card-pending forever with no recovery path. Force a
+  // redraw if it's still pending after a few seconds.
+  setTimeout(() => {
+    const stillPending = document.querySelector(`.project-card[data-id="${projectId}"].card-pending`);
+    if (stillPending) renderBoard();
+  }, 3000);
 }
 
 export async function renderBoard() {
