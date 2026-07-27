@@ -177,12 +177,24 @@ describe('editor access', () => {
     });
 
     it('activity_log', async () => {
+      const pm = await createTestProfile('pm');
       editor = await createTestProfile('editor');
-      project = await createTestProject({ stage: 'shoot_completed' });
+      project = await createTestProject({ stage: 'booked' });
+
+      // Seed a real activity_log row via a genuine UPDATE through a signed-in
+      // PM session (adminClient's service-role calls have no auth.uid(), so
+      // the audit trigger no-ops and would leave nothing to deny access to —
+      // see Fix 6's re-review finding). This mirrors how the row actually
+      // gets created in production: a real authenticated user's edit.
+      await pm.client.from('projects').update({ stage: 'shoot_completed' }).eq('id', project.id);
+      const { data: seeded } = await adminClient.from('activity_log').select('id').eq('project_id', project.id);
+      expect(seeded.length).toBeGreaterThan(0);
 
       const { data, error } = await editor.client.from('activity_log').select('*').eq('project_id', project.id);
       expect(error).toBeNull();
       expect(data).toHaveLength(0);
+
+      await deleteTestProfile(pm.id);
     });
 
     it('comments', async () => {

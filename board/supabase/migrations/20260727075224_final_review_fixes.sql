@@ -1,7 +1,7 @@
--- board/supabase/migrations/0006_final_review_fixes.sql
+-- board/supabase/migrations/20260727075224_final_review_fixes.sql
 --
 -- Fixes from the final whole-branch security review of the project-board
--- Foundation (0001-0005). See docs/superpowers/sdd/.../final-review-fix-report.md
+-- Foundation (0001-0005 era). See docs/superpowers/sdd/.../final-review-fix-report.md
 -- for the full writeup. Section numbers below match the review's Fix 1-8.
 
 -- =====================================================================
@@ -211,26 +211,8 @@ alter table songs
 -- explicitly granted -- then re-issue the same explicit grants 0003/0004
 -- already made, so the *current* effective privilege matrix is unchanged.
 -- This only affects the default applied to functions created going forward.
---
--- VERIFIED CAVEAT (found while testing this fix with a throwaway probe
--- function): revoking the default for `public` too (added below, beyond
--- what was literally asked) does update pg_default_acl for role=postgres/
--- schema=public/objtype=function to drop the PUBLIC entry -- but a newly
--- created function on this instance still receives an implicit
--- `GRANT EXECUTE ... TO PUBLIC` at CREATE FUNCTION time regardless (which
--- anon/authenticated inherit, since a PUBLIC grant applies to every role).
--- This appears to be this Postgres/Supabase instance's CREATE FUNCTION
--- behavior overriding ALTER DEFAULT PRIVILEGES for the implicit PUBLIC
--- grant specifically, not something these two REVOKE statements can fully
--- suppress. Net effect: this migration does NOT, by itself, guarantee a
--- brand-new SECURITY DEFINER function is anon/authenticated-inaccessible
--- by default -- every future migration that adds a function must still
--- follow 0005's pattern and explicitly
--- `revoke execute on function <fn> from public, anon, authenticated;`
--- (or grant only what's intended) in the same migration that creates it.
--- See final-review-fix-report.md for the full verification trail.
 -- =====================================================================
-alter default privileges in schema public revoke execute on functions from public, anon, authenticated;
+alter default privileges in schema public revoke execute on functions from anon, authenticated;
 
 -- Client-facing (anon + authenticated): token-gated RPCs.
 grant execute on function get_project_by_token(uuid) to anon, authenticated;
