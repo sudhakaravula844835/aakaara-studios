@@ -129,4 +129,107 @@ describe('editor access', () => {
     });
     expect(commentError).toBeNull();
   });
+
+  // Fix 6: set_song_license must check assignment against the SONG's own
+  // project, not just "some project this editor happens to be assigned to".
+  it('set_song_license rejects when the song belongs to a project the editor is not assigned to', async () => {
+    editor = await createTestProfile('editor');
+    project = await createTestProject(); // deliberately NOT assigning editor
+    const { data: song } = await adminClient
+      .from('songs')
+      .insert({ project_id: project.id, title: 'Unassigned Project Song' })
+      .select()
+      .single();
+
+    const { error } = await editor.client.rpc('set_song_license', {
+      p_song_id: song.id,
+      p_license_confirmed: true,
+    });
+    expect(error).not.toBeNull();
+
+    const { data: unchanged } = await adminClient.from('songs').select('license_confirmed').eq('id', song.id).single();
+    expect(unchanged.license_confirmed).toBe(false);
+  });
+
+  // Fix 6: table-level SELECT policies for sub_events/songs/activity_log/
+  // comments are all "editor AND assigned to this project" -- confirm the
+  // assignment half actually gates it, not just editor_project_view's own
+  // row-scoping (which was already covered above).
+  describe('editor denied table access for a project they are NOT assigned to', () => {
+    it('sub_events', async () => {
+      editor = await createTestProfile('editor');
+      project = await createTestProject();
+      await adminClient.from('sub_events').insert({ project_id: project.id, name: 'Sangeet' });
+
+      const { data, error } = await editor.client.from('sub_events').select('*').eq('project_id', project.id);
+      expect(error).toBeNull();
+      expect(data).toHaveLength(0);
+    });
+
+    it('songs', async () => {
+      editor = await createTestProfile('editor');
+      project = await createTestProject();
+      await adminClient.from('songs').insert({ project_id: project.id, title: 'Song' });
+
+      const { data, error } = await editor.client.from('songs').select('*').eq('project_id', project.id);
+      expect(error).toBeNull();
+      expect(data).toHaveLength(0);
+    });
+
+    it('activity_log', async () => {
+      editor = await createTestProfile('editor');
+      project = await createTestProject({ stage: 'shoot_completed' });
+
+      const { data, error } = await editor.client.from('activity_log').select('*').eq('project_id', project.id);
+      expect(error).toBeNull();
+      expect(data).toHaveLength(0);
+    });
+
+    it('comments', async () => {
+      editor = await createTestProfile('editor');
+      project = await createTestProject();
+      await adminClient.from('comments').insert({ project_id: project.id, author_role: 'owner', author_label: 'Owner', body: 'hi' });
+
+      const { data, error } = await editor.client.from('comments').select('*').eq('project_id', project.id);
+      expect(error).toBeNull();
+      expect(data).toHaveLength(0);
+    });
+  });
+
+  // Fix 6: the primary self-escalation path -- an editor inserting
+  // themselves into project_editors for a project nobody assigned them to.
+  it('editor cannot self-assign to an arbitrary project via project_editors insert', async () => {
+    editor = await createTestProfile('editor');
+    project = await createTestProject();
+
+    const { data, error } = await editor.client
+      .from('project_editors')
+      .insert({ project_id: project.id, editor_id: editor.id })
+      .select();
+    expect(data ?? []).toHaveLength(0);
+    expect(error).not.toBeNull();
+
+    const { data: rows } = await adminClient
+      .from('project_editors')
+      .select('*')
+      .eq('project_id', project.id)
+      .eq('editor_id', editor.id);
+    expect(rows).toHaveLength(0);
+  });
+
+  // Fix 7: profiles is no longer readable by every authenticated user --
+  // an editor can see their own row but not another user's.
+  it('editor can select their own profile row but not another user\'s', async () => {
+    editor = await createTestProfile('editor');
+    const other = await createTestProfile('editor');
+    try {
+      const { data: own } = await editor.client.from('profiles').select('id').eq('id', editor.id);
+      expect(own).toHaveLength(1);
+
+      const { data: theirs } = await editor.client.from('profiles').select('id').eq('id', other.id);
+      expect(theirs).toHaveLength(0);
+    } finally {
+      await deleteTestProfile(other.id);
+    }
+  });
 });
