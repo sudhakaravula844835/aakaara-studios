@@ -4,6 +4,7 @@ import {
   deriveWeddingDate, formatDate, compareProjectsByDate,
 } from './board-utils.js';
 import { showErrorToast, setCurrentProfile } from './board-shared.js';
+import { openProjectModal } from './project-modal.js';
 
 async function requireSession() {
   const { data } = await supabase.auth.getSession();
@@ -190,6 +191,8 @@ async function init() {
     await supabase.auth.signOut();
     window.location.href = 'login.html';
   });
+
+  document.getElementById('addProjectBtn').addEventListener('click', () => openProjectModal(null));
 }
 
 document.addEventListener('DOMContentLoaded', init);
