@@ -57,6 +57,9 @@ function renderColumns() {
     cardsEl.dataset.stage = col.key;
     columnEl.appendChild(cardsEl);
 
+    columnEl.addEventListener('dragover', (e) => e.preventDefault());
+    columnEl.addEventListener('drop', (e) => handleDrop(e, col.key));
+
     container.appendChild(columnEl);
   });
 }
@@ -65,6 +68,10 @@ function renderCard(project) {
   const card = document.createElement('div');
   card.className = 'project-card';
   card.dataset.id = project.id;
+  card.draggable = true;
+  card.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', project.id);
+  });
 
   const name = document.createElement('div');
   name.className = 'card-client-name';
@@ -101,6 +108,23 @@ function renderCard(project) {
   card.appendChild(bar);
 
   return card;
+}
+
+async function handleDrop(e, newStage) {
+  e.preventDefault();
+  const projectId = e.dataTransfer.getData('text/plain');
+  const card = document.querySelector(`.project-card[data-id="${projectId}"]`);
+  if (card) card.classList.add('card-pending');
+
+  const { error } = await supabase.from('projects').update({ stage: newStage }).eq('id', projectId);
+
+  if (error) {
+    if (card) card.classList.remove('card-pending');
+    showErrorToast('Could not move project — please try again.');
+  }
+  // On success, the realtime subscription's redraw (Task 5) is what actually
+  // moves the card — no local DOM move happens here, per the design spec's
+  // explicit no-optimistic-update decision.
 }
 
 export async function renderBoard() {
