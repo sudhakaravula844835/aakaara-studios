@@ -1,0 +1,134 @@
+/* Inherits CSS variables from ../styles.css */
+
+html, body { background: var(--noir); }
+body {
+  font-family: var(--font-body); font-weight: 300;
+  margin: 0; -webkit-font-smoothing: antialiased; color: var(--ivory);
+}
+
+/* Header */
+.board-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(201,149,107,0.1);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.board-header h1 {
+  font-family: var(--font-display); font-weight: 300; font-size: 1.4rem;
+  letter-spacing: 0.1em; margin: 0;
+}
+.board-header .brand {
+  font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--rose);
+}
+.board-header-actions { display: flex; gap: 0.75rem; }
+.board-add-btn, .board-logout-btn {
+  padding: 0.5rem 1rem; border-radius: 6px; font-family: var(--font-body);
+  font-size: 0.7rem; letter-spacing: 0.08em; cursor: pointer; transition: background 0.2s var(--ease);
+}
+.board-add-btn {
+  background: rgba(201,149,107,0.12); border: 1px solid rgba(201,149,107,0.35); color: var(--rose);
+}
+.board-add-btn:hover { background: rgba(201,149,107,0.22); }
+.board-logout-btn {
+  background: none; border: 1px solid rgba(201,149,107,0.15); color: rgba(250,246,241,0.5);
+}
+.board-logout-btn:hover { border-color: rgba(201,149,107,0.3); color: var(--ivory); }
+
+/* Login page */
+.login-body {
+  display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0;
+}
+.login-box {
+  width: 100%; max-width: 380px; padding: 2.5rem 2rem;
+  background: #111; border: 1px solid rgba(201,149,107,0.15); border-radius: 10px;
+}
+.login-box .brand {
+  font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--rose);
+}
+.login-box h1 {
+  font-family: var(--font-display); font-weight: 300; font-size: 1.6rem;
+  margin: 0.3rem 0 1.75rem;
+}
+.login-error { color: #e07070; font-size: 0.75rem; min-height: 1rem; margin: 0.5rem 0 1rem; }
+.login-submit { width: 100%; margin-top: 0.5rem; }
+
+/* Shared form styles (modal + login) */
+.form-group { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1rem; }
+.form-group.form-full { grid-column: 1 / -1; }
+.form-group.form-checkbox { flex-direction: row; align-items: center; gap: 0.5rem; }
+.form-group.form-checkbox label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: rgba(250,246,241,0.7); }
+.form-label {
+  font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(250,246,241,0.35);
+}
+.form-input {
+  background: rgba(0,0,0,0.3); border: 1px solid rgba(201,149,107,0.15); border-radius: 5px;
+  padding: 0.55rem 0.75rem; color: var(--ivory); font-family: var(--font-body); font-size: 0.82rem;
+  outline: none; transition: border-color 0.15s var(--ease); width: 100%; box-sizing: border-box;
+}
+.form-input:focus { border-color: rgba(201,149,107,0.45); }
+.form-error { color: #e07070; font-size: 0.7rem; min-height: 1rem; }
+
+/* Board columns */
+.board-columns {
+  display: flex; gap: 1rem; padding: 1.5rem 2rem; overflow-x: auto;
+  align-items: flex-start;
+}
+.board-column {
+  flex: 0 0 260px; background: #111; border: 1px solid rgba(201,149,107,0.1);
+  border-radius: 8px; display: flex; flex-direction: column; max-height: calc(100vh - 8rem);
+}
+.board-column-header {
+  padding: 0.85rem 1rem; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--rose); border-bottom: 1px solid rgba(201,149,107,0.08);
+}
+.board-column-cards {
+  padding: 0.75rem; display: flex; flex-direction: column; gap: 0.6rem; overflow-y: auto;
+}
+.board-column-empty {
+  text-align: center; padding: 1.5rem 0; color: rgba(250,246,241,0.2); font-size: 0.75rem;
+}
+
+/* Project cards */
+.project-card {
+  background: rgba(0,0,0,0.25); border: 1px solid rgba(201,149,107,0.1); border-radius: 6px;
+  padding: 0.75rem; cursor: grab; transition: border-color 0.15s var(--ease), opacity 0.2s var(--ease);
+}
+.project-card:hover { border-color: rgba(201,149,107,0.3); }
+.project-card.card-pending { opacity: 0.45; pointer-events: none; }
+.card-client-name {
+  font-family: var(--font-display); font-size: 1rem; color: var(--ivory); margin-bottom: 0.25rem;
+}
+.card-date, .card-tier {
+  font-size: 0.7rem; color: rgba(250,246,241,0.45); margin-bottom: 0.15rem;
+}
+.card-substatus {
+  display: inline-block; margin-top: 0.3rem; font-size: 0.6rem; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 0.15rem 0.45rem; border-radius: 4px;
+  background: rgba(201,149,107,0.12); color: var(--rose);
+}
+.card-progress { display: flex; gap: 3px; margin-top: 0.6rem; }
+.card-progress-segment {
+  flex: 1; height: 3px; border-radius: 2px; background: rgba(201,149,107,0.15);
+}
+.card-progress-segment.filled { background: var(--rose); }
+
+/* Toasts */
+.toast-container {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; display: flex; flex-direction: column;
+  gap: 0.5rem; z-index: 2000;
+}
+.toast {
+  display: flex; align-items: center; gap: 0.75rem; background: #1a1418;
+  border: 1px solid rgba(224,112,112,0.4); border-radius: 6px; padding: 0.65rem 0.9rem;
+  color: var(--ivory); font-size: 0.78rem; max-width: 320px; box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.toast-dismiss {
+  background: none; border: none; color: rgba(250,246,241,0.5); font-size: 1rem; cursor: pointer;
+  line-height: 1; padding: 0;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .board-header { padding: 1rem 1.25rem; flex-wrap: wrap; gap: 0.75rem; }
+  .board-columns { padding: 1rem 1.25rem; scroll-snap-type: x mandatory; }
+  .board-column { flex: 0 0 82vw; scroll-snap-align: start; max-height: none; }
+}
