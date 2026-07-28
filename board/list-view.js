@@ -1,9 +1,20 @@
 import { supabase } from './supabase-client.js';
 import {
-  STAGE_COLUMNS, formatDate, deriveWeddingDate, compareProjectsByField, progressSegments,
+  STAGE_COLUMNS, SUBSTATUS_LABELS, formatDate, deriveWeddingDate, compareProjectsByField, progressSegments,
 } from './board-utils.js';
 import { showErrorToast } from './board-shared.js';
+// Circular import: board.js imports renderListView from this module, and
+// this module imports openDetailPanel from project-modal.js and
+// refreshProjects from board.js — same board.js <-> project-modal.js cycle
+// documented in project-modal.js's own import comment, now with this file
+// as a third participant. Safe here because openDetailPanel is only invoked
+// from inside a row click handler (never at module-eval time), and
+// refreshProjects is a hoisted function declaration only invoked from
+// inside the stage <select>'s change handler below. A future top-level call
+// to either in this file (e.g. outside an event handler) would be a real
+// hazard — a TDZ error at page load — so watch for that.
 import { openDetailPanel } from './project-modal.js';
+import { refreshProjects } from './board.js';
 
 let sortState = { column: null, direction: 1 };
 
@@ -26,7 +37,10 @@ export function renderListView(projects) {
   const headerRow = document.createElement('tr');
   columns.forEach(col => {
     const th = document.createElement('th');
-    th.textContent = col.label;
+    const isActive = sortState.column === col.key;
+    th.textContent = isActive ? `${col.label} ${sortState.direction === 1 ? '▲' : '▼'}` : col.label;
+    th.setAttribute('aria-sort', isActive ? (sortState.direction === 1 ? 'ascending' : 'descending') : 'none');
+    if (isActive) th.classList.add('list-table-th-active');
     th.addEventListener('click', () => {
       if (sortState.column === col.key) {
         sortState = { column: col.key, direction: sortState.direction * -1 };
@@ -100,12 +114,24 @@ function renderListRow(project) {
     if (error) {
       select.value = previousStage;
       showErrorToast('Could not update stage — please try again.');
+      return;
     }
-    // On success, the realtime subscription's refresh reflects the change
-    // (including re-sorting if the active sort column is affected) — no
-    // local mutation here, consistent with the rest of the board.
+    // Don't rely solely on the realtime redraw — if realtime is ever
+    // silently down, a user changing the stage here should still see List
+    // (and Kanban) agree with what was just written to the DB. Same pattern
+    // as project-modal.js's handleProjectFormSubmit and board.js's
+    // handleDrop 3-second safety net.
+    await refreshProjects();
   });
   stageCell.appendChild(select);
+
+  if (project.stage === 'video_editing' && project.video_editing_substatus) {
+    const sub = document.createElement('span');
+    sub.className = 'list-stage-substatus';
+    sub.textContent = SUBSTATUS_LABELS[project.video_editing_substatus] || project.video_editing_substatus;
+    stageCell.appendChild(sub);
+  }
+
   row.appendChild(stageCell);
 
   const progressCell = document.createElement('td');

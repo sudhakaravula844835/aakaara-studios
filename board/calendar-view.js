@@ -1,4 +1,12 @@
 import { flattenSubEventsByMonth } from './board-utils.js';
+// Part of the same board.js <-> project-modal.js circular-import cycle
+// documented in project-modal.js (which imports refreshProjects from
+// board.js) and in list-view.js (which imports both openDetailPanel from
+// here and refreshProjects from board.js). Safe in this file because
+// openDetailPanel is only ever invoked from inside a marker's click/keydown
+// handler below, never at module-evaluation time. A future top-level call
+// to openDetailPanel in this file would be a real hazard — a TDZ error at
+// page load — so watch for that.
 import { openDetailPanel } from './project-modal.js';
 
 let currentCalendarMonth = new Date();
@@ -79,9 +87,18 @@ export function renderCalendarView(projects) {
     dayEntries.forEach(entry => {
       const marker = document.createElement('div');
       marker.className = 'calendar-marker';
+      marker.setAttribute('role', 'button');
+      marker.setAttribute('tabindex', '0');
+      marker.setAttribute('aria-label', `${entry.clientName} — ${entry.subEventName}`);
       marker.addEventListener('click', () => {
         const project = projects.find(p => p.id === entry.projectId);
         if (project) openDetailPanel(project);
+      });
+      marker.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          marker.click();
+        }
       });
 
       const tooltip = document.createElement('div');

@@ -326,6 +326,10 @@ body {
   cursor: pointer; user-select: none;
 }
 .list-table th:hover { color: var(--ivory); }
+/* Higher specificity than `.list-table th` above (which sets --rose) so the
+   active-sort color actually wins at rest; :hover still wins over both, as
+   intended, since it's more specific still. */
+.list-table th.list-table-th-active { color: var(--rose-light); font-weight: 600; }
 .list-row { cursor: pointer; transition: background 0.15s var(--ease); }
 .list-row:hover { background: rgba(201,149,107,0.05); }
 .list-row td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(201,149,107,0.08); color: var(--ivory); }
@@ -333,6 +337,10 @@ body {
   background: rgba(0,0,0,0.3); border: 1px solid rgba(201,149,107,0.15); border-radius: 5px;
   padding: 0.35rem 0.6rem; color: var(--ivory); font-family: var(--font-body); font-size: 0.75rem;
   cursor: pointer;
+}
+.list-stage-substatus {
+  display: inline-block; margin-left: 0.5rem; font-size: 0.65rem; color: var(--rose);
+  text-transform: uppercase; letter-spacing: 0.05em;
 }
 .list-progress { width: 100px; }
 .list-empty { text-align: center; padding: 2rem 0; color: rgba(250,246,241,0.2); }
@@ -373,7 +381,9 @@ body {
   padding: 0.5rem 0.8rem; border-radius: 4px; font-size: 0.72rem; white-space: nowrap;
   z-index: 10; border: 1px solid rgba(201,149,107,0.2); color: var(--ivory);
 }
-.calendar-marker:hover .tooltip { display: block; }
+.calendar-marker:hover .tooltip,
+.calendar-marker:focus-visible .tooltip { display: block; }
+.calendar-marker:focus-visible { outline: 2px solid var(--rose); outline-offset: 1px; }
 
 @media (max-width: 768px) {
   .calendar-view-container { padding: 1rem 1.25rem; }
