@@ -229,6 +229,12 @@ function closeSubEventModal() {
 
 async function handleSubEventFormSubmit(e) {
   e.preventDefault();
+  // Guard for symmetry/defense-in-depth with renderSubEventsTimeline's and
+  // renderActivityFeed's currentDetailProject checks (Task 5). Currently
+  // unreachable in practice — the sub-event modal sits above the detail
+  // panel with no way to close the panel while this modal is open — but if
+  // that ever changes, currentDetailProject could be null here.
+  if (!currentDetailProject) return;
   const fields = {
     project_id: currentDetailProject.id,
     name: document.getElementById('seName').value.trim(),
