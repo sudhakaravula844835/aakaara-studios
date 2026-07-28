@@ -5,11 +5,12 @@ import {
 } from './board-utils.js';
 import { showErrorToast, getCurrentProfile } from './board-shared.js';
 // Circular import: board.js imports openProjectModal/openDetailPanel/etc from
-// this module, and this module imports renderBoard from board.js. Safe here
-// because renderBoard is a hoisted function declaration and is only invoked
-// from inside an event handler (after a user submits the form), never at
-// module-evaluation time — by then both modules have finished initializing.
-import { renderBoard } from './board.js';
+// this module, and this module imports refreshProjects from board.js. Safe
+// here because refreshProjects is a hoisted function declaration and is only
+// invoked from inside an event handler (after a user submits the form),
+// never at module-evaluation time — by then both modules have finished
+// initializing.
+import { refreshProjects } from './board.js';
 
 export function openProjectModal(project) {
   const backdrop = document.getElementById('projectModalBackdrop');
@@ -85,7 +86,9 @@ async function handleProjectFormSubmit(e) {
   // Don't rely solely on the realtime redraw — if realtime is ever silently
   // down (this exact failure mode happened once before the publication was
   // fixed), a user clicking Save should still see the project appear.
-  await renderBoard();
+  // refreshProjects() (not just re-rendering) since the underlying data
+  // changed and whichever view is active needs the new snapshot.
+  await refreshProjects();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -70,11 +70,24 @@ body {
 .form-group .form-input:focus { border-color: rgba(201,149,107,0.45); background: rgba(0,0,0,0.3); }
 .form-error { color: #e07070; font-size: 0.7rem; min-height: 1rem; }
 
+/* View toggle */
+.view-toggle { display: flex; gap: 0.4rem; }
+.view-toggle-btn {
+  padding: 0.4rem 0.85rem; border-radius: 20px; font-size: 0.65rem; letter-spacing: 0.07em;
+  border: 1px solid rgba(201,149,107,0.15); color: rgba(250,246,241,0.4); background: none;
+  cursor: pointer; transition: all 0.15s var(--ease); font-family: var(--font-body);
+}
+.view-toggle-btn:hover { border-color: rgba(201,149,107,0.35); color: var(--ivory); }
+.view-toggle-btn.active {
+  background: rgba(201,149,107,0.12); border-color: rgba(201,149,107,0.4); color: var(--rose);
+}
+
 /* Board columns */
 .board-columns {
-  display: flex; gap: 1rem; padding: 1.5rem 2rem; overflow-x: auto;
+  display: none; gap: 1rem; padding: 1.5rem 2rem; overflow-x: auto;
   align-items: flex-start;
 }
+.board-columns.view-active { display: flex; }
 .board-column {
   flex: 0 0 260px; background: #111; border: 1px solid rgba(201,149,107,0.1);
   border-radius: 8px; display: flex; flex-direction: column; max-height: calc(100vh - 8rem);

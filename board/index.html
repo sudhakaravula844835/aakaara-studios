@@ -16,12 +16,21 @@
       <h1>Project Board</h1>
     </div>
     <div class="board-header-actions">
+      <div class="view-toggle" id="viewToggle" role="group" aria-label="Board view">
+        <button class="view-toggle-btn active" data-view="kanban" type="button">Kanban</button>
+        <button class="view-toggle-btn" data-view="list" type="button">List</button>
+        <button class="view-toggle-btn" data-view="calendar" type="button">Calendar</button>
+      </div>
       <button class="board-add-btn" id="addProjectBtn">+ New Project</button>
       <button class="board-logout-btn" id="logoutBtn">Log Out</button>
     </div>
   </header>
 
-  <main class="board-columns" id="boardColumns"></main>
+  <main class="board-main">
+    <div class="board-columns view-active" id="boardColumns"></div>
+    <div class="list-view-container" id="listViewContainer"></div>
+    <div class="calendar-view-container" id="calendarViewContainer"></div>
+  </main>
 
   <div class="toast-container" id="toastContainer"></div>
 
@@ -153,6 +162,8 @@
   </div>
 
 <script type="module" src="project-modal.js"></script>
+<script type="module" src="list-view.js"></script>
+<script type="module" src="calendar-view.js"></script>
 <script type="module" src="board.js"></script>
 </body>
 </html>

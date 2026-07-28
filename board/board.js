@@ -8,6 +8,8 @@ import {
   openProjectModal, openDetailPanel, getCurrentDetailProjectId,
   renderSubEventsTimeline, renderActivityFeed,
 } from './project-modal.js';
+import { renderListView } from './list-view.js';
+import { renderCalendarView } from './calendar-view.js';
 
 async function requireSession() {
   const { data } = await supabase.auth.getSession();
@@ -144,32 +146,25 @@ async function handleDrop(e, newStage) {
     return;
   }
 
-  // On success, the realtime subscription's redraw (Task 5) is what normally
-  // moves the card — no local DOM move happens here, per the design spec's
+  // On success, the realtime subscription's refresh is what normally moves
+  // the card — no local DOM move happens here, per the design spec's
   // explicit no-optimistic-update decision. Safety net: if a realtime event
-  // was missed (e.g. this drop happened before the channel finished
-  // subscribing on a freshly-loaded page), the card would otherwise stay
-  // stuck showing .card-pending forever with no recovery path. Force a
-  // redraw if it's still pending after a few seconds.
+  // was missed, the card would otherwise stay stuck showing .card-pending
+  // forever with no recovery path. Force a refresh if it's still pending
+  // after a few seconds.
   setTimeout(() => {
     const stillPending = document.querySelector(`.project-card[data-id="${projectId}"].card-pending`);
-    if (stillPending) renderBoard();
+    if (stillPending) refreshProjects();
   }, 3000);
 }
 
-let renderGeneration = 0;
-
-export async function renderBoard() {
-  const myGeneration = ++renderGeneration;
-  const projects = await fetchProjects();
-  if (myGeneration !== renderGeneration) return; // a newer render started while we were fetching; abandon this stale one
-
+function renderBoard() {
   STAGE_COLUMNS.forEach(col => {
     const columnCardsEl = document.querySelector(`.board-column-cards[data-stage="${col.key}"]`);
     if (!columnCardsEl) return;
     columnCardsEl.innerHTML = '';
 
-    const columnProjects = projects.filter(p => p.stage === col.key).sort(compareProjectsByDate);
+    const columnProjects = currentProjects.filter(p => p.stage === col.key).sort(compareProjectsByDate);
 
     if (columnProjects.length === 0) {
       const empty = document.createElement('div');
@@ -183,25 +178,56 @@ export async function renderBoard() {
   });
 }
 
+let currentProjects = [];
+let currentView = 'kanban';
+let renderGeneration = 0;
+
+function renderActiveView() {
+  if (currentView === 'kanban') renderBoard();
+  else if (currentView === 'list') renderListView(currentProjects);
+  else if (currentView === 'calendar') renderCalendarView(currentProjects);
+}
+
+export async function refreshProjects() {
+  const myGeneration = ++renderGeneration;
+  const projects = await fetchProjects();
+  if (myGeneration !== renderGeneration) return; // a newer refresh started while we were fetching; abandon this stale one
+  currentProjects = projects;
+  renderActiveView();
+}
+
+function setActiveView(view) {
+  currentView = view;
+  document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.view === view);
+  });
+  document.getElementById('boardColumns').classList.toggle('view-active', view === 'kanban');
+  document.getElementById('listViewContainer').classList.toggle('view-active', view === 'list');
+  document.getElementById('calendarViewContainer').classList.toggle('view-active', view === 'calendar');
+  renderActiveView();
+}
+
 let realtimeChannel = null;
 
 function subscribeToChanges() {
   realtimeChannel = supabase
     .channel('board-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => renderBoard())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => refreshProjects())
     .on('postgres_changes', { event: '*', schema: 'public', table: 'sub_events' }, (payload) => {
-      // Sub-event dates affect card display (deriveWeddingDate), so the
-      // board still needs a full redraw. Additionally, if the detail panel
-      // is open for the affected project, refresh its timeline in place so
-      // a second person's edit shows up without closing/reopening.
-      renderBoard();
+      // Sub-event dates affect card display (deriveWeddingDate) and the
+      // Calendar view, so a full refresh is still needed. Additionally, if
+      // the detail panel is open for the affected project, refresh its
+      // timeline in place so a second person's edit shows up without
+      // closing/reopening.
+      refreshProjects();
       const projectId = payload.new?.project_id ?? payload.old?.project_id;
       if (projectId && getCurrentDetailProjectId() === projectId) renderSubEventsTimeline();
     })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, (payload) => {
-      // Nothing on a board card reads comments — do NOT redraw the whole
-      // board (that resets every column's scroll position). Only the open
-      // detail panel's activity feed, if any, cares about this.
+      // Nothing on a board card, list row, or calendar marker reads
+      // comments — do NOT trigger a full refresh (that resets Kanban's
+      // column scroll positions). Only the open detail panel's activity
+      // feed, if any, cares about this.
       const projectId = payload.new?.project_id ?? payload.old?.project_id;
       if (projectId && getCurrentDetailProjectId() === projectId) renderActivityFeed();
     })
@@ -218,10 +244,7 @@ function subscribeToChanges() {
 
 async function init() {
   // Wire up header button handlers before any network awaits below, so
-  // "+ New Project" / "Log Out" are never visible-but-inert. On a slow
-  // connection the projects fetch can take long enough for a real user
-  // (or an eager click right after paint) to hit these buttons before
-  // listeners were attached, silently swallowing the click.
+  // "+ New Project" / "Log Out" / the view toggle are never visible-but-inert.
   document.getElementById('logoutBtn').addEventListener('click', async () => {
     if (realtimeChannel) supabase.removeChannel(realtimeChannel);
     await supabase.auth.signOut();
@@ -230,6 +253,10 @@ async function init() {
 
   document.getElementById('addProjectBtn').addEventListener('click', () => openProjectModal(null));
 
+  document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => setActiveView(btn.dataset.view));
+  });
+
   const user = await requireSession();
   if (!user) return;
 
@@ -237,7 +264,7 @@ async function init() {
   if (profile) setCurrentProfile(profile);
 
   renderColumns();
-  await renderBoard();
+  await refreshProjects();
   subscribeToChanges();
 }
 
