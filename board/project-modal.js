@@ -122,11 +122,27 @@ function closeDetailPanel() {
 }
 
 export async function renderSubEventsTimeline() {
+  // Capture the project this call is rendering for *before* the await —
+  // currentDetailProject may be reassigned (panel closed -> null, or
+  // switched to another project) while the fetch below is in flight.
+  const requestedProject = currentDetailProject;
+  // Bail out immediately if the panel was already closed before this call
+  // even started (e.g. openDetailPanel's own earlier `await` yielded, the
+  // panel was closed during that gap, and only then did control reach this
+  // function) — there's nothing to fetch for and requestedProject.id below
+  // would throw on null.
+  if (!requestedProject) return;
   const { data: subEvents, error } = await supabase
     .from('sub_events')
     .select('*')
-    .eq('project_id', currentDetailProject.id)
+    .eq('project_id', requestedProject.id)
     .order('event_date', { ascending: true, nullsFirst: false });
+
+  // Bail out silently if the panel was closed (currentDetailProject is now
+  // null) or switched to a different project while this fetch was pending —
+  // touching the DOM/dereferencing currentDetailProject.id here would
+  // otherwise throw or paint stale data over a different project's panel.
+  if (!currentDetailProject || currentDetailProject.id !== requestedProject.id) return;
 
   const container = document.getElementById('subEventsTimeline');
   container.innerHTML = '';
@@ -256,10 +272,22 @@ document.addEventListener('DOMContentLoaded', () => {
 // ---- Activity & Comments Feed ----
 
 export async function renderActivityFeed() {
+  // Same guard as renderSubEventsTimeline: capture the project before the
+  // await, since currentDetailProject can change (or become null) while
+  // these two fetches are in flight.
+  const requestedProject = currentDetailProject;
+  // Bail out immediately if the panel was already closed before this call
+  // started — this is the primary reported race: openDetailPanel's
+  // `await renderSubEventsTimeline()` yields, the panel is closed during
+  // that gap, and only then does `await renderActivityFeed()` run, with
+  // currentDetailProject already null before its own fetch ever begins.
+  if (!requestedProject) return;
   const [{ data: comments, error: commentsError }, { data: activity, error: activityError }] = await Promise.all([
-    supabase.from('comments').select('*').eq('project_id', currentDetailProject.id).order('created_at', { ascending: true }),
-    supabase.from('activity_log').select('*').eq('project_id', currentDetailProject.id).order('created_at', { ascending: true }),
+    supabase.from('comments').select('*').eq('project_id', requestedProject.id).order('created_at', { ascending: true }),
+    supabase.from('activity_log').select('*').eq('project_id', requestedProject.id).order('created_at', { ascending: true }),
   ]);
+
+  if (!currentDetailProject || currentDetailProject.id !== requestedProject.id) return;
 
   const container = document.getElementById('activityFeed');
   container.innerHTML = '';
