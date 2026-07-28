@@ -327,3 +327,42 @@ body {
 @media (max-width: 768px) {
   .list-view-container { padding: 1rem 1.25rem; }
 }
+
+/* Calendar view */
+.calendar-view-container { display: none; padding: 1.5rem 2rem; }
+.calendar-view-container.view-active { display: block; }
+.calendar-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;
+}
+.calendar-header button {
+  background: none; border: 1px solid rgba(201,149,107,0.2); color: var(--rose);
+  border-radius: 50%; width: 28px; height: 28px; cursor: pointer; transition: all 0.2s var(--ease);
+}
+.calendar-header button:hover { background: rgba(201,149,107,0.1); }
+#calendarMonthYear { font-family: var(--font-display); font-size: 1.1rem; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 5px; }
+.calendar-weekday {
+  text-align: center; font-size: 0.6rem; text-transform: uppercase; color: rgba(250,246,241,0.3);
+  padding: 0.4rem 0;
+}
+.calendar-day {
+  min-height: 70px; padding: 0.4rem; border: 1px solid rgba(201,149,107,0.08); border-radius: 4px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.calendar-day-number { font-size: 0.7rem; color: rgba(250,246,241,0.35); }
+.calendar-marker {
+  position: relative; background: rgba(201,149,107,0.15); border: 1px solid rgba(201,149,107,0.35);
+  border-radius: 3px; height: 6px; cursor: pointer;
+}
+.calendar-marker:hover { background: rgba(201,149,107,0.3); }
+.calendar-marker .tooltip {
+  display: none; position: absolute; bottom: 130%; left: 0; background: var(--umber);
+  padding: 0.5rem 0.8rem; border-radius: 4px; font-size: 0.72rem; white-space: nowrap;
+  z-index: 10; border: 1px solid rgba(201,149,107,0.2); color: var(--ivory);
+}
+.calendar-marker:hover .tooltip { display: block; }
+
+@media (max-width: 768px) {
+  .calendar-view-container { padding: 1rem 1.25rem; }
+  .calendar-day { min-height: 50px; }
+}
