@@ -47,7 +47,10 @@ async function fetchProjects() {
     .select('id, client_name, client_email, client_phone, stage, video_editing_substatus, package_tier, hours_booked, quoted_price, confirmed_price, deposit_paid, balance_paid, contract_url, quote_pdf_url, sub_events(id, name, event_date, venue, photo_selection_status, photo_selected_count, photo_total_count)');
   if (error) {
     showErrorToast('Could not load projects.');
-    return [];
+    // null (not []) signals "fetch failed" distinctly from "fetch succeeded
+    // with zero rows" — refreshProjects() below relies on this distinction
+    // to avoid blanking the board on a transient network blip.
+    return null;
   }
   return data;
 }
@@ -192,6 +195,13 @@ export async function refreshProjects() {
   const myGeneration = ++renderGeneration;
   const projects = await fetchProjects();
   if (myGeneration !== renderGeneration) return; // a newer refresh started while we were fetching; abandon this stale one
+  // null means the fetch itself failed (fetchProjects already showed a
+  // toast) — leave currentProjects/the on-screen render exactly as they
+  // were rather than blanking the board to "No projects yet.", which would
+  // misleadingly read as "you have zero projects" instead of "something
+  // went wrong." A genuinely empty result ([]) still updates and renders
+  // normally.
+  if (projects === null) return;
   currentProjects = projects;
   renderActiveView();
 }
