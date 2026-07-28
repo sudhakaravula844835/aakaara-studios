@@ -90,3 +90,30 @@ export function synthesizeActivityLine(entry) {
   const newDisplay = new_value === null || new_value === undefined ? '—' : new_value;
   return `${fieldLabel} changed: ${oldDisplay} → ${newDisplay}`;
 }
+
+export function flattenSubEventsByMonth(projects, year, month) {
+  const entries = [];
+  (projects || []).forEach(project => {
+    (project.sub_events || []).forEach(se => {
+      if (!se.event_date) return;
+      const d = new Date(se.event_date + 'T00:00:00');
+      if (d.getFullYear() === year && d.getMonth() === month) {
+        entries.push({
+          day: d.getDate(),
+          subEventName: se.name,
+          clientName: project.client_name,
+          projectId: project.id,
+        });
+      }
+    });
+  });
+  return entries;
+}
+
+export function compareProjectsByField(a, b, column) {
+  if (column === 'client_name') return (a.client_name || '').localeCompare(b.client_name || '');
+  if (column === 'date') return compareProjectsByDate(a, b);
+  if (column === 'package_tier') return (a.package_tier || '').localeCompare(b.package_tier || '');
+  if (column === 'stage' || column === 'progress') return stageIndex(a.stage) - stageIndex(b.stage);
+  return 0;
+}

@@ -3,6 +3,7 @@ import {
   STAGE_COLUMNS, stageIndex, stageLabel, progressSegments,
   deriveWeddingDate, formatDate, compareProjectsByDate,
   validateProjectForm, validateSubEventForm, photoSelectionLabel, synthesizeActivityLine,
+  flattenSubEventsByMonth, compareProjectsByField,
 } from '../board-utils.js';
 
 describe('STAGE_COLUMNS', () => {
@@ -105,5 +106,75 @@ describe('synthesizeActivityLine', () => {
   it('falls back to a generic line for any other field', () => {
     expect(synthesizeActivityLine({ field_changed: 'package_tier', old_value: 'Silver', new_value: 'Gold' }))
       .toBe('package tier changed: Silver → Gold');
+  });
+});
+
+describe('flattenSubEventsByMonth', () => {
+  const projects = [
+    { id: 'p1', client_name: 'Priya & Rohan', sub_events: [
+      { name: 'Haldi', event_date: '2026-09-05' },
+      { name: 'Wedding', event_date: '2026-09-12' },
+    ] },
+    { id: 'p2', client_name: 'Meera & Arjun', sub_events: [
+      { name: 'Sangeet', event_date: '2026-10-01' },
+    ] },
+  ];
+
+  it('returns only entries in the given month/year', () => {
+    // September = month index 8 (JS Date months are 0-indexed)
+    expect(flattenSubEventsByMonth(projects, 2026, 8)).toHaveLength(2);
+  });
+
+  it('excludes sub-events with no date', () => {
+    const withUndated = [{ id: 'p3', client_name: 'X', sub_events: [{ name: 'TBD', event_date: null }] }];
+    expect(flattenSubEventsByMonth(withUndated, 2026, 8)).toHaveLength(0);
+  });
+
+  it('includes the day, sub-event name, client name, and project id', () => {
+    const result = flattenSubEventsByMonth(projects, 2026, 8);
+    expect(result[0]).toEqual({ day: 5, subEventName: 'Haldi', clientName: 'Priya & Rohan', projectId: 'p1' });
+  });
+
+  it('returns an empty array for a month with no sub-events', () => {
+    expect(flattenSubEventsByMonth(projects, 2026, 0)).toHaveLength(0);
+  });
+
+  it('handles a project with no sub_events at all', () => {
+    expect(flattenSubEventsByMonth([{ id: 'p4', client_name: 'Y', sub_events: [] }], 2026, 8)).toHaveLength(0);
+  });
+});
+
+describe('compareProjectsByField', () => {
+  const a = {
+    client_name: 'Bravo', package_tier: 'Silver', stage: 'booked',
+    sub_events: [{ event_date: '2026-09-01' }],
+  };
+  const b = {
+    client_name: 'Alpha', package_tier: 'Gold', stage: 'completed',
+    sub_events: [{ event_date: '2026-08-01' }],
+  };
+
+  it('sorts by client_name alphabetically', () => {
+    expect(compareProjectsByField(a, b, 'client_name')).toBeGreaterThan(0); // 'Bravo' > 'Alpha'
+  });
+
+  it('sorts by date using compareProjectsByDate', () => {
+    expect(compareProjectsByField(a, b, 'date')).toBeGreaterThan(0); // Sep 2026 > Aug 2026
+  });
+
+  it('sorts by package_tier alphabetically', () => {
+    expect(compareProjectsByField(a, b, 'package_tier')).toBeGreaterThan(0); // 'Silver' > 'Gold'
+  });
+
+  it('sorts by stage using pipeline order', () => {
+    expect(compareProjectsByField(a, b, 'stage')).toBeLessThan(0); // booked (index 0) < completed (index 7)
+  });
+
+  it('sorts by progress identically to stage', () => {
+    expect(compareProjectsByField(a, b, 'progress')).toBe(compareProjectsByField(a, b, 'stage'));
+  });
+
+  it('returns 0 for an unrecognized column', () => {
+    expect(compareProjectsByField(a, b, 'nonsense')).toBe(0);
   });
 });
