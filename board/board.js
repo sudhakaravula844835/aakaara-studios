@@ -45,7 +45,13 @@ async function fetchProfile(userId) {
 async function fetchProjects() {
   const { data, error } = await supabase
     .from('projects')
-    .select('id, client_name, client_email, client_phone, stage, video_editing_substatus, package_tier, hours_booked, quoted_price, confirmed_price, deposit_paid, balance_paid, contract_url, quote_pdf_url, sub_events(id, name, event_date, venue, photo_selection_status, photo_selected_count, photo_total_count)');
+    // pm_id must stay in this list: openDetailPanel() stores whatever this
+    // query returns as currentDetailProject, and the Edit button re-opens
+    // the project modal from that in-memory object (not a fresh fetch). If
+    // pm_id is missing here, the PM select silently shows "Unassigned" on
+    // every re-open regardless of the true DB value, and an unsuspecting
+    // Save wipes the real assignment. Caught by Task 6 manual verification.
+    .select('id, client_name, client_email, client_phone, stage, video_editing_substatus, package_tier, hours_booked, quoted_price, confirmed_price, deposit_paid, balance_paid, contract_url, quote_pdf_url, pm_id, sub_events(id, name, event_date, venue, photo_selection_status, photo_selected_count, photo_total_count)');
   if (error) {
     showErrorToast('Could not load projects.');
     // null (not []) signals "fetch failed" distinctly from "fetch succeeded
