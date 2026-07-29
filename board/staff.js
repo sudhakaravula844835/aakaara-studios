@@ -3,7 +3,6 @@ import { showErrorToast } from './board-shared.js';
 
 export async function renderStaffView() {
   const wrap = document.getElementById('staffTableWrap');
-  wrap.innerHTML = '';
 
   const [{ data: staffData, error }, { data: userData }] = await Promise.all([
     supabase.from('profiles').select('id, full_name, email, role, active').order('full_name', { ascending: true }),
@@ -11,9 +10,16 @@ export async function renderStaffView() {
   ]);
 
   if (error) {
+    // Don't touch wrap.innerHTML here -- leave whatever was already
+    // rendered in place rather than blanking the table on a transient
+    // fetch failure (matches board.js's fetchProjects()/refreshProjects()
+    // null-vs-[] convention: a failed refetch must not wipe a correct
+    // prior render, e.g. right after a successful mutation).
     showErrorToast('Could not load staff.');
     return;
   }
+
+  wrap.innerHTML = '';
 
   const currentUserId = userData.user?.id;
 
