@@ -46,6 +46,26 @@ async function populateAssignmentFields(project) {
     pmSelect.appendChild(option);
   });
 
+  // If the project's currently-assigned PM is no longer active, they won't
+  // be in `pms` above — without this, the select would silently fall back
+  // to "Unassigned" and saving an otherwise-unrelated edit would wipe the
+  // assignment. Fetch and append them explicitly, labeled as inactive, so
+  // the assignment survives unless the Owner/PM deliberately changes it.
+  if (project && project.pm_id && !pms.some(pm => pm.id === project.pm_id)) {
+    const { data: inactivePm } = await supabase
+      .from('profiles')
+      .select('id, full_name')
+      .eq('id', project.pm_id)
+      .single();
+    if (inactivePm) {
+      const option = document.createElement('option');
+      option.value = inactivePm.id;
+      option.textContent = `${inactivePm.full_name} (inactive)`;
+      option.selected = true;
+      pmSelect.appendChild(option);
+    }
+  }
+
   let assignedEditorIds = [];
   if (project) {
     const { data } = await supabase.from('project_editors').select('editor_id').eq('project_id', project.id);
@@ -61,6 +81,26 @@ async function populateAssignmentFields(project) {
     if (assignedEditorIds.includes(editor.id)) option.selected = true;
     editorSelect.appendChild(option);
   });
+
+  // Same problem as the PM select above, but for assigned editors who are
+  // no longer active: fetch all of them in a single batched query and
+  // append inactive-labeled, pre-selected options so their assignment
+  // isn't silently dropped by an unrelated edit.
+  const activeEditorIds = new Set(editors.map(e => e.id));
+  const missingEditorIds = assignedEditorIds.filter(id => !activeEditorIds.has(id));
+  if (missingEditorIds.length > 0) {
+    const { data: inactiveEditors } = await supabase
+      .from('profiles')
+      .select('id, full_name')
+      .in('id', missingEditorIds);
+    (inactiveEditors || []).forEach(editor => {
+      const option = document.createElement('option');
+      option.value = editor.id;
+      option.textContent = `${editor.full_name} (inactive)`;
+      option.selected = true;
+      editorSelect.appendChild(option);
+    });
+  }
 }
 
 async function saveEditorAssignments(projectId) {
