@@ -12,7 +12,73 @@ import { showErrorToast, getCurrentProfile } from './board-shared.js';
 // initializing.
 import { refreshProjects } from './board.js';
 
-export function openProjectModal(project) {
+async function loadStaffOptions() {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, full_name, role')
+    .in('role', ['pm', 'editor'])
+    .eq('active', true)
+    .order('full_name', { ascending: true });
+  if (error) {
+    showErrorToast('Could not load staff for assignment.');
+    return { pms: [], editors: [] };
+  }
+  return {
+    pms: data.filter(p => p.role === 'pm'),
+    editors: data.filter(p => p.role === 'editor'),
+  };
+}
+
+async function populateAssignmentFields(project) {
+  const { pms, editors } = await loadStaffOptions();
+
+  const pmSelect = document.getElementById('fPmId');
+  pmSelect.innerHTML = '';
+  const unassignedOption = document.createElement('option');
+  unassignedOption.value = '';
+  unassignedOption.textContent = 'Unassigned';
+  pmSelect.appendChild(unassignedOption);
+  pms.forEach(pm => {
+    const option = document.createElement('option');
+    option.value = pm.id;
+    option.textContent = pm.full_name;
+    if (project && project.pm_id === pm.id) option.selected = true;
+    pmSelect.appendChild(option);
+  });
+
+  let assignedEditorIds = [];
+  if (project) {
+    const { data } = await supabase.from('project_editors').select('editor_id').eq('project_id', project.id);
+    assignedEditorIds = (data || []).map(row => row.editor_id);
+  }
+
+  const editorSelect = document.getElementById('fEditorIds');
+  editorSelect.innerHTML = '';
+  editors.forEach(editor => {
+    const option = document.createElement('option');
+    option.value = editor.id;
+    option.textContent = editor.full_name;
+    if (assignedEditorIds.includes(editor.id)) option.selected = true;
+    editorSelect.appendChild(option);
+  });
+}
+
+async function saveEditorAssignments(projectId) {
+  const editorSelect = document.getElementById('fEditorIds');
+  const selectedIds = Array.from(editorSelect.selectedOptions).map(o => o.value);
+
+  const { error: deleteError } = await supabase.from('project_editors').delete().eq('project_id', projectId);
+  if (deleteError) return deleteError;
+
+  if (selectedIds.length === 0) return null;
+
+  const { error: insertError } = await supabase.from('project_editors').insert(
+    selectedIds.map(editorId => ({ project_id: projectId, editor_id: editorId }))
+  );
+  return insertError;
+}
+
+export async function openProjectModal(project) {
   const backdrop = document.getElementById('projectModalBackdrop');
   const form = document.getElementById('projectForm');
   form.reset();
@@ -31,6 +97,8 @@ export function openProjectModal(project) {
   document.getElementById('fBalancePaid').checked = project ? !!project.balance_paid : false;
   document.getElementById('fContractUrl').value = project ? (project.contract_url || '') : '';
   document.getElementById('fQuotePdfUrl').value = project ? (project.quote_pdf_url || '') : '';
+
+  await populateAssignmentFields(project);
 
   backdrop.classList.add('open');
   document.getElementById('fClientName').focus();
@@ -55,6 +123,7 @@ async function handleProjectFormSubmit(e) {
     balance_paid: document.getElementById('fBalancePaid').checked,
     contract_url: document.getElementById('fContractUrl').value.trim() || null,
     quote_pdf_url: document.getElementById('fQuotePdfUrl').value.trim() || null,
+    pm_id: document.getElementById('fPmId').value || null,
   };
 
   const { valid, errors } = validateProjectForm(fields);
@@ -64,13 +133,24 @@ async function handleProjectFormSubmit(e) {
   }
 
   const editId = document.getElementById('fId').value;
-  const { error } = editId
-    ? await supabase.from('projects').update(fields).eq('id', editId)
-    : await supabase.from('projects').insert(fields);
+  let projectId = editId;
+  let error;
+  if (editId) {
+    ({ error } = await supabase.from('projects').update(fields).eq('id', editId));
+  } else {
+    const insertResult = await supabase.from('projects').insert(fields).select().single();
+    error = insertResult.error;
+    projectId = insertResult.data?.id;
+  }
 
   if (error) {
     showErrorToast('Could not save project — please try again.');
     return;
+  }
+
+  const assignError = await saveEditorAssignments(projectId);
+  if (assignError) {
+    showErrorToast('Project saved, but editor assignment could not be updated — please try again.');
   }
 
   // If the detail panel is open for the project we just edited, refresh its

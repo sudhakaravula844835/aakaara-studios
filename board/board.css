@@ -418,3 +418,4 @@ body {
   transition: all 0.15s var(--ease);
 }
 .staff-status-toggle:hover { border-color: rgba(201,149,107,0.3); color: var(--ivory); }
+.form-group .form-input.form-multiselect { min-height: 100px; padding: 0.4rem; }
