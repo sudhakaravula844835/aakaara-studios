@@ -10,6 +10,7 @@ import {
 } from './project-modal.js';
 import { renderListView } from './list-view.js';
 import { renderCalendarView } from './calendar-view.js';
+import { renderStaffView } from './staff.js';
 
 async function requireSession() {
   const { data } = await supabase.auth.getSession();
@@ -189,6 +190,7 @@ function renderActiveView() {
   if (currentView === 'kanban') renderBoard();
   else if (currentView === 'list') renderListView(currentProjects);
   else if (currentView === 'calendar') renderCalendarView(currentProjects);
+  else if (currentView === 'staff') renderStaffView();
 }
 
 export async function refreshProjects() {
@@ -214,6 +216,7 @@ function setActiveView(view) {
   document.getElementById('boardColumns').classList.toggle('view-active', view === 'kanban');
   document.getElementById('listViewContainer').classList.toggle('view-active', view === 'list');
   document.getElementById('calendarViewContainer').classList.toggle('view-active', view === 'calendar');
+  document.getElementById('staffViewContainer').classList.toggle('view-active', view === 'staff');
   renderActiveView();
 }
 
@@ -271,7 +274,12 @@ async function init() {
   if (!user) return;
 
   const profile = await fetchProfile(user.id);
-  if (profile) setCurrentProfile(profile);
+  if (profile) {
+    setCurrentProfile(profile);
+    if (profile.role === 'owner') {
+      document.querySelectorAll('.owner-only').forEach(el => el.classList.add('owner-visible'));
+    }
+  }
 
   renderColumns();
   await refreshProjects();

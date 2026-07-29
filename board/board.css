@@ -389,3 +389,32 @@ body {
   .calendar-view-container { padding: 1rem 1.25rem; }
   .calendar-day { min-height: 50px; }
 }
+
+/* Owner-only visibility -- hidden by default; board.js reveals it only
+   after confirming the signed-in profile's role is 'owner'. */
+.owner-only { display: none; }
+.owner-only.owner-visible { display: inline-block; }
+
+/* Staff view */
+.staff-view-container { display: none; padding: 1.5rem 2rem; overflow-x: auto; }
+.staff-view-container.view-active { display: block; }
+.staff-view-header { display: flex; justify-content: flex-end; margin-bottom: 1rem; }
+.btn-invite-staff {
+  padding: 0.5rem 1rem; border-radius: 6px; font-family: var(--font-body);
+  font-size: 0.7rem; letter-spacing: 0.08em; cursor: pointer; transition: background 0.2s var(--ease);
+  background: rgba(201,149,107,0.12); border: 1px solid rgba(201,149,107,0.35); color: var(--rose);
+}
+.btn-invite-staff:hover { background: rgba(201,149,107,0.22); }
+.staff-table th { cursor: default; }
+.staff-status-badge {
+  display: inline-block; padding: 0.2rem 0.6rem; border-radius: 12px;
+  font-size: 0.65rem; letter-spacing: 0.05em; text-transform: uppercase; margin-right: 0.6rem;
+}
+.staff-status-active { background: rgba(120,190,120,0.12); border: 1px solid rgba(120,190,120,0.3); color: #8fd98f; }
+.staff-status-inactive { background: rgba(224,112,112,0.12); border: 1px solid rgba(224,112,112,0.3); color: #e07070; }
+.staff-status-toggle {
+  background: none; border: 1px solid rgba(201,149,107,0.15); color: rgba(250,246,241,0.5);
+  border-radius: 4px; padding: 0.3rem 0.6rem; font-size: 0.65rem; cursor: pointer;
+  transition: all 0.15s var(--ease);
+}
+.staff-status-toggle:hover { border-color: rgba(201,149,107,0.3); color: var(--ivory); }
