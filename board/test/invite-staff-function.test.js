@@ -12,6 +12,15 @@ beforeAll(async () => {
   ({ default: handler } = await import('../../netlify/edge-functions/invite-staff.ts'));
 });
 
+// This project's Supabase instance uses Supabase's built-in email sender,
+// which has a low, easily-exhausted rate limit -- unconditionally sending a
+// real invite email on every `npm test` run makes the suite flaky/red for
+// anyone whenever that quota is tight. Gate the one test that actually
+// triggers a real send behind an opt-in env var so the default suite stays
+// green; run it explicitly with:
+//   RUN_LIVE_EMAIL_TESTS=1 npm run test:unit -- board/test/invite-staff-function.test.js
+const itLive = process.env.RUN_LIVE_EMAIL_TESTS ? it : it.skip;
+
 function inviteRequest(jwt, body) {
   return new Request('https://example.com/board/api/invite-staff', {
     method: 'POST',
@@ -65,7 +74,7 @@ describe('invite-staff edge function', () => {
     expect(res.status).toBe(403);
   });
 
-  it('a valid Owner invite creates both the auth account and the profiles row', async () => {
+  itLive('a valid Owner invite creates both the auth account and the profiles row', async () => {
     owner = await createTestProfile('owner');
     const { data: session } = await owner.client.auth.getSession();
     // Unlike every other email in this file, this one is passed to the real
@@ -74,9 +83,11 @@ describe('invite-staff edge function', () => {
     // the entire RFC 2606 reserved set (example.com/.org/.net/.edu) with 400
     // email_address_invalid (confirmed empirically against this project's auth
     // logs), unlike admin.auth.admin.createUser() (used by createTestProfile
-    // above), which never validates deliverability. Using the studio's own
-    // real domain here passes that validation and exercises the real send path.
-    const email = `invited-${Date.now()}@aakaarastudiosnyc.com`;
+    // above), which never validates deliverability. mailinator.com is a real,
+    // deliverable, public disposable-inbox domain, so it passes that
+    // validation and exercises the real send path without ever touching the
+    // studio's actual mailbox or accumulating fake accounts against it.
+    const email = `invited-${Date.now()}@mailinator.com`;
 
     const res = await handler(inviteRequest(session.session.access_token, {
       email, full_name: 'New Editor', role: 'editor',
