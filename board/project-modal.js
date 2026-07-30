@@ -103,19 +103,48 @@ async function populateAssignmentFields(project) {
   }
 }
 
+// Insert-then-delete, deliberately not delete-then-reinsert: if the insert
+// half fails (network blip, transient RLS hiccup), the old delete-first
+// ordering left the project with ZERO editors -- silently wiping a correct
+// assignment while telling the user "please try again", which implies
+// nothing was lost. Adding the new rows first and only then removing the
+// no-longer-selected ones means a failed insert leaves the previous, still
+// correct, assignment fully intact.
 async function saveEditorAssignments(projectId) {
   const editorSelect = document.getElementById('fEditorIds');
   const selectedIds = Array.from(editorSelect.selectedOptions).map(o => o.value);
 
-  const { error: deleteError } = await supabase.from('project_editors').delete().eq('project_id', projectId);
-  if (deleteError) return deleteError;
+  const { data: existingRows, error: fetchError } = await supabase
+    .from('project_editors')
+    .select('editor_id')
+    .eq('project_id', projectId);
+  if (fetchError) return fetchError;
 
-  if (selectedIds.length === 0) return null;
+  const existingIds = (existingRows || []).map(row => row.editor_id);
+  // Only insert genuinely new rows -- re-inserting an existing pair would
+  // trip the unique (project_id, editor_id) constraint and report a failure
+  // for what is actually a no-op.
+  const toInsert = selectedIds.filter(id => !existingIds.includes(id));
+  const toRemove = existingIds.filter(id => !selectedIds.includes(id));
 
-  const { error: insertError } = await supabase.from('project_editors').insert(
-    selectedIds.map(editorId => ({ project_id: projectId, editor_id: editorId }))
-  );
-  return insertError;
+  if (toInsert.length > 0) {
+    const { error: insertError } = await supabase.from('project_editors').insert(
+      toInsert.map(editorId => ({ project_id: projectId, editor_id: editorId }))
+    );
+    // Return WITHOUT deleting anything -- the old assignment stays valid.
+    if (insertError) return insertError;
+  }
+
+  if (toRemove.length > 0) {
+    const { error: deleteError } = await supabase
+      .from('project_editors')
+      .delete()
+      .eq('project_id', projectId)
+      .in('editor_id', toRemove);
+    if (deleteError) return deleteError;
+  }
+
+  return null;
 }
 
 export async function openProjectModal(project) {
