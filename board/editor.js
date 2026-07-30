@@ -212,12 +212,77 @@ async function handleSubstatusChange() {
   await refreshProjects();
 }
 
+function renderSongRow(song) {
+  const row = document.createElement('div');
+  row.className = 'song-row';
+
+  const title = document.createElement('div');
+  title.className = 'song-title';
+  title.textContent = song.artist ? `${song.title} — ${song.artist}` : song.title;
+  row.appendChild(title);
+
+  const label = document.createElement('label');
+  label.className = 'song-license-toggle';
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.checked = song.license_confirmed;
+  checkbox.addEventListener('change', async () => {
+    const newValue = checkbox.checked;
+    checkbox.disabled = true;
+    const { error } = await supabase.rpc('set_song_license', {
+      p_song_id: song.id,
+      p_license_confirmed: newValue,
+    });
+    checkbox.disabled = false;
+    if (error) {
+      checkbox.checked = !newValue;
+      showErrorToast('Could not update song license — please try again.');
+    }
+  });
+  label.appendChild(checkbox);
+  label.appendChild(document.createTextNode(' License confirmed'));
+  row.appendChild(label);
+
+  return row;
+}
+
+async function renderSongsList() {
+  const requestedProject = currentDetailProject;
+  if (!requestedProject) return;
+  const { data: songs, error } = await supabase
+    .from('songs')
+    .select('*')
+    .eq('project_id', requestedProject.id)
+    .order('created_at', { ascending: true });
+
+  if (!currentDetailProject || currentDetailProject.id !== requestedProject.id) return;
+
+  const container = document.getElementById('songsList');
+  container.innerHTML = '';
+
+  if (error) {
+    showErrorToast('Could not load songs.');
+    return;
+  }
+
+  if (songs.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'timeline-empty';
+    empty.textContent = 'No songs yet.';
+    container.appendChild(empty);
+    return;
+  }
+
+  songs.forEach(song => container.appendChild(renderSongRow(song)));
+}
+
 async function openProjectDetail(project) {
   currentDetailProject = project;
   document.getElementById('detailClientName').textContent = project.client_name;
   document.getElementById('detailBackdrop').classList.add('open');
   renderSubstatusControl();
   await renderSubEventsTimeline();
+  await renderSongsList();
 }
 
 function closeProjectDetail() {
