@@ -194,9 +194,10 @@ async function resyncCurrentDetailProject() {
 async function handleSubstatusChange() {
   const select = document.getElementById('substatusSelect');
   const newSubstatus = select.value;
+  const requestedProjectId = currentDetailProject.id;
   select.disabled = true;
   const { error } = await supabase.rpc('update_editing_status', {
-    p_project_id: currentDetailProject.id,
+    p_project_id: requestedProjectId,
     p_substatus: newSubstatus,
   });
   if (error) {
@@ -204,8 +205,10 @@ async function handleSubstatusChange() {
     await resyncCurrentDetailProject();
     return;
   }
-  currentDetailProject = { ...currentDetailProject, video_editing_substatus: newSubstatus };
-  renderSubstatusControl();
+  if (currentDetailProject && currentDetailProject.id === requestedProjectId) {
+    currentDetailProject = { ...currentDetailProject, video_editing_substatus: newSubstatus };
+    renderSubstatusControl();
+  }
   await refreshProjects();
 }
 
