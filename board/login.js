@@ -1,11 +1,20 @@
 import { supabase } from './supabase-client.js';
 
+async function redirectForRole(userId) {
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .single();
+  window.location.href = profile && profile.role === 'editor' ? 'editor.html' : 'index.html';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('loginForm');
   const errorEl = document.getElementById('loginError');
 
   supabase.auth.getSession().then(({ data }) => {
-    if (data.session) window.location.href = 'index.html';
+    if (data.session) redirectForRole(data.session.user.id);
   });
 
   form.addEventListener('submit', async (e) => {
@@ -23,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('active')
+      .select('role, active')
       .eq('id', signInData.user.id)
       .single();
 
@@ -37,6 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    window.location.href = 'index.html';
+    window.location.href = (!profileError && profile && profile.role === 'editor') ? 'editor.html' : 'index.html';
   });
 });
