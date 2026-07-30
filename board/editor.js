@@ -96,10 +96,68 @@ async function refreshProjects() {
   renderProjectList();
 }
 
+async function renderSubEventsTimeline() {
+  // Capture the project this call is rendering for *before* the await --
+  // currentDetailProject may be reassigned (panel closed -> null, or
+  // switched to another project) while the fetch below is in flight. Same
+  // guard pattern as project-modal.js's renderSubEventsTimeline.
+  const requestedProject = currentDetailProject;
+  if (!requestedProject) return;
+  const { data: subEvents, error } = await supabase
+    .from('sub_events')
+    .select('*')
+    .eq('project_id', requestedProject.id)
+    .order('event_date', { ascending: true, nullsFirst: false });
+
+  if (!currentDetailProject || currentDetailProject.id !== requestedProject.id) return;
+
+  const container = document.getElementById('subEventsTimeline');
+  container.innerHTML = '';
+
+  if (error) {
+    showErrorToast('Could not load sub-events.');
+    return;
+  }
+
+  if (subEvents.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'timeline-empty';
+    empty.textContent = 'No sub-events yet.';
+    container.appendChild(empty);
+    return;
+  }
+
+  subEvents.forEach(se => {
+    const item = document.createElement('div');
+    item.className = 'timeline-item';
+
+    const dot = document.createElement('div');
+    dot.className = 'timeline-dot timeline-dot-' + se.photo_selection_status;
+    item.appendChild(dot);
+
+    const content = document.createElement('div');
+    content.className = 'timeline-content';
+
+    const name = document.createElement('div');
+    name.className = 'timeline-name';
+    name.textContent = se.name;
+    content.appendChild(name);
+
+    const meta = document.createElement('div');
+    meta.className = 'timeline-meta';
+    meta.textContent = [formatDate(se.event_date), se.venue].filter(Boolean).join(' · ');
+    content.appendChild(meta);
+
+    item.appendChild(content);
+    container.appendChild(item);
+  });
+}
+
 async function openProjectDetail(project) {
   currentDetailProject = project;
   document.getElementById('detailClientName').textContent = project.client_name;
   document.getElementById('detailBackdrop').classList.add('open');
+  await renderSubEventsTimeline();
 }
 
 function closeProjectDetail() {
