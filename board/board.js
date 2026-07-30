@@ -24,7 +24,12 @@ async function requireSession() {
 async function fetchProfile(userId) {
   const { data, error } = await supabase
     .from('profiles')
-    .select('full_name, role')
+    // `active` must stay in this list: login.js only checks it on the
+    // login-FORM submit path, so a tab that already holds a valid session
+    // lands straight on the board without ever passing that check. init()
+    // below is the only place a deactivated-but-still-signed-in user gets
+    // ejected, and it can't notice what this select doesn't fetch.
+    .select('full_name, role, active')
     .eq('id', userId)
     .single();
   if (error) {
@@ -281,6 +286,17 @@ async function init() {
 
   const profile = await fetchProfile(user.id);
   if (profile) {
+    // A deactivated user whose session is still valid would otherwise sit on
+    // a fully-rendered (if empty) board indefinitely -- every RLS-gated read
+    // returns nothing, but nothing tells them why or sends them away. Eject
+    // them to a clean login screen; login.js's own check then shows the
+    // "access revoked" message if they try to sign back in.
+    if (profile.active === false) {
+      await supabase.auth.signOut();
+      window.location.href = 'login.html';
+      return;
+    }
+
     setCurrentProfile(profile);
     if (profile.role === 'owner') {
       document.querySelectorAll('.owner-only').forEach(el => el.classList.add('owner-visible'));
