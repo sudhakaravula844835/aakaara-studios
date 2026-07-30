@@ -14,17 +14,41 @@ export const adminClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
 let testCounter = 0;
 
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+// The full suite creates ~50 auth users in a short window, and GoTrue
+// occasionally answers one createUser call with a transient 500
+// (AuthRetryableFetchError). Retry only that shape -- a genuine validation
+// error (4xx: duplicate email, weak password) must still fail loudly and
+// immediately rather than being retried into a slower identical failure.
+function isRetryableAuthError(error) {
+  if (!error) return false;
+  if (error.name === 'AuthRetryableFetchError') return true;
+  return typeof error.status === 'number' && error.status >= 500;
+}
+
+async function createAuthUserWithRetry(payload, attempts = 3) {
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    const { data, error } = await adminClient.auth.admin.createUser(payload);
+    if (!error) return data;
+    lastError = error;
+    if (!isRetryableAuthError(error) || attempt === attempts) break;
+    await sleep(300 * attempt);
+  }
+  throw lastError;
+}
+
 export async function createTestProfile(role) {
   testCounter += 1;
   const email = `test-${role}-${Date.now()}-${testCounter}@example.com`;
   const password = 'TestPassword123!';
 
-  const { data: userData, error: userError } = await adminClient.auth.admin.createUser({
+  const userData = await createAuthUserWithRetry({
     email,
     password,
     email_confirm: true,
   });
-  if (userError) throw userError;
 
   const { error: profileError } = await adminClient
     .from('profiles')
