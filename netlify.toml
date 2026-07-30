@@ -18,3 +18,7 @@
 [[edge_functions]]
   path = "/admin/*"
   function = "admin-auth"
+
+[[edge_functions]]
+  path = "/board/api/invite-staff"
+  function = "invite-staff"

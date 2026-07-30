@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Projects — Aakaara Studios</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Outfit:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="board.css">
+</head>
+<body>
+
+  <header class="board-header">
+    <div>
+      <div class="brand">Aakaara Studios</div>
+      <h1>My Projects</h1>
+    </div>
+    <div class="board-header-actions">
+      <button class="board-logout-btn" id="logoutBtn">Log Out</button>
+    </div>
+  </header>
+
+  <main class="board-main">
+    <div class="list-view-container view-active" id="editorProjectListContainer"></div>
+  </main>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Project Detail Panel -->
+  <div class="detail-backdrop" id="detailBackdrop">
+    <div class="detail-panel" role="dialog" aria-modal="true" aria-labelledby="detailClientName">
+      <div class="detail-header">
+        <div class="detail-title" id="detailClientName"></div>
+        <div class="detail-header-actions">
+          <button class="detail-close" id="detailClose" aria-label="Close">&times;</button>
+        </div>
+      </div>
+
+      <section class="detail-section">
+        <div class="detail-section-title">Sub-Events</div>
+        <div class="timeline" id="subEventsTimeline"></div>
+      </section>
+
+      <section class="detail-section">
+        <div class="detail-section-title">Video Editing Status</div>
+        <div class="form-group">
+          <select class="form-input" id="substatusSelect"></select>
+          <div class="substatus-note" id="substatusNote"></div>
+        </div>
+      </section>
+
+      <section class="detail-section">
+        <div class="detail-section-title">Songs</div>
+        <div class="songs-list" id="songsList"></div>
+      </section>
+
+      <section class="detail-section">
+        <div class="detail-section-title">Activity &amp; Notes</div>
+        <div class="activity-feed" id="activityFeed"></div>
+        <form class="comment-composer" id="commentForm">
+          <textarea class="comment-input" id="commentBody" placeholder="Add a note&hellip;" required></textarea>
+          <div class="comment-composer-row">
+            <button type="submit" class="btn-comment-post">Post</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+
+<script type="module" src="editor.js"></script>
+</body>
+</html>

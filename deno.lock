@@ -12,6 +12,8 @@
     "packageJson": {
       "dependencies": [
         "npm:@playwright/test@^1.40.0",
+        "npm:@supabase/supabase-js@^2.110.8",
+        "npm:dotenv@^17.4.2",
         "npm:http-server@^14.1.1",
         "npm:jsdom@23",
         "npm:vitest@1"

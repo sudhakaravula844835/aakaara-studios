@@ -9,6 +9,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0",
+    "@supabase/supabase-js": "^2.110.8",
+    "dotenv": "^17.4.2",
     "http-server": "^14.1.1",
     "jsdom": "^23.0.0",
     "vitest": "^1.0.0"
