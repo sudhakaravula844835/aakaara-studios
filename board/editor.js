@@ -153,10 +153,67 @@ async function renderSubEventsTimeline() {
   });
 }
 
+function renderSubstatusControl() {
+  const select = document.getElementById('substatusSelect');
+  const note = document.getElementById('substatusNote');
+  select.innerHTML = '';
+
+  Object.entries(SUBSTATUS_LABELS).forEach(([value, label]) => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = label;
+    if (value === currentDetailProject.video_editing_substatus) option.selected = true;
+    select.appendChild(option);
+  });
+
+  const isEditable = currentDetailProject.stage === 'video_editing';
+  select.disabled = !isEditable;
+  note.textContent = isEditable ? '' : 'Available once this project reaches Video Editing.';
+}
+
+// Re-fetches the open detail panel's project row and re-renders the
+// substatus control against the fresh data -- used after a failed substatus
+// update, since the failure is most likely a stage-race (a PM moved the
+// project out of video_editing between page-load and this click) and the
+// locally-cached currentDetailProject.stage is now stale.
+async function resyncCurrentDetailProject() {
+  if (!currentDetailProject) return;
+  const requestedId = currentDetailProject.id;
+  const { data, error } = await supabase
+    .from('editor_project_view')
+    .select('*')
+    .eq('id', requestedId)
+    .single();
+  if (!error && data && currentDetailProject && currentDetailProject.id === requestedId) {
+    currentDetailProject = { ...currentDetailProject, ...data };
+    renderSubstatusControl();
+  }
+  await refreshProjects();
+}
+
+async function handleSubstatusChange() {
+  const select = document.getElementById('substatusSelect');
+  const newSubstatus = select.value;
+  select.disabled = true;
+  const { error } = await supabase.rpc('update_editing_status', {
+    p_project_id: currentDetailProject.id,
+    p_substatus: newSubstatus,
+  });
+  if (error) {
+    showErrorToast('Could not update status — please try again.');
+    await resyncCurrentDetailProject();
+    return;
+  }
+  currentDetailProject = { ...currentDetailProject, video_editing_substatus: newSubstatus };
+  renderSubstatusControl();
+  await refreshProjects();
+}
+
 async function openProjectDetail(project) {
   currentDetailProject = project;
   document.getElementById('detailClientName').textContent = project.client_name;
   document.getElementById('detailBackdrop').classList.add('open');
+  renderSubstatusControl();
   await renderSubEventsTimeline();
 }
 
@@ -187,6 +244,7 @@ async function init() {
   document.getElementById('detailBackdrop').addEventListener('click', (e) => {
     if (e.target.id === 'detailBackdrop') closeProjectDetail();
   });
+  document.getElementById('substatusSelect').addEventListener('change', handleSubstatusChange);
 
   const user = await requireSession();
   if (!user) return;
