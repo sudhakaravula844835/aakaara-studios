@@ -1,6 +1,6 @@
 import { supabase } from './supabase-client.js';
 import {
-  formatDate, deriveWeddingDate, stageLabel, SUBSTATUS_LABELS,
+  formatDate, deriveWeddingDate, stageLabel, SUBSTATUS_LABELS, synthesizeActivityLine,
 } from './board-utils.js';
 import { showErrorToast } from './board-shared.js';
 
@@ -276,6 +276,113 @@ async function renderSongsList() {
   songs.forEach(song => container.appendChild(renderSongRow(song)));
 }
 
+async function renderActivityFeed() {
+  const requestedProject = currentDetailProject;
+  if (!requestedProject) return;
+  const [{ data: comments, error: commentsError }, { data: activity, error: activityError }] = await Promise.all([
+    supabase.from('comments').select('*').eq('project_id', requestedProject.id).order('created_at', { ascending: true }),
+    supabase.from('activity_log').select('*').eq('project_id', requestedProject.id).order('created_at', { ascending: true }),
+  ]);
+
+  if (!currentDetailProject || currentDetailProject.id !== requestedProject.id) return;
+
+  const container = document.getElementById('activityFeed');
+  container.innerHTML = '';
+
+  if (commentsError || activityError) {
+    showErrorToast('Could not load activity.');
+    return;
+  }
+
+  const entries = [
+    ...comments.map(c => ({ type: 'comment', created_at: c.created_at, data: c })),
+    ...activity.map(a => ({ type: 'activity', created_at: a.created_at, data: a })),
+  ].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+  if (entries.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'feed-empty';
+    empty.textContent = 'No comments yet.';
+    container.appendChild(empty);
+    return;
+  }
+
+  entries.forEach(entry => {
+    const row = document.createElement('div');
+
+    if (entry.type === 'comment') {
+      row.className = 'feed-row feed-row-comment';
+
+      const avatar = document.createElement('div');
+      avatar.className = 'feed-avatar';
+      avatar.textContent = (entry.data.author_label || '?').charAt(0).toUpperCase();
+      row.appendChild(avatar);
+
+      const content = document.createElement('div');
+      content.className = 'feed-content';
+
+      const authorLine = document.createElement('div');
+      authorLine.className = 'feed-author-line';
+      const authorName = document.createElement('span');
+      authorName.className = 'feed-author-name';
+      authorName.textContent = entry.data.author_label || '?';
+      authorLine.appendChild(authorName);
+
+      // Editors can see internal (staff-only) comments too, per the
+      // comments_select_editor RLS policy -- this tag makes it clear which
+      // past notes were never shown to the client, matching the Owner/PM
+      // feed's own behavior in project-modal.js.
+      if (entry.data.internal) {
+        const tag = document.createElement('span');
+        tag.className = 'feed-internal-tag';
+        tag.textContent = 'Internal';
+        authorLine.appendChild(tag);
+      }
+      content.appendChild(authorLine);
+
+      const body = document.createElement('div');
+      body.className = 'feed-body';
+      body.textContent = entry.data.body;
+      content.appendChild(body);
+
+      row.appendChild(content);
+    } else {
+      row.className = 'feed-row feed-row-activity';
+      const marker = document.createElement('div');
+      marker.className = 'feed-marker';
+      row.appendChild(marker);
+      const text = document.createElement('div');
+      text.className = 'feed-activity-text';
+      text.textContent = synthesizeActivityLine(entry.data);
+      row.appendChild(text);
+    }
+
+    container.appendChild(row);
+  });
+}
+
+async function handleCommentSubmit(e) {
+  e.preventDefault();
+  const body = document.getElementById('commentBody').value.trim();
+  if (!body || !currentDetailProject) return;
+
+  const submitBtn = document.querySelector('#commentForm button[type="submit"]');
+  submitBtn.disabled = true;
+  const { error } = await supabase.rpc('post_comment', {
+    p_project_id: currentDetailProject.id,
+    p_body: body,
+  });
+  submitBtn.disabled = false;
+
+  if (error) {
+    showErrorToast('Could not post comment — please try again.');
+    return;
+  }
+
+  document.getElementById('commentBody').value = '';
+  await renderActivityFeed();
+}
+
 async function openProjectDetail(project) {
   currentDetailProject = project;
   document.getElementById('detailClientName').textContent = project.client_name;
@@ -283,11 +390,52 @@ async function openProjectDetail(project) {
   renderSubstatusControl();
   await renderSubEventsTimeline();
   await renderSongsList();
+  await renderActivityFeed();
 }
 
 function closeProjectDetail() {
   document.getElementById('detailBackdrop').classList.remove('open');
   currentDetailProject = null;
+}
+
+function subscribeToChanges() {
+  realtimeChannel = supabase
+    .channel('editor-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, (payload) => {
+      refreshProjects();
+      const projectId = payload.new?.id ?? payload.old?.id;
+      if (projectId && getCurrentDetailProjectId() === projectId) {
+        // Sync the open detail panel's in-memory project object with the
+        // fresh row so the substatus control's enabled/disabled state
+        // (gated on currentDetailProject.stage) reflects a stage change
+        // made elsewhere -- e.g. a PM moving the project out of
+        // video_editing -- without the Editor needing to close/reopen.
+        currentDetailProject = { ...currentDetailProject, ...payload.new };
+        renderSubstatusControl();
+      }
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'sub_events' }, (payload) => {
+      refreshProjects();
+      const projectId = payload.new?.project_id ?? payload.old?.project_id;
+      if (projectId && getCurrentDetailProjectId() === projectId) renderSubEventsTimeline();
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'songs' }, (payload) => {
+      const projectId = payload.new?.project_id ?? payload.old?.project_id;
+      if (projectId && getCurrentDetailProjectId() === projectId) renderSongsList();
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, (payload) => {
+      const projectId = payload.new?.project_id ?? payload.old?.project_id;
+      if (projectId && getCurrentDetailProjectId() === projectId) renderActivityFeed();
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'activity_log' }, (payload) => {
+      const projectId = payload.new?.project_id ?? payload.old?.project_id;
+      if (projectId && getCurrentDetailProjectId() === projectId) renderActivityFeed();
+    })
+    .subscribe((status) => {
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        showErrorToast('Live updates disconnected — reconnecting…');
+      }
+    });
 }
 
 async function requireSession() {
@@ -313,6 +461,7 @@ async function init() {
     if (e.target.id === 'detailBackdrop') closeProjectDetail();
   });
   document.getElementById('substatusSelect').addEventListener('change', handleSubstatusChange);
+  document.getElementById('commentForm').addEventListener('submit', handleCommentSubmit);
 
   const user = await requireSession();
   if (!user) return;
@@ -334,6 +483,7 @@ async function init() {
   }
 
   await refreshProjects();
+  subscribeToChanges();
 }
 
 document.addEventListener('DOMContentLoaded', init);
