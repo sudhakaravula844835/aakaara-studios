@@ -82,14 +82,24 @@ describe('client token portal', () => {
   it('lets clients paste photo-number lists and stores them as client notes', () => {
     expect(clientJs).toContain('parsePhotoNumbers');
     expect(clientJs).toContain('client-photo-list-input');
+    expect(clientJs).toContain('client-live-count');
     expect(clientJs).toContain('post_client_comment');
     expect(clientJs).toContain('Photo selections for');
   });
 
   it('captures song reference links for editors', () => {
-    expect(clientHtml).toContain('id="songUrl"');
+    expect(clientHtml).toContain('song-url-input');
+    expect(clientHtml.match(/class="client-song-slot"/g)).toHaveLength(5);
     expect(clientJs).toContain('YouTube:');
+    expect(clientJs).toContain('getFilledSongSlots');
     expect(clientJs).toContain('song-reference-link');
     expect(editorJs).toContain('song-reference-link');
+  });
+
+  it('renders guided client workflow language', () => {
+    expect(clientHtml).toContain('Choose Photos for Editing');
+    expect(clientHtml).toContain('Song Suggestions');
+    expect(clientHtml).toContain('Notes for the Studio');
+    expect(clientJs).toContain('client-status-grid');
   });
 });

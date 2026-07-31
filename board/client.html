@@ -23,24 +23,62 @@
     </section>
 
     <section class="client-section">
-      <div class="detail-section-title">Photo Selection</div>
+      <div class="detail-section-title">Choose Photos for Editing</div>
+      <div class="client-section-note">Paste the photo numbers or filenames exactly as shown in the RAW gallery.</div>
       <div class="client-sub-events" id="clientSubEvents"></div>
     </section>
 
     <section class="client-section">
-      <div class="detail-section-title">Songs</div>
+      <div class="detail-section-title">Song Suggestions</div>
+      <div class="client-section-note">Suggest up to 5 songs. YouTube links help the editor find the exact version.</div>
       <div class="songs-list" id="clientSongsList"></div>
-      <form class="client-inline-form" id="songForm">
-        <select class="form-input" id="songSubEvent"></select>
-        <input class="form-input" type="text" id="songTitle" placeholder="Song title" required>
-        <input class="form-input" type="text" id="songArtist" placeholder="Artist">
-        <input class="form-input" type="url" id="songUrl" placeholder="YouTube or song link">
-        <button type="submit" class="btn-comment-post">Add Song</button>
+      <form class="client-song-slots-form" id="songForm">
+        <div class="client-song-slots" id="songSlots">
+          <div class="client-song-slot">
+            <div class="client-song-slot-number">1</div>
+            <select class="form-input song-sub-event-select"></select>
+            <input class="form-input song-title-input" type="text" placeholder="Song title">
+            <input class="form-input song-artist-input" type="text" placeholder="Artist">
+            <input class="form-input song-url-input" type="url" placeholder="YouTube or song link">
+          </div>
+          <div class="client-song-slot">
+            <div class="client-song-slot-number">2</div>
+            <select class="form-input song-sub-event-select"></select>
+            <input class="form-input song-title-input" type="text" placeholder="Song title">
+            <input class="form-input song-artist-input" type="text" placeholder="Artist">
+            <input class="form-input song-url-input" type="url" placeholder="YouTube or song link">
+          </div>
+          <div class="client-song-slot">
+            <div class="client-song-slot-number">3</div>
+            <select class="form-input song-sub-event-select"></select>
+            <input class="form-input song-title-input" type="text" placeholder="Song title">
+            <input class="form-input song-artist-input" type="text" placeholder="Artist">
+            <input class="form-input song-url-input" type="url" placeholder="YouTube or song link">
+          </div>
+          <div class="client-song-slot">
+            <div class="client-song-slot-number">4</div>
+            <select class="form-input song-sub-event-select"></select>
+            <input class="form-input song-title-input" type="text" placeholder="Song title">
+            <input class="form-input song-artist-input" type="text" placeholder="Artist">
+            <input class="form-input song-url-input" type="url" placeholder="YouTube or song link">
+          </div>
+          <div class="client-song-slot">
+            <div class="client-song-slot-number">5</div>
+            <select class="form-input song-sub-event-select"></select>
+            <input class="form-input song-title-input" type="text" placeholder="Song title">
+            <input class="form-input song-artist-input" type="text" placeholder="Artist">
+            <input class="form-input song-url-input" type="url" placeholder="YouTube or song link">
+          </div>
+        </div>
+        <div class="client-song-actions">
+          <div class="client-muted" id="songSlotNote">0 of 5 slots filled</div>
+          <button type="submit" class="btn-comment-post">Submit Songs</button>
+        </div>
       </form>
     </section>
 
     <section class="client-section">
-      <div class="detail-section-title">Comments</div>
+      <div class="detail-section-title">Notes for the Studio</div>
       <div class="activity-feed" id="clientComments"></div>
       <form class="comment-composer" id="clientCommentForm">
         <textarea class="comment-input" id="clientCommentBody" placeholder="Add a comment&hellip;" required></textarea>

@@ -69,6 +69,25 @@ function renderHeader() {
   meta.textContent = pieces.join(' · ');
   header.appendChild(meta);
 
+  const statusGrid = document.createElement('div');
+  statusGrid.className = 'client-status-grid';
+  statusGrid.appendChild(renderStatusTile(
+    'RAW Gallery',
+    project.raw_delivery_link ? 'Ready' : 'Waiting',
+    project.raw_delivery_link ? 'client-status-ready' : 'client-status-waiting'
+  ));
+  statusGrid.appendChild(renderStatusTile(
+    'Photo Selection',
+    summarizePhotoSelection(),
+    'client-status-ready'
+  ));
+  statusGrid.appendChild(renderStatusTile(
+    'Songs',
+    `${Math.min(portalData.songs.length, 5)} of 5 suggested`,
+    portalData.songs.length > 0 ? 'client-status-ready' : 'client-status-waiting'
+  ));
+  header.appendChild(statusGrid);
+
   if (project.raw_delivery_link) {
     const link = document.createElement('a');
     link.className = 'client-raw-link';
@@ -78,6 +97,27 @@ function renderHeader() {
     link.textContent = 'Open RAW Delivery';
     header.appendChild(link);
   }
+}
+
+function renderStatusTile(label, value, className) {
+  const tile = document.createElement('div');
+  tile.className = `client-status-tile ${className}`;
+  const labelEl = document.createElement('div');
+  labelEl.className = 'client-status-label';
+  labelEl.textContent = label;
+  tile.appendChild(labelEl);
+  const valueEl = document.createElement('div');
+  valueEl.className = 'client-status-value';
+  valueEl.textContent = value;
+  tile.appendChild(valueEl);
+  return tile;
+}
+
+function summarizePhotoSelection() {
+  const selected = portalData.sub_events.reduce((sum, event) => sum + (event.photo_selected_count || 0), 0);
+  const total = portalData.sub_events.reduce((sum, event) => sum + (event.photo_total_count || 0), 0);
+  if (selected === 0) return 'Not started';
+  return total > 0 ? `${selected} of ${total} selected` : `${selected} selected`;
 }
 
 function renderSubEvents() {
@@ -139,10 +179,19 @@ function renderSubEvents() {
       : `${event.photo_selected_count || 0} selected`;
     form.appendChild(total);
 
+    const liveCount = document.createElement('div');
+    liveCount.className = 'client-live-count';
+    liveCount.textContent = '0 photos in this list';
+    input.addEventListener('input', () => {
+      const count = parsePhotoNumbers(input.value).length;
+      liveCount.textContent = count === 1 ? '1 photo in this list' : `${count} photos in this list`;
+    });
+    form.appendChild(liveCount);
+
     const submitBtn = document.createElement('button');
     submitBtn.className = 'btn-comment-post';
     submitBtn.type = 'submit';
-    submitBtn.textContent = 'Update';
+    submitBtn.textContent = 'Submit Selection';
     form.appendChild(submitBtn);
 
     row.appendChild(form);
@@ -206,19 +255,21 @@ async function updatePhotoSelection(event, value, button) {
 }
 
 function renderSongSubEventOptions() {
-  const select = document.getElementById('songSubEvent');
-  select.innerHTML = '';
+  const selects = document.querySelectorAll('.song-sub-event-select');
+  selects.forEach(select => {
+    select.innerHTML = '';
 
-  const general = document.createElement('option');
-  general.value = '';
-  general.textContent = 'General song';
-  select.appendChild(general);
+    const general = document.createElement('option');
+    general.value = '';
+    general.textContent = 'General';
+    select.appendChild(general);
 
-  portalData.sub_events.forEach(event => {
-    const option = document.createElement('option');
-    option.value = event.id;
-    option.textContent = event.name;
-    select.appendChild(option);
+    portalData.sub_events.forEach(event => {
+      const option = document.createElement('option');
+      option.value = event.id;
+      option.textContent = event.name;
+      select.appendChild(option);
+    });
   });
 }
 
@@ -279,35 +330,52 @@ function renderSongText(row, song) {
 
 async function handleSongSubmit(e) {
   e.preventDefault();
-  const titleInput = document.getElementById('songTitle');
-  const artistInput = document.getElementById('songArtist');
-  const urlInput = document.getElementById('songUrl');
   const submitBtn = document.querySelector('#songForm button[type="submit"]');
-  const title = titleInput.value.trim();
-  if (!title) return;
-
-  const artist = artistInput.value.trim();
-  const songUrl = urlInput.value.trim();
-  const artistPayload = [artist, songUrl ? `YouTube: ${songUrl}` : ''].filter(Boolean).join('\n') || null;
-
-  submitBtn.disabled = true;
-  const { error } = await supabase.rpc('submit_song', {
-    p_token: token,
-    p_sub_event_id: document.getElementById('songSubEvent').value || null,
-    p_title: title,
-    p_artist: artistPayload,
-  });
-  submitBtn.disabled = false;
-
-  if (error) {
-    showErrorToast('Could not add song — please try again.');
+  const slotData = getFilledSongSlots();
+  if (slotData.length === 0) {
+    showErrorToast('Add at least one song title.');
     return;
   }
 
-  titleInput.value = '';
-  artistInput.value = '';
-  urlInput.value = '';
+  submitBtn.disabled = true;
+  for (const song of slotData) {
+    const { error } = await supabase.rpc('submit_song', {
+      p_token: token,
+      p_sub_event_id: song.subEventId || null,
+      p_title: song.title,
+      p_artist: song.artistPayload,
+    });
+    if (error) {
+      submitBtn.disabled = false;
+      showErrorToast('Could not add one of the songs — please try again.');
+      return;
+    }
+  }
+  submitBtn.disabled = false;
+
+  document.querySelectorAll('.client-song-slot input').forEach(input => { input.value = ''; });
+  updateSongSlotNote();
   await fetchProject();
+}
+
+function getFilledSongSlots() {
+  return Array.from(document.querySelectorAll('.client-song-slot'))
+    .map(slot => {
+      const title = slot.querySelector('.song-title-input').value.trim();
+      const artist = slot.querySelector('.song-artist-input').value.trim();
+      const songUrl = slot.querySelector('.song-url-input').value.trim();
+      return {
+        subEventId: slot.querySelector('.song-sub-event-select').value,
+        title,
+        artistPayload: [artist, songUrl ? `YouTube: ${songUrl}` : ''].filter(Boolean).join('\n') || null,
+      };
+    })
+    .filter(song => song.title);
+}
+
+function updateSongSlotNote() {
+  const count = getFilledSongSlots().length;
+  document.getElementById('songSlotNote').textContent = `${count} of 5 slots filled`;
 }
 
 function renderComments() {
@@ -376,6 +444,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   token = getTokenFromLocation();
   document.getElementById('songForm').addEventListener('submit', handleSongSubmit);
   document.getElementById('clientCommentForm').addEventListener('submit', handleCommentSubmit);
+  document.getElementById('songSlots').addEventListener('input', updateSongSlotNote);
 
   if (!token) {
     renderInvalidToken();
