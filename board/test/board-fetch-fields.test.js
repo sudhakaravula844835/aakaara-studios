@@ -8,6 +8,7 @@ const boardJs = fs.readFileSync(path.resolve(__dirname, '../board.js'), 'utf8');
 const boardHtml = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
 const clientHtml = fs.readFileSync(path.resolve(__dirname, '../client.html'), 'utf8');
 const clientJs = fs.readFileSync(path.resolve(__dirname, '../client.js'), 'utf8');
+const editorJs = fs.readFileSync(path.resolve(__dirname, '../editor.js'), 'utf8');
 
 function fetchProjectsSelectArg() {
   const match = boardJs.match(/async function fetchProjects\(\)[\s\S]*?\.select\((['`])([\s\S]*?)\1\)/);
@@ -76,5 +77,19 @@ describe('client token portal', () => {
   it('supports production client links with token query params', () => {
     expect(clientJs).toContain("searchParams.get('token')");
     expect(clientJs).toContain('getTokenFromLocation');
+  });
+
+  it('lets clients paste photo-number lists and stores them as client notes', () => {
+    expect(clientJs).toContain('parsePhotoNumbers');
+    expect(clientJs).toContain('client-photo-list-input');
+    expect(clientJs).toContain('post_client_comment');
+    expect(clientJs).toContain('Photo selections for');
+  });
+
+  it('captures song reference links for editors', () => {
+    expect(clientHtml).toContain('id="songUrl"');
+    expect(clientJs).toContain('YouTube:');
+    expect(clientJs).toContain('song-reference-link');
+    expect(editorJs).toContain('song-reference-link');
   });
 });

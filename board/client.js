@@ -7,6 +7,8 @@ import { showErrorToast } from './board-shared.js';
 let token = '';
 let portalData = null;
 
+const URL_PATTERN = /(https?:\/\/[^\s]+)/i;
+
 function getTokenFromLocation() {
   const url = new URL(window.location.href);
   const queryToken = url.searchParams.get('token');
@@ -117,35 +119,33 @@ function renderSubEvents() {
 
     row.appendChild(summary);
 
-    if (event.photo_total_count > 0) {
-      const form = document.createElement('form');
-      form.className = 'client-photo-form';
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        await updatePhotoSelection(event.id, input.value, submitBtn);
-      });
+    const form = document.createElement('form');
+    form.className = 'client-photo-form client-photo-list-form';
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await updatePhotoSelection(event, input.value, submitBtn);
+    });
 
-      const input = document.createElement('input');
-      input.className = 'form-input client-count-input';
-      input.type = 'number';
-      input.min = '0';
-      input.max = String(event.photo_total_count);
-      input.value = String(event.photo_selected_count || 0);
-      form.appendChild(input);
+    const input = document.createElement('textarea');
+    input.className = 'form-input client-photo-list-input';
+    input.rows = 4;
+    input.placeholder = 'Paste photo numbers: 0012, 0019, DSC_0244, IMG_1050';
+    form.appendChild(input);
 
-      const total = document.createElement('span');
-      total.className = 'client-count-total';
-      total.textContent = `/ ${event.photo_total_count}`;
-      form.appendChild(total);
+    const total = document.createElement('span');
+    total.className = 'client-count-total';
+    total.textContent = event.photo_total_count > 0
+      ? `${event.photo_selected_count || 0} / ${event.photo_total_count} selected`
+      : `${event.photo_selected_count || 0} selected`;
+    form.appendChild(total);
 
-      const submitBtn = document.createElement('button');
-      submitBtn.className = 'btn-comment-post';
-      submitBtn.type = 'submit';
-      submitBtn.textContent = 'Update';
-      form.appendChild(submitBtn);
+    const submitBtn = document.createElement('button');
+    submitBtn.className = 'btn-comment-post';
+    submitBtn.type = 'submit';
+    submitBtn.textContent = 'Update';
+    form.appendChild(submitBtn);
 
-      row.appendChild(form);
-    }
+    row.appendChild(form);
 
     container.appendChild(row);
   });
@@ -153,18 +153,53 @@ function renderSubEvents() {
   renderSongSubEventOptions();
 }
 
-async function updatePhotoSelection(subEventId, value, button) {
-  const selectedCount = Number(value);
+function parsePhotoNumbers(value) {
+  return Array.from(new Set(value
+    .split(/[\s,;]+/)
+    .map(item => item.trim())
+    .filter(Boolean)));
+}
+
+async function updatePhotoSelection(event, value, button) {
+  const photoNumbers = parsePhotoNumbers(value);
+  const selectedCount = photoNumbers.length;
+  if (selectedCount === 0) {
+    showErrorToast('Paste at least one photo number.');
+    return;
+  }
+  if (event.photo_total_count > 0 && selectedCount > event.photo_total_count) {
+    showErrorToast(`Please choose no more than ${event.photo_total_count} photos.`);
+    return;
+  }
+
   button.disabled = true;
-  const { error } = await supabase.rpc('update_photo_selection', {
+  if (event.photo_total_count > 0) {
+    const { error } = await supabase.rpc('update_photo_selection', {
+      p_token: token,
+      p_sub_event_id: event.id,
+      p_selected_count: selectedCount,
+    });
+
+    if (error) {
+      button.disabled = false;
+      showErrorToast('Could not update photo selection — please try again.');
+      return;
+    }
+  }
+
+  const note = [
+    `Photo selections for ${event.name}:`,
+    photoNumbers.join(', '),
+  ].join('\n');
+  const { error: commentError } = await supabase.rpc('post_client_comment', {
     p_token: token,
-    p_sub_event_id: subEventId,
-    p_selected_count: selectedCount,
+    p_body: note,
   });
   button.disabled = false;
 
-  if (error) {
-    showErrorToast('Could not update photo selection — please try again.');
+  if (commentError) {
+    showErrorToast('Photo count saved, but the number list could not be posted.');
+    await fetchProject();
     return;
   }
   await fetchProject();
@@ -203,10 +238,7 @@ function renderSongs() {
     const row = document.createElement('div');
     row.className = 'song-row';
 
-    const title = document.createElement('div');
-    title.className = 'song-title';
-    title.textContent = song.artist ? `${song.title} — ${song.artist}` : song.title;
-    row.appendChild(title);
+    renderSongText(row, song);
 
     const status = document.createElement('div');
     status.className = 'client-muted';
@@ -217,20 +249,53 @@ function renderSongs() {
   });
 }
 
+function splitSongArtistAndUrl(artistValue) {
+  const artist = artistValue || '';
+  const urlMatch = artist.match(URL_PATTERN);
+  const url = urlMatch ? urlMatch[1] : '';
+  return {
+    artist: artist.replace(URL_PATTERN, '').replace(/^YouTube:\s*/im, '').trim(),
+    url,
+  };
+}
+
+function renderSongText(row, song) {
+  const { artist, url } = splitSongArtistAndUrl(song.artist);
+  const title = document.createElement('div');
+  title.className = 'song-title';
+  title.textContent = artist ? `${song.title} — ${artist}` : song.title;
+  row.appendChild(title);
+
+  if (url) {
+    const link = document.createElement('a');
+    link.className = 'song-reference-link';
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = 'Open song reference';
+    row.appendChild(link);
+  }
+}
+
 async function handleSongSubmit(e) {
   e.preventDefault();
   const titleInput = document.getElementById('songTitle');
   const artistInput = document.getElementById('songArtist');
+  const urlInput = document.getElementById('songUrl');
   const submitBtn = document.querySelector('#songForm button[type="submit"]');
   const title = titleInput.value.trim();
   if (!title) return;
+
+  const artist = artistInput.value.trim();
+  const songUrl = urlInput.value.trim();
+  const artistPayload = [artist, songUrl ? `YouTube: ${songUrl}` : ''].filter(Boolean).join('\n') || null;
 
   submitBtn.disabled = true;
   const { error } = await supabase.rpc('submit_song', {
     p_token: token,
     p_sub_event_id: document.getElementById('songSubEvent').value || null,
     p_title: title,
-    p_artist: artistInput.value.trim() || null,
+    p_artist: artistPayload,
   });
   submitBtn.disabled = false;
 
@@ -241,6 +306,7 @@ async function handleSongSubmit(e) {
 
   titleInput.value = '';
   artistInput.value = '';
+  urlInput.value = '';
   await fetchProject();
 }
 

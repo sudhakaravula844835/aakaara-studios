@@ -443,6 +443,14 @@ body {
 .songs-list { display: flex; flex-direction: column; }
 .song-row { padding: 0.75rem 0; border-bottom: 1px solid rgba(201,149,107,0.08); }
 .song-title { font-size: 0.85rem; color: var(--ivory); margin-bottom: 0.35rem; }
+.song-reference-link {
+  display: inline-block;
+  color: var(--rose);
+  font-size: 0.72rem;
+  margin-bottom: 0.35rem;
+  text-decoration: none;
+}
+.song-reference-link:hover { text-decoration: underline; }
 .song-license-toggle { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: rgba(250,246,241,0.6); cursor: pointer; }
 
 /* Editor dashboard: video-editing substatus control */
@@ -496,6 +504,17 @@ body {
   background: rgba(0,0,0,0.18);
 }
 .client-photo-form { display: flex; align-items: center; gap: 0.45rem; }
+.client-photo-list-form {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto auto;
+  align-items: end;
+  min-width: min(540px, 100%);
+}
+.client-photo-list-input {
+  min-height: 5.5rem;
+  resize: vertical;
+  line-height: 1.5;
+}
 .client-count-input { width: 5rem; }
 .client-count-total {
   color: rgba(250,246,241,0.45);
@@ -504,7 +523,7 @@ body {
 }
 .client-inline-form {
   display: grid;
-  grid-template-columns: minmax(140px, 0.8fr) minmax(180px, 1fr) minmax(140px, 0.8fr) auto;
+  grid-template-columns: minmax(130px, 0.7fr) minmax(160px, 1fr) minmax(130px, 0.8fr) minmax(180px, 1fr) auto;
   gap: 0.6rem;
   margin-top: 1rem;
 }
@@ -514,5 +533,9 @@ body {
   .client-inline-form {
     grid-template-columns: 1fr;
   }
-  .client-photo-form { align-items: stretch; }
+  .client-photo-form,
+  .client-photo-list-form {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
 }

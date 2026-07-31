@@ -9,6 +9,8 @@ let currentDetailProject = null;
 let renderGeneration = 0;
 let realtimeChannel = null;
 
+const URL_PATTERN = /(https?:\/\/[^\s]+)/i;
+
 export function getCurrentDetailProjectId() {
   return currentDetailProject?.id ?? null;
 }
@@ -216,10 +218,22 @@ function renderSongRow(song) {
   const row = document.createElement('div');
   row.className = 'song-row';
 
+  const { artist, url } = splitSongArtistAndUrl(song.artist);
+
   const title = document.createElement('div');
   title.className = 'song-title';
-  title.textContent = song.artist ? `${song.title} — ${song.artist}` : song.title;
+  title.textContent = artist ? `${song.title} — ${artist}` : song.title;
   row.appendChild(title);
+
+  if (url) {
+    const link = document.createElement('a');
+    link.className = 'song-reference-link';
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = 'Open song reference';
+    row.appendChild(link);
+  }
 
   const label = document.createElement('label');
   label.className = 'song-license-toggle';
@@ -244,6 +258,16 @@ function renderSongRow(song) {
   row.appendChild(label);
 
   return row;
+}
+
+function splitSongArtistAndUrl(artistValue) {
+  const artist = artistValue || '';
+  const urlMatch = artist.match(URL_PATTERN);
+  const url = urlMatch ? urlMatch[1] : '';
+  return {
+    artist: artist.replace(URL_PATTERN, '').replace(/^YouTube:\s*/im, '').trim(),
+    url,
+  };
 }
 
 async function renderSongsList() {
