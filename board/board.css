@@ -137,6 +137,7 @@ body {
   border: 1px solid rgba(224,112,112,0.4); border-radius: 6px; padding: 0.65rem 0.9rem;
   color: var(--ivory); font-size: 0.78rem; max-width: 320px; box-shadow: 0 4px 16px rgba(0,0,0,0.4);
 }
+.toast-success { border-color: rgba(112, 184, 146, 0.55); }
 .toast-dismiss {
   background: none; border: none; color: rgba(250,246,241,0.5); font-size: 1rem; cursor: pointer;
   line-height: 1; padding: 0;

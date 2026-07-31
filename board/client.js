@@ -2,7 +2,7 @@ import { supabase } from './supabase-client.js';
 import {
   formatDate, stageLabel, SUBSTATUS_LABELS, photoSelectionLabel,
 } from './board-utils.js';
-import { showErrorToast } from './board-shared.js';
+import { showErrorToast, showSuccessToast } from './board-shared.js';
 
 let token = '';
 let portalData = null;
@@ -252,6 +252,7 @@ async function updatePhotoSelection(event, value, button) {
     return;
   }
   await fetchProject();
+  showSuccessToast('Photo list submitted.');
 }
 
 function renderSongSubEventOptions() {
@@ -356,6 +357,7 @@ async function handleSongSubmit(e) {
   document.querySelectorAll('.client-song-slot input').forEach(input => { input.value = ''; });
   updateSongSlotNote();
   await fetchProject();
+  showSuccessToast('Song suggestions submitted.');
 }
 
 function getFilledSongSlots() {
@@ -438,6 +440,7 @@ async function handleCommentSubmit(e) {
 
   bodyInput.value = '';
   await fetchProject();
+  showSuccessToast('Comment posted.');
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

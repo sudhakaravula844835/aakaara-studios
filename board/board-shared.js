@@ -8,10 +8,10 @@ export function getCurrentProfile() {
   return currentProfile;
 }
 
-export function showErrorToast(message) {
+function showToast(message, type = 'error') {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
-  toast.className = 'toast toast-error';
+  toast.className = `toast toast-${type}`;
 
   const text = document.createElement('span');
   text.textContent = message;
@@ -26,4 +26,12 @@ export function showErrorToast(message) {
 
   container.appendChild(toast);
   setTimeout(() => toast.remove(), 8000);
+}
+
+export function showErrorToast(message) {
+  showToast(message, 'error');
+}
+
+export function showSuccessToast(message) {
+  showToast(message, 'success');
 }
