@@ -15,8 +15,11 @@ function getAttr(markup, attr) {
 }
 
 describe('portfolio asset wiring', () => {
-  it('keeps Sanjana & Shubash live when the maternity images exist', () => {
-    const item = getGalleryItem('Sanjana &amp; Shubash');
+  it.each([
+    ['Shreya'],
+    ['Sanjana &amp; Shubash'],
+  ])('keeps %s live when the maternity images exist', (title) => {
+    const item = getGalleryItem(title);
     const folder = getAttr(item, 'data-folder');
     const count = Number(getAttr(item, 'data-count'));
 
