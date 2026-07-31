@@ -21,6 +21,7 @@ describe('video asset wiring', () => {
     expect(card).toBeTruthy();
     expect(getAttr(card, 'data-vcat')).toBe('prewedding');
     expect(getAttr(card, 'data-type')).toBe('Pre-Wedding Film · NYC');
+    expect(getAttr(card, 'data-poster')).toBe('/images/video-covers/prewedding/Manish-Sreeja.jpg');
     expect(getAttr(card, 'data-video')).toBe('https://vz-757250d0-999.b-cdn.net/ab5c8475-2b31-45b6-8054-1eeaf87359bd/playlist.m3u8');
   });
 });
