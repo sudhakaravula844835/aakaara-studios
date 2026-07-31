@@ -102,4 +102,13 @@ describe('client token portal', () => {
     expect(clientHtml).toContain('Notes for the Studio');
     expect(clientJs).toContain('client-status-grid');
   });
+
+  it('renders a project tracker and next-step guidance for clients', () => {
+    expect(clientJs).toContain('renderNextStepBanner');
+    expect(clientJs).toContain('renderProjectTracker');
+    expect(clientJs).toContain('client-next-step');
+    expect(clientJs).toContain('client-project-tracker');
+    expect(clientJs).toContain('Select photos for editing.');
+    expect(clientJs).toContain('Studio is editing your film.');
+  });
 });

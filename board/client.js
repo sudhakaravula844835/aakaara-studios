@@ -1,6 +1,6 @@
 import { supabase } from './supabase-client.js';
 import {
-  formatDate, stageLabel, SUBSTATUS_LABELS, photoSelectionLabel,
+  formatDate, stageLabel, STAGE_COLUMNS, SUBSTATUS_LABELS, photoSelectionLabel, stageIndex,
 } from './board-utils.js';
 import { showErrorToast, showSuccessToast } from './board-shared.js';
 
@@ -69,6 +69,9 @@ function renderHeader() {
   meta.textContent = pieces.join(' · ');
   header.appendChild(meta);
 
+  header.appendChild(renderNextStepBanner(project));
+  header.appendChild(renderProjectTracker(project));
+
   const statusGrid = document.createElement('div');
   statusGrid.className = 'client-status-grid';
   statusGrid.appendChild(renderStatusTile(
@@ -97,6 +100,113 @@ function renderHeader() {
     link.textContent = 'Open RAW Delivery';
     header.appendChild(link);
   }
+}
+
+function renderNextStepBanner(project) {
+  const banner = document.createElement('div');
+  banner.className = 'client-next-step';
+
+  const eyebrow = document.createElement('div');
+  eyebrow.className = 'client-next-step-label';
+  eyebrow.textContent = 'Next Step';
+  banner.appendChild(eyebrow);
+
+  const title = document.createElement('div');
+  title.className = 'client-next-step-title';
+  title.textContent = nextStepCopy(project).title;
+  banner.appendChild(title);
+
+  const body = document.createElement('div');
+  body.className = 'client-next-step-body';
+  body.textContent = nextStepCopy(project).body;
+  banner.appendChild(body);
+
+  return banner;
+}
+
+function renderProjectTracker(project) {
+  const tracker = document.createElement('div');
+  tracker.className = 'client-project-tracker';
+  tracker.setAttribute('aria-label', 'Project progress tracker');
+
+  const currentIndex = Math.max(stageIndex(project.stage), 0);
+  STAGE_COLUMNS.forEach((stage, index) => {
+    const item = document.createElement('div');
+    const state = index < currentIndex ? 'done' : index === currentIndex ? 'current' : 'waiting';
+    item.className = `client-tracker-item client-tracker-${state}`;
+
+    const marker = document.createElement('div');
+    marker.className = 'client-tracker-marker';
+    marker.textContent = state === 'done' ? '✓' : String(index + 1);
+    item.appendChild(marker);
+
+    const copy = document.createElement('div');
+    copy.className = 'client-tracker-copy';
+
+    const label = document.createElement('div');
+    label.className = 'client-tracker-label';
+    label.textContent = stage.label;
+    copy.appendChild(label);
+
+    const status = document.createElement('div');
+    status.className = 'client-tracker-status';
+    status.textContent = trackerStatusText(stage.key, state, project);
+    copy.appendChild(status);
+
+    item.appendChild(copy);
+    tracker.appendChild(item);
+  });
+
+  return tracker;
+}
+
+function nextStepCopy(project) {
+  const selected = portalData.sub_events.reduce((sum, event) => sum + (event.photo_selected_count || 0), 0);
+  const songsCount = portalData.songs.length;
+
+  if (project.stage === 'booked' || project.stage === 'shoot_completed') {
+    return {
+      title: 'We are preparing your delivery timeline.',
+      body: 'After the event, RAW delivery and selection steps will appear here.',
+    };
+  }
+  if (project.stage === 'raw_delivered') {
+    return project.raw_delivery_link
+      ? { title: 'Review your RAW gallery.', body: 'Open the RAW delivery link, then paste the photo numbers you want edited.' }
+      : { title: 'RAW gallery is being prepared.', body: 'The gallery link will appear here as soon as it is ready.' };
+  }
+  if (project.stage === 'photo_selection') {
+    return selected > 0
+      ? { title: 'Photo selections received.', body: 'You can still add notes below if anything needs clarification.' }
+      : { title: 'Select photos for editing.', body: 'Paste the photo numbers or filenames from the RAW gallery into the selection box.' };
+  }
+  if (project.stage === 'video_editing') {
+    return songsCount > 0
+      ? { title: 'Studio is editing your film.', body: 'Your song suggestions are saved for the editing team.' }
+      : { title: 'Suggest songs for your film.', body: 'Add up to 5 song links so the editor can match the exact versions.' };
+  }
+  if (project.stage === 'song_finalization') {
+    return { title: 'Confirm music direction.', body: 'Review the song list and leave a note if any song choice needs adjustment.' };
+  }
+  if (project.stage === 'final_delivery') {
+    return { title: 'Final delivery is being prepared.', body: 'Your finished gallery and films will be shared here when ready.' };
+  }
+  if (project.stage === 'completed') {
+    return { title: 'Project completed.', body: 'Your project has reached final delivery. You can still leave a note if needed.' };
+  }
+  return { title: 'Project is in progress.', body: 'Track each studio step here as your project moves forward.' };
+}
+
+function trackerStatusText(stageKey, state, project) {
+  if (state === 'done') return 'Done';
+  if (state === 'waiting') return 'Waiting';
+  if (stageKey === 'raw_delivered' && project.raw_delivered_at) {
+    return `Current · ${formatDate(project.raw_delivered_at)}`;
+  }
+  if (stageKey === 'video_editing' && project.video_editing_substatus) {
+    return `Current · ${SUBSTATUS_LABELS[project.video_editing_substatus] || project.video_editing_substatus}`;
+  }
+  return 'Current';
 }
 
 function renderStatusTile(label, value, className) {

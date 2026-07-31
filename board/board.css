@@ -480,6 +480,82 @@ body {
   font-size: 0.78rem;
 }
 .client-project-meta { margin-top: 0.25rem; }
+.client-next-step {
+  margin-top: 1.15rem;
+  border: 1px solid rgba(201,149,107,0.26);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  background: linear-gradient(135deg, rgba(201,149,107,0.16), rgba(0,0,0,0.12));
+}
+.client-next-step-label,
+.client-tracker-status {
+  color: rgba(250,246,241,0.46);
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.client-next-step-title {
+  color: var(--ivory);
+  font-size: 1rem;
+  margin-top: 0.35rem;
+}
+.client-next-step-body {
+  color: rgba(250,246,241,0.62);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  margin-top: 0.35rem;
+}
+.client-project-tracker {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+.client-tracker-item {
+  position: relative;
+  border: 1px solid rgba(201,149,107,0.1);
+  border-radius: 8px;
+  padding: 0.75rem;
+  background: rgba(0,0,0,0.14);
+  min-height: 5.25rem;
+}
+.client-tracker-marker {
+  width: 1.65rem;
+  height: 1.65rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(201,149,107,0.24);
+  border-radius: 50%;
+  color: rgba(250,246,241,0.5);
+  font-size: 0.68rem;
+  margin-bottom: 0.65rem;
+}
+.client-tracker-label {
+  color: rgba(250,246,241,0.82);
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+.client-tracker-status { margin-top: 0.4rem; }
+.client-tracker-done {
+  border-color: rgba(112,184,146,0.26);
+  background: rgba(112,184,146,0.06);
+}
+.client-tracker-done .client-tracker-marker {
+  border-color: rgba(112,184,146,0.42);
+  color: #9bd6b7;
+}
+.client-tracker-current {
+  border-color: rgba(201,149,107,0.44);
+  background: rgba(201,149,107,0.12);
+}
+.client-tracker-current .client-tracker-marker {
+  background: rgba(201,149,107,0.18);
+  border-color: rgba(201,149,107,0.56);
+  color: var(--rose-light);
+}
+.client-tracker-waiting {
+  opacity: 0.68;
+}
 .client-status-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -595,6 +671,19 @@ body {
 }
 
 @media (max-width: 768px) {
+  .client-project-tracker {
+    grid-template-columns: 1fr;
+  }
+  .client-tracker-item {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0.7rem;
+    min-height: auto;
+    align-items: start;
+  }
+  .client-tracker-marker {
+    margin-bottom: 0;
+  }
   .client-status-grid {
     grid-template-columns: 1fr;
   }
