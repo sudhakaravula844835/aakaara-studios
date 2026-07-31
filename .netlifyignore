@@ -1,0 +1,15 @@
+node_modules
+node_modules/*
+.git
+.git/*
+.netlify
+.netlify/*
+.DS_Store
+playwright-report
+playwright-report/*
+test-results
+test-results/*
+coverage
+coverage/*
+board/.env
+*.log

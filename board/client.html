@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Portal — Aakaara Studios</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Outfit:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="board.css">
+</head>
+<body>
+
+  <header class="board-header">
+    <div>
+      <div class="brand">Aakaara Studios</div>
+      <h1>Project Portal</h1>
+    </div>
+  </header>
+
+  <main class="client-portal-main">
+    <section class="client-project-header" id="clientProjectHeader">
+      <div class="client-muted">Loading project...</div>
+    </section>
+
+    <section class="client-section">
+      <div class="detail-section-title">Photo Selection</div>
+      <div class="client-sub-events" id="clientSubEvents"></div>
+    </section>
+
+    <section class="client-section">
+      <div class="detail-section-title">Songs</div>
+      <div class="songs-list" id="clientSongsList"></div>
+      <form class="client-inline-form" id="songForm">
+        <select class="form-input" id="songSubEvent"></select>
+        <input class="form-input" type="text" id="songTitle" placeholder="Song title" required>
+        <input class="form-input" type="text" id="songArtist" placeholder="Artist">
+        <button type="submit" class="btn-comment-post">Add Song</button>
+      </form>
+    </section>
+
+    <section class="client-section">
+      <div class="detail-section-title">Comments</div>
+      <div class="activity-feed" id="clientComments"></div>
+      <form class="comment-composer" id="clientCommentForm">
+        <textarea class="comment-input" id="clientCommentBody" placeholder="Add a comment&hellip;" required></textarea>
+        <div class="comment-composer-row">
+          <button type="submit" class="btn-comment-post">Post</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+<script type="module" src="client.js"></script>
+</body>
+</html>

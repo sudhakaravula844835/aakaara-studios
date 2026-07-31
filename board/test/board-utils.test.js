@@ -73,6 +73,29 @@ describe('validateProjectForm', () => {
   it('rejects a whitespace-only client_name', () => {
     expect(validateProjectForm({ client_name: '   ' }).valid).toBe(false);
   });
+  it('requires a first sub-event name when requested', () => {
+    const result = validateProjectForm(
+      { client_name: 'Priya & Rohan' },
+      { requireDatedSubEvent: true, subEvents: [{ name: '', event_date: '2026-09-12' }] },
+    );
+    expect(result.valid).toBe(false);
+    expect(result.errors.first_sub_event_name).toBeTruthy();
+  });
+  it('requires a first sub-event date when requested', () => {
+    const result = validateProjectForm(
+      { client_name: 'Priya & Rohan' },
+      { requireDatedSubEvent: true, subEvents: [{ name: 'Wedding', event_date: null }] },
+    );
+    expect(result.valid).toBe(false);
+    expect(result.errors.first_sub_event_date).toBeTruthy();
+  });
+  it('passes with client_name and a dated first sub-event when requested', () => {
+    const result = validateProjectForm(
+      { client_name: 'Priya & Rohan' },
+      { requireDatedSubEvent: true, subEvents: [{ name: 'Wedding', event_date: '2026-09-12' }] },
+    );
+    expect(result.valid).toBe(true);
+  });
 });
 
 describe('validateSubEventForm', () => {

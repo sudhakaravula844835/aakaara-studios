@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { randomUUID } from 'node:crypto';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
@@ -12,36 +13,46 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !SUPABASE_SERVICE_ROLE_KEY) {
 
 export const adminClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-let testCounter = 0;
-
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 // The full suite creates ~50 auth users in a short window, and GoTrue
 // occasionally answers one createUser call with a transient 500
 // (AuthRetryableFetchError). Retry only that shape -- a genuine validation
-// error (4xx: duplicate email, weak password) must still fail loudly and
+// error (duplicate email, weak password) must still fail loudly and
 // immediately rather than being retried into a slower identical failure.
 function isRetryableAuthError(error) {
   if (!error) return false;
   if (error.name === 'AuthRetryableFetchError') return true;
+  if (error.status === 429 || error.code === 'over_request_rate_limit') return true;
   return typeof error.status === 'number' && error.status >= 500;
 }
 
-async function createAuthUserWithRetry(payload, attempts = 3) {
+async function createAuthUserWithRetry(payload, attempts = 5) {
   let lastError;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     const { data, error } = await adminClient.auth.admin.createUser(payload);
     if (!error) return data;
     lastError = error;
     if (!isRetryableAuthError(error) || attempt === attempts) break;
-    await sleep(300 * attempt);
+    await sleep(750 * attempt);
+  }
+  throw lastError;
+}
+
+async function signInWithRetry(client, credentials, attempts = 5) {
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    const { error } = await client.auth.signInWithPassword(credentials);
+    if (!error) return;
+    lastError = error;
+    if (!isRetryableAuthError(error) || attempt === attempts) break;
+    await sleep(750 * attempt);
   }
   throw lastError;
 }
 
 export async function createTestProfile(role) {
-  testCounter += 1;
-  const email = `test-${role}-${Date.now()}-${testCounter}@example.com`;
+  const email = `test-${role}-${randomUUID()}@example.com`;
   const password = 'TestPassword123!';
 
   const userData = await createAuthUserWithRetry({
@@ -56,8 +67,7 @@ export async function createTestProfile(role) {
   if (profileError) throw profileError;
 
   const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const { error: signInError } = await client.auth.signInWithPassword({ email, password });
-  if (signInError) throw signInError;
+  await signInWithRetry(client, { email, password });
 
   return { id: userData.user.id, email, client };
 }

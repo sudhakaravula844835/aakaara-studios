@@ -54,10 +54,21 @@ export function compareProjectsByDate(a, b) {
   return 0;
 }
 
-export function validateProjectForm(fields) {
+export function validateProjectForm(fields, options = {}) {
   const errors = {};
   if (!fields.client_name || !fields.client_name.trim()) {
     errors.client_name = 'Client name is required.';
+  }
+  if (options.requireDatedSubEvent) {
+    const subEvents = options.subEvents || [];
+    const hasDatedSubEvent = subEvents.some(event => event.event_date);
+    if (!hasDatedSubEvent) {
+      errors.first_sub_event_date = 'A dated sub-event is required.';
+    }
+    const firstSubEvent = subEvents[0];
+    if (!firstSubEvent?.name || !firstSubEvent.name.trim()) {
+      errors.first_sub_event_name = 'Sub-event name is required.';
+    }
   }
   return { valid: Object.keys(errors).length === 0, errors };
 }

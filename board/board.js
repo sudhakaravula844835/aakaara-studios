@@ -50,12 +50,6 @@ async function fetchProfile(userId) {
 async function fetchProjects() {
   const { data, error } = await supabase
     .from('projects')
-    // pm_id must stay in this list: openDetailPanel() stores whatever this
-    // query returns as currentDetailProject, and the Edit button re-opens
-    // the project modal from that in-memory object (not a fresh fetch). If
-    // pm_id is missing here, the PM select silently shows "Unassigned" on
-    // every re-open regardless of the true DB value, and an unsuspecting
-    // Save wipes the real assignment. Caught by Task 6 manual verification.
     .select('id, client_name, client_email, client_phone, stage, video_editing_substatus, package_tier, hours_booked, quoted_price, confirmed_price, deposit_paid, balance_paid, contract_url, quote_pdf_url, pm_id, sub_events(id, name, event_date, venue, photo_selection_status, photo_selected_count, photo_total_count)');
   if (error) {
     showErrorToast('Could not load projects.');
@@ -194,14 +188,44 @@ function renderBoard() {
 }
 
 let currentProjects = [];
-let currentView = 'kanban';
 let renderGeneration = 0;
+let currentView = 'kanban';
 
 function renderActiveView() {
-  if (currentView === 'kanban') renderBoard();
-  else if (currentView === 'list') renderListView(currentProjects);
-  else if (currentView === 'calendar') renderCalendarView(currentProjects);
-  else if (currentView === 'staff') renderStaffView();
+  if (currentView === 'list') {
+    renderListView(currentProjects);
+    return;
+  }
+  if (currentView === 'calendar') {
+    renderCalendarView(currentProjects);
+    return;
+  }
+  if (currentView === 'staff') {
+    renderStaffView();
+    return;
+  }
+  renderBoard();
+}
+
+function setActiveView(view) {
+  currentView = view;
+
+  document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.view === view);
+  });
+
+  document.getElementById('boardColumns').classList.toggle('view-active', view === 'kanban');
+  document.getElementById('listViewContainer').classList.toggle('view-active', view === 'list');
+  document.getElementById('calendarViewContainer').classList.toggle('view-active', view === 'calendar');
+  document.getElementById('staffViewContainer').classList.toggle('view-active', view === 'staff');
+
+  renderActiveView();
+}
+
+function setupViewToggle() {
+  document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => setActiveView(btn.dataset.view));
+  });
 }
 
 export async function refreshProjects() {
@@ -219,18 +243,6 @@ export async function refreshProjects() {
   renderActiveView();
 }
 
-function setActiveView(view) {
-  currentView = view;
-  document.querySelectorAll('.view-toggle-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.view === view);
-  });
-  document.getElementById('boardColumns').classList.toggle('view-active', view === 'kanban');
-  document.getElementById('listViewContainer').classList.toggle('view-active', view === 'list');
-  document.getElementById('calendarViewContainer').classList.toggle('view-active', view === 'calendar');
-  document.getElementById('staffViewContainer').classList.toggle('view-active', view === 'staff');
-  renderActiveView();
-}
-
 let realtimeChannel = null;
 
 function subscribeToChanges() {
@@ -238,8 +250,8 @@ function subscribeToChanges() {
     .channel('board-changes')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => refreshProjects())
     .on('postgres_changes', { event: '*', schema: 'public', table: 'sub_events' }, (payload) => {
-      // Sub-event dates affect card display (deriveWeddingDate) and the
-      // Calendar view, so a full refresh is still needed. Additionally, if
+      // Sub-event dates affect Kanban card dates, List rows, and Calendar
+      // markers, so a full refresh is still needed. Additionally, if
       // the detail panel is open for the affected project, refresh its
       // timeline in place so a second person's edit shows up without
       // closing/reopening.
@@ -248,10 +260,8 @@ function subscribeToChanges() {
       if (projectId && getCurrentDetailProjectId() === projectId) renderSubEventsTimeline();
     })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, (payload) => {
-      // Nothing on a board card, list row, or calendar marker reads
-      // comments — do NOT trigger a full refresh (that resets Kanban's
-      // column scroll positions). Only the open detail panel's activity
-      // feed, if any, cares about this.
+      // Nothing on a board card reads comments, so do not trigger a full
+      // refresh that resets Kanban's column scroll positions.
       const projectId = payload.new?.project_id ?? payload.old?.project_id;
       if (projectId && getCurrentDetailProjectId() === projectId) renderActivityFeed();
     })
@@ -268,7 +278,7 @@ function subscribeToChanges() {
 
 async function init() {
   // Wire up header button handlers before any network awaits below, so
-  // "+ New Project" / "Log Out" / the view toggle are never visible-but-inert.
+  // "+ New Project" / "Log Out" / view switching are never visible-but-inert.
   document.getElementById('logoutBtn').addEventListener('click', async () => {
     if (realtimeChannel) supabase.removeChannel(realtimeChannel);
     await supabase.auth.signOut();
@@ -276,10 +286,7 @@ async function init() {
   });
 
   document.getElementById('addProjectBtn').addEventListener('click', () => openProjectModal(null));
-
-  document.querySelectorAll('.view-toggle-btn').forEach(btn => {
-    btn.addEventListener('click', () => setActiveView(btn.dataset.view));
-  });
+  setupViewToggle();
 
   const user = await requireSession();
   if (!user) return;

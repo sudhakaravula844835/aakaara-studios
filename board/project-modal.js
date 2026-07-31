@@ -46,11 +46,6 @@ async function populateAssignmentFields(project) {
     pmSelect.appendChild(option);
   });
 
-  // If the project's currently-assigned PM is no longer active, they won't
-  // be in `pms` above — without this, the select would silently fall back
-  // to "Unassigned" and saving an otherwise-unrelated edit would wipe the
-  // assignment. Fetch and append them explicitly, labeled as inactive, so
-  // the assignment survives unless the Owner/PM deliberately changes it.
   if (project && project.pm_id && !pms.some(pm => pm.id === project.pm_id)) {
     const { data: inactivePm } = await supabase
       .from('profiles')
@@ -82,10 +77,6 @@ async function populateAssignmentFields(project) {
     editorSelect.appendChild(option);
   });
 
-  // Same problem as the PM select above, but for assigned editors who are
-  // no longer active: fetch all of them in a single batched query and
-  // append inactive-labeled, pre-selected options so their assignment
-  // isn't silently dropped by an unrelated edit.
   const activeEditorIds = new Set(editors.map(e => e.id));
   const missingEditorIds = assignedEditorIds.filter(id => !activeEditorIds.has(id));
   if (missingEditorIds.length > 0) {
@@ -103,13 +94,6 @@ async function populateAssignmentFields(project) {
   }
 }
 
-// Insert-then-delete, deliberately not delete-then-reinsert: if the insert
-// half fails (network blip, transient RLS hiccup), the old delete-first
-// ordering left the project with ZERO editors -- silently wiping a correct
-// assignment while telling the user "please try again", which implies
-// nothing was lost. Adding the new rows first and only then removing the
-// no-longer-selected ones means a failed insert leaves the previous, still
-// correct, assignment fully intact.
 async function saveEditorAssignments(projectId) {
   const editorSelect = document.getElementById('fEditorIds');
   const selectedIds = Array.from(editorSelect.selectedOptions).map(o => o.value);
@@ -121,9 +105,6 @@ async function saveEditorAssignments(projectId) {
   if (fetchError) return fetchError;
 
   const existingIds = (existingRows || []).map(row => row.editor_id);
-  // Only insert genuinely new rows -- re-inserting an existing pair would
-  // trip the unique (project_id, editor_id) constraint and report a failure
-  // for what is actually a no-op.
   const toInsert = selectedIds.filter(id => !existingIds.includes(id));
   const toRemove = existingIds.filter(id => !selectedIds.includes(id));
 
@@ -131,7 +112,6 @@ async function saveEditorAssignments(projectId) {
     const { error: insertError } = await supabase.from('project_editors').insert(
       toInsert.map(editorId => ({ project_id: projectId, editor_id: editorId }))
     );
-    // Return WITHOUT deleting anything -- the old assignment stays valid.
     if (insertError) return insertError;
   }
 
@@ -152,7 +132,10 @@ export async function openProjectModal(project) {
   const form = document.getElementById('projectForm');
   form.reset();
   document.getElementById('fClientNameError').textContent = '';
+  document.getElementById('fFirstSubEventNameError').textContent = '';
+  document.getElementById('fFirstSubEventDateError').textContent = '';
   document.getElementById('projectModalTitle').textContent = project ? 'Edit Project' : 'New Project';
+  document.getElementById('firstSubEventSection').hidden = !!project;
 
   document.getElementById('fId').value = project ? project.id : '';
   document.getElementById('fClientName').value = project ? project.client_name : '';
@@ -166,6 +149,9 @@ export async function openProjectModal(project) {
   document.getElementById('fBalancePaid').checked = project ? !!project.balance_paid : false;
   document.getElementById('fContractUrl').value = project ? (project.contract_url || '') : '';
   document.getElementById('fQuotePdfUrl').value = project ? (project.quote_pdf_url || '') : '';
+  document.getElementById('fFirstSubEventName').value = '';
+  document.getElementById('fFirstSubEventDate').value = '';
+  document.getElementById('fFirstSubEventVenue').value = '';
 
   await populateAssignmentFields(project);
 
@@ -195,13 +181,24 @@ async function handleProjectFormSubmit(e) {
     pm_id: document.getElementById('fPmId').value || null,
   };
 
-  const { valid, errors } = validateProjectForm(fields);
+  const editId = document.getElementById('fId').value;
+  const firstSubEvent = {
+    name: document.getElementById('fFirstSubEventName').value.trim(),
+    event_date: document.getElementById('fFirstSubEventDate').value || null,
+    venue: document.getElementById('fFirstSubEventVenue').value.trim() || null,
+  };
+
+  const { valid, errors } = validateProjectForm(fields, {
+    requireDatedSubEvent: !editId,
+    subEvents: [firstSubEvent],
+  });
   if (!valid) {
     document.getElementById('fClientNameError').textContent = errors.client_name || '';
+    document.getElementById('fFirstSubEventNameError').textContent = errors.first_sub_event_name || '';
+    document.getElementById('fFirstSubEventDateError').textContent = errors.first_sub_event_date || '';
     return;
   }
 
-  const editId = document.getElementById('fId').value;
   let projectId = editId;
   let error;
   if (editId) {
@@ -210,6 +207,13 @@ async function handleProjectFormSubmit(e) {
     const insertResult = await supabase.from('projects').insert(fields).select().single();
     error = insertResult.error;
     projectId = insertResult.data?.id;
+    if (!error) {
+      const { error: subEventError } = await supabase.from('sub_events').insert({
+        project_id: insertResult.data.id,
+        ...firstSubEvent,
+      });
+      error = subEventError;
+    }
   }
 
   if (error) {

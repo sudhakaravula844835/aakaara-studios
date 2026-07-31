@@ -103,6 +103,25 @@
             <input class="form-input" type="url" id="fQuotePdfUrl">
           </div>
         </div>
+        <div class="modal-section" id="firstSubEventSection">
+          <div class="modal-section-title">First Sub-Event</div>
+          <div class="modal-grid">
+            <div class="form-group">
+              <label class="form-label" for="fFirstSubEventName">Name *</label>
+              <input class="form-input" type="text" id="fFirstSubEventName" placeholder="Haldi, Sangeet, Wedding&hellip;" required>
+              <div class="form-error" id="fFirstSubEventNameError"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="fFirstSubEventDate">Date *</label>
+              <input class="form-input" type="date" id="fFirstSubEventDate" required>
+              <div class="form-error" id="fFirstSubEventDateError"></div>
+            </div>
+            <div class="form-group form-full">
+              <label class="form-label" for="fFirstSubEventVenue">Venue</label>
+              <input class="form-input" type="text" id="fFirstSubEventVenue">
+            </div>
+          </div>
+        </div>
         <div class="modal-actions">
           <button type="button" class="btn-modal-cancel" id="projectModalCancel">Cancel</button>
           <button type="submit" class="btn-modal-save">Save Project</button>
