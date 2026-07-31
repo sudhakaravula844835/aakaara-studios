@@ -176,17 +176,22 @@ function nextStepCopy(project) {
       : { title: 'RAW gallery is being prepared.', body: 'The gallery link will appear here as soon as it is ready.' };
   }
   if (project.stage === 'photo_selection') {
-    return selected > 0
-      ? { title: 'Photo selections received.', body: 'You can still add notes below if anything needs clarification.' }
-      : { title: 'Select photos for editing.', body: 'Paste the photo numbers or filenames from the RAW gallery into the selection box.' };
+    if (selected === 0) {
+      return { title: 'Select photos for editing.', body: 'Paste the photo numbers or filenames from the RAW gallery into the selection box.' };
+    }
+    return songsCount > 0
+      ? { title: 'Selections received.', body: 'Your photo list and song suggestions are saved. Video editing will begin after studio review.' }
+      : { title: 'Suggest songs before video editing.', body: 'Add up to 5 song links so the editor can start with the right music direction.' };
+  }
+  if (project.stage === 'song_finalization') {
+    return songsCount > 0
+      ? { title: 'Songs received for final review.', body: 'Once the music direction is confirmed, the studio will move your project into video editing.' }
+      : { title: 'Suggest songs before video editing.', body: 'Add up to 5 song links so the editor can start with the exact versions.' };
   }
   if (project.stage === 'video_editing') {
     return songsCount > 0
       ? { title: 'Studio is editing your film.', body: 'Your song suggestions are saved for the editing team.' }
-      : { title: 'Suggest songs for your film.', body: 'Add up to 5 song links so the editor can match the exact versions.' };
-  }
-  if (project.stage === 'song_finalization') {
-    return { title: 'Confirm music direction.', body: 'Review the song list and leave a note if any song choice needs adjustment.' };
+      : { title: 'Studio is editing your film.', body: 'Leave a note below if you still need to share music direction.' };
   }
   if (project.stage === 'final_delivery') {
     return { title: 'Final delivery is being prepared.', body: 'Your finished gallery and films will be shared here when ready.' };

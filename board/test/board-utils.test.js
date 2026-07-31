@@ -7,10 +7,10 @@ import {
 } from '../board-utils.js';
 
 describe('STAGE_COLUMNS', () => {
-  it('has exactly 8 stages in schema order', () => {
+  it('has exactly 8 stages in workflow order', () => {
     expect(STAGE_COLUMNS.map(c => c.key)).toEqual([
       'booked', 'shoot_completed', 'raw_delivered', 'photo_selection',
-      'video_editing', 'song_finalization', 'final_delivery', 'completed',
+      'song_finalization', 'video_editing', 'final_delivery', 'completed',
     ]);
   });
 });

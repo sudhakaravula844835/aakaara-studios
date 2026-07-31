@@ -109,6 +109,7 @@ describe('client token portal', () => {
     expect(clientJs).toContain('client-next-step');
     expect(clientJs).toContain('client-project-tracker');
     expect(clientJs).toContain('Select photos for editing.');
+    expect(clientJs).toContain('Suggest songs before video editing.');
     expect(clientJs).toContain('Studio is editing your film.');
   });
 });

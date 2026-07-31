@@ -3,8 +3,8 @@ export const STAGE_COLUMNS = [
   { key: 'shoot_completed', label: 'Shoot Completed' },
   { key: 'raw_delivered', label: 'RAW Delivered' },
   { key: 'photo_selection', label: 'Photo Selection' },
-  { key: 'video_editing', label: 'Video Editing' },
   { key: 'song_finalization', label: 'Song Finalization' },
+  { key: 'video_editing', label: 'Video Editing' },
   { key: 'final_delivery', label: 'Final Delivery' },
   { key: 'completed', label: 'Completed' },
 ];
