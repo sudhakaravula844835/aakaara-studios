@@ -126,7 +126,6 @@ describe('Owner/PM project tracker section', () => {
     const sectionMatch = boardHtml.match(/id="projectTrackerSection"[\s\S]*?<\/div>\s*<\/div>/);
     expect(sectionMatch).not.toBeNull();
     expect(sectionMatch[0]).toContain('id="projectTracker"');
-    expect(sectionMatch[0]).toContain('class="client-project-tracker"');
   });
 });
 

@@ -139,6 +139,7 @@ function trackerStatusText(stageKey, state, project) {
 
 function renderProjectTracker(project) {
   const tracker = document.createElement('div');
+  tracker.className = 'client-project-tracker';
   tracker.setAttribute('aria-label', 'Project stage tracker');
 
   const currentIndex = Math.max(stageIndex(project.stage), 0);
