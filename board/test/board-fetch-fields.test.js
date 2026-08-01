@@ -114,6 +114,22 @@ describe('client token portal', () => {
   });
 });
 
+describe('Owner/PM project tracker section', () => {
+  it('adds a hidden-by-default tracker section to the project modal', () => {
+    expect(boardHtml).toContain('id="projectTrackerSection"');
+    const match = boardHtml.match(/<div class="modal-section" id="projectTrackerSection"[^>]*>/);
+    expect(match).not.toBeNull();
+    expect(match[0]).toContain('hidden');
+  });
+
+  it('places an empty tracker container inside the section', () => {
+    const sectionMatch = boardHtml.match(/id="projectTrackerSection"[\s\S]*?<\/div>\s*<\/div>/);
+    expect(sectionMatch).not.toBeNull();
+    expect(sectionMatch[0]).toContain('id="projectTracker"');
+    expect(sectionMatch[0]).toContain('class="client-project-tracker"');
+  });
+});
+
 describe('Copy Client Link button', () => {
   it('adds a Copy Client Link button to the detail panel header actions', () => {
     expect(boardHtml).toContain('id="detailCopyLinkBtn"');
