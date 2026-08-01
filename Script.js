@@ -642,6 +642,9 @@ const portfolioNarrativeLibrary = {
   '/images/couple-portraits/karthik-sowmya': {
     story: 'Warm light, quiet confidence, and a love that reads effortlessly on camera.'
   },
+  '/images/couple-portraits/anagha-revanth': {
+    story: 'A gentle city story shaped by closeness, movement, and quiet ease.'
+  },
   '/images/couple-portraits/sripad-ritika': {
     story: 'Classic portraiture with the kind of ease that makes it feel lived in.'
   },
