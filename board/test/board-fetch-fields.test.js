@@ -113,3 +113,17 @@ describe('client token portal', () => {
     expect(clientJs).toContain('Studio is editing your film.');
   });
 });
+
+describe('Copy Client Link button', () => {
+  it('adds a Copy Client Link button to the detail panel header actions', () => {
+    expect(boardHtml).toContain('id="detailCopyLinkBtn"');
+  });
+
+  it('places it inside .detail-header-actions, alongside Edit and Close', () => {
+    const match = boardHtml.match(/<div class="detail-header-actions">([\s\S]*?)<\/div>/);
+    expect(match).not.toBeNull();
+    expect(match[1]).toContain('id="detailCopyLinkBtn"');
+    expect(match[1]).toContain('id="detailEditBtn"');
+    expect(match[1]).toContain('id="detailClose"');
+  });
+});

@@ -241,6 +241,13 @@ body {
   display: flex; align-items: center; justify-content: center;
 }
 .detail-close:hover { border-color: var(--rose); color: var(--rose); }
+.detail-copy-link {
+  background: none; border: 1px solid rgba(201,149,107,0.15); color: rgba(250,246,241,0.4);
+  border-radius: 4px; height: 30px; padding: 0 0.65rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 0.7rem;
+  white-space: nowrap;
+}
+.detail-copy-link:hover { border-color: var(--rose); color: var(--rose); }
 .detail-edit {
   background: none; border: 1px solid rgba(201,149,107,0.15); color: rgba(250,246,241,0.4);
   border-radius: 4px; height: 30px; padding: 0 0.65rem; cursor: pointer;
