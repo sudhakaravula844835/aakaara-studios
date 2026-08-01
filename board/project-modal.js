@@ -3,7 +3,7 @@ import {
   validateProjectForm, validateSubEventForm, formatDate,
   photoSelectionLabel, synthesizeActivityLine,
 } from './board-utils.js';
-import { showErrorToast, getCurrentProfile } from './board-shared.js';
+import { showErrorToast, showSuccessToast, getCurrentProfile } from './board-shared.js';
 // Circular import: board.js imports openProjectModal/openDetailPanel/etc from
 // this module, and this module imports refreshProjects from board.js. Safe
 // here because refreshProjects is a hoisted function declaration and is only
@@ -416,7 +416,33 @@ async function handleSubEventFormSubmit(e) {
   await renderSubEventsTimeline();
 }
 
+async function copyClientLink() {
+  if (!currentDetailProject) return;
+
+  const { data, error } = await supabase
+    .from('projects')
+    .select('client_access_token')
+    .eq('id', currentDetailProject.id)
+    .single();
+
+  if (error || !data) {
+    showErrorToast('Could not copy link.');
+    return;
+  }
+
+  const url = `https://aakaarastudiosnyc.com/board/client.html?token=${data.client_access_token}`;
+
+  try {
+    await navigator.clipboard.writeText(url);
+    showSuccessToast('Client link copied.');
+  } catch {
+    showErrorToast('Could not copy link.');
+  }
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('detailCopyLinkBtn').addEventListener('click', copyClientLink);
   document.getElementById('detailClose').addEventListener('click', closeDetailPanel);
   document.getElementById('detailEditBtn').addEventListener('click', () => openProjectModal(currentDetailProject));
   document.getElementById('detailBackdrop').addEventListener('click', (e) => {

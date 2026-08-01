@@ -127,3 +127,24 @@ describe('Copy Client Link button', () => {
     expect(match[1]).toContain('id="detailClose"');
   });
 });
+
+describe('Copy Client Link wiring', () => {
+  const modalJs = fs.readFileSync(path.resolve(__dirname, '../project-modal.js'), 'utf8');
+
+  it('still keeps client_access_token out of the bulk fetchProjects() select (regression guard)', () => {
+    expect(fetchProjectsSelectArg()).not.toMatch(/\bclient_access_token\b/);
+  });
+
+  it('wires a click listener on detailCopyLinkBtn', () => {
+    expect(modalJs).toMatch(/detailCopyLinkBtn['"]\)\.addEventListener\(\s*['"]click['"]/);
+  });
+
+  it('fetches client_access_token by id rather than through fetchProjects()', () => {
+    expect(modalJs).toMatch(/\.select\(['"]client_access_token['"]\)/);
+  });
+
+  it('builds a client.html?token= URL and copies it to the clipboard', () => {
+    expect(modalJs).toContain('board/client.html?token=');
+    expect(modalJs).toContain('navigator.clipboard.writeText');
+  });
+});
