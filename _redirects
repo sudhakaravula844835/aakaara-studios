@@ -1,4 +1,6 @@
 /the-experience.html   /couple-portraits.html   301
+/couple-portraits      /couple-portraits.html   301
+/index.html            /                        301
 /admin/*              /admin/:splat            200
 /tools/*              /tools/:splat            200
 /board/*              /board/:splat            200

@@ -418,10 +418,10 @@ body.intro-active #heroScroll { opacity: 0; }
   line-height: 1.2; margin-bottom: 1rem;
 }
 .section-desc {
-  font-size: 0.85rem; color: rgba(205, 115, 25, 0.4); max-width: 520px;
+  font-size: 0.85rem; color: rgba(30, 26, 22, 0.65); max-width: 520px;
   line-height: 1.85; margin-bottom: 3rem;
 }
-.section-dark .section-desc { color: rgba(250,246,241,0.3); }
+.section-dark .section-desc { color: rgba(250,246,241,0.5); }
 
 /* ═══════════════════════════════════════════════════════════
    PORTFOLIO - SECTION INTRO ANIMATION
