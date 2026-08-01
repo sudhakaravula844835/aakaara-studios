@@ -2,6 +2,7 @@ import { supabase } from './supabase-client.js';
 import {
   validateProjectForm, validateSubEventForm, formatDate,
   photoSelectionLabel, synthesizeActivityLine,
+  STAGE_COLUMNS, SUBSTATUS_LABELS, stageIndex,
 } from './board-utils.js';
 import { showErrorToast, showSuccessToast, getCurrentProfile } from './board-shared.js';
 // Circular import: board.js imports openProjectModal/openDetailPanel/etc from
@@ -127,6 +128,50 @@ async function saveEditorAssignments(projectId) {
   return null;
 }
 
+function trackerStatusText(stageKey, state, project) {
+  if (state === 'done') return 'Done';
+  if (state === 'waiting') return 'Not started';
+  if (stageKey === 'video_editing' && project.video_editing_substatus) {
+    return `In Progress · ${SUBSTATUS_LABELS[project.video_editing_substatus]}`;
+  }
+  return 'In Progress';
+}
+
+function renderProjectTracker(project) {
+  const tracker = document.createElement('div');
+  tracker.setAttribute('aria-label', 'Project stage tracker');
+
+  const currentIndex = Math.max(stageIndex(project.stage), 0);
+  STAGE_COLUMNS.forEach((stage, index) => {
+    const item = document.createElement('div');
+    const state = index < currentIndex ? 'done' : index === currentIndex ? 'current' : 'waiting';
+    item.className = `client-tracker-item client-tracker-${state}`;
+
+    const marker = document.createElement('div');
+    marker.className = 'client-tracker-marker';
+    marker.textContent = state === 'done' ? '✓' : String(index + 1);
+    item.appendChild(marker);
+
+    const copy = document.createElement('div');
+    copy.className = 'client-tracker-copy';
+
+    const label = document.createElement('div');
+    label.className = 'client-tracker-label';
+    label.textContent = stage.label;
+    copy.appendChild(label);
+
+    const status = document.createElement('div');
+    status.className = 'client-tracker-status';
+    status.textContent = trackerStatusText(stage.key, state, project);
+    copy.appendChild(status);
+
+    item.appendChild(copy);
+    tracker.appendChild(item);
+  });
+
+  return tracker;
+}
+
 export async function openProjectModal(project) {
   const backdrop = document.getElementById('projectModalBackdrop');
   const form = document.getElementById('projectForm');
@@ -152,6 +197,13 @@ export async function openProjectModal(project) {
   document.getElementById('fFirstSubEventName').value = '';
   document.getElementById('fFirstSubEventDate').value = '';
   document.getElementById('fFirstSubEventVenue').value = '';
+
+  document.getElementById('projectTrackerSection').hidden = !project;
+  const trackerContainer = document.getElementById('projectTracker');
+  trackerContainer.textContent = '';
+  if (project) {
+    trackerContainer.appendChild(renderProjectTracker(project));
+  }
 
   await populateAssignmentFields(project);
 

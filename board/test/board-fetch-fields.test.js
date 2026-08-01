@@ -164,3 +164,29 @@ describe('Copy Client Link wiring', () => {
     expect(modalJs).toContain('navigator.clipboard.writeText');
   });
 });
+
+describe('Owner/PM project tracker rendering', () => {
+  const modalJs = fs.readFileSync(path.resolve(__dirname, '../project-modal.js'), 'utf8');
+
+  it('imports the stage utilities needed to render the tracker', () => {
+    expect(modalJs).toMatch(/STAGE_COLUMNS/);
+    expect(modalJs).toMatch(/stageIndex/);
+    expect(modalJs).toMatch(/SUBSTATUS_LABELS/);
+  });
+
+  it('defines a renderProjectTracker function', () => {
+    expect(modalJs).toMatch(/function renderProjectTracker\(/);
+  });
+
+  it('uses plain operational status labels, not narrative copy', () => {
+    expect(modalJs).toContain("'Done'");
+    expect(modalJs).toContain("'Not started'");
+    expect(modalJs).toContain('In Progress');
+  });
+
+  it('toggles the tracker section based on whether a project was passed to openProjectModal', () => {
+    const openFnMatch = modalJs.match(/export async function openProjectModal\(project\)[\s\S]*?\n}/);
+    expect(openFnMatch).not.toBeNull();
+    expect(openFnMatch[0]).toMatch(/projectTrackerSection['"]\)\.hidden\s*=\s*!project/);
+  });
+});
