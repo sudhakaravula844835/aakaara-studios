@@ -195,6 +195,8 @@ export async function openProjectModal(project) {
   document.getElementById('fBalancePaid').checked = project ? !!project.balance_paid : false;
   document.getElementById('fContractUrl').value = project ? (project.contract_url || '') : '';
   document.getElementById('fQuotePdfUrl').value = project ? (project.quote_pdf_url || '') : '';
+  document.getElementById('fRawDeliveredAt').value = project ? (project.raw_delivered_at || '') : '';
+  document.getElementById('fRawDeliveryLink').value = project ? (project.raw_delivery_link || '') : '';
   document.getElementById('fFirstSubEventName').value = '';
   document.getElementById('fFirstSubEventDate').value = '';
   document.getElementById('fFirstSubEventVenue').value = '';
@@ -231,6 +233,8 @@ async function handleProjectFormSubmit(e) {
     balance_paid: document.getElementById('fBalancePaid').checked,
     contract_url: document.getElementById('fContractUrl').value.trim() || null,
     quote_pdf_url: document.getElementById('fQuotePdfUrl').value.trim() || null,
+    raw_delivered_at: document.getElementById('fRawDeliveredAt').value || null,
+    raw_delivery_link: document.getElementById('fRawDeliveryLink').value.trim() || null,
     pm_id: document.getElementById('fPmId').value || null,
   };
 

@@ -50,7 +50,7 @@ async function fetchProfile(userId) {
 async function fetchProjects() {
   const { data, error } = await supabase
     .from('projects')
-    .select('id, client_name, client_email, client_phone, stage, video_editing_substatus, package_tier, hours_booked, quoted_price, confirmed_price, deposit_paid, balance_paid, contract_url, quote_pdf_url, pm_id, sub_events(id, name, event_date, venue, photo_selection_status, photo_selected_count, photo_total_count)');
+    .select('id, client_name, client_email, client_phone, stage, video_editing_substatus, package_tier, hours_booked, quoted_price, confirmed_price, deposit_paid, balance_paid, contract_url, quote_pdf_url, raw_delivered_at, raw_delivery_link, pm_id, sub_events(id, name, event_date, venue, photo_selection_status, photo_selected_count, photo_total_count)');
   if (error) {
     showErrorToast('Could not load projects.');
     // null (not []) signals "fetch failed" distinctly from "fetch succeeded

@@ -25,6 +25,11 @@ describe('fetchProjects() select field list', () => {
     expect(fetchProjectsSelectArg()).not.toMatch(/\bclient_access_token\b/);
   });
 
+  it('includes the RAW delivery fields editable in the project modal', () => {
+    expect(fetchProjectsSelectArg()).toMatch(/\braw_delivered_at\b/);
+    expect(fetchProjectsSelectArg()).toMatch(/\braw_delivery_link\b/);
+  });
+
   it('still includes id and client_name (sanity check the regex found the real select call)', () => {
     const arg = fetchProjectsSelectArg();
     expect(arg).toMatch(/\bid\b/);
@@ -187,5 +192,24 @@ describe('Owner/PM project tracker rendering', () => {
     const openFnMatch = modalJs.match(/export async function openProjectModal\(project\)[\s\S]*?\n}/);
     expect(openFnMatch).not.toBeNull();
     expect(openFnMatch[0]).toMatch(/projectTrackerSection['"]\)\.hidden\s*=\s*!project/);
+  });
+});
+
+describe('RAW delivery fields in the project modal', () => {
+  const modalJs = fs.readFileSync(path.resolve(__dirname, '../project-modal.js'), 'utf8');
+
+  it('adds date and URL inputs for RAW delivery to the modal markup', () => {
+    expect(boardHtml).toContain('id="fRawDeliveredAt"');
+    expect(boardHtml).toContain('id="fRawDeliveryLink"');
+  });
+
+  it('populates both fields when opening an existing project for edit', () => {
+    expect(modalJs).toMatch(/fRawDeliveredAt['"]\)\.value\s*=\s*project \? \(project\.raw_delivered_at/);
+    expect(modalJs).toMatch(/fRawDeliveryLink['"]\)\.value\s*=\s*project \? \(project\.raw_delivery_link/);
+  });
+
+  it('saves both fields back to raw_delivered_at and raw_delivery_link on submit', () => {
+    expect(modalJs).toMatch(/raw_delivered_at:\s*document\.getElementById\('fRawDeliveredAt'\)/);
+    expect(modalJs).toMatch(/raw_delivery_link:\s*document\.getElementById\('fRawDeliveryLink'\)/);
   });
 });
