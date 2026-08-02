@@ -252,3 +252,21 @@ describe('Dashboard counters', () => {
     expect(refreshFnMatch[0]).toContain('renderCounters(currentProjects)');
   });
 });
+
+describe('Sub-event crew field', () => {
+  const modalJs = fs.readFileSync(path.resolve(__dirname, '../project-modal.js'), 'utf8');
+
+  it('adds an editable crew field to the sub-event modal', () => {
+    expect(boardHtml).toContain('id="seCrew"');
+  });
+
+  it('populates and saves the crew field like the other sub-event fields', () => {
+    expect(modalJs).toMatch(/seCrew['"]\)\.value\s*=\s*subEvent \? \(subEvent\.crew/);
+    expect(modalJs).toMatch(/crew:\s*document\.getElementById\('seCrew'\)/);
+  });
+
+  it('shows crew in the detail panel timeline when set', () => {
+    expect(modalJs).toContain('if (se.crew)');
+    expect(modalJs).toContain('Crew: ${se.crew}');
+  });
+});

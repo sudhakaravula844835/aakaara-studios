@@ -401,6 +401,13 @@ export async function renderSubEventsTimeline() {
       content.appendChild(sel);
     }
 
+    if (se.crew) {
+      const crew = document.createElement('div');
+      crew.className = 'timeline-crew';
+      crew.textContent = `Crew: ${se.crew}`;
+      content.appendChild(crew);
+    }
+
     const editBtn = document.createElement('button');
     editBtn.className = 'timeline-edit-btn';
     editBtn.textContent = 'Edit';
@@ -432,6 +439,7 @@ function openSubEventModal(subEvent) {
   document.getElementById('seName').value = subEvent ? subEvent.name : '';
   document.getElementById('seDate').value = subEvent ? (subEvent.event_date || '') : '';
   document.getElementById('seVenue').value = subEvent ? (subEvent.venue || '') : '';
+  document.getElementById('seCrew').value = subEvent ? (subEvent.crew || '') : '';
   document.getElementById('subEventModalBackdrop').classList.add('open');
 }
 
@@ -452,6 +460,7 @@ async function handleSubEventFormSubmit(e) {
     name: document.getElementById('seName').value.trim(),
     event_date: document.getElementById('seDate').value || null,
     venue: document.getElementById('seVenue').value.trim() || null,
+    crew: document.getElementById('seCrew').value.trim() || null,
   };
 
   const { valid, errors } = validateSubEventForm(fields);
