@@ -100,6 +100,39 @@ function renderHeader() {
     link.textContent = 'Open RAW Delivery';
     header.appendChild(link);
   }
+
+  header.appendChild(renderDocumentLinks(project));
+}
+
+// The links below hit the get-client-document edge function, which
+// validates the token server-side and 302s to a short-lived signed
+// Storage URL -- the browser never talks to Storage directly, and the
+// signed link itself is never exposed in this page's markup or JS.
+function renderDocumentLinks(project) {
+  const wrap = document.createElement('div');
+  wrap.className = 'client-document-links';
+
+  if (project.contract_uploaded_at) {
+    const link = document.createElement('a');
+    link.className = 'client-raw-link';
+    link.href = `/board/api/document?token=${encodeURIComponent(token)}&type=contract`;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = 'View Contract';
+    wrap.appendChild(link);
+  }
+
+  if (project.quote_uploaded_at) {
+    const link = document.createElement('a');
+    link.className = 'client-raw-link';
+    link.href = `/board/api/document?token=${encodeURIComponent(token)}&type=quote`;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = 'View Quote';
+    wrap.appendChild(link);
+  }
+
+  return wrap;
 }
 
 function renderNextStepBanner(project) {

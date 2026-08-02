@@ -22,3 +22,7 @@
 [[edge_functions]]
   path = "/board/api/invite-staff"
   function = "invite-staff"
+
+[[edge_functions]]
+  path = "/board/api/document"
+  function = "get-client-document"

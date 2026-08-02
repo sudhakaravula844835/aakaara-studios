@@ -128,6 +128,50 @@ async function saveEditorAssignments(projectId) {
   return null;
 }
 
+async function viewProjectDocument(projectId, docType) {
+  const path = `${projectId}/${docType}.pdf`;
+  const { data, error } = await supabase.storage.from('project-documents').createSignedUrl(path, 300);
+  if (error || !data?.signedUrl) {
+    showErrorToast('Could not open document — please try again.');
+    return;
+  }
+  window.open(data.signedUrl, '_blank', 'noopener');
+}
+
+function renderFileStatus(elementId, project, docType, uploadedAt) {
+  const el = document.getElementById(elementId);
+  el.textContent = '';
+  if (!uploadedAt) {
+    el.textContent = 'Not uploaded';
+    return;
+  }
+  el.append(`Uploaded ${formatDate(uploadedAt)}`);
+  const viewLink = document.createElement('a');
+  viewLink.href = '#';
+  viewLink.textContent = 'View';
+  viewLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    viewProjectDocument(project.id, docType);
+  });
+  el.appendChild(viewLink);
+}
+
+async function uploadProjectDocument(projectId, docType, file) {
+  const path = `${projectId}/${docType}.pdf`;
+  const { error: uploadError } = await supabase.storage
+    .from('project-documents')
+    .upload(path, file, { upsert: true, contentType: 'application/pdf' });
+  if (uploadError) return { error: uploadError };
+
+  const column = docType === 'contract' ? 'contract_uploaded_at' : 'quote_uploaded_at';
+  const uploadedAt = new Date().toISOString();
+  const { error: updateError } = await supabase
+    .from('projects')
+    .update({ [column]: uploadedAt })
+    .eq('id', projectId);
+  return updateError ? { error: updateError } : { column, uploadedAt };
+}
+
 function trackerStatusText(stageKey, state, project) {
   if (state === 'done') return 'Done';
   if (state === 'waiting') return 'Not started';
@@ -193,8 +237,10 @@ export async function openProjectModal(project) {
   document.getElementById('fConfirmedPrice').value = project ? (project.confirmed_price ?? '') : '';
   document.getElementById('fDepositAmount').value = project ? (project.deposit_amount ?? '') : '';
   document.getElementById('fBalancePaid').checked = project ? !!project.balance_paid : false;
-  document.getElementById('fContractUrl').value = project ? (project.contract_url || '') : '';
-  document.getElementById('fQuotePdfUrl').value = project ? (project.quote_pdf_url || '') : '';
+  document.getElementById('fContractFile').value = '';
+  document.getElementById('fQuoteFile').value = '';
+  renderFileStatus('fContractStatus', project, 'contract', project?.contract_uploaded_at);
+  renderFileStatus('fQuoteStatus', project, 'quote', project?.quote_uploaded_at);
   document.getElementById('fRawDeliveredAt').value = project ? (project.raw_delivered_at || '') : '';
   document.getElementById('fRawDeliveryLink').value = project ? (project.raw_delivery_link || '') : '';
   document.getElementById('fExpectedDeliveryDate').value = project ? (project.expected_delivery_date || '') : '';
@@ -232,8 +278,6 @@ async function handleProjectFormSubmit(e) {
     confirmed_price: document.getElementById('fConfirmedPrice').value ? Number(document.getElementById('fConfirmedPrice').value) : null,
     deposit_amount: document.getElementById('fDepositAmount').value ? Number(document.getElementById('fDepositAmount').value) : null,
     balance_paid: document.getElementById('fBalancePaid').checked,
-    contract_url: document.getElementById('fContractUrl').value.trim() || null,
-    quote_pdf_url: document.getElementById('fQuotePdfUrl').value.trim() || null,
     raw_delivered_at: document.getElementById('fRawDeliveredAt').value || null,
     raw_delivery_link: document.getElementById('fRawDeliveryLink').value.trim() || null,
     expected_delivery_date: document.getElementById('fExpectedDeliveryDate').value || null,
@@ -285,12 +329,29 @@ async function handleProjectFormSubmit(e) {
     showErrorToast('Project saved, but editor assignment could not be updated — please try again.');
   }
 
+  // Collected separately from `fields` because these two columns are set
+  // by their own update() calls (after the Storage upload succeeds), not
+  // as part of the main project save above.
+  const documentUpdates = {};
+  const contractFile = document.getElementById('fContractFile').files[0];
+  if (contractFile) {
+    const result = await uploadProjectDocument(projectId, 'contract', contractFile);
+    if (result.error) showErrorToast('Project saved, but the contract upload failed — please try again.');
+    else documentUpdates[result.column] = result.uploadedAt;
+  }
+  const quoteFile = document.getElementById('fQuoteFile').files[0];
+  if (quoteFile) {
+    const result = await uploadProjectDocument(projectId, 'quote', quoteFile);
+    if (result.error) showErrorToast('Project saved, but the quote upload failed — please try again.');
+    else documentUpdates[result.column] = result.uploadedAt;
+  }
+
   // If the detail panel is open for the project we just edited, refresh its
   // in-memory snapshot too — otherwise re-opening Edit from the still-open
   // panel (without closing/reopening it) would show stale pre-edit values,
   // even though the save itself succeeded.
   if (editId && currentDetailProject && currentDetailProject.id === editId) {
-    currentDetailProject = { ...currentDetailProject, ...fields };
+    currentDetailProject = { ...currentDetailProject, ...fields, ...documentUpdates };
     document.getElementById('detailClientName').textContent = currentDetailProject.client_name;
   }
 

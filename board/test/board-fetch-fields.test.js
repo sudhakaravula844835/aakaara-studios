@@ -313,3 +313,59 @@ describe('Deposit amount field', () => {
     expect(modalJs).toMatch(/deposit_amount:\s*document\.getElementById\('fDepositAmount'\)/);
   });
 });
+
+describe('Contract/quote document upload', () => {
+  const modalJs = fs.readFileSync(path.resolve(__dirname, '../project-modal.js'), 'utf8');
+  const clientJs2 = fs.readFileSync(path.resolve(__dirname, '../client.js'), 'utf8');
+  const edgeFn = fs.readFileSync(path.resolve(__dirname, '../../netlify/edge-functions/get-client-document.ts'), 'utf8');
+  const netlifyToml = fs.readFileSync(path.resolve(__dirname, '../../netlify.toml'), 'utf8');
+
+  it('replaced the URL text fields with PDF file inputs', () => {
+    expect(boardHtml).toContain('id="fContractFile"');
+    expect(boardHtml).toContain('id="fQuoteFile"');
+    expect(boardHtml).toContain('accept="application/pdf"');
+    expect(boardHtml).not.toContain('id="fContractUrl"');
+    expect(boardHtml).not.toContain('id="fQuotePdfUrl"');
+  });
+
+  it('is selected in fetchProjects() via the new upload-marker columns', () => {
+    expect(fetchProjectsSelectArg()).toMatch(/\bcontract_uploaded_at\b/);
+    expect(fetchProjectsSelectArg()).toMatch(/\bquote_uploaded_at\b/);
+    expect(fetchProjectsSelectArg()).not.toMatch(/\bcontract_url\b/);
+    expect(fetchProjectsSelectArg()).not.toMatch(/\bquote_pdf_url\b/);
+  });
+
+  it('uploads to Storage and stamps the uploaded-at column, rather than saving a pasted URL', () => {
+    expect(modalJs).toMatch(/function uploadProjectDocument\(/);
+    expect(modalJs).toContain("supabase.storage\n    .from('project-documents')\n    .upload(path, file, { upsert: true");
+    expect(modalJs).toContain("column = docType === 'contract' ? 'contract_uploaded_at' : 'quote_uploaded_at'");
+  });
+
+  it('merges the new upload timestamps into currentDetailProject, not just fields (regression: reopening Edit right after upload showed stale "Not uploaded")', () => {
+    const submitFnMatch = modalJs.match(/async function handleProjectFormSubmit\(e\)[\s\S]*?\n}/);
+    expect(submitFnMatch).not.toBeNull();
+    expect(submitFnMatch[0]).toContain('documentUpdates');
+    expect(submitFnMatch[0]).toMatch(/currentDetailProject = \{ \.\.\.currentDetailProject, \.\.\.fields, \.\.\.documentUpdates \}/);
+  });
+
+  it('Owner/PM view uses a signed URL, not a public link', () => {
+    expect(modalJs).toMatch(/function viewProjectDocument\(/);
+    expect(modalJs).toContain('.createSignedUrl(path, 300)');
+  });
+
+  it('client portal links to the token-gated edge function, not Storage directly', () => {
+    expect(clientJs2).toContain('/board/api/document?token=');
+    expect(clientJs2).not.toMatch(/storage.*createSignedUrl/);
+  });
+
+  it('edge function validates the token before ever touching Storage', () => {
+    expect(edgeFn).toContain("eq(\"client_access_token\", token)");
+    expect(edgeFn).toContain("eq(\"token_revoked\", false)");
+    expect(edgeFn).toMatch(/createSignedUrl\(path, SIGNED_URL_TTL_SECONDS\)/);
+  });
+
+  it('edge function is registered in netlify.toml', () => {
+    expect(netlifyToml).toContain('path = "/board/api/document"');
+    expect(netlifyToml).toContain('function = "get-client-document"');
+  });
+});

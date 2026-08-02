@@ -69,6 +69,8 @@ body {
 }
 .form-group .form-input:focus { border-color: rgba(201,149,107,0.45); background: rgba(0,0,0,0.3); }
 .form-error { color: #e07070; font-size: 0.7rem; min-height: 1rem; }
+.form-file-status { font-size: 0.72rem; color: rgba(250,246,241,0.4); margin-top: 0.35rem; }
+.form-file-status a { color: var(--rose); margin-left: 0.5rem; }
 
 /* View toggle */
 .view-toggle { display: flex; gap: 0.4rem; }
@@ -651,6 +653,7 @@ body {
   text-decoration: none;
 }
 .client-raw-link:hover { text-decoration: underline; }
+.client-document-links { display: flex; gap: 1.25rem; }
 .client-section {
   border-bottom: 1px solid rgba(201,149,107,0.08);
   margin-bottom: 1.5rem;

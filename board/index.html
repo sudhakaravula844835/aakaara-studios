@@ -106,12 +106,14 @@
             <label><input type="checkbox" id="fBalancePaid"> Balance Paid</label>
           </div>
           <div class="form-group form-full">
-            <label class="form-label" for="fContractUrl">Contract URL</label>
-            <input class="form-input" type="url" id="fContractUrl">
+            <label class="form-label" for="fContractFile">Contract (PDF)</label>
+            <input class="form-input" type="file" id="fContractFile" accept="application/pdf">
+            <div class="form-file-status" id="fContractStatus"></div>
           </div>
           <div class="form-group form-full">
-            <label class="form-label" for="fQuotePdfUrl">Quote PDF URL</label>
-            <input class="form-input" type="url" id="fQuotePdfUrl">
+            <label class="form-label" for="fQuoteFile">Quote (PDF)</label>
+            <input class="form-input" type="file" id="fQuoteFile" accept="application/pdf">
+            <div class="form-file-status" id="fQuoteStatus"></div>
           </div>
           <div class="form-group">
             <label class="form-label" for="fRawDeliveredAt">RAW Delivered Date</label>
