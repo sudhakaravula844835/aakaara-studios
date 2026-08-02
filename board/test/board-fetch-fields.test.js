@@ -284,6 +284,10 @@ describe('Financial summary', () => {
     expect(boardJs).toMatch(/p\.confirmed_price && !p\.balance_paid/);
   });
 
+  it('subtracts the deposit already paid from confirmed_price, rather than treating the full price as owed', () => {
+    expect(boardJs).toMatch(/amountOwed\s*=\s*\(p\)\s*=>\s*p\.confirmed_price\s*-\s*\(p\.deposit_amount \|\| 0\)/);
+  });
+
   it('lists unpaid balances by client name, not just the total', () => {
     expect(boardJs).toMatch(/unpaidBalances[\s\S]*?client_name/);
   });
@@ -292,5 +296,20 @@ describe('Financial summary', () => {
     const refreshFnMatch = boardJs.match(/export async function refreshProjects\(\)[\s\S]*?\n}/);
     expect(refreshFnMatch).not.toBeNull();
     expect(refreshFnMatch[0]).toContain('renderFinancialSummary(currentProjects)');
+  });
+});
+
+describe('Deposit amount field', () => {
+  const modalJs = fs.readFileSync(path.resolve(__dirname, '../project-modal.js'), 'utf8');
+
+  it('replaced the Deposit Paid checkbox with a Deposit Amount ($) number field', () => {
+    expect(boardHtml).toContain('id="fDepositAmount"');
+    expect(boardHtml).not.toContain('id="fDepositPaid"');
+  });
+
+  it('is selected in fetchProjects(), populated on edit, and saved on submit', () => {
+    expect(fetchProjectsSelectArg()).toMatch(/\bdeposit_amount\b/);
+    expect(modalJs).toMatch(/fDepositAmount['"]\)\.value\s*=\s*project \? \(project\.deposit_amount/);
+    expect(modalJs).toMatch(/deposit_amount:\s*document\.getElementById\('fDepositAmount'\)/);
   });
 });

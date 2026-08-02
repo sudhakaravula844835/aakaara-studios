@@ -191,7 +191,7 @@ export async function openProjectModal(project) {
   document.getElementById('fHoursBooked').value = project ? (project.hours_booked ?? '') : '';
   document.getElementById('fQuotedPrice').value = project ? (project.quoted_price ?? '') : '';
   document.getElementById('fConfirmedPrice').value = project ? (project.confirmed_price ?? '') : '';
-  document.getElementById('fDepositPaid').checked = project ? !!project.deposit_paid : false;
+  document.getElementById('fDepositAmount').value = project ? (project.deposit_amount ?? '') : '';
   document.getElementById('fBalancePaid').checked = project ? !!project.balance_paid : false;
   document.getElementById('fContractUrl').value = project ? (project.contract_url || '') : '';
   document.getElementById('fQuotePdfUrl').value = project ? (project.quote_pdf_url || '') : '';
@@ -230,7 +230,7 @@ async function handleProjectFormSubmit(e) {
     hours_booked: document.getElementById('fHoursBooked').value ? Number(document.getElementById('fHoursBooked').value) : null,
     quoted_price: document.getElementById('fQuotedPrice').value ? Number(document.getElementById('fQuotedPrice').value) : null,
     confirmed_price: document.getElementById('fConfirmedPrice').value ? Number(document.getElementById('fConfirmedPrice').value) : null,
-    deposit_paid: document.getElementById('fDepositPaid').checked,
+    deposit_amount: document.getElementById('fDepositAmount').value ? Number(document.getElementById('fDepositAmount').value) : null,
     balance_paid: document.getElementById('fBalancePaid').checked,
     contract_url: document.getElementById('fContractUrl').value.trim() || null,
     quote_pdf_url: document.getElementById('fQuotePdfUrl').value.trim() || null,

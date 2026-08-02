@@ -50,7 +50,7 @@ async function fetchProfile(userId) {
 async function fetchProjects() {
   const { data, error } = await supabase
     .from('projects')
-    .select('id, client_name, client_email, client_phone, stage, video_editing_substatus, package_tier, hours_booked, quoted_price, confirmed_price, deposit_paid, balance_paid, contract_url, quote_pdf_url, raw_delivered_at, raw_delivery_link, expected_delivery_date, pm_id, sub_events(id, name, event_date, venue, photo_selection_status, photo_selected_count, photo_total_count)');
+    .select('id, client_name, client_email, client_phone, stage, video_editing_substatus, package_tier, hours_booked, quoted_price, confirmed_price, deposit_amount, balance_paid, contract_url, quote_pdf_url, raw_delivered_at, raw_delivery_link, expected_delivery_date, pm_id, sub_events(id, name, event_date, venue, photo_selection_status, photo_selected_count, photo_total_count)');
   if (error) {
     showErrorToast('Could not load projects.');
     // null (not []) signals "fetch failed" distinctly from "fetch succeeded
@@ -230,8 +230,12 @@ function renderFinancialSummary(projects) {
 
   const totalQuoted = projects.reduce((sum, p) => sum + (p.quoted_price || 0), 0);
   const totalConfirmed = projects.reduce((sum, p) => sum + (p.confirmed_price || 0), 0);
-  const unpaidBalances = projects.filter(p => p.confirmed_price && !p.balance_paid);
-  const totalOutstanding = unpaidBalances.reduce((sum, p) => sum + p.confirmed_price, 0);
+  // Amount still owed on a project = confirmed price minus whatever deposit
+  // was already paid, not the full confirmed price -- a partial deposit
+  // still leaves a balance, just a smaller one.
+  const amountOwed = (p) => p.confirmed_price - (p.deposit_amount || 0);
+  const unpaidBalances = projects.filter(p => p.confirmed_price && !p.balance_paid && amountOwed(p) > 0);
+  const totalOutstanding = unpaidBalances.reduce((sum, p) => sum + amountOwed(p), 0);
 
   const stats = [
     { label: 'Total Quoted', value: formatCurrency(totalQuoted) },
@@ -268,11 +272,11 @@ function renderFinancialSummary(projects) {
   }
 
   unpaidBalances
-    .sort((a, b) => b.confirmed_price - a.confirmed_price)
+    .sort((a, b) => amountOwed(b) - amountOwed(a))
     .forEach(p => {
       const item = document.createElement('span');
       item.className = 'board-finance-outstanding-item';
-      item.textContent = `${p.client_name} · ${formatCurrency(p.confirmed_price)}`;
+      item.textContent = `${p.client_name} · ${formatCurrency(amountOwed(p))}`;
       outstandingEl.appendChild(item);
     });
 }
