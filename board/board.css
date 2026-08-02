@@ -581,6 +581,43 @@ body {
   text-transform: uppercase;
   margin-top: 0.15rem;
 }
+.board-finance-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem 2.5rem;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid rgba(201,149,107,0.12);
+  background: rgba(0,0,0,0.14);
+}
+.board-finance-summary {
+  display: flex;
+  gap: 1.75rem;
+}
+.board-finance-outstanding {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  color: rgba(250,246,241,0.5);
+}
+.board-finance-outstanding-label {
+  color: rgba(250,246,241,0.35);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-right: 0.2rem;
+}
+.board-finance-outstanding-item {
+  border: 1px solid rgba(201,149,107,0.16);
+  border-radius: 20px;
+  padding: 0.3rem 0.75rem;
+  color: rgba(250,246,241,0.72);
+}
+.board-finance-outstanding-empty {
+  color: rgba(250,246,241,0.32);
+}
 .client-status-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

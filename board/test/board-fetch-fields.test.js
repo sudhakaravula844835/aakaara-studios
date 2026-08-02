@@ -270,3 +270,27 @@ describe('Sub-event crew field', () => {
     expect(modalJs).toContain('Crew: ${se.crew}');
   });
 });
+
+describe('Financial summary', () => {
+  it('renders summary and outstanding-balance containers in the board header', () => {
+    expect(boardHtml).toContain('id="financeSummary"');
+    expect(boardHtml).toContain('id="financeOutstanding"');
+  });
+
+  it('computes total quoted, total confirmed, and outstanding balance from already-fetched projects', () => {
+    expect(boardJs).toMatch(/function renderFinancialSummary\(/);
+    expect(boardJs).toContain('p.quoted_price');
+    expect(boardJs).toContain('p.confirmed_price');
+    expect(boardJs).toMatch(/p\.confirmed_price && !p\.balance_paid/);
+  });
+
+  it('lists unpaid balances by client name, not just the total', () => {
+    expect(boardJs).toMatch(/unpaidBalances[\s\S]*?client_name/);
+  });
+
+  it('refreshes the financial summary every time projects are refetched', () => {
+    const refreshFnMatch = boardJs.match(/export async function refreshProjects\(\)[\s\S]*?\n}/);
+    expect(refreshFnMatch).not.toBeNull();
+    expect(refreshFnMatch[0]).toContain('renderFinancialSummary(currentProjects)');
+  });
+});

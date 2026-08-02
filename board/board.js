@@ -219,6 +219,64 @@ function renderCounters(projects) {
   });
 }
 
+function formatCurrency(amount) {
+  return `$${Math.round(amount).toLocaleString('en-US')}`;
+}
+
+function renderFinancialSummary(projects) {
+  const summaryEl = document.getElementById('financeSummary');
+  const outstandingEl = document.getElementById('financeOutstanding');
+  if (!summaryEl || !outstandingEl) return;
+
+  const totalQuoted = projects.reduce((sum, p) => sum + (p.quoted_price || 0), 0);
+  const totalConfirmed = projects.reduce((sum, p) => sum + (p.confirmed_price || 0), 0);
+  const unpaidBalances = projects.filter(p => p.confirmed_price && !p.balance_paid);
+  const totalOutstanding = unpaidBalances.reduce((sum, p) => sum + p.confirmed_price, 0);
+
+  const stats = [
+    { label: 'Total Quoted', value: formatCurrency(totalQuoted) },
+    { label: 'Total Confirmed', value: formatCurrency(totalConfirmed) },
+    { label: 'Outstanding Balance', value: formatCurrency(totalOutstanding) },
+  ];
+
+  summaryEl.textContent = '';
+  stats.forEach(({ label, value }) => {
+    const stat = document.createElement('div');
+    const valueEl = document.createElement('div');
+    valueEl.className = 'board-counter-value';
+    valueEl.textContent = value;
+    const labelEl = document.createElement('div');
+    labelEl.className = 'board-counter-label';
+    labelEl.textContent = label;
+    stat.appendChild(valueEl);
+    stat.appendChild(labelEl);
+    summaryEl.appendChild(stat);
+  });
+
+  outstandingEl.textContent = '';
+  const outstandingLabel = document.createElement('span');
+  outstandingLabel.className = 'board-finance-outstanding-label';
+  outstandingLabel.textContent = 'Balance Due';
+  outstandingEl.appendChild(outstandingLabel);
+
+  if (unpaidBalances.length === 0) {
+    const empty = document.createElement('span');
+    empty.className = 'board-finance-outstanding-empty';
+    empty.textContent = 'None outstanding';
+    outstandingEl.appendChild(empty);
+    return;
+  }
+
+  unpaidBalances
+    .sort((a, b) => b.confirmed_price - a.confirmed_price)
+    .forEach(p => {
+      const item = document.createElement('span');
+      item.className = 'board-finance-outstanding-item';
+      item.textContent = `${p.client_name} · ${formatCurrency(p.confirmed_price)}`;
+      outstandingEl.appendChild(item);
+    });
+}
+
 function renderActiveView() {
   if (currentView === 'list') {
     renderListView(currentProjects);
@@ -269,6 +327,7 @@ export async function refreshProjects() {
   if (projects === null) return;
   currentProjects = projects;
   renderCounters(currentProjects);
+  renderFinancialSummary(currentProjects);
   renderActiveView();
 }
 
