@@ -563,6 +563,23 @@ body {
 .client-tracker-waiting {
   opacity: 0.68;
 }
+.board-counters {
+  display: flex;
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+}
+.board-counter-value {
+  color: var(--ivory);
+  font-size: 1.1rem;
+  font-family: var(--font-display);
+}
+.board-counter-label {
+  color: rgba(250,246,241,0.4);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 0.15rem;
+}
 .client-status-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

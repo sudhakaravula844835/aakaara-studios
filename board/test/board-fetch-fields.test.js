@@ -232,3 +232,23 @@ describe('Expected delivery date', () => {
     expect(clientJs).toMatch(/stageKey === 'final_delivery' && project\.expected_delivery_date/);
   });
 });
+
+describe('Dashboard counters', () => {
+  it('renders a counters container in the board header', () => {
+    expect(boardHtml).toContain('id="boardCounters"');
+  });
+
+  it('defines the four counters with the agreed stage groupings', () => {
+    expect(boardJs).toMatch(/function renderCounters\(/);
+    expect(boardJs).toContain("p.stage !== 'completed'");
+    expect(boardJs).toMatch(/WAITING_ON_CLIENT_STAGES\s*=\s*\['raw_delivered', 'photo_selection', 'song_finalization'\]/);
+    expect(boardJs).toContain("p.stage === 'video_editing'");
+    expect(boardJs).toContain("p.stage === 'final_delivery'");
+  });
+
+  it('refreshes counters every time projects are refetched', () => {
+    const refreshFnMatch = boardJs.match(/export async function refreshProjects\(\)[\s\S]*?\n}/);
+    expect(refreshFnMatch).not.toBeNull();
+    expect(refreshFnMatch[0]).toContain('renderCounters(currentProjects)');
+  });
+});

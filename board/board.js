@@ -191,6 +191,34 @@ let currentProjects = [];
 let renderGeneration = 0;
 let currentView = 'kanban';
 
+const WAITING_ON_CLIENT_STAGES = ['raw_delivered', 'photo_selection', 'song_finalization'];
+
+function renderCounters(projects) {
+  const container = document.getElementById('boardCounters');
+  if (!container) return;
+
+  const counts = [
+    { label: 'Active Weddings', value: projects.filter(p => p.stage !== 'completed').length },
+    { label: 'Waiting on Client', value: projects.filter(p => WAITING_ON_CLIENT_STAGES.includes(p.stage)).length },
+    { label: 'Editing', value: projects.filter(p => p.stage === 'video_editing').length },
+    { label: 'Final Delivery', value: projects.filter(p => p.stage === 'final_delivery').length },
+  ];
+
+  container.textContent = '';
+  counts.forEach(({ label, value }) => {
+    const stat = document.createElement('div');
+    const valueEl = document.createElement('div');
+    valueEl.className = 'board-counter-value';
+    valueEl.textContent = String(value);
+    const labelEl = document.createElement('div');
+    labelEl.className = 'board-counter-label';
+    labelEl.textContent = label;
+    stat.appendChild(valueEl);
+    stat.appendChild(labelEl);
+    container.appendChild(stat);
+  });
+}
+
 function renderActiveView() {
   if (currentView === 'list') {
     renderListView(currentProjects);
@@ -240,6 +268,7 @@ export async function refreshProjects() {
   // normally.
   if (projects === null) return;
   currentProjects = projects;
+  renderCounters(currentProjects);
   renderActiveView();
 }
 
