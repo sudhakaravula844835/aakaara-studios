@@ -194,7 +194,9 @@ function nextStepCopy(project) {
       : { title: 'Studio is editing your film.', body: 'Leave a note below if you still need to share music direction.' };
   }
   if (project.stage === 'final_delivery') {
-    return { title: 'Final delivery is being prepared.', body: 'Your finished gallery and films will be shared here when ready.' };
+    return project.expected_delivery_date
+      ? { title: 'Final delivery is being prepared.', body: `Your finished gallery and films will be shared here when ready. Expected by ${formatDate(project.expected_delivery_date)}.` }
+      : { title: 'Final delivery is being prepared.', body: 'Your finished gallery and films will be shared here when ready.' };
   }
   if (project.stage === 'completed') {
     return { title: 'Project completed.', body: 'Your project has reached final delivery. You can still leave a note if needed.' };
@@ -210,6 +212,9 @@ function trackerStatusText(stageKey, state, project) {
   }
   if (stageKey === 'video_editing' && project.video_editing_substatus) {
     return `Current · ${SUBSTATUS_LABELS[project.video_editing_substatus] || project.video_editing_substatus}`;
+  }
+  if (stageKey === 'final_delivery' && project.expected_delivery_date) {
+    return `Current · Expected ${formatDate(project.expected_delivery_date)}`;
   }
   return 'Current';
 }

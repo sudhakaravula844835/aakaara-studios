@@ -213,3 +213,22 @@ describe('RAW delivery fields in the project modal', () => {
     expect(modalJs).toMatch(/raw_delivery_link:\s*document\.getElementById\('fRawDeliveryLink'\)/);
   });
 });
+
+describe('Expected delivery date', () => {
+  const modalJs = fs.readFileSync(path.resolve(__dirname, '../project-modal.js'), 'utf8');
+
+  it('adds an editable field in the project modal, populated and saved like the other date fields', () => {
+    expect(boardHtml).toContain('id="fExpectedDeliveryDate"');
+    expect(modalJs).toMatch(/fExpectedDeliveryDate['"]\)\.value\s*=\s*project \? \(project\.expected_delivery_date/);
+    expect(modalJs).toMatch(/expected_delivery_date:\s*document\.getElementById\('fExpectedDeliveryDate'\)/);
+  });
+
+  it('is included in fetchProjects() so the modal can populate it on edit', () => {
+    expect(fetchProjectsSelectArg()).toMatch(/\bexpected_delivery_date\b/);
+  });
+
+  it('is mentioned in the client-facing Next Step banner and tracker for the final_delivery stage', () => {
+    expect(clientJs).toContain('Expected by ${formatDate(project.expected_delivery_date)}');
+    expect(clientJs).toMatch(/stageKey === 'final_delivery' && project\.expected_delivery_date/);
+  });
+});
