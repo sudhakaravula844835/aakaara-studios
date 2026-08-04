@@ -6,8 +6,8 @@ import {
 } from './helpers.js';
 
 const FINANCIAL_FIELDS = [
-  'quoted_price', 'confirmed_price', 'deposit_paid', 'balance_paid',
-  'contract_url', 'quote_pdf_url', 'client_access_token',
+  'quoted_price', 'confirmed_price', 'deposit_amount', 'balance_paid',
+  'contract_uploaded_at', 'quote_uploaded_at', 'client_access_token',
 ];
 
 describe('owner/pm access', () => {
@@ -86,7 +86,7 @@ describe('owner/pm access', () => {
 
     const { error } = await profile.client
       .from('projects')
-      .update({ confirmed_price: 8000, contract_url: 'https://example.com/contract.pdf' })
+      .update({ confirmed_price: 8000, deposit_amount: 500 })
       .eq('id', project.id);
     expect(error).toBeNull();
 
@@ -96,7 +96,7 @@ describe('owner/pm access', () => {
       .from('activity_log')
       .select('field_changed')
       .eq('project_id', project.id)
-      .in('field_changed', ['confirmed_price', 'contract_url']);
+      .in('field_changed', ['confirmed_price', 'deposit_amount']);
     expect(pmView).toHaveLength(2);
 
     const { data: editorView, error: editorError } = await editor.client
