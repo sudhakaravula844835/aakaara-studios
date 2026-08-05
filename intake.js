@@ -36,6 +36,14 @@ export function parseIntakeParams(searchString) {
   };
 }
 
+export function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim());
+}
+
+export function isValidPhone(value) {
+  return /^\+?[\d\s()-]{7,}$/.test(String(value).trim());
+}
+
 export function formatDaysForEmail(days) {
   return days.map((day, i) => {
     const events = day.events.map(e => `${e.name} (${e.dur}h)`).join(', ');
@@ -50,14 +58,11 @@ if (typeof document !== 'undefined') {
 }
 
 function initIntakeForm() {
-  // Date picker
-  flatpickr('#eventDate', {
-    minDate: 'today',
-    dateFormat: 'Y-m-d',
-    altInput: true,
-    altFormat: 'F j, Y',
-    disableMobile: false,
-  });
+  // Date picker (guarded — if the flatpickr CDN script is blocked, slow, or
+  // down, the field falls back to a native date input instead of taking the
+  // rest of this function — validation, conditional fields, day builder,
+  // submit handling — down with it)
+  initDatePicker('#eventDate', { minDate: 'today' });
 
   // Conditional: live streaming
   document.querySelectorAll('input[name="live"]').forEach(radio => {
@@ -141,6 +146,31 @@ function initIntakeForm() {
   });
 }
 
+function initDatePicker(el, opts = {}) {
+  if (typeof flatpickr !== 'function') {
+    // Fallback: keep the field usable via the browser's native date input
+    // rather than leaving it stuck as an inert readonly text field.
+    const input = typeof el === 'string' ? document.querySelector(el) : el;
+    if (input) {
+      input.readOnly = false;
+      input.type = 'date';
+      input.placeholder = '';
+    }
+    return null;
+  }
+  try {
+    return flatpickr(el, {
+      dateFormat: 'Y-m-d',
+      altInput: true,
+      altFormat: 'F j, Y',
+      disableMobile: false,
+      ...opts,
+    });
+  } catch {
+    return null;
+  }
+}
+
 function toggleConditional(el, show) {
   if (show) {
     el.hidden = false;
@@ -183,12 +213,7 @@ function buildDayCard(dayNum) {
   dateGroup.appendChild(dateLabel);
   dateGroup.appendChild(dateInput);
 
-  flatpickr(dateInput, {
-    dateFormat:    'Y-m-d',
-    altInput:      true,
-    altFormat:     'F j, Y',
-    disableMobile: false,
-  });
+  initDatePicker(dateInput);
 
   const eventsList = document.createElement('div');
   eventsList.className = 'events-list';
@@ -275,25 +300,28 @@ function collectFormData() {
 }
 
 function validateForm() {
+  const required = v => v.trim().length > 0;
   const fields = [
-    { id: 'clientName',  errId: 'err-clientName',  msg: 'Please enter your name'    },
-    { id: 'clientEmail', errId: 'err-clientEmail', msg: 'Please enter a valid email' },
-    { id: 'clientPhone', errId: 'err-clientPhone', msg: 'Please enter your phone'    },
-    { id: 'eventType',   errId: 'err-eventType',   msg: 'Please select event type'   },
-    { id: 'eventDate',   errId: 'err-eventDate',   msg: 'Please select a date'       },
-    { id: 'city',        errId: 'err-city',         msg: 'Please enter the city'      },
+    { id: 'clientName',  errId: 'err-clientName',  test: required,     msg: 'Please enter your name'          },
+    { id: 'clientEmail', errId: 'err-clientEmail', test: isValidEmail, msg: 'Please enter a valid email'      },
+    { id: 'clientPhone', errId: 'err-clientPhone', test: isValidPhone, msg: 'Please enter a valid phone number' },
+    { id: 'eventType',   errId: 'err-eventType',   test: required,     msg: 'Please select event type'        },
+    { id: 'eventDate',   errId: 'err-eventDate',   test: required,     msg: 'Please select a date'            },
+    { id: 'city',        errId: 'err-city',        test: required,     msg: 'Please enter the city'           },
   ];
   let valid = true;
-  fields.forEach(({ id, errId, msg }) => {
+  let firstInvalid = null;
+  fields.forEach(({ id, errId, test, msg }) => {
     const el  = document.getElementById(id);
     const err = document.getElementById(errId);
-    if (!el.value.trim()) {
+    if (!test(el.value)) {
       if (err) err.textContent = msg;
-      if (valid) el.focus();
+      if (!firstInvalid) firstInvalid = el;
       valid = false;
-    } else {
-      if (err) err.textContent = '';
+    } else if (err) {
+      err.textContent = '';
     }
   });
+  if (firstInvalid) firstInvalid.focus();
   return valid;
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildPreFillUrl, parseIntakeParams } from './intake.js';
+import { buildPreFillUrl, parseIntakeParams, isValidEmail, isValidPhone } from './intake.js';
 
 describe('buildPreFillUrl', () => {
   it('encodes required fields into URL params', () => {
@@ -62,5 +62,32 @@ describe('parseIntakeParams', () => {
     const params = new URLSearchParams({ name: 'A', email: 'a@a.com', phone: '1', days: 'not-json' });
     const result = parseIntakeParams('?' + params.toString());
     expect(result.days).toEqual([]);
+  });
+});
+
+describe('isValidEmail', () => {
+  it('accepts well-formed addresses', () => {
+    expect(isValidEmail('jane@example.com')).toBe(true);
+    expect(isValidEmail('  jane.doe+wedding@example.co.uk  ')).toBe(true);
+  });
+
+  it('rejects malformed input', () => {
+    expect(isValidEmail('not-an-email')).toBe(false);
+    expect(isValidEmail('jane@')).toBe(false);
+    expect(isValidEmail('')).toBe(false);
+  });
+});
+
+describe('isValidPhone', () => {
+  it('accepts common phone formats', () => {
+    expect(isValidPhone('+1 (917) 555-0123')).toBe(true);
+    expect(isValidPhone('917-555-0123')).toBe(true);
+    expect(isValidPhone('9175550123')).toBe(true);
+  });
+
+  it('rejects too-short or non-numeric input', () => {
+    expect(isValidPhone('abc')).toBe(false);
+    expect(isValidPhone('12345')).toBe(false);
+    expect(isValidPhone('')).toBe(false);
   });
 });

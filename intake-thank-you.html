@@ -276,11 +276,20 @@
   </div>
 
   <script>
+    // "Congratulations on your ___" only reads naturally for a few of the
+    // event types the intake form offers — map the rest to a phrase that
+    // still fits the sentence instead of dropping the raw value in.
+    const EVENT_LABELS = {
+      Wedding:    'Wedding',
+      Engagement: 'Engagement',
+      Portrait:   'Portrait Session',
+      Maternity:  'Maternity Session',
+      Family:     'Family Session',
+      Other:      'Photography Session',
+    };
     const params = new URLSearchParams(window.location.search);
     const event  = params.get('event');
-    if (event) {
-      document.getElementById('ty-event-type').textContent = event;
-    }
+    document.getElementById('ty-event-type').textContent = EVENT_LABELS[event] || 'Wedding';
   </script>
 </body>
 </html>
