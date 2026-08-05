@@ -1,5 +1,5 @@
 // tests/intake.spec.js
-import { test, expect } from '@playwright/test';
+import { test, expect, devices } from '@playwright/test';
 
 test.describe('Intake form', () => {
   test.beforeEach(async ({ page }) => { await page.goto('/intake.html'); });
@@ -39,6 +39,24 @@ test.describe('Intake form', () => {
   test('validation shows error for empty required fields', async ({ page }) => {
     await page.locator('#submitBtn').click();
     await expect(page.locator('#err-clientName')).not.toBeEmpty();
+  });
+});
+
+test.describe('Intake form — touch devices', () => {
+  const { defaultBrowserType, ...iPhone13 } = devices['iPhone 13'];
+  test.use({ ...iPhone13 });
+
+  // Regression test for a bug where flatpickr's native mobile date input
+  // (which carries the "flatpickr-input" class same as the desktop altInput
+  // setup) was being hidden by a leftover "#eventDate + .flatpickr-input"
+  // CSS rule, leaving touch users with no way to select the event date.
+  test('event date field renders a visible, fillable native date input', async ({ page }) => {
+    await page.goto('/intake.html');
+    const mobileDateInput = page.locator('#step2 input[type="date"]');
+    await expect(mobileDateInput).toBeVisible();
+    await mobileDateInput.fill('2026-12-15');
+    await mobileDateInput.dispatchEvent('change');
+    await expect(page.locator('#eventDate')).toHaveValue('2026-12-15');
   });
 });
 
