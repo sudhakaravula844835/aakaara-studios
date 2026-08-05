@@ -1169,7 +1169,9 @@ function init() {
     clearDraft();
     window.location.reload();
   });
-  $('dashboardBtn').addEventListener('click', () => { window.location.href = 'dashboard.html'; });
+  // Board is the real CRM now (Supabase-backed, replacing the old
+  // localStorage admin/dashboard.html) — its Dashboard tab is the landing view.
+  $('dashboardBtn').addEventListener('click', () => { window.location.href = '../board/index.html'; });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
   loadFromUrlParams();
 }

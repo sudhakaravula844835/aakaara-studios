@@ -346,6 +346,92 @@ body {
 }
 .btn-comment-post:hover { background: rgba(201,149,107,0.22); }
 
+/* Dashboard view — searchable card grid, ported from admin/dashboard.html's
+   "Client CRM" home page onto board's real project data. */
+.dashboard-view-container { display: none; padding: 1.5rem 2rem; flex-direction: column; gap: 1.25rem; }
+.dashboard-view-container.view-active { display: flex; }
+
+.dash-toolbar { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.dash-search-wrap {
+  display: flex; align-items: center; gap: 0.5rem; background: #111;
+  border: 1px solid rgba(201,149,107,0.1); border-radius: 6px; padding: 0.5rem 0.85rem;
+  flex: 1; min-width: 180px;
+}
+.dash-search-wrap svg { opacity: 0.35; flex-shrink: 0; }
+.dash-search-wrap input {
+  background: none; border: none; outline: none; color: var(--ivory);
+  font-family: var(--font-body); font-size: 0.8rem; width: 100%;
+}
+.dash-search-wrap input::placeholder { color: rgba(250,246,241,0.25); }
+
+.dash-filter-pills { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.dash-filter-pill {
+  padding: 0.35rem 0.85rem; border-radius: 20px; font-size: 0.65rem; letter-spacing: 0.07em;
+  border: 1px solid rgba(201,149,107,0.15); color: rgba(250,246,241,0.4); background: none;
+  cursor: pointer; transition: all 0.15s var(--ease); font-family: var(--font-body);
+}
+.dash-filter-pill:hover { border-color: rgba(201,149,107,0.35); color: var(--ivory); }
+.dash-filter-pill.active {
+  background: rgba(201,149,107,0.12); border-color: rgba(201,149,107,0.4); color: var(--rose);
+}
+
+.dash-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.dash-empty {
+  grid-column: 1 / -1; text-align: center; padding: 3rem;
+  color: rgba(250,246,241,0.2); font-size: 0.85rem; letter-spacing: 0.05em;
+}
+
+.dash-card {
+  background: #111; border: 1px solid rgba(201,149,107,0.1); border-left: 3px solid transparent;
+  border-radius: 8px; padding: 1.1rem; display: flex; flex-direction: column;
+  cursor: pointer; transition: border-color 0.2s var(--ease);
+}
+.dash-card:hover { border-color: rgba(201,149,107,0.2); }
+.dash-card:focus-visible { outline: 2px solid var(--rose); outline-offset: 1px; }
+.dash-card.stage-completed { border-left-color: #a8b8a0; }
+.dash-card.stage-booked { border-left-color: #e0a458; }
+.dash-card.stage-active { border-left-color: var(--rose); }
+
+.dash-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.7rem; }
+.dash-card-name { font-family: var(--font-display); font-size: 1.1rem; font-weight: 300; color: var(--ivory); line-height: 1.2; }
+.dash-card-badge {
+  font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.2rem 0.5rem;
+  border-radius: 4px; flex-shrink: 0; white-space: nowrap;
+}
+.dash-badge-completed { background: rgba(168,184,160,0.15); color: #a8b8a0; }
+.dash-badge-booked { background: rgba(224,164,88,0.15); color: #e0a458; }
+.dash-badge-active { background: rgba(201,149,107,0.15); color: var(--rose); }
+
+.dash-card-field {
+  display: flex; align-items: flex-start; gap: 0.45rem; margin-bottom: 0.35rem;
+  color: rgba(250,246,241,0.55); font-size: 0.75rem; line-height: 1.4;
+}
+.dash-card-field svg { flex-shrink: 0; margin-top: 1px; opacity: 0.6; }
+
+.dash-card-divider { border: none; border-top: 1px solid rgba(201,149,107,0.08); margin: 0.7rem 0; }
+
+.dash-card-price-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; }
+.dash-card-prices { display: flex; gap: 1rem; }
+.dash-price-lbl { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(250,246,241,0.3); margin-bottom: 0.1rem; }
+.dash-price-val { font-family: var(--font-display); font-size: 1rem; color: var(--rose); }
+
+.dash-balance-badge { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.2rem 0.5rem; border-radius: 4px; white-space: nowrap; }
+.dash-balance-paid { background: rgba(168,184,160,0.12); color: #a8b8a0; }
+.dash-balance-due { background: rgba(224,164,88,0.12); color: #e0a458; }
+
+@media (max-width: 1024px) {
+  .dash-cards { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .dashboard-view-container { padding: 1rem 1.25rem; }
+  .dash-cards { grid-template-columns: 1fr; }
+  .dash-toolbar { flex-direction: column; align-items: stretch; }
+  .dash-search-wrap { min-width: unset; }
+  /* iOS Safari zooms the viewport on focus when an input's font-size is
+     below 16px — that zoom+scroll reads as a "random reload" while typing. */
+  .dash-search-wrap input { font-size: 16px; }
+}
+
 /* List view */
 .list-view-container { display: none; padding: 1.5rem 2rem; overflow-x: auto; }
 .list-view-container.view-active { display: block; }

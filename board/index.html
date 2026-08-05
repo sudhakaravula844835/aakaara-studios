@@ -18,7 +18,8 @@
     </div>
     <div class="board-header-actions">
       <div class="view-toggle" id="viewToggle" role="group" aria-label="Board view">
-        <button class="view-toggle-btn active" data-view="kanban" type="button">Kanban</button>
+        <button class="view-toggle-btn active" data-view="dashboard" type="button">Dashboard</button>
+        <button class="view-toggle-btn" data-view="kanban" type="button">Kanban</button>
         <button class="view-toggle-btn" data-view="list" type="button">List</button>
         <button class="view-toggle-btn" data-view="calendar" type="button">Calendar</button>
         <button class="view-toggle-btn owner-only" data-view="staff" type="button" id="staffToggleBtn">Staff</button>
@@ -34,7 +35,17 @@
   </div>
 
   <main class="board-main">
-    <div class="board-columns view-active" id="boardColumns"></div>
+    <div class="dashboard-view-container view-active" id="dashboardViewContainer">
+      <div class="dash-toolbar">
+        <div class="dash-search-wrap">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="dashSearch" placeholder="Search clients, package, venue&#8230;" autocomplete="off" aria-label="Search projects">
+        </div>
+        <div class="dash-filter-pills" id="dashFilterPills" role="group" aria-label="Filter projects"></div>
+      </div>
+      <div class="dash-cards" id="dashCards" role="list"></div>
+    </div>
+    <div class="board-columns" id="boardColumns"></div>
     <div class="list-view-container" id="listViewContainer"></div>
     <div class="calendar-view-container" id="calendarViewContainer"></div>
     <div class="staff-view-container" id="staffViewContainer">
@@ -260,6 +271,7 @@
   </div>
 
 <script type="module" src="project-modal.js"></script>
+<script type="module" src="dashboard-view.js"></script>
 <script type="module" src="list-view.js"></script>
 <script type="module" src="calendar-view.js"></script>
 <script type="module" src="staff.js"></script>

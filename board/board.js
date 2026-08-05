@@ -8,6 +8,7 @@ import {
   openProjectModal, openDetailPanel, getCurrentDetailProjectId,
   renderSubEventsTimeline, renderActivityFeed,
 } from './project-modal.js';
+import { renderDashboardView } from './dashboard-view.js';
 import { renderListView } from './list-view.js';
 import { renderCalendarView } from './calendar-view.js';
 import { renderStaffView } from './staff.js';
@@ -189,7 +190,7 @@ function renderBoard() {
 
 let currentProjects = [];
 let renderGeneration = 0;
-let currentView = 'kanban';
+let currentView = 'dashboard';
 
 const WAITING_ON_CLIENT_STAGES = ['raw_delivered', 'photo_selection', 'song_finalization'];
 
@@ -282,6 +283,10 @@ function renderFinancialSummary(projects) {
 }
 
 function renderActiveView() {
+  if (currentView === 'dashboard') {
+    renderDashboardView(currentProjects);
+    return;
+  }
   if (currentView === 'list') {
     renderListView(currentProjects);
     return;
@@ -304,6 +309,7 @@ function setActiveView(view) {
     btn.classList.toggle('active', btn.dataset.view === view);
   });
 
+  document.getElementById('dashboardViewContainer').classList.toggle('view-active', view === 'dashboard');
   document.getElementById('boardColumns').classList.toggle('view-active', view === 'kanban');
   document.getElementById('listViewContainer').classList.toggle('view-active', view === 'list');
   document.getElementById('calendarViewContainer').classList.toggle('view-active', view === 'calendar');
