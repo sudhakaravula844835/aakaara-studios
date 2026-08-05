@@ -55,6 +55,25 @@ function removeStorage(key) {
 // ── DOM SHORTHAND ─────────────────────────────────────────────────
 function $(id) { return document.getElementById(id); }
 
+// Guarded flatpickr init — if the CDN script failed to load, fall back to a
+// native date input instead of throwing and aborting the caller (init(),
+// addDay()) partway through.
+function initDatePicker(el, opts = {}) {
+  if (typeof flatpickr !== 'function') {
+    const input = typeof el === 'string' ? document.querySelector(el) : el;
+    if (input) {
+      input.readOnly = false;
+      input.type = 'date';
+    }
+    return null;
+  }
+  try {
+    return flatpickr(el, { dateFormat: 'Y-m-d', altInput: true, altFormat: 'F j, Y', ...opts });
+  } catch {
+    return null;
+  }
+}
+
 // ── DAY / EVENT MANAGEMENT ────────────────────────────────────────
 function addDay(dayData) {
   dayCount++;
@@ -68,11 +87,7 @@ function addDay(dayData) {
   }
   $('daysContainer').appendChild(block);
   const addedBlock = $('daysContainer').lastElementChild;
-  flatpickr(addedBlock.querySelector('[data-field="date"]'), {
-    dateFormat: 'Y-m-d',
-    altInput: true,
-    altFormat: 'F j, Y',
-  });
+  initDatePicker(addedBlock.querySelector('[data-field="date"]'));
   const events = (dayData && dayData.events) ? dayData.events : [{}];
   events.forEach(ev => addEvent(addedBlock, ev));
   recalcDayPhotos(addedBlock);
@@ -1058,11 +1073,7 @@ function loadFromUrlParams() {
 
 // ── INIT ──────────────────────────────────────────────────────────
 function init() {
-  quoteDatePicker = flatpickr('#quoteDate', {
-    dateFormat: 'Y-m-d',
-    altInput: true,
-    altFormat: 'F j, Y',
-  });
+  quoteDatePicker = initDatePicker('#quoteDate');
 
   const draft = readStorage(APP_SETTINGS.draftStorageKey);
   if (draft) {
