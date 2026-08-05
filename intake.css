@@ -363,7 +363,14 @@ select option { background: var(--umber); }
   color: rgba(250, 246, 241, 0.25);
 }
 
-/* Input fields — cursor + hide the hidden original when altInput is active */
+/* Input fields — cursor for the flatpickr-driven date field */
 #eventDate { cursor: pointer; }
 .flatpickr-alt-input { cursor: pointer; }
-#eventDate + .flatpickr-input { display: none; }
+/* NOTE: do not add "#eventDate + .flatpickr-input { display: none; }" here.
+   flatpickr already sets the original #eventDate input's type to "hidden"
+   once altInput is active, so that selector is redundant on desktop — but
+   on touch devices (disableMobile: false) flatpickr swaps in a *visible*
+   native <input type="date"> fallback that also gets the "flatpickr-input"
+   class and lands in this exact sibling position. That selector used to
+   match it and hide the only interactive control mobile users had for this
+   field, leaving Event Date impossible to fill in on phones. */
