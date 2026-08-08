@@ -165,11 +165,20 @@ async function uploadProjectDocument(projectId, docType, file) {
 
   const column = docType === 'contract' ? 'contract_uploaded_at' : 'quote_uploaded_at';
   const uploadedAt = new Date().toISOString();
-  const { error: updateError } = await supabase
+  const { data: updateData, error: updateError } = await supabase
     .from('projects')
     .update({ [column]: uploadedAt })
-    .eq('id', projectId);
-  return updateError ? { error: updateError } : { column, uploadedAt };
+    .eq('id', projectId)
+    .select('id');
+  if (updateError) return { error: updateError };
+  // PostgREST does not treat "0 rows matched" as an error -- without this
+  // check, a stale/deleted/wrong projectId would upload the file to Storage,
+  // report success, and silently leave the DB column (and therefore the "Not
+  // uploaded" status shown in the modal) unchanged forever.
+  if (!updateData || updateData.length === 0) {
+    return { error: new Error(`No project row matched id "${projectId}" -- document uploaded to Storage but the database record was not updated.`) };
+  }
+  return { column, uploadedAt };
 }
 
 function trackerStatusText(stageKey, state, project) {
@@ -334,16 +343,23 @@ async function handleProjectFormSubmit(e) {
   // as part of the main project save above.
   const documentUpdates = {};
   const contractFile = document.getElementById('fContractFile').files[0];
-  if (contractFile) {
-    const result = await uploadProjectDocument(projectId, 'contract', contractFile);
-    if (result.error) showErrorToast('Project saved, but the contract upload failed — please try again.');
-    else documentUpdates[result.column] = result.uploadedAt;
-  }
   const quoteFile = document.getElementById('fQuoteFile').files[0];
-  if (quoteFile) {
-    const result = await uploadProjectDocument(projectId, 'quote', quoteFile);
-    if (result.error) showErrorToast('Project saved, but the quote upload failed — please try again.');
-    else documentUpdates[result.column] = result.uploadedAt;
+  // Defense in depth: uploadProjectDocument() now catches a wrong/stale
+  // projectId server-side (Fix root-caused in the DB layer above), but don't
+  // even attempt Storage uploads without a real id to attach them to.
+  if ((contractFile || quoteFile) && !projectId) {
+    showErrorToast('Project saved, but the project ID could not be determined — documents were not uploaded. Reopen the project and attach them from Edit.');
+  } else {
+    if (contractFile) {
+      const result = await uploadProjectDocument(projectId, 'contract', contractFile);
+      if (result.error) showErrorToast('Project saved, but the contract upload failed — please try again.');
+      else documentUpdates[result.column] = result.uploadedAt;
+    }
+    if (quoteFile) {
+      const result = await uploadProjectDocument(projectId, 'quote', quoteFile);
+      if (result.error) showErrorToast('Project saved, but the quote upload failed — please try again.');
+      else documentUpdates[result.column] = result.uploadedAt;
+    }
   }
 
   // If the detail panel is open for the project we just edited, refresh its
