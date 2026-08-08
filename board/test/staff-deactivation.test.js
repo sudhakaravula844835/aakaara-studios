@@ -73,4 +73,43 @@ describe('staff deactivation', () => {
     const { data } = await pm.client.from('projects').select('id').eq('id', project.id);
     expect(data).toHaveLength(1);
   });
+
+  // Deep QA pass: the PM cases above exercise current_profile_role() via
+  // projects_all_owner_pm; Owner is a separate role value and also gates
+  // profiles_all_owner (the staff table itself), so it's worth confirming
+  // the same "takes effect on the very next query, no re-login" contract
+  // holds for an Owner too, on both projects and the profiles table staff.js
+  // writes to.
+  it('deactivated Owner loses RLS-gated project AND staff-table access immediately, without re-login', async () => {
+    const owner = await createTestProfile('owner');
+    const editor = await createTestProfile('editor');
+    project = await createTestProject({ stage: 'booked' });
+
+    try {
+      const before = await owner.client.from('projects').select('id').eq('id', project.id);
+      expect(before.data).toHaveLength(1);
+
+      await adminClient.from('profiles').update({ active: false }).eq('id', owner.id);
+
+      const { data: reads } = await owner.client.from('projects').select('id').eq('id', project.id);
+      expect(reads).toHaveLength(0);
+
+      const { data: projectWrite } = await owner.client
+        .from('projects').update({ stage: 'shoot_completed' }).eq('id', project.id).select();
+      expect(projectWrite ?? []).toHaveLength(0);
+
+      // profiles_all_owner is Owner-only -- this is the exact call staff.js's
+      // deactivate toggle makes; a deactivated Owner must not be able to use
+      // their still-open Staff page to touch someone else's row either.
+      const { data: staffWrite } = await owner.client
+        .from('profiles').update({ active: false }).eq('id', editor.id).select();
+      expect(staffWrite ?? []).toHaveLength(0);
+
+      const { data: editorUnchanged } = await adminClient.from('profiles').select('active').eq('id', editor.id).single();
+      expect(editorUnchanged.active).toBe(true);
+    } finally {
+      await deleteTestProfile(owner.id);
+      await deleteTestProfile(editor.id);
+    }
+  });
 });

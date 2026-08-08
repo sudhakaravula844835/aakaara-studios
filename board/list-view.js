@@ -109,9 +109,14 @@ function renderListRow(project) {
     const newStage = select.value;
     const previousStage = project.stage;
     select.disabled = true;
-    const { error } = await supabase.from('projects').update({ stage: newStage }).eq('id', project.id);
+    const { data, error } = await supabase.from('projects').update({ stage: newStage }).eq('id', project.id).select('id');
     select.disabled = false;
-    if (error) {
+    // PostgREST does not treat "0 rows matched" as an error -- same
+    // silent-no-op risk as board.js's handleDrop (see its comment): a
+    // caller whose owner/pm access lapsed between page load and this
+    // change would otherwise see the dropdown report success while
+    // nothing was written.
+    if (error || !data || data.length === 0) {
       select.value = previousStage;
       showErrorToast('Could not update stage — please try again.');
       return;

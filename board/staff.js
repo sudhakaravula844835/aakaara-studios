@@ -84,9 +84,14 @@ function renderStaffRow(staff, currentUserId) {
       const newRole = select.value;
       const previousRole = staff.role;
       select.disabled = true;
-      const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', staff.id);
+      const { data, error } = await supabase.from('profiles').update({ role: newRole }).eq('id', staff.id).select('id');
       select.disabled = false;
-      if (error) {
+      // PostgREST does not treat "0 rows matched" as an error -- without this
+      // check, a caller whose own owner access lapsed between page load and
+      // this click (e.g. deactivated by another Owner in another tab) would
+      // have the update silently excluded by RLS while the dropdown reports
+      // success, leaving the target's role unchanged with no error shown.
+      if (error || !data || data.length === 0) {
         select.value = previousRole;
         showErrorToast('Could not update role — please try again.');
         return;
@@ -109,9 +114,12 @@ function renderStaffRow(staff, currentUserId) {
     toggleBtn.textContent = staff.active ? 'Deactivate' : 'Reactivate';
     toggleBtn.addEventListener('click', async () => {
       toggleBtn.disabled = true;
-      const { error } = await supabase.from('profiles').update({ active: !staff.active }).eq('id', staff.id);
+      const { data, error } = await supabase.from('profiles').update({ active: !staff.active }).eq('id', staff.id).select('id');
       toggleBtn.disabled = false;
-      if (error) {
+      // Same silent-no-op risk as the role-change handler above, but higher
+      // stakes here: a "Deactivate" click that reports success while the
+      // target stays active is an access-control gap, not just stale UI.
+      if (error || !data || data.length === 0) {
         showErrorToast('Could not update status — please try again.');
         return;
       }

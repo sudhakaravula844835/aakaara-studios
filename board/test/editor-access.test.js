@@ -244,4 +244,26 @@ describe('editor access', () => {
       await deleteTestProfile(other.id);
     }
   });
+
+  // Deep QA pass: mirrors owner-pm-access.test.js's "pm cannot change a
+  // profiles.role value" guard, for the editor role -- profiles_all_owner is
+  // the only write policy on profiles, so an editor (like a PM) has no grant
+  // path to touch role/active on any row, including their own.
+  it('editor cannot self-promote via profiles UPDATE, and cannot self-reactivate once deactivated', async () => {
+    editor = await createTestProfile('editor');
+
+    const { data: promoteData, error: promoteError } = await editor.client
+      .from('profiles').update({ role: 'owner' }).eq('id', editor.id).select();
+    expect(promoteData ?? []).toHaveLength(0);
+    expect(promoteError).toBeNull(); // RLS-excluded, not a thrown error -- matches update()'s no-op shape
+    const { data: roleAfter } = await adminClient.from('profiles').select('role').eq('id', editor.id).single();
+    expect(roleAfter.role).toBe('editor');
+
+    await adminClient.from('profiles').update({ active: false }).eq('id', editor.id);
+    const { data: reactivateData } = await editor.client
+      .from('profiles').update({ active: true }).eq('id', editor.id).select();
+    expect(reactivateData ?? []).toHaveLength(0);
+    const { data: activeAfter } = await adminClient.from('profiles').select('active').eq('id', editor.id).single();
+    expect(activeAfter.active).toBe(false);
+  });
 });

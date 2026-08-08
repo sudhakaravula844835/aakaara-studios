@@ -314,7 +314,15 @@ async function handleProjectFormSubmit(e) {
   let projectId = editId;
   let error;
   if (editId) {
-    ({ error } = await supabase.from('projects').update(fields).eq('id', editId));
+    const { data: updateData, error: updateError } = await supabase.from('projects').update(fields).eq('id', editId).select('id');
+    // PostgREST does not treat "0 rows matched" as an error -- without this
+    // check (same anti-pattern fixed in uploadProjectDocument, 9cf35ad), a
+    // stale/deleted project row, or a caller whose own owner/pm access
+    // lapsed between opening Edit and clicking Save, would report a
+    // successful save while writing nothing.
+    error = updateError || ((!updateData || updateData.length === 0)
+      ? new Error(`No project row matched id "${editId}" — edit was not saved.`)
+      : null);
   } else {
     const insertResult = await supabase.from('projects').insert(fields).select().single();
     error = insertResult.error;
@@ -548,9 +556,18 @@ async function handleSubEventFormSubmit(e) {
 
   const editId = document.getElementById('seId').value;
 
-  const { error } = editId
-    ? await supabase.from('sub_events').update(fields).eq('id', editId)
-    : await supabase.from('sub_events').insert(fields);
+  let error;
+  if (editId) {
+    const { data, error: updateError } = await supabase.from('sub_events').update(fields).eq('id', editId).select('id');
+    // Same no-op-update safety as the main project save above: a 0-row
+    // match (stale sub-event, or a lapsed-access caller) is not an error
+    // PostgREST will report on its own.
+    error = updateError || ((!data || data.length === 0)
+      ? new Error(`No sub-event row matched id "${editId}" — edit was not saved.`)
+      : null);
+  } else {
+    ({ error } = await supabase.from('sub_events').insert(fields));
+  }
 
   if (error) {
     showErrorToast('Could not save sub-event — please try again.');

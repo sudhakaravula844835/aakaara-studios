@@ -148,9 +148,15 @@ async function handleDrop(e, newStage) {
     card.classList.add('card-pending');
   }
 
-  const { error } = await supabase.from('projects').update({ stage: newStage }).eq('id', projectId);
+  const { data, error } = await supabase.from('projects').update({ stage: newStage }).eq('id', projectId).select('id');
 
-  if (error) {
+  // PostgREST does not treat "0 rows matched" as an error -- without this
+  // check, a caller whose own owner/pm access lapsed between page load and
+  // this drop (deactivated in another tab, e.g.) would have the update
+  // silently excluded by RLS while the drop reports success, leaving the
+  // card stuck in .card-pending with no explanation until the 3s safety net
+  // quietly snaps it back with no error shown.
+  if (error || !data || data.length === 0) {
     if (card) card.classList.remove('card-pending');
     showErrorToast('Could not move project — please try again.');
     return;
