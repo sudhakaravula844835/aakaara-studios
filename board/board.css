@@ -62,12 +62,18 @@ body {
 .form-group .form-label {
   font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(250,246,241,0.35);
 }
-.form-group .form-input {
+/* Not scoped to ".form-group .form-input" -- client.html's photo-selection
+   textarea and its 5 song-suggestion slots all carry the .form-input class
+   without a .form-group wrapper (they're built directly inside plain
+   <form>/<div class="client-song-slot"> containers), so a .form-group-scoped
+   rule silently left them with zero styling -- unthemed default browser
+   inputs on the one page a client actually sees. */
+.form-input {
   background: rgba(0,0,0,0.3); border: 1px solid rgba(201,149,107,0.15); border-radius: 5px;
   padding: 0.55rem 0.75rem; color: var(--ivory); font-family: var(--font-body); font-size: 0.82rem;
   outline: none; transition: border-color 0.15s var(--ease); width: 100%; box-sizing: border-box;
 }
-.form-group .form-input:focus { border-color: rgba(201,149,107,0.45); background: rgba(0,0,0,0.3); }
+.form-input:focus { border-color: rgba(201,149,107,0.45); background: rgba(0,0,0,0.3); }
 .form-error { color: #e07070; font-size: 0.7rem; min-height: 1rem; }
 .form-file-status { font-size: 0.72rem; color: rgba(250,246,241,0.4); margin-top: 0.35rem; }
 .form-file-status a { color: var(--rose); margin-left: 0.5rem; }
@@ -430,6 +436,20 @@ body {
   /* iOS Safari zooms the viewport on focus when an input's font-size is
      below 16px — that zoom+scroll reads as a "random reload" while typing. */
   .dash-search-wrap input { font-size: 16px; }
+}
+
+/* Same iOS-zoom-on-focus fix as .dash-search-wrap above, applied to every
+   other text input/textarea/select across all four board pages (login,
+   project/sub-event/invite modals, comment composers, and the client
+   portal's photo-selection and song-suggestion forms all use these shared
+   classes) — .form-input's base font-size is 0.82rem (~13px), well under
+   the 16px floor that keeps Safari from zooming in on focus. */
+@media (max-width: 768px) {
+  .form-input,
+  .comment-input,
+  .list-stage-select {
+    font-size: 16px;
+  }
 }
 
 /* List view */
