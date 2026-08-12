@@ -67,7 +67,15 @@ export default async (req: Request): Promise<Response> => {
     return jsonResponse({ error: "Only the Owner can invite staff." }, 403);
   }
 
-  const { data: inviteData, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email);
+  // Explicit redirectTo rather than relying solely on the Supabase project's
+  // Site URL default -- that default has drifted to a local dev address
+  // before (every invite link landed on http://localhost:3000 for every
+  // recipient) with no visible error on this end, only a broken link in the
+  // recipient's inbox. Falls back to production if SITE_URL isn't set.
+  const siteUrl = env("SITE_URL") || "https://www.aakaarastudiosnyc.com";
+  const { data: inviteData, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
+    redirectTo: `${siteUrl}/board/reset-password.html`,
+  });
   if (inviteError || !inviteData?.user) {
     return jsonResponse({ error: inviteError?.message || "Could not send invite." }, 400);
   }
