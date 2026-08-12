@@ -54,4 +54,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     await routeSignedInUser(signInData.user.id, errorEl);
   });
+
+  const forgotBtn = document.getElementById('forgotPasswordBtn');
+  const statusEl = document.getElementById('loginStatus');
+  forgotBtn.addEventListener('click', async () => {
+    errorEl.textContent = '';
+    statusEl.textContent = '';
+
+    const email = document.getElementById('lEmail').value.trim();
+    if (!email) {
+      errorEl.textContent = 'Enter your email above first, then click "Forgot password?"';
+      return;
+    }
+
+    forgotBtn.disabled = true;
+    statusEl.textContent = 'Sending…';
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/board/reset-password.html`,
+    });
+
+    forgotBtn.disabled = false;
+    // Deliberately the same message whether or not the email has an account --
+    // Supabase itself doesn't reveal that either, and this endpoint shouldn't
+    // become a way to enumerate staff/PM email addresses.
+    statusEl.textContent = error
+      ? 'Something went wrong — please try again in a moment.'
+      : 'If an account exists for that email, a reset link has been sent.';
+  });
 });
