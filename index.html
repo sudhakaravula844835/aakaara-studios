@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-R0B8G15NCL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-R0B8G15NCL');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -112,35 +121,6 @@
     ]
   }
 }
-</script>
-<!-- GA4 FIX: Google Analytics 4 global site tag.
-     STEPS: 1. Go to https://analytics.google.com
-              2. Create new GA4 property: "Aakaara Studios NYC"
-              3. Add Web data stream → https://aakaarastudiosnyc.com
-              4. Copy Measurement ID (format: G-72E9BMSGN3)
-              5. Replace BOTH occurrences of G-72E9BMSGN3 below with your real ID
-              6. Deploy to Netlify → check GA4 Realtime report to confirm pageview fires
-     The async attribute ensures this script never blocks page rendering. -->
-<!-- NOTE: SRI (integrity="sha384-...") is intentionally omitted from this script tag.
-     googletagmanager.com/gtag/js is dynamically generated per Measurement ID and is
-     updated continuously by Google. A fixed hash would break on every Google-side
-     release. See: https://developers.google.com/tag-platform/security/guides/csp
-     Mitigations instead: strict-origin-when-cross-origin Referrer-Policy (already
-     set in _headers), and CSP script-src can restrict to 'https://www.googletagmanager.com'
-     if a Content Security Policy is added in a future pass. -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-72E9BMSGN3"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-72E9BMSGN3', {
-    page_title: document.title,
-    page_location: window.location.href,
-    send_page_view: true,
-    // GA4 FIX: link_attribution enables "Page Analytics" mode and better
-    // cross-page session stitching when GSC is linked to this GA4 property
-    link_attribution: true
-  });
 </script>
 <noscript><style>.reveal { opacity: 1 !important; transform: none !important; }</style></noscript>
 </head>
