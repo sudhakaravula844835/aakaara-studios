@@ -1,3 +1,11 @@
+# Canonical domain: force apex -> www so window.location.origin is always
+# https://www.aakaarastudiosnyc.com. Board auth (Supabase invite/reset
+# redirects) is allow-listed only for the www origin -- an editor landing on
+# the bare apex domain would send a redirectTo Supabase can't match, and it
+# silently falls back to the homepage instead of board/reset-password.html.
+http://aakaarastudiosnyc.com/*    https://www.aakaarastudiosnyc.com/:splat   301!
+https://aakaarastudiosnyc.com/*   https://www.aakaarastudiosnyc.com/:splat   301!
+
 /the-experience.html   /couple-portraits.html   301
 /couple-portraits      /couple-portraits.html   301
 /index.html            /                        301
