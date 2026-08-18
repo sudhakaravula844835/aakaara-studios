@@ -378,6 +378,35 @@ function revokePreviewUrl() {
 }
 
 // ── PDF GENERATION ────────────────────────────────────────────────
+
+// Counts named wedding events (Haldi, Sangeet, Wedding, Reception, etc.)
+// entered across all day-blocks, regardless of whether photo counts were
+// filled in. Drives the Highlight Video duration estimate below.
+function countWeddingEvents() {
+  let count = 0;
+  document.querySelectorAll('#daysContainer .day-block [data-event-item]').forEach(item => {
+    const name = item.querySelector('[data-field="eventName"]').value.trim();
+    if (name) count++;
+  });
+  return count;
+}
+
+// Highlight reels run longer when there's more than one function to cover —
+// a single ceremony cuts down to ~5 min, a multi-event wedding (Haldi +
+// Sangeet + Wedding, etc.) needs 7-10 min to do every event justice.
+function getHighlightDuration() {
+  return countWeddingEvents() > 1 ? '7-10 min' : '5 min';
+}
+
+// Documentary follows the same single-vs-multi split as Highlight: a single
+// ceremony is still just a ~5 min edit, and only grows into a full 8-12 min
+// story-format film once there's more than one event to weave together.
+function getDocumentaryDetail() {
+  return countWeddingEvents() > 1
+    ? '8-12 min · all events, story format'
+    : '5 min · full ceremony coverage';
+}
+
 function getDeliverableRows() {
   const rows = [];
 
@@ -407,9 +436,9 @@ function getDeliverableRows() {
   del('delGallery', 'Online Gallery', 'Private link, downloads enabled');
   del('delSneakPeek', 'Sneak Peek', '5-10 images within 48 hours');
   del('delTeaser', 'Teaser Reel', '60-second social media cut');
-  del('delDoc', 'Documentary Video', 'Full ceremony & reception');
+  del('delDoc', 'Documentary Video', getDocumentaryDetail());
   del('delTraditional', 'Traditional Video', 'Full coverage edit');
-  del('delHighlight', 'Highlight Video', '2-3 min cinematic edit');
+  del('delHighlight', 'Highlight Video', `${getHighlightDuration()} cinematic edit`);
   del('delDrone', 'Drone Coverage', 'Aerial footage & stills');
   del('delLive', 'Livestream', 'Private streaming link');
   del('delSecondShooter', 'Second Shooter', 'Additional photographer');
@@ -503,9 +532,9 @@ function generatePDF(action) {
   if ($('delGallery').checked)      scopeItems.push('Online gallery for viewing and downloads');
   if ($('delSneakPeek').checked)    scopeItems.push('Sneak peek — 5-10 images within 48 hours');
   if ($('delTeaser').checked)       scopeItems.push('Teaser reel — 60 second social media cut');
-  if ($('delDoc').checked)          scopeItems.push('Documentary Film — full ceremony & reception');
+  if ($('delDoc').checked)          scopeItems.push(`Documentary Film — ${getDocumentaryDetail()}`);
   if ($('delTraditional').checked)  scopeItems.push('Traditional video — full coverage edit');
-  if ($('delHighlight').checked)    scopeItems.push('Highlight Video (2-3 minutes) — cinematic edit');
+  if ($('delHighlight').checked)    scopeItems.push(`Highlight Video (${getHighlightDuration()}) — cinematic edit`);
   if ($('delDrone').checked)        scopeItems.push('Drone footage where permitted');
   if ($('delLive').checked)         scopeItems.push('Livestream — private streaming link');
   if ($('delSecondShooter').checked) scopeItems.push('Second photographer for full coverage');

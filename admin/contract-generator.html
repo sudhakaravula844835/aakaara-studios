@@ -1047,6 +1047,25 @@ function fmtDate(val) {
 function chk(id) { return document.getElementById(id).checked; }
 function val(id) { return (document.getElementById(id)?.value || '').trim(); }
 
+// Counts named events in the Deliverables list (e.g. Pellikoduku, Sangeet,
+// Wedding). Mirrors quote-generator.js's countWeddingEvents() so Documentary
+// Film runtime scales the same way here as it does on a quote.
+function countContractEvents() {
+  let count = 0;
+  document.querySelectorAll('#delRows .del-name').forEach(inp => {
+    if (inp.value.trim()) count++;
+  });
+  return count;
+}
+
+// Single ceremony stays a ~5 min edit; more than one event grows it into a
+// full 8-12 min story-format film covering all of them.
+function getDocumentaryDetail() {
+  return countContractEvents() > 1
+    ? 'Documentary Film (8-12 min · all events, story format)'
+    : 'Documentary Film (5 min · full ceremony coverage)';
+}
+
 // ── COLLECT FORM DATA ──
 function collectData() {
   const clientName  = val('clientName');
@@ -1081,7 +1100,7 @@ function collectData() {
   if (chk('svcPhoto'))   services.push('Photography');
   if (chk('svcVideo'))   services.push('Videography');
   if (chk('svcTeaser'))  services.push('Wedding Teaser Film (2-3 minutes)');
-  if (chk('svcDocfilm')) services.push('Documentary Film (~10 minutes with interviews)');
+  if (chk('svcDocfilm')) services.push(getDocumentaryDetail());
   if (chk('svcRaw'))     services.push('Raw Files Delivery');
   if (chk('svcGallery')) services.push('Online Gallery');
   if (chk('svcNYC'))     services.push('NYC Post-Wedding Shoot');
@@ -1438,6 +1457,16 @@ function generateContract(action) {
           'Client designates delivery address in writing by event day.',
           'Final 20% payment must be received before raw data is released.',
           'Service Provider retains backups for 60 days post-delivery only.'
+        ]
+      },
+      {
+        title: 'Data Handling & Delivery',
+        items: [
+          'Client to provide two external hard disks (1–2TB capacity each) before the wedding date.',
+          'One drive is for the photography team\'s on-site data backup; the second is for RAW data delivery.',
+          'Both drives must be formatted in exFAT for cross-platform compatibility.',
+          'Photography team will return the RAW data drive to the client within one week of the event.',
+          'Client assumes responsibility for the drives once handed over for data transfer.'
         ]
       }
     ];
