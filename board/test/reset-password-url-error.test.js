@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readUrlError } from '../reset-password.js';
+import { hasAuthRedirectParams, readUrlError } from '../reset-password.js';
 
 // Pure URL-parsing logic only -- no Supabase session/network involved, so
 // this runs without board/.env credentials. The live "valid link -> shows
@@ -34,5 +34,20 @@ describe('readUrlError', () => {
   it('prefers the hash fragment over the query string when both somehow carry error params', () => {
     const loc = fakeLocation('#error=from_hash', '?error=from_query');
     expect(readUrlError(loc)).toBe('from_hash');
+  });
+});
+
+describe('hasAuthRedirectParams', () => {
+  it('detects PKCE invite/recovery callback URLs with a code query param', () => {
+    expect(hasAuthRedirectParams(fakeLocation('', '?code=abc123&type=invite'))).toBe(true);
+    expect(hasAuthRedirectParams(fakeLocation('', '?code=abc123&type=recovery'))).toBe(true);
+  });
+
+  it('detects implicit-token callback URLs in the hash fragment', () => {
+    expect(hasAuthRedirectParams(fakeLocation('#access_token=token&refresh_token=refresh&type=invite'))).toBe(true);
+  });
+
+  it('returns false for ordinary page loads with no auth callback state', () => {
+    expect(hasAuthRedirectParams(fakeLocation('', '?foo=bar'))).toBe(false);
   });
 });

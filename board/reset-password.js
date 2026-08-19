@@ -17,6 +17,18 @@ export function readUrlError(location = window.location) {
   );
 }
 
+export function hasAuthRedirectParams(location = window.location) {
+  const hashParams = new URLSearchParams(location.hash.replace(/^#/, ''));
+  const queryParams = new URLSearchParams(location.search);
+  return Boolean(
+    queryParams.get('code') ||
+    hashParams.get('access_token') ||
+    hashParams.get('refresh_token') ||
+    hashParams.get('type') ||
+    queryParams.get('type')
+  );
+}
+
 async function routeAfterPasswordSet(userId) {
   const { data: profile, error } = await supabase
     .from('profiles')
@@ -63,11 +75,13 @@ function initResetPasswordPage() {
     return;
   }
 
+  const authRedirectInProgress = hasAuthRedirectParams();
+
   // supabase-js (detectSessionInUrl: true by default) parses the URL's
-  // access/refresh tokens asynchronously on load. onAuthStateChange's
-  // INITIAL_SESSION event is the documented signal that it's finished --
-  // fires exactly once, with either a resolved session (link was valid) or
-  // null (nothing usable was in the URL).
+  // access/refresh tokens asynchronously on load. Invite/recovery links can
+  // briefly report a null INITIAL_SESSION before the URL code/token exchange
+  // completes, so auth-callback URLs wait for SIGNED_IN/PASSWORD_RECOVERY or
+  // the fallback getSession() check before declaring the link expired.
   let resolved = false;
   supabase.auth.onAuthStateChange((event, session) => {
     if (resolved) return;
@@ -75,6 +89,7 @@ function initResetPasswordPage() {
       resolved = true;
       showForm();
     } else if (event === 'INITIAL_SESSION' && !session) {
+      if (authRedirectInProgress) return;
       resolved = true;
       showExpired();
     }
@@ -89,7 +104,7 @@ function initResetPasswordPage() {
       resolved = true;
       if (data.session) showForm(); else showExpired();
     });
-  }, 2500);
+  }, authRedirectInProgress ? 8000 : 2500);
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
