@@ -846,6 +846,10 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   if (!gallery || !galleryImg || !galleryTitle || !gallerySubtitle || !galleryCounter || !stage) return;
 
   let swImages = [], swIndex = 0, swIsOpen = false, swParafRAF = null, lastFocusedElement = null;
+  // Tracks the carousel card that triggered the currently-open lightbox, so its
+  // black-and-white -> color "tap reveal" (.gi-color-reveal, see styles.css) can
+  // be cleared again once the lightbox closes.
+  let swSourceCard = null;
   let stripThumbCache = [];
   let dockMouseMoveFn = null, dockMouseLeaveFn = null;
   let dockCurrentScales = [], dockTargetScales = [], dockRAF = null, dockRAFRunning = false, dockLerp = 0.18;
@@ -853,6 +857,12 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
 
   function openSwGallery(work) {
     lastFocusedElement = document.activeElement;
+    // Turn the tapped cover from black & white to color, and keep it that way
+    // for the whole open/close cycle (a :hover-only trigger reverts the instant
+    // a finger lifts, which flashed back to black & white as the lightbox
+    // faded in — see styles.css comment above .gi-color-reveal).
+    swSourceCard = work;
+    work.classList.add('gi-color-reveal');
     const folder = work.dataset.folder || 'images/default';
     const count = parseInt(work.dataset.count || '1', 10);
     const ext = work.dataset.ext || 'jpg';
@@ -1005,6 +1015,11 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       if (lastFocusedElement) {
         lastFocusedElement.focus();
         lastFocusedElement = null;
+      }
+      // Reset the cover back to black & white for the next time it's viewed
+      if (swSourceCard) {
+        swSourceCard.classList.remove('gi-color-reveal');
+        swSourceCard = null;
       }
     }
     gallery.addEventListener('animationend', cleanup, { once: true });

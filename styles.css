@@ -1468,7 +1468,14 @@ body.intro-active #heroScroll { opacity: 0; }
   opacity: 0.3;
 }
 
-/* ── Center card: black & white at rest, blooms into color on hover ── */
+/* ── Center card: black & white at rest, turns to color on tap ──
+   Reveal is driven by a JS-added class (.gi-color-reveal, set in
+   openSwGallery/closeSwGallery in Script.js) rather than :hover. A pure
+   :hover trigger ends the instant a finger lifts, so on tap/touch the
+   card reverted back to black & white right as the lightbox opened —
+   visible through the lightbox's translucent fade-in (0.8s, see
+   .sw-gallery-enter) as a black-and-white "switch" flash. The JS class
+   persists through the whole open/close cycle instead. */
 .ethereal-carousel .gallery-item[data-ec-offset="0"] .gi-bg {
   filter: grayscale(100%) brightness(0.9) contrast(1.05);
 }
@@ -1476,7 +1483,11 @@ body.intro-active #heroScroll { opacity: 0; }
 .ethereal-carousel .gallery-item .gi-bg {
   transform: none !important;
 }
-/* ── But allow hover zoom + color reveal on center card ── */
+/* ── Tap reveal (persists — see comment above) ── */
+.ethereal-carousel .gallery-item[data-ec-offset="0"].gi-color-reveal .gi-bg {
+  filter: grayscale(0%) brightness(1) contrast(1);
+}
+/* ── Desktop-only preview: subtle zoom + color on hover before tapping ── */
 .ethereal-carousel .gallery-item[data-ec-offset="0"]:hover .gi-bg {
   transform: scale(1.06) !important;
   filter: grayscale(0%) brightness(1) contrast(1);
@@ -3897,6 +3908,16 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 
 @media (hover: none) {
   .gallery-item .gi-bg { filter: grayscale(0%) brightness(1) contrast(1) !important; }
+  /* Exception: the carousel's active/center card stays black & white until
+     tapped (.gi-color-reveal, added by openSwGallery in Script.js) — touch
+     devices have no :hover to bloom it, so the blanket rule above would
+     otherwise force it permanently into color, skipping the reveal. */
+  .ethereal-carousel .gallery-item[data-ec-offset="0"]:not(.gi-color-reveal) .gi-bg {
+    filter: grayscale(100%) brightness(0.9) contrast(1.05) !important;
+  }
+  .ethereal-carousel .gallery-item[data-ec-offset="0"].gi-color-reveal .gi-bg {
+    filter: grayscale(0%) brightness(1) contrast(1) !important;
+  }
   .gallery-item:hover { transform: none; box-shadow: none; }
   .gallery-item:active { transform: translateY(-5px); box-shadow: 0 24px 56px rgba(0,0,0,0.5); }
   .gallery-item .gi-overlay { opacity: 1; background: linear-gradient(to top, rgba(9,8,11,0.88) 0%, rgba(9,8,11,0.22) 48%, transparent 100%); }
