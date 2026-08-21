@@ -3709,6 +3709,10 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   font-size: 0.49rem; letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--rose); opacity: 0.75; margin-top: 0.3rem;
 }
+.vm-actions {
+  display: flex; align-items: center; gap: 0.5rem;
+  flex-shrink: 0;
+}
 .vm-chapters {
   display: flex; flex-wrap: wrap; gap: 0.5rem;
   margin: -0.4rem 0 1.2rem;
@@ -3742,6 +3746,23 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   flex-shrink: 0;
 }
 .vm-close:hover { color: var(--rose); }
+.vm-share {
+  display: flex; align-items: center; gap: 0.45rem;
+  font-size: 0.52rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(250,246,241,0.5); cursor: pointer;
+  transition: color 0.3s, border-color 0.3s, background 0.3s;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(250,246,241,0.12);
+  border-radius: 999px;
+  font-family: var(--font-body); white-space: nowrap;
+  min-height: 44px; padding-inline: 0.85rem;
+}
+.vm-share:hover {
+  color: var(--rose);
+  border-color: rgba(201,149,107,0.45);
+  background: rgba(201,149,107,0.08);
+}
+.vm-share[hidden] { display: none; }
 .vm-stage {
   position: relative; background: #000;
   aspect-ratio: 16/9; border-radius: 2px; overflow: hidden;

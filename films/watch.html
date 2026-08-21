@@ -471,9 +471,15 @@ const VIDEOS = {
 };
 
 // ─── resolve slug ───────────────────────────────────────────────────────────
+function normalizeSlug(value) {
+  return String(value || '')
+    .trim()
+    .replace(/^[/"'“”‘’]+|[/"'“”‘’]+$/g, '');
+}
+
 const pathSlug = location.pathname.replace(/^\/films\/?/, '').replace(/\.html$/, '');
 const paramSlug = new URLSearchParams(location.search).get('v') || '';
-const slug = (pathSlug && pathSlug !== 'watch') ? pathSlug : paramSlug;
+const slug = normalizeSlug((pathSlug && pathSlug !== 'watch') ? pathSlug : paramSlug);
 
 const wrap    = document.getElementById('filmWrap');
 const ambient = document.getElementById('filmAmbient');

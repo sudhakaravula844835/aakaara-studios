@@ -1699,6 +1699,7 @@ function filterVideos(cat, btn) {
   const vmPlay   = document.getElementById('vmPlayToggle');
   const vmMute   = document.getElementById('vmMuteToggle');
   const vmFs     = document.getElementById('vmFsToggle');
+  const vmShare  = document.getElementById('vmShare');
   const vmTrack  = document.getElementById('vmProgressTrack');
   const vmFill   = document.getElementById('vmProgressFill');
   const vmTime   = document.getElementById('vmTimeDisplay');
@@ -1712,6 +1713,7 @@ function filterVideos(cat, btn) {
   var modalScrollY = 0;
   var modalRequestId = 0;
   var modalLastFocusedEl = null;
+  var currentShareUrl = '';
   const YT_ARROW_SKIP = 5;
   const YT_JL_SKIP = 10;
   const YT_VOLUME_STEP = 0.05;
@@ -1890,6 +1892,48 @@ function filterVideos(cat, btn) {
     });
   }
 
+  function buildShareUrl(slug) {
+    if (!slug) return '';
+    return new URL(`/films/${slug}`, window.location.origin).toString();
+  }
+
+  function updateShareButton(card) {
+    currentShareUrl = buildShareUrl(card.dataset.shareSlug || '');
+    if (!vmShare) return;
+    vmShare.hidden = !currentShareUrl;
+    vmShare.querySelector('span').textContent = 'Share';
+  }
+
+  function fallbackCopyText(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.top = '-999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    const copied = document.execCommand('copy');
+    textarea.remove();
+    return copied;
+  }
+
+  async function copyShareUrl() {
+    if (!currentShareUrl || !vmShare) return;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentShareUrl);
+      } else if (!fallbackCopyText(currentShareUrl)) {
+        throw new Error('Copy command failed');
+      }
+      vmShare.querySelector('span').textContent = 'Copied';
+      window.setTimeout(() => {
+        if (currentShareUrl && vmShare) vmShare.querySelector('span').textContent = 'Share';
+      }, 1600);
+    } catch (err) {
+      window.prompt('Copy this film link:', currentShareUrl);
+    }
+  }
+
   async function selectChapter(chapter, tab) {
     if (tab.classList.contains('active')) return;
     Array.from(vmChapters.children).forEach(el => {
@@ -1917,6 +1961,7 @@ function filterVideos(cat, btn) {
     vmTitle.textContent = card.dataset.title || '';
     vmSub.textContent   = type;
     renderChapterTabs(chapters, defaultChapter);
+    updateShareButton(card);
 
     // GA4 FIX: fire video_play event — marks this as an engagement conversion in GA4.
     // video_type matches the playing chapter (or the card badge for single-video cards).
@@ -1977,6 +2022,8 @@ function filterVideos(cat, btn) {
       p.classList.remove('active');
     });
     modalLastFocusedEl = null;
+    currentShareUrl = '';
+    if (vmShare) vmShare.hidden = true;
   }
 
   function formatTime(s) {
@@ -2010,6 +2057,10 @@ function filterVideos(cat, btn) {
     
     // Reset icon on close
     vmClose.addEventListener('click', () => { if(document.fullscreenElement) document.exitFullscreen(); });
+  }
+
+  if (vmShare) {
+    vmShare.addEventListener('click', copyShareUrl);
   }
 
   if (vmVideo) {
