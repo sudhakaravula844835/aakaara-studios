@@ -854,6 +854,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   let dockMouseMoveFn = null, dockMouseLeaveFn = null;
   let dockCurrentScales = [], dockTargetScales = [], dockRAF = null, dockRAFRunning = false, dockLerp = 0.18;
   let _dockBoundMoveFn = null;
+  const photoJournal = window.createPhotoJournal?.({ gallery, onClose: closeSwGallery });
 
   function openSwGallery(work) {
     lastFocusedElement = document.activeElement;
@@ -888,7 +889,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     }
 
     gallery.classList.add('sw-open', 'sw-gallery-enter');
-    if (isStatic) gallery.classList.add('sw-static');
+    gallery.classList.toggle('sw-static', isStatic);
     
     // Handle Coming Soon state
     gallery.classList.toggle('sw-is-coming-soon', isComingSoon);
@@ -911,6 +912,11 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
 
     document.body.style.overflow = 'hidden'; 
     swIsOpen = true;
+
+    if (photoJournal?.shouldOpen(work)) {
+      photoJournal.open(work, swImages);
+      return;
+    }
 
     // Focus close button for accessibility
     setTimeout(() => {
@@ -992,11 +998,15 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
 
   function closeSwGallery() {
     if (!swIsOpen) return;
+    swIsOpen = false;
     gallery.classList.add('sw-gallery-exit');
     let cleanupCalled = false;
-    function cleanup() {
+    function cleanup(event) {
+      if (event && (event.target !== gallery || event.animationName !== 'swGalleryOut')) return;
       if (cleanupCalled) return;
       cleanupCalled = true;
+      gallery.removeEventListener('animationend', cleanup);
+      photoJournal?.close();
       gallery.classList.remove('sw-open', 'sw-gallery-enter', 'sw-gallery-exit', 'sw-static', 'sw-is-coming-soon');
       // Remove any gi- classes added for coming soon background
       gallery.className = gallery.className.replace(/gi-\d+/g, '').trim();
@@ -1013,7 +1023,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       swIsOpen = false;
       // Return focus to triggering element
       if (lastFocusedElement) {
-        lastFocusedElement.focus();
+        lastFocusedElement.focus({ preventScroll: true });
         lastFocusedElement = null;
       }
       // Reset the cover back to black & white for the next time it's viewed
@@ -1022,7 +1032,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
         swSourceCard = null;
       }
     }
-    gallery.addEventListener('animationend', cleanup, { once: true });
+    gallery.addEventListener('animationend', cleanup);
     // Fallback if animationend never fires
     setTimeout(cleanup, 600);
     document.body.style.overflow = '';
@@ -1039,7 +1049,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   document.getElementById('swGalleryClose').addEventListener('click', closeSwGallery);
 
   document.addEventListener('keydown', function (e) {
-    if (!swIsOpen) return;
+    if (!swIsOpen || photoJournal?.isOpen()) return;
     if (e.key === 'Escape')     closeSwGallery();
     if (e.key === 'ArrowRight') swNav(1);
     if (e.key === 'ArrowLeft')  swNav(-1);
@@ -1049,7 +1059,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   let swTouchStartX = 0, swTouchStartY = 0, swTouchDX = 0, swIsHorizontal = null;
 
   gallery.addEventListener('touchstart', (e) => {
-    if (!swIsOpen) return;
+    if (!swIsOpen || photoJournal?.isOpen() || e.touches.length !== 1) return;
     swTouchStartX = e.touches[0].clientX;
     swTouchStartY = e.touches[0].clientY;
     swTouchDX = 0;
@@ -1058,7 +1068,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   }, { passive: true });
 
   gallery.addEventListener('touchmove', (e) => {
-    if (!swIsOpen) return;
+    if (!swIsOpen || photoJournal?.isOpen() || e.touches.length !== 1) return;
     const dx = e.touches[0].clientX - swTouchStartX;
     const dy = e.touches[0].clientY - swTouchStartY;
     if (swIsHorizontal === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
@@ -1074,7 +1084,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   }, { passive: false });
 
   gallery.addEventListener('touchend', () => {
-    if (!swIsOpen) return;
+    if (!swIsOpen || photoJournal?.isOpen()) return;
     galleryImg.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
     if (Math.abs(swTouchDX) > 50) {
       swNav(swTouchDX < 0 ? 1 : -1);
@@ -2784,6 +2794,35 @@ class EtherealCarousel {
       e.preventDefault();
       this.navigate(e.key === 'ArrowLeft' ? -1 : 1);
     });
+
+    // Touch browsers do not reliably apply :active while a cover is held.
+    // Preview its color until the touch ends or becomes a scrolling gesture.
+    if (this.container.id === 'portfolioCarousel') {
+      let touchPreview = null;
+      const clearTouchPreview = () => {
+        touchPreview?.card.classList.remove('gi-touch-preview');
+        touchPreview = null;
+      };
+      this.container.addEventListener('touchstart', (e) => {
+        clearTouchPreview();
+        if (e.touches.length !== 1 || !window.matchMedia('(hover: none)').matches) return;
+        const card = e.target.closest(this.itemSelector);
+        if (!card) return;
+        const { clientX: x, clientY: y } = e.touches[0];
+        touchPreview = { card, x, y };
+        card.classList.add('gi-touch-preview');
+      }, { passive: true });
+      this.container.addEventListener('touchmove', (e) => {
+        if (!touchPreview) return;
+        const touch = e.touches[0];
+        if (e.touches.length !== 1 || Math.abs(touch.clientX - touchPreview.x) > 8 || Math.abs(touch.clientY - touchPreview.y) > 8) {
+          clearTouchPreview();
+        }
+      }, { passive: true });
+      this.container.addEventListener('touchend', clearTouchPreview, { passive: true });
+      this.container.addEventListener('touchcancel', clearTouchPreview, { passive: true });
+      window.addEventListener('blur', clearTouchPreview);
+    }
 
     // Touch swipe — finger-following, prevents browser back gesture
     let touchStartX = 0, touchStartY = 0, touchDX = 0, touchIsHorizontal = null;

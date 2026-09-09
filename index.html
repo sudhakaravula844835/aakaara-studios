@@ -948,6 +948,54 @@
   </div>
 </div>
 
+<!-- The journal shares the album dialog; its content is populated for each work. -->
+<template id="swJournalTemplate">
+  <section class="sw-journal" id="swJournal" hidden>
+    <div class="sw-journal-scroll" id="swJournalScroll" tabindex="-1">
+      <div class="sw-journal-nav">
+        <button class="sw-journal-action" id="swJournalClose" aria-label="Back to Framed Stories">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+          <span class="sw-journal-back-label">Portfolio</span>
+        </button>
+        <span class="sw-journal-compact-title" id="swJournalCompactTitle" aria-hidden="true"></span>
+        <span class="sw-journal-wordmark" aria-hidden="true">Aakaara</span>
+      </div>
+      <header class="sw-journal-intro">
+        <h2 id="swJournalTitle"></h2>
+        <p class="sw-journal-subtitle" id="swJournalSubtitle"></p>
+        <div class="sw-journal-meta">
+          <p id="swJournalCount"></p>
+          <p>Tap a photo to enlarge</p>
+        </div>
+      </header>
+      <div class="sw-journal-grid" id="swJournalGrid" aria-label="Album photographs"></div>
+      <p class="sw-journal-status" id="swJournalStatus" role="status" hidden>Loading photographs…</p>
+    </div>
+  </section>
+  <section class="sw-journal-detail" id="swJournalDetail" hidden>
+    <div class="sw-journal-detail-bar">
+      <button class="sw-journal-action" id="swJournalBack">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        Back to story
+      </button>
+      <span id="swJournalDetailCounter" aria-live="polite"></span>
+    </div>
+    <h2 class="sw-journal-detail-title" id="swJournalDetailTitle"></h2>
+    <div class="sw-journal-detail-stage">
+      <img id="swJournalDetailImg" alt="" decoding="async">
+      <p class="sw-journal-detail-error" id="swJournalDetailError" role="status" hidden>Photograph unavailable. You can continue exploring the story.</p>
+    </div>
+    <div class="sw-journal-detail-controls">
+      <button class="sw-journal-action" id="swJournalPrev" aria-label="Previous photograph">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg> Previous
+      </button>
+      <button class="sw-journal-action" id="swJournalNext" aria-label="Next photograph">
+        Next <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+  </section>
+</template>
+
 <!-- ════════════════════ VIDEO WORKS ════════════════════ -->
 <section class="section section-dark" id="video-works">
   <!-- Full-section ambience background — crossfades with active card poster -->
@@ -2101,6 +2149,7 @@
   </div>
 </footer>
 
+<script src="/photo-journal.js"></script>
 <script src="/Script.js"></script>
 </body>
 </html>

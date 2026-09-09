@@ -3929,14 +3929,16 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 
 @media (hover: none) {
   .gallery-item .gi-bg { filter: grayscale(0%) brightness(1) contrast(1) !important; }
-  /* Exception: the carousel's active/center card stays black & white until
-     tapped (.gi-color-reveal, added by openSwGallery in Script.js) — touch
-     devices have no :hover to bloom it, so the blanket rule above would
-     otherwise force it permanently into color, skipping the reveal. */
-  .ethereal-carousel .gallery-item[data-ec-offset="0"]:not(.gi-color-reveal) .gi-bg {
+  /* Framed Stories follows the desktop monochrome default on every cover.
+     Touch-and-hold previews color; opening an album keeps the reveal through
+     its transition. Ignore emulated sticky :hover after the finger lifts. */
+  #portfolioCarousel .gallery-item .gi-bg {
     filter: grayscale(100%) brightness(0.9) contrast(1.05) !important;
+    transform: none !important;
+    transition: filter 280ms ease;
   }
-  .ethereal-carousel .gallery-item[data-ec-offset="0"].gi-color-reveal .gi-bg {
+  #portfolioCarousel .gallery-item.gi-touch-preview .gi-bg,
+  #portfolioCarousel .gallery-item.gi-color-reveal .gi-bg {
     filter: grayscale(0%) brightness(1) contrast(1) !important;
   }
   .gallery-item:hover { transform: none; box-shadow: none; }
@@ -4289,6 +4291,104 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
     opacity: 1;
     border-bottom-color: var(--rose);
     letter-spacing: 0.1em;
+}
+
+/* Mobile photo journal — selected when an album opens, retained on rotation. */
+.sw-journal[hidden], .sw-journal-detail[hidden],
+.sw-journal [hidden], .sw-journal-detail [hidden] { display: none !important; }
+.sw-gallery.sw-journal-mode { color: var(--ivory); }
+.sw-gallery.sw-journal-mode > .sw-gallery-bar,
+.sw-gallery.sw-journal-mode > .sw-gallery-stage { display: none; }
+.sw-journal { flex: 1; min-height: 0; }
+.sw-journal-scroll {
+  height: 100%; overflow-y: auto; overflow-x: hidden;
+  overscroll-behavior: contain; touch-action: pan-y pinch-zoom;
+  scrollbar-width: thin; scrollbar-color: var(--rose) transparent;
+  scroll-padding-top: calc(64px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+}
+.sw-journal-nav {
+  position: sticky; top: 0; z-index: 2;
+  display: flex; align-items: center; gap: 8px;
+  min-height: calc(64px + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) max(16px, env(safe-area-inset-right, 0px)) 0 max(12px, env(safe-area-inset-left, 0px));
+  background: var(--noir);
+}
+.sw-journal-action {
+  display: inline-flex; justify-content: center; align-items: center; gap: 6px;
+  min-width: 44px; min-height: 44px; padding: 8px 4px;
+  color: var(--ivory); font: 400 14px/1.4 var(--font-body);
+  cursor: pointer; transition: color 180ms ease;
+}
+.sw-journal-action svg { flex-shrink: 0; }
+.sw-journal-action:hover { color: var(--rose-light); }
+.sw-journal-action:disabled, .sw-journal-action[aria-disabled="true"] { opacity: 0.35; cursor: default; }
+.sw-journal-action:focus-visible, .sw-journal-photo:focus-visible {
+  outline: 2px solid var(--rose-light); outline-offset: -2px;
+}
+.sw-journal-wordmark {
+  margin-left: auto; color: var(--rose-light);
+  font: 400 12px/1 var(--font-body); letter-spacing: 0.24em; text-transform: uppercase;
+}
+.sw-journal-compact-title {
+  display: none; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  font: 400 22px/1.3 var(--font-display);
+}
+.sw-journal-scrolled .sw-journal-compact-title { display: block; }
+.sw-journal-scrolled .sw-journal-back-label,
+.sw-journal-scrolled .sw-journal-wordmark { display: none; }
+.sw-journal-intro, .sw-journal-grid { max-width: 860px; margin-inline: auto; }
+.sw-journal-intro {
+  padding: 6px max(16px, env(safe-area-inset-right, 0px)) 22px max(16px, env(safe-area-inset-left, 0px));
+}
+.sw-journal-intro h2 {
+  font: 300 clamp(30px, 8.4vw, 42px)/1.12 var(--font-display);
+  color: var(--ivory); letter-spacing: -0.02em; overflow-wrap: anywhere;
+}
+.sw-journal-subtitle {
+  margin-top: 10px; color: var(--rose-light);
+  font: 400 10px/1.7 var(--font-body); letter-spacing: 0.16em; text-transform: uppercase;
+}
+.sw-journal-meta { margin-top: 16px; color: #bdb7b0; font: 300 13px/1.6 var(--font-body); }
+.sw-journal-grid {
+  display: flex; flex-direction: column; gap: 8px;
+  padding-inline: max(12px, env(safe-area-inset-left, 0px)) max(12px, env(safe-area-inset-right, 0px));
+}
+.sw-journal-row { display: flex; align-items: flex-start; gap: 8px; }
+.sw-journal-photo {
+  display: block; position: relative; flex-basis: 0; flex-shrink: 1; min-width: 0;
+  padding: 0; border: 0; border-radius: 0; overflow: hidden;
+  background: #1e1a1b; color: var(--ivory); cursor: zoom-in;
+  scroll-margin-top: calc(72px + env(safe-area-inset-top, 0px));
+}
+.sw-journal-photo img { display: block; width: 100%; height: auto; }
+.sw-journal-photo.sw-photo-unavailable img { visibility: hidden; }
+.sw-journal-error {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  padding: 16px; color: #bdb7b0; font: 400 13px/1.5 var(--font-body);
+}
+.sw-journal-status { padding: 32px 16px; text-align: center; color: #bdb7b0; font-size: 14px; }
+.sw-journal-detail {
+  position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column;
+  background: var(--noir); padding: env(safe-area-inset-top, 0px) max(12px, env(safe-area-inset-right, 0px)) env(safe-area-inset-bottom, 0px) max(12px, env(safe-area-inset-left, 0px));
+}
+.sw-journal-detail-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0; min-height: 60px; gap: 12px;
+}
+.sw-journal-detail-bar > span { color: #bdb7b0; font: 400 13px/1.4 var(--font-body); white-space: nowrap; }
+.sw-journal-detail-title {
+  position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+.sw-journal-detail-stage { display: flex; justify-content: center; align-items: center; flex: 1; min-height: 0; }
+.sw-journal-detail-stage img { width: 100%; height: 100%; object-fit: contain; }
+.sw-journal-detail-error { max-width: 28ch; color: #bdb7b0; font-size: 16px; text-align: center; }
+.sw-journal-detail-controls { display: flex; justify-content: space-between; flex-shrink: 0; padding-block: 8px; }
+@media (prefers-reduced-motion: reduce) {
+  .sw-gallery.sw-journal-mode.sw-gallery-enter,
+  .sw-gallery.sw-journal-mode.sw-gallery-exit { animation-duration: 0.01ms; }
+  .sw-journal-action { transition: none; }
 }
 
 /* ═══════ STATIC GALLERY MODE ═══════ */
