@@ -354,6 +354,7 @@ input[data-field="hours"].hours-auto {
   color: var(--warm-grey);
 }
 .addon-rate input { width: 80px; }
+.field-help { color: var(--cream); opacity: 0.75; font-size: 12px; line-height: 1.55; margin: 8px 0 12px; }
 .addon-notes { flex: 1; min-width: 0; }
 
 /* PRICING PREVIEW */

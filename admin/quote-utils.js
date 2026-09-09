@@ -26,11 +26,13 @@ export function generateQuoteRef(existingRefs) {
   return `${prefix}${String(max + 1).padStart(3, '0')}`;
 }
 
-export function calculatePricingSummary(days, { model, hourlyRate, flatRate, travelType, travelAmount, retainerFee }) {
+export function calculatePricingSummary(days, { model, hourlyRate, flatRate, travelType, travelAmount, livestreamSelected = false, livestreamFee }) {
   const rate = parseFloat(hourlyRate) || 0;
   const flat = parseFloat(flatRate) || 0;
   const travel = travelType === 'fixed' ? (parseFloat(travelAmount) || 0) : 0;
-  const retainer = parseFloat(retainerFee) || 0;
+  const enteredLiveFee = parseFloat(livestreamFee);
+  const liveFee = livestreamSelected && Number.isFinite(enteredLiveFee) && enteredLiveFee > 0 ? enteredLiveFee : 0;
+  const livestreamPending = livestreamSelected && liveFee === 0;
 
   const dayBreakdown = days.map((day, i) => {
     const hours = parseFloat(day.hours) || 0;
@@ -45,9 +47,11 @@ export function calculatePricingSummary(days, { model, hourlyRate, flatRate, tra
   const totalHours = dayBreakdown.reduce((s, d) => s + d.hours, 0);
   const totalPhotos = days.reduce((s, day) => s + sumEventPhotos(day.events || []), 0);
   const baseTotal = model === 'hourly' ? totalHours * rate : flat;
-  const total = baseTotal + travel + retainer;
+  // Payment schedules belong in the contract. Complimentary extra hours do
+  // not reduce the scheduled coverage price or add a speculative overtime fee.
+  const total = baseTotal + travel + liveFee;
 
-  return { model, hourlyRate: rate, flatRate: flat, travelType, travelAmount: travel, retainerFee: retainer, totalHours, totalPhotos, baseTotal, total, dayBreakdown };
+  return { model, hourlyRate: rate, flatRate: flat, travelType, travelAmount: travel, livestreamFee: liveFee, livestreamPending, totalHours, totalPhotos, baseTotal, total, dayBreakdown };
 }
 
 export function computeInvestmentBoxHeight(pricing, showIntro) {

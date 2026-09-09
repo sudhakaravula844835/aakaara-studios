@@ -20,7 +20,7 @@ const DRAFT_VALUE_FIELD_IDS = [
   'clientName', 'clientEmail', 'clientPhone',
   'venueName', 'location', 'eventType',
   'quoteDate', 'quoteRef', 'referralSource',
-  'timeline', 'customNotes',
+  'timeline', 'customNotes', 'dataHandling', 'galleryDelivery',
   'pricingModel', 'hourlyRate', 'flatRate',
   'travelType', 'travelAmount', 'retainerFee',
   'standardRate', 'deposit', 'validity', 'balanceDue',
@@ -31,7 +31,7 @@ const DRAFT_CHECK_FIELD_IDS = [
   'delDoc', 'delTraditional', 'delHighlight', 'delDrone', 'delLive',
   'delSecondShooter', 'delEngagement', 'delAddlHours', 'delRush', 'showIntro',
 ];
-const DRAFT_ADDON_FIELDS = ['delEngagementNotes', 'delAddlHoursRate', 'delRushFee'];
+const DRAFT_ADDON_FIELDS = ['delEngagementNotes', 'delAddlHoursRate', 'delRushFee', 'delLiveFee'];
 
 // ── STATE ─────────────────────────────────────────────────────────
 let dayCount = 0;
@@ -213,7 +213,8 @@ function getPricingInputs() {
     flatRate: parseFloat($('flatRate').value) || 0,
     travelType: $('travelType').value,
     travelAmount: parseFloat($('travelAmount').value) || 0,
-    retainerFee: parseFloat($('retainerFee').value) || 0,
+    livestreamSelected: $('delLive').checked,
+    livestreamFee: $('delLiveFee').value,
   };
 }
 
@@ -233,6 +234,7 @@ function updatePricingUI(pricing, inputs) {
   if (numDays > 0) metaParts.push(`${numDays} day${numDays > 1 ? 's' : ''}`);
   if (inputs.travelType === 'separate') metaParts.push('Travel separate');
   if (inputs.travelType === 'included') metaParts.push('Travel included');
+  if (pricing.livestreamPending) metaParts.push('Livestream fee separate');
   $('totalMeta').textContent = metaParts.join(' · ');
 
   const preview = $('pricingPreview');
@@ -263,7 +265,12 @@ function updatePricingUI(pricing, inputs) {
   else if (inputs.travelType === 'separate') addRow('Travel & Accommodation', 'Billed Separately');
   else if (inputs.travelType === 'included') addRow('Travel & Accommodation', 'Included');
 
-  if (inputs.retainerFee > 0) addRow('Retainer / Booking Fee', `$${inputs.retainerFee.toLocaleString()}`);
+  if (inputs.livestreamSelected) addRow('Livestream (paid add-on)', pricing.livestreamPending
+    ? 'Fee to be confirmed — excluded from estimate' : `$${pricing.livestreamFee.toLocaleString()}`);
+  if ($('delAddlHours').checked) {
+    addRow('Complimentary extra coverage', '2 hours total per booking — no charge');
+    addRow('Further extra coverage', `$${getOvertimeRate().toLocaleString()}/hour after the free hours`);
+  }
 
   const divider = document.createElement('div');
   divider.className = 'pr-divider';
@@ -302,12 +309,18 @@ function collectDraftState() {
   return state;
 }
 
+const LEGACY_DATA_HANDLING_NOTE = "Data Handling & Delivery: Client to provide two external hard disks (1–2TB capacity each) before the wedding date — one for the photography team to use for on-site data backup, and a second for RAW data delivery. Both drives formatted in exFAT for cross-platform compatibility. Photography team will return the RAW data drive to the client within one week of the event. Client assumes responsibility for drives once handed over for data transfer.";
+
 function applyDraftState(state) {
   isApplyingDraft = true;
   DRAFT_VALUE_FIELD_IDS.forEach(id => { const el = $(id); if (el && state[id] !== undefined) el.value = state[id]; });
+  // Remove only the previous standard policy; preserve any custom notes.
+  $('extraNotes').value = $('extraNotes').value.replace(LEGACY_DATA_HANDLING_NOTE, '').trim();
   if (quoteDatePicker && state.quoteDate) quoteDatePicker.setDate(state.quoteDate, false);
   DRAFT_CHECK_FIELD_IDS.forEach(id => { const el = $(id); if (el && state[id] !== undefined) el.checked = state[id]; });
   DRAFT_ADDON_FIELDS.forEach(id => { const el = $(id); if (el && state[id] !== undefined) el.value = state[id]; });
+  if (!$('timeline').value.trim()) $('timeline').value = $('timeline').defaultValue;
+  if (!$('delAddlHoursRate').value) $('delAddlHoursRate').value = $('delAddlHoursRate').defaultValue;
   toggleAddonFields();
   togglePricingFields();
 
@@ -407,6 +420,17 @@ function getDocumentaryDetail() {
     : '5 min · full ceremony coverage';
 }
 
+function getOvertimeRate() {
+  const rate = parseFloat($('delAddlHoursRate').value);
+  return Number.isFinite(rate) && rate > 0 ? rate : 150;
+}
+
+function getLivestreamDetail() {
+  const pricing = calculatePricingSummary(getDays(), getPricingInputs());
+  return pricing.livestreamPending ? 'Paid add-on; fee quoted separately'
+    : `Paid add-on: $${pricing.livestreamFee.toLocaleString()}`;
+}
+
 function getDeliverableRows() {
   const rows = [];
 
@@ -440,15 +464,15 @@ function getDeliverableRows() {
   del('delTraditional', 'Traditional Video', 'Full coverage edit');
   del('delHighlight', 'Highlight Video', `${getHighlightDuration()} cinematic edit`);
   del('delDrone', 'Drone Coverage', 'Aerial footage & stills');
-  del('delLive', 'Livestream', 'Private streaming link');
+  if ($('delLive').checked) rows.push({ label: 'Livestream', detail: getLivestreamDetail() });
   del('delSecondShooter', 'Second Shooter', 'Additional photographer');
 
   if ($('delEngagement').checked) {
     rows.push({ label: 'Engagement Session', detail: $('delEngagementNotes').value || 'Pre-wedding couple shoot' });
   }
   if ($('delAddlHours').checked) {
-    const rate = parseFloat($('delAddlHoursRate').value);
-    rows.push({ label: 'Additional Hours', detail: rate ? `$${rate}/hr overtime rate` : 'Rate TBD' });
+    rows.push({ label: 'Complimentary Extra Coverage', detail: '2 hours total per booking; no charge' });
+    rows.push({ label: 'Further Extra Coverage', detail: `$${getOvertimeRate().toLocaleString()}/hr after complimentary hours` });
   }
   if ($('delRush').checked) {
     const fee = parseFloat($('delRushFee').value);
@@ -519,9 +543,7 @@ function generatePDF(action) {
   const numDays    = days.length;
   const totalHours = days.reduce((s, d) => s + (parseFloat(d.hours) || 0), 0);
   const travelType = $('travelType').value;
-  const deposit    = $('deposit').value.trim();
   const validity   = $('validity').value.trim();
-  const balanceDue = $('balanceDue').value.trim();
   const extraNotes = $('extraNotes').value.trim();
   const customNotes = $('customNotes').value.trim();
 
@@ -536,7 +558,8 @@ function generatePDF(action) {
   if ($('delTraditional').checked)  scopeItems.push('Traditional video — full coverage edit');
   if ($('delHighlight').checked)    scopeItems.push(`Highlight Video (${getHighlightDuration()}) — cinematic edit`);
   if ($('delDrone').checked)        scopeItems.push('Drone footage where permitted');
-  if ($('delLive').checked)         scopeItems.push('Livestream — private streaming link');
+  if ($('delLive').checked)         scopeItems.push(`Livestream — private streaming link (${getLivestreamDetail()})`);
+  if ($('delAddlHours').checked)    scopeItems.push('2 complimentary extra hours total per booking, shared across all event days');
   if ($('delSecondShooter').checked) scopeItems.push('Second photographer for full coverage');
   if ($('delEngagement').checked)   scopeItems.push($('delEngagementNotes').value || 'Engagement session — pre-wedding couple shoot');
 
@@ -795,34 +818,42 @@ function generatePDF(action) {
   const hasRush     = $('delRush').checked;
   const hasOvertime = $('delAddlHours').checked;
   const hasEngmt    = $('delEngagement').checked;
-  if (hasRush || hasOvertime || hasEngmt) {
-    const addonsH = 18 + (hasRush ? 14 : 0) + (hasOvertime ? 14 : 0) + (hasEngmt ? 14 : 0) + 8;
-    checkPageBreak(addonsH);
-    doc.setFontSize(7); doc.setFont('helvetica', 'bold'); sc(...GREY);
-    doc.text('ADD-ONS', mL + 2, y + 10);
-    y += 18;
+  const hasLive     = $('delLive').checked;
+  if (hasRush || hasOvertime || hasEngmt || hasLive) {
+    const addonRows = [];
+    if (hasOvertime) {
+      addonRows.push(['Extra coverage', '2 hours total per booking, shared across all event days', 'Complimentary']);
+      addonRows.push(['Additional coverage', 'Further coverage after the complimentary hours', `$${getOvertimeRate().toLocaleString()}/hr`]);
+    }
+    if (hasLive) addonRows.push(['Livestream', 'Paid add-on', pricing.livestreamPending
+      ? 'Fee quoted separately' : `$${pricing.livestreamFee.toLocaleString()}`]);
     if (hasRush) {
       const fee = parseFloat($('delRushFee').value);
-      doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-      sc(...GREY);  doc.text('Rush / Priority Delivery', mL + 12, y);
-      sc(...CREAM); doc.text(fee > 0 ? `$${fee.toLocaleString()}` : 'Fee TBD', amtX, y, { align: 'right' });
-      y += 14;
+      addonRows.push(['Rush / Priority Delivery', 'Paid add-on', fee > 0 ? `$${fee.toLocaleString()}` : 'Fee TBD']);
     }
-    if (hasOvertime) {
-      const rate = parseFloat($('delAddlHoursRate').value);
-      doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-      sc(...GREY);  doc.text('Additional Hours (Overtime Rate)', mL + 12, y);
-      sc(...CREAM); doc.text(rate > 0 ? `$${rate.toLocaleString()}/hr` : 'Rate TBD', amtX, y, { align: 'right' });
-      y += 14;
-    }
-    if (hasEngmt) {
-      const engNotes = $('delEngagementNotes').value.trim();
-      doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-      sc(...GREY); doc.text('Engagement / Pre-Wedding Session', mL + 12, y);
-      if (engNotes) { sc(...CREAM); doc.text(engNotes, amtX, y, { align: 'right' }); }
-      y += 14;
-    }
-    y += 8;
+    if (hasEngmt) addonRows.push(['Engagement / Pre-Wedding Session', $('delEngagementNotes').value.trim(), '']);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+    const rows = addonRows.map(([title, detail, value]) => {
+      const lines = detail ? doc.splitTextToSize(detail, cW - 170) : [];
+      return { title, lines, value, height: 32 + lines.length * 11 };
+    });
+    const panelH = rows.reduce((sum, row) => sum + row.height, 0);
+    checkPageBreak(34 + panelH);
+    sectionHeader('COVERAGE & ADD-ONS');
+    sf(...PANEL); doc.roundedRect(mL, y, cW, panelH, 3, 3, 'F');
+    rows.forEach(({ title, lines, value, height }, index) => {
+      if (index) {
+        sd(...BORD); doc.setLineWidth(0.3);
+        doc.line(mL + 12, y, W - mR - 12, y);
+      }
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9); sc(...CREAM);
+      doc.text(title, mL + 12, y + 17);
+      sc(...COPPER); doc.text(value, amtX, y + 17, { align: 'right' });
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); sc(...CREAM);
+      if (lines.length) doc.text(lines, mL + 12, y + 30);
+      y += height;
+    });
+    y += 16;
   }
 
   // ── Travel & Accommodation ────────────────────────────────────
@@ -843,45 +874,67 @@ function generatePDF(action) {
   sf(...PANEL); doc.roundedRect(mL, y, cW, 54, 3, 3, 'F');
   sf(...COPPER); doc.roundedRect(mL, y, 4, 54, 1, 1, 'F');
   sd(...COPPER); doc.setLineWidth(0.5);
-  doc.line(mL + 16, y + 36, W - mR - 12, y + 36);
   doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); sc(...GREY);
   doc.text('ESTIMATED TOTAL INVESTMENT', mL + 16, y + 20);
   doc.setFontSize(30); doc.setFont(CG, 'normal'); sc(...COPPER);
   doc.text(`$${pricing.total.toLocaleString()}`, amtX, y + 48, { align: 'right' });
   y += 66;
 
-  // ── Retainer / Booking Fee ────────────────────────────────────
-  if (pricing.retainerFee > 0) {
-    checkPageBreak(38);
-    sf(42, 36, 24); doc.roundedRect(mL, y, cW, 28, 2, 2, 'F');
-    doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-    sc(...GREY);   doc.text('Retainer / Booking Fee to Confirm Dates', mL + 12, y + 17);
-    sc(...COPPER); doc.text(`$${pricing.retainerFee.toLocaleString()}`, amtX, y + 17, { align: 'right' });
-    y += 38;
+  if (pricing.livestreamPending) {
+    checkPageBreak(18);
+    doc.setFontSize(8); doc.setFont('helvetica', 'normal'); sc(...CREAM);
+    doc.text('Livestream fee is quoted separately and is not included in this estimate.', mL + 12, y);
+    y += 18;
   }
 
   y += 10;
 
+  // Full-width delivery details keep client requirements separate from payment terms.
+  const deliveryDetails = [
+    ['DATA HANDLING & RAW DELIVERY', $('dataHandling').value.trim()],
+    ['FINAL DELIVERABLES & ONLINE GALLERY', $('galleryDelivery').value.trim()],
+  ];
+  if (deliveryDetails.some(([, text]) => text)) addContentPage();
+  deliveryDetails.forEach(([heading, text]) => {
+    if (!text) return;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+    const lines = doc.splitTextToSize(text, cW - 24);
+    checkPageBreak(54);
+    sectionHeader(heading);
+    lines.forEach(line => {
+      checkPageBreak(14);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); sc(...CREAM);
+      doc.text(line, mL + 12, y);
+      y += 14;
+    });
+    y += 16;
+  });
+
   // ── Booking Terms ──────────────────────────────────────────
   const timeline    = $('timeline').value.trim();
-  const termRows = [];
-  if (deposit)    termRows.push(['Deposit Required',  deposit]);
-  if (balanceDue) termRows.push(['Balance Due',       balanceDue]);
+  const termRows = [['Payment Details', 'Deposit and remaining payment details will be shared in the contract after the final quote is agreed.']];
   if (timeline)   termRows.push(['Delivery Timeline', timeline]);
   if (validity)   termRows.push(['Quote Valid For',   validity]);
 
   if (termRows.length > 0 || extraNotes) {
+    // Measure at the same font and size used to render the terms.
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+    const wrappedTerms = termRows.map(([label, value]) => {
+      const lines = doc.splitTextToSize(value, cW - 192);
+      return { label, lines, height: Math.max(22, lines.length * 12 + 6) };
+    });
     const extraWrapped = extraNotes ? doc.splitTextToSize(extraNotes, cW - 24) : [];
-    const termBoxH = termRows.length * 22 + (extraWrapped.length > 0 ? extraWrapped.length * 12 + 20 : 0) + 18;
+    const termBoxH = wrappedTerms.reduce((height, row) => height + row.height, 0)
+      + (extraWrapped.length > 0 ? extraWrapped.length * 12 + 20 : 0) + 18;
     checkPageBreak(40 + termBoxH);
     sectionHeader('BOOKING TERMS');
     sf(...PANEL); doc.roundedRect(mL, y, cW, termBoxH, 3, 3, 'F');
     let tY = y + 18;
-    termRows.forEach(([lbl, val]) => {
+    wrappedTerms.forEach(({ label, lines, height }) => {
       doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-      sc(...GREY);  doc.text(lbl,  mL + 12, tY);
-      sc(...CREAM); doc.text(val,  mL + 180, tY);
-      tY += 22;
+      sc(...GREY);  doc.text(label, mL + 12, tY);
+      sc(...CREAM); doc.text(lines, mL + 180, tY);
+      tY += height;
     });
     if (extraWrapped.length > 0) {
       if (termRows.length > 0) {
@@ -1039,6 +1092,8 @@ function showToast(message) {
 
 // ── UI TOGGLE HELPERS ─────────────────────────────────────────────
 function toggleAddonFields() {
+  $('delLiveFeeWrap').classList.toggle('hidden', !$('delLive').checked);
+  $('livestreamHelp').classList.toggle('hidden', !$('delLive').checked);
   $('delEngagementNotes').classList.toggle('hidden', !$('delEngagement').checked);
   $('delAddlHoursRateWrap').classList.toggle('hidden', !$('delAddlHours').checked);
   $('delRushFeeWrap').classList.toggle('hidden', !$('delRush').checked);
@@ -1076,6 +1131,7 @@ function loadFromUrlParams() {
   $('location').value  = p.get('city')  || '';
 
   if (p.get('live') === 'yes') {
+    $('delLive').checked = true;
     const events = p.get('liveEvents');
     const notesText = events
       ? `Live streaming required: ${events}`
@@ -1097,6 +1153,8 @@ function loadFromUrlParams() {
   banner.textContent = 'Pre-filled from client intake';
   $('qgMain').insertBefore(banner, $('qgMain').firstChild);
 
+  toggleAddonFields();
+  recalcTotal();
   scheduleDraftSave();
 }
 
@@ -1144,8 +1202,9 @@ function init() {
       recalcTotal();
       scheduleDraftSave();
     }
-    if (['delEngagement', 'delAddlHours', 'delRush'].includes(e.target.id)) {
+    if (['delEngagement', 'delAddlHours', 'delRush', 'delLive'].includes(e.target.id)) {
       toggleAddonFields();
+      recalcTotal();
       scheduleDraftSave();
     }
     if (e.target.dataset.field === 'date') scheduleDraftSave();
@@ -1182,6 +1241,11 @@ function init() {
     });
     DRAFT_CHECK_FIELD_IDS.forEach(id => { const el = $(id); if (el) el.checked = false; });
     DRAFT_ADDON_FIELDS.forEach(id => { const el = $(id); if (el) el.value = ''; });
+    $('timeline').value = $('timeline').defaultValue;
+    $('dataHandling').value = $('dataHandling').defaultValue;
+    $('galleryDelivery').value = $('galleryDelivery').defaultValue;
+    $('delAddlHoursRate').value = $('delAddlHoursRate').defaultValue;
+    $('delAddlHours').checked = $('delAddlHours').defaultChecked;
     addDay();
     initQuoteRef();
     togglePricingFields();

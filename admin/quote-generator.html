@@ -121,7 +121,6 @@
       <label class="del-check"><input type="checkbox" id="delTraditional"> Traditional Video</label>
       <label class="del-check"><input type="checkbox" id="delHighlight"> Highlight Video</label>
       <label class="del-check"><input type="checkbox" id="delDrone"> Drone Coverage</label>
-      <label class="del-check"><input type="checkbox" id="delLive"> Livestream</label>
       <label class="del-check"><input type="checkbox" id="delSecondShooter"> Second Shooter</label>
     </div>
 
@@ -129,18 +128,30 @@
       <div class="addon-card-label">Add-ons &amp; Upgrades</div>
 
       <div class="addon-row">
+        <label class="del-check"><input type="checkbox" id="delLive"> Livestream — paid add-on</label>
+        <div class="addon-rate hidden" id="delLiveFeeWrap">
+          <label for="delLiveFee">Livestream fee</label>
+          <input type="number" id="delLiveFee" inputmode="decimal" min="1" step="1" placeholder="TBD" aria-describedby="livestreamHelp">
+          <span>$</span>
+        </div>
+      </div>
+      <p class="field-help" id="livestreamHelp">Leave the fee blank to quote it separately. Unpriced livestreaming is excluded from the estimate.</p>
+
+      <div class="addon-row">
         <label class="del-check"><input type="checkbox" id="delEngagement"> Engagement / Pre-Wedding Session</label>
         <input type="text" id="delEngagementNotes" class="addon-notes hidden" placeholder="Session details…">
       </div>
 
       <div class="addon-row">
-        <label class="del-check"><input type="checkbox" id="delAddlHours"> Additional Hours</label>
-        <div class="addon-rate hidden" id="delAddlHoursRateWrap">
-          <span>Overtime rate</span>
-          <input type="number" id="delAddlHoursRate" inputmode="decimal" min="0" step="25" placeholder="0">
+        <label class="del-check"><input type="checkbox" id="delAddlHours" checked> Extra coverage — 2 complimentary hours</label>
+        <div class="addon-rate" id="delAddlHoursRateWrap">
+          <label for="delAddlHoursRate">Rate after the free hours</label>
+          <input type="number" id="delAddlHoursRate" inputmode="decimal" min="1" step="25" value="150">
           <span>$/hr</span>
         </div>
       </div>
+
+      <p class="field-help">Two complimentary extra hours total per booking, shared across all event days. Further coverage is charged at the hourly rate above.</p>
 
       <div class="addon-row">
         <label class="del-check"><input type="checkbox" id="delRush"> Rush / Priority Delivery</label>
@@ -155,12 +166,23 @@
     <div class="field-row field-row-2" style="margin-top:16px;">
       <div class="field-group">
         <label class="field-label" for="timeline">Delivery Timeline</label>
-        <input type="text" id="timeline" placeholder="6–8 weeks after event">
+        <input type="text" id="timeline" value="10–12 weeks" placeholder="Enter your preferred delivery timeline">
+        <p class="field-help">Standard: 10–12 weeks. You can enter a different timeline for this quote.</p>
       </div>
       <div class="field-group">
         <label class="field-label" for="customNotes">Custom Deliverable Notes</label>
         <textarea id="customNotes" rows="2" placeholder="Any custom items…"></textarea>
       </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="dataHandling">Data Handling &amp; RAW Delivery</label>
+      <textarea id="dataHandling" rows="6">Please provide two external SSDs before the first scheduled event, formatted in exFAT for compatibility with Mac and Windows.
+Studio working SSD: 1 TB for bookings with up to three events, or 2 TB for bookings with more than three events. This drive will be used by the photography team for backup and editing.
+Client delivery SSD: 1 TB, which will be returned with all RAW data within one week of the wedding day or the final scheduled event, whichever is later.</textarea>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="galleryDelivery">Final Deliverables &amp; Online Gallery</label>
+      <textarea id="galleryDelivery" rows="3">All final edited photographs and films will be delivered through a private, password-protected online gallery. The gallery link and password will be shared with the client once the deliverables are ready, within the delivery timeline specified in this quote.</textarea>
     </div>
   </section>
 
@@ -203,10 +225,6 @@
 
     <div class="field-row field-row-2">
       <div class="field-group">
-        <label class="field-label" for="retainerFee">Retainer / Booking Fee ($)</label>
-        <input type="number" id="retainerFee" inputmode="decimal" min="0" step="100" placeholder="Optional">
-      </div>
-      <div class="field-group">
         <label class="field-label intro-label">
           <input type="checkbox" id="showIntro"> Show as Introductory Rate
         </label>
@@ -220,24 +238,21 @@
   <section id="sectionTerms" class="qg-section">
     <h2 class="section-label">05 — Additional Terms</h2>
 
-    <div class="field-row field-row-3">
-      <div class="field-group">
-        <label class="field-label" for="deposit">Deposit Requirement</label>
-        <input type="text" id="deposit" placeholder="50% to secure the date">
-      </div>
+    <p class="field-help">Deposit and remaining payment details will be shared in the contract after the final quote is agreed.</p>
+    <!-- Retain legacy draft values without exposing or charging them in quotes. -->
+    <input type="hidden" id="retainerFee">
+    <input type="hidden" id="deposit">
+    <input type="hidden" id="balanceDue">
+    <div class="field-row">
       <div class="field-group">
         <label class="field-label" for="validity">Quote Validity</label>
         <input type="text" id="validity" placeholder="Valid for 14 days">
-      </div>
-      <div class="field-group">
-        <label class="field-label" for="balanceDue">Balance Due Date</label>
-        <input type="text" id="balanceDue" placeholder="30 days before event">
       </div>
     </div>
 
     <div class="field-group" style="margin-top:12px;">
       <label class="field-label" for="extraNotes">Extra Notes</label>
-      <textarea id="extraNotes" rows="3" placeholder="Any other terms or notes for the client…">Data Handling & Delivery: Client to provide two external hard disks (1–2TB capacity each) before the wedding date — one for the photography team to use for on-site data backup, and a second for RAW data delivery. Both drives formatted in exFAT for cross-platform compatibility. Photography team will return the RAW data drive to the client within one week of the event. Client assumes responsibility for drives once handed over for data transfer.</textarea>
+      <textarea id="extraNotes" rows="3" placeholder="Any other terms or notes for the client…"></textarea>
     </div>
   </section>
 

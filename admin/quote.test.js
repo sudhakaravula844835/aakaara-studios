@@ -60,9 +60,31 @@ describe('calculatePricingSummary', () => {
     const r = calculatePricingSummary(twoHourlyDays, { model: 'hourly', hourlyRate: 300, flatRate: 0, travelType: 'separate', travelAmount: 400, retainerFee: 0 });
     expect(r.total).toBe(4200);
   });
-  it('adds retainer fee to total', () => {
+  it('excludes legacy retainer amounts because payment details belong in the contract', () => {
     const r = calculatePricingSummary(twoHourlyDays, { model: 'hourly', hourlyRate: 300, flatRate: 0, travelType: 'none', travelAmount: 0, retainerFee: 500 });
-    expect(r.total).toBe(4700);
+    expect(r.total).toBe(4200);
+  });
+  it('adds a priced livestream only when selected', () => {
+    const r = calculatePricingSummary(twoHourlyDays, { model: 'hourly', hourlyRate: 300, livestreamSelected: true, livestreamFee: '650' });
+    expect(r.total).toBe(4850);
+    expect(r.livestreamFee).toBe(650);
+    expect(r.livestreamPending).toBe(false);
+  });
+  it('marks an unpriced livestream as separate rather than free', () => {
+    const r = calculatePricingSummary(twoHourlyDays, { model: 'hourly', hourlyRate: 300, livestreamSelected: true, livestreamFee: '' });
+    expect(r.total).toBe(4200);
+    expect(r.livestreamPending).toBe(true);
+  });
+  it('does not charge a retained livestream fee after deselection', () => {
+    const r = calculatePricingSummary(twoHourlyDays, { model: 'hourly', hourlyRate: 300, livestreamSelected: false, livestreamFee: 650 });
+    expect(r.total).toBe(4200);
+    expect(r.livestreamFee).toBe(0);
+    expect(r.livestreamPending).toBe(false);
+  });
+  it('keeps scheduled coverage fully priced; complimentary extra hours do not reduce it', () => {
+    const r = calculatePricingSummary([{ hours: 20 }], { model: 'hourly', hourlyRate: 400 });
+    expect(r.totalHours).toBe(20);
+    expect(r.total).toBe(8000);
   });
   it('zero hours produces 0 total not NaN', () => {
     const r = calculatePricingSummary([], { model: 'hourly', hourlyRate: 300, flatRate: 0, travelType: 'none', travelAmount: 0, retainerFee: 0 });
