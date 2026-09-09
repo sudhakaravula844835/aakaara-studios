@@ -78,6 +78,18 @@
     position: relative;
   }
 
+  /* MOBILE FIX: fixed 240px circles in a 4-col grid overflowed small
+     viewports (grid tracks can't shrink below a child's intrinsic
+     width). Shrink to 2 columns and scale circles down below 768px. */
+  @media (max-width: 768px) {
+    body { padding: 2.5rem 1.25rem; }
+    .dp-grid { grid-template-columns: repeat(2, 1fr); gap: 1.75rem 1rem; }
+    .dp-circle, .dp-canvas { width: clamp(120px, 38vw, 200px); height: clamp(120px, 38vw, 200px); }
+  }
+  @media (max-width: 420px) {
+    .size-row { flex-wrap: wrap; gap: 1.5rem; }
+  }
+
   /* Download button per option */
   .dp-download {
     background: none;

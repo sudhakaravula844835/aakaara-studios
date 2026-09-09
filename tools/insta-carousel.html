@@ -83,6 +83,14 @@
     box-shadow: 0 8px 40px rgba(0,0,0,0.08);
   }
 
+  /* MOBILE FIX: fixed 540px slide (half of the 1080px export size)
+     overflowed narrow viewports. Scale it down with zoom so every
+     absolutely-positioned child inside stays proportionally correct. */
+  @media (max-width: 768px) {
+    body { padding: 24px 12px; }
+    .slide { zoom: 0.58; }
+  }
+
   /* ===== SHARED ELEMENTS ===== */
   .corner-num {
     position: absolute;

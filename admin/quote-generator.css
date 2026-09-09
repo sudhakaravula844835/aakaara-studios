@@ -501,6 +501,13 @@ input[data-field="hours"].hours-auto {
   .field-row-2 { grid-template-columns: 1fr; }
   .event-fields { grid-template-columns: 1fr; }
   .deliverables-grid { grid-template-columns: 1fr; }
+
+  /* MOBILE FIX: brand + ref/saved + 3 buttons in one unwrapped row
+     overflowed narrow viewports. Wrap onto two rows instead. */
+  #topbar { flex-wrap: wrap; height: auto; min-height: 56px; padding: 10px 16px; row-gap: 8px; }
+  .topbar-center { order: 3; flex: 1 0 100%; justify-content: center; }
+  .topbar-actions { flex-wrap: wrap; justify-content: flex-end; }
+  #topbar button { font-size: 9px; padding: 5px 8px; }
 }
 
 .intake-prefill-banner {

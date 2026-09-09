@@ -3214,7 +3214,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .ec-prev { left: 0.5rem; }
   .ec-next { right: 0.5rem; }
 
-  .nav-links.show { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: rgba(9,8,11,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 2rem; gap: 1.5rem; max-height: 85vh; overflow-y: auto; }
+  .nav-links.show { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: rgba(9,8,11,1); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 2rem; gap: 1.5rem; max-height: 85vh; overflow-y: auto; isolation: isolate; }
 
   /* Disable custom cursor on touch devices */
   .gallery-item { cursor: pointer; }
