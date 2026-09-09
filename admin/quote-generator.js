@@ -571,7 +571,7 @@ function generatePDF(action) {
     sd(...BORD); doc.setLineWidth(0.4);
     doc.line(mL, H - 50, W - mL, H - 50);
     doc.setFontSize(7); doc.setFont('helvetica', 'normal'); sc(...GREY);
-    doc.text('aakaarastudiosnyc.com  |  info@aakaarastudiosnyc.com  |  +1 (475) 332-2020', W / 2, H - 20, { align: 'center' });
+    doc.text('aakaarastudios.com  |  info@aakaarastudiosnyc.com  |  +1 (475) 332-2020', W / 2, H - 20, { align: 'center' });
   }
 
   function drawPageHeader(pageNum) {

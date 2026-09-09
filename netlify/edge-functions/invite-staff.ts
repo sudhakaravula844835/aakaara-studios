@@ -72,7 +72,7 @@ export default async (req: Request): Promise<Response> => {
   // before (every invite link landed on http://localhost:3000 for every
   // recipient) with no visible error on this end, only a broken link in the
   // recipient's inbox. Falls back to production if SITE_URL isn't set.
-  const siteUrl = env("SITE_URL") || "https://www.aakaarastudiosnyc.com";
+  const siteUrl = env("SITE_URL") || "https://www.aakaarastudios.com";
   const { data: inviteData, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
     redirectTo: `${siteUrl}/board/reset-password.html`,
   });

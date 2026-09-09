@@ -592,7 +592,7 @@ async function copyClientLink() {
     return;
   }
 
-  const url = `https://aakaarastudiosnyc.com/board/client.html?token=${data.client_access_token}`;
+  const url = `https://aakaarastudios.com/board/client.html?token=${data.client_access_token}`;
 
   try {
     await navigator.clipboard.writeText(url);

@@ -147,7 +147,7 @@ test.describe('Board desktop click-through', () => {
 
       const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
       const { data: fresh } = await adminClient.from('projects').select('client_access_token').eq('id', project.id).single();
-      expect(clipboardText).toBe(`https://aakaarastudiosnyc.com/board/client.html?token=${fresh.client_access_token}`);
+      expect(clipboardText).toBe(`https://aakaarastudios.com/board/client.html?token=${fresh.client_access_token}`);
     });
   });
 });

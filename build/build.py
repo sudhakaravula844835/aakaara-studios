@@ -14,7 +14,7 @@ from optimize_images import optimize_images
 # --- Configuration ---
 SRC_DIR = Path(__file__).parent.parent  # Project root (one level up from build/)
 DIST_DIR = SRC_DIR / 'dist'
-SITE_URL = 'https://www.aakaarastudiosnyc.com' # Your production domain
+SITE_URL = 'https://www.aakaarastudios.com' # Your production domain
 GA_MEASUREMENT_ID = 'G-R0B8G15NCL' # <-- REPLACE WITH YOUR GOOGLE ANALYTICS ID
 
 def inject_head_tags(html_content, measurement_id):

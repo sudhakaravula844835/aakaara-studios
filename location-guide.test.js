@@ -12,7 +12,7 @@ describe('Location Guide Interaction', () => {
   beforeEach(async () => {
     const dom = new JSDOM(html, {
       runScripts: 'dangerously',
-      url: 'https://www.aakaarastudiosnyc.com/couple-portraits.html',
+      url: 'https://www.aakaarastudios.com/couple-portraits.html',
       beforeParse(parsedWindow) {
         parsedWindow.IntersectionObserver = class IntersectionObserver {
           observe() {}

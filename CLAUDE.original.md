@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Aakaara Studios NYC — a static photography portfolio site. No build step, no framework. Pure HTML/CSS/JS deployed directly to Netlify. ~7,600 lines of code total.
 
-- **URL**: https://www.aakaarastudiosnyc.com/
+- **URL**: https://www.aakaarastudios.com/
 - **Deployment**: Netlify (auto-deploy from repo root)
 - **Tech stack**: HTML5, CSS3, Vanilla JS (ES6+), HLS.js, Flatpickr, Formspree
 

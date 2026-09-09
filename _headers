@@ -1,5 +1,5 @@
 # ═════════════════════════════════════════════════════════════════════════════
-# NETLIFY RESPONSE HEADERS — aakaarastudiosnyc.com
+# NETLIFY RESPONSE HEADERS — aakaarastudios.com
 #
 # SCOPE OF THIS FILE:
 #   • Controls headers for Netlify-served assets only (HTML, CSS, JS, /images/*, /videos/*)
@@ -20,7 +20,7 @@
   # CDN FIX: HSTS added — forces HTTPS on all future visits without a redirect
   #   round-trip, prevents SSL-stripping attacks, and signals to browsers that
   #   this site should never be loaded over HTTP. max-age=1 year; includeSubDomains
-  #   covers admin.aakaarastudiosnyc.com etc. Do NOT add "preload" unless you
+  #   covers admin.aakaarastudios.com etc. Do NOT add "preload" unless you
   #   have submitted to the HSTS preload list at hstspreload.org.
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   # CDN FIX: Timing-Allow-Origin added — required for Real User Monitoring tools
