@@ -202,6 +202,8 @@ for (const name of ['iPhone SE', 'Pixel 7']) {
     test('opens from the cover with full-width photographs, paired portraits, and no crop', async ({ page }, testInfo) => {
       await page.locator('#portfolio').scrollIntoViewIfNeeded();
       await page.locator(firstAlbum).click();
+      await expect(page.locator('#swGallery')).toBeHidden();
+      await page.locator(firstAlbum).click();
       await expect(page.locator('#swJournalScroll')).toBeVisible();
       await expect(page.locator('#swGalleryStage')).toBeHidden();
       await expect(page.locator('#swGalleryStrip')).toBeHidden();
@@ -274,6 +276,8 @@ for (const name of ['iPhone SE', 'Pixel 7']) {
       await card.scrollIntoViewIfNeeded();
       await card.focus();
       const originalScroll = await page.evaluate(() => window.scrollY);
+      await card.click();
+      await expect(page.locator('#swGallery')).toBeHidden();
       await card.click();
       await page.locator('#swJournalGrid .sw-journal-photo').nth(8).scrollIntoViewIfNeeded();
       await closeJournal(page);

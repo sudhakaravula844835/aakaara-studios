@@ -3930,16 +3930,53 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 @media (hover: none) {
   .gallery-item .gi-bg { filter: grayscale(0%) brightness(1) contrast(1) !important; }
   /* Framed Stories follows the desktop monochrome default on every cover.
-     Touch-and-hold previews color; opening an album keeps the reveal through
-     its transition. Ignore emulated sticky :hover after the finger lifts. */
+     The first tap reveals color and text until another cover is selected.
+     The second tap opens the album. Ignore emulated sticky :hover. */
   #portfolioCarousel .gallery-item .gi-bg {
     filter: grayscale(100%) brightness(0.9) contrast(1.05) !important;
     transform: none !important;
     transition: filter 280ms ease;
   }
-  #portfolioCarousel .gallery-item.gi-touch-preview .gi-bg,
+  #portfolioCarousel .gallery-item.gi-tap-reveal .gi-bg,
   #portfolioCarousel .gallery-item.gi-color-reveal .gi-bg {
     filter: grayscale(0%) brightness(1) contrast(1) !important;
+  }
+  #portfolioCarousel .gallery-item .gi-overlay { opacity: 0; }
+  #portfolioCarousel .gallery-item.gi-tap-reveal .gi-overlay,
+  #portfolioCarousel .gallery-item.gi-color-reveal .gi-overlay { opacity: 1; }
+  #portfolioCarousel .gallery-item.gi-cinematic .gi-overlay { padding: 2.25rem 1rem 2rem; }
+  #portfolioCarousel .gi-cinematic .gi-title-group h4 {
+    font-size: clamp(22px, 5.5vw, 28px);
+    line-height: 1.15;
+  }
+  #portfolioCarousel .gi-cinematic .gi-subtitle {
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    margin-bottom: 0.45rem;
+  }
+  #portfolioCarousel .gi-cinematic .gi-story {
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    margin: 0;
+  }
+  #portfolioCarousel .gi-cinematic .gi-divider { margin: 0.5rem 0; }
+  #portfolioCarousel .gallery-item.gi-tap-reveal .gi-subtitle,
+  #portfolioCarousel .gallery-item.gi-tap-reveal .story-line {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  #portfolioCarousel .gallery-item.gi-tap-reveal .gi-title-group h4 { transform: scale(1); }
+  #portfolioCarousel .gallery-item.gi-tap-reveal .gi-divider { width: 80px; }
+  #portfolioCarousel .gallery-item .gi-overlay::after {
+    content: 'Tap again to open';
+    margin-top: 1rem;
+    color: var(--ivory);
+    font: 400 0.6rem/1.4 var(--font-body);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 4px #000;
   }
   .gallery-item:hover { transform: none; box-shadow: none; }
   .gallery-item:active { transform: translateY(-5px); box-shadow: 0 24px 56px rgba(0,0,0,0.5); }

@@ -52,42 +52,45 @@ for (const name of ['iPhone SE', 'Pixel 7']) {
       await expect(page.locator('#swGallery')).toBeHidden();
     });
 
-    test('holding a cover reveals colour and cancelling restores monochrome', async ({ page }, testInfo) => {
+    test('the first tap keeps colour and story text visible after the finger lifts', async ({ page }, testInfo) => {
       const cover = page.locator(centerCover);
       const background = cover.locator('.gi-bg');
       await decodeCover(cover);
       await expectMonochromeCovers(page);
+      await expect(cover.locator('.gi-overlay')).toHaveCSS('opacity', '0');
       await page.screenshot({ path: testInfo.outputPath('cover-monochrome.png'), animations: 'disabled' });
-      const box = await cover.boundingBox();
-      const session = await page.context().newCDPSession(page);
-      try {
-        await session.send('Input.dispatchTouchEvent', {
-          type: 'touchStart',
-          touchPoints: [{ x: box.x + box.width / 2, y: box.y + box.height / 2 }],
-        });
-        await expect.poll(() => grayscale(background)).toBe(0);
-        await expect(page.locator('#swGallery')).toBeHidden();
-        await page.screenshot({ path: testInfo.outputPath('cover-touch-colour.png'), animations: 'disabled' });
-      } finally {
-        await session.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] });
-        await session.detach();
-      }
-      await expectMonochromeCovers(page);
+      await cover.tap();
+      await expect.poll(() => grayscale(background)).toBe(0);
       await expect(page.locator('#swGallery')).toBeHidden();
+      await expect(cover.locator('.gi-overlay')).toHaveCSS('opacity', '1');
+      await expect(cover.locator('.gi-subtitle')).toHaveCSS('opacity', '1');
+      for (const line of await cover.locator('.story-line').all()) {
+        await expect(line).toHaveCSS('opacity', '1');
+      }
+      await page.waitForTimeout(600);
+      await expect.poll(() => grayscale(background)).toBe(0);
+      await expect(page.locator('#swGallery')).toBeHidden();
+      await page.screenshot({ path: testInfo.outputPath('cover-tap-colour-and-text.png'), animations: 'disabled' });
     });
 
-    test('a tap opens the album and closing restores monochrome covers', async ({ page }) => {
+    test('the second tap opens the album and closing resets the cover', async ({ page }) => {
       const cover = page.locator(centerCover);
       const background = cover.locator('.gi-bg');
+      await cover.tap();
+      await expect(page.locator('#swGallery')).toBeHidden();
       await cover.tap();
       await expect(page.locator('#swJournalScroll')).toBeVisible();
       await expect.poll(() => grayscale(background)).toBe(0);
       await page.locator('#swJournalClose').tap();
       await expect(page.locator('#swGallery')).toBeHidden();
       await expectMonochromeCovers(page);
+      await expect(cover.locator('.gi-overlay')).toHaveCSS('opacity', '0');
+      await cover.tap();
+      await expect.poll(() => grayscale(background)).toBe(0);
+      await expect(page.locator('#swGallery')).toBeHidden();
     });
 
-    test('dragging vertically clears the colour preview without opening an album', async ({ page }) => {
+    test('scrolling over a cover does not reveal it or open an album', async ({ page }) => {
       const cover = page.locator(centerCover);
       const box = await cover.boundingBox();
       const x = box.x + box.width / 2;
@@ -98,7 +101,7 @@ for (const name of ['iPhone SE', 'Pixel 7']) {
         await session.send('Input.dispatchTouchEvent', {
           type: 'touchStart', touchPoints: [{ x, y }],
         });
-        await expect.poll(() => grayscale(cover.locator('.gi-bg'))).toBe(0);
+        await expectMonochromeCovers(page);
         for (let step = 1; step <= 6; step += 1) {
           await session.send('Input.dispatchTouchEvent', {
             type: 'touchMove', touchPoints: [{ x, y: y - step * 15 }],
@@ -108,11 +111,30 @@ for (const name of ['iPhone SE', 'Pixel 7']) {
         await expectMonochromeCovers(page);
         await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
         touchEnded = true;
+        await expectMonochromeCovers(page);
         await expect(page.locator('#swGallery')).toBeHidden();
       } finally {
         if (!touchEnded) await session.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] });
         await session.detach();
       }
+    });
+
+    test('selecting another album or tapping outside resets the first-tap reveal', async ({ page }) => {
+      const first = page.locator(centerCover);
+      await first.tap();
+      await expect.poll(() => grayscale(first.locator('.gi-bg'))).toBe(0);
+      await page.locator(`${carousel} .ec-next`).tap();
+      await expectMonochromeCovers(page);
+      await expect(page.locator('#swGallery')).toBeHidden();
+      // Let the carousel finish moving before selecting the next cover.
+      await expect(page.locator(`${carousel} .ec-counter-current`)).toHaveText('2');
+      await page.waitForTimeout(400);
+      const next = page.locator(centerCover);
+      await next.tap();
+      await expect.poll(() => grayscale(next.locator('.gi-bg'))).toBe(0);
+      await page.locator('#portfolio .section-title').tap();
+      await expectMonochromeCovers(page);
+      await expect(page.locator('#swGallery')).toBeHidden();
     });
   });
 }
@@ -130,6 +152,35 @@ for (const width of [1440, 375]) {
       await expect.poll(() => grayscale(background)).toBe(0);
       await page.mouse.move(0, 0);
       await expect.poll(() => grayscale(background)).toBe(1);
+      await cover.click();
+      await expect(page.locator('#swGallery')).toBeVisible();
     });
   });
 }
+
+test.describe('Touch cover accessibility', () => {
+  const { defaultBrowserType, ...device } = devices['iPhone SE'];
+  test.use(device);
+
+  test('reduced-motion browsing also reveals before opening', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    const cover = page.locator(centerCover);
+    await cover.scrollIntoViewIfNeeded();
+    await expect(page.locator(carousel)).toHaveClass(/is-native-scroll/);
+    // Native scrolling temporarily suppresses clicks while the rail settles.
+    await page.waitForTimeout(800);
+    await cover.tap();
+    await expect.poll(() => grayscale(cover.locator('.gi-bg'))).toBe(0);
+    await expect(cover.locator('.gi-overlay')).toHaveCSS('opacity', '1');
+    await expect(page.locator('#swGallery')).toBeHidden();
+    await cover.tap();
+    await expect(page.locator('#swJournalScroll')).toBeVisible();
+  });
+
+  test('keyboard activation opens without requiring a preview tap', async ({ page }) => {
+    await page.locator(centerCover).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#swJournalScroll')).toBeVisible();
+  });
+});

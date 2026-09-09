@@ -1028,7 +1028,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       }
       // Reset the cover back to black & white for the next time it's viewed
       if (swSourceCard) {
-        swSourceCard.classList.remove('gi-color-reveal');
+        swSourceCard.classList.remove('gi-color-reveal', 'gi-tap-reveal');
         swSourceCard = null;
       }
     }
@@ -2502,6 +2502,7 @@ class EtherealCarousel {
   _markNativeOffsets() {
     this.filteredItems.forEach((item, i) => {
       const offset = i - this.currentIndex;
+      if (offset !== 0) item.classList.remove('gi-tap-reveal');
       if (offset === 0) item.setAttribute('data-ec-offset', '0');
       else item.setAttribute('data-ec-offset', offset < 0 ? '-1' : '1');
     });
@@ -2578,7 +2579,14 @@ class EtherealCarousel {
     this.render();
   }
 
+  _clearCoverReveal(activeCard) {
+    this.container.querySelectorAll('.gi-tap-reveal').forEach(card => {
+      if (card !== activeCard) card.classList.remove('gi-tap-reveal');
+    });
+  }
+
   render() {
+    this._clearCoverReveal(this.filteredItems[this.currentIndex]);
     const allItems = this.track.querySelectorAll(this.itemSelector);
     const filtered = this.filteredItems;
     const ci = this.currentIndex;
@@ -2757,13 +2765,6 @@ class EtherealCarousel {
       const blockedCardClick = this._consumeBlockedCardClick();
       const suppressedClick = this._shouldSuppressClick();
 
-      if (this._useNativeScroll()) {
-        if (suppressedClick || blockedCardClick) {
-          e.stopImmediatePropagation();
-          e.preventDefault();
-        }
-        return;
-      }
       if (suppressedClick || blockedCardClick) {
         e.stopImmediatePropagation();
         e.preventDefault();
@@ -2772,12 +2773,23 @@ class EtherealCarousel {
       const card = e.target.closest(this.itemSelector);
       if (!card) return;
       const offset = card.getAttribute('data-ec-offset');
-      if (offset === '1' || offset === '-1') {
+      if (!this._useNativeScroll() && (offset === '1' || offset === '-1')) {
         e.stopImmediatePropagation();
         e.preventDefault();
         this.navigate(parseInt(offset));
+        return;
       }
-      // offset '0' — let click propagate to existing onclick / addEventListener handlers
+
+      // On phones, one completed tap reveals the cover; the next opens it.
+      // Keyboard activation and desktop mouse clicks still open immediately.
+      if (this.container.id === 'portfolioCarousel' &&
+          window.matchMedia('(hover: none)').matches && e.detail !== 0 &&
+          !card.classList.contains('gi-tap-reveal')) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        this._clearCoverReveal();
+        card.classList.add('gi-tap-reveal');
+      }
     }, true); // capture phase — fires before card-level handlers
 
     // Keyboard: ArrowLeft / ArrowRight when carousel is in view
@@ -2795,33 +2807,11 @@ class EtherealCarousel {
       this.navigate(e.key === 'ArrowLeft' ? -1 : 1);
     });
 
-    // Touch browsers do not reliably apply :active while a cover is held.
-    // Preview its color until the touch ends or becomes a scrolling gesture.
+    // Keep the first-tap reveal after the finger lifts, until another selection.
     if (this.container.id === 'portfolioCarousel') {
-      let touchPreview = null;
-      const clearTouchPreview = () => {
-        touchPreview?.card.classList.remove('gi-touch-preview');
-        touchPreview = null;
-      };
-      this.container.addEventListener('touchstart', (e) => {
-        clearTouchPreview();
-        if (e.touches.length !== 1 || !window.matchMedia('(hover: none)').matches) return;
-        const card = e.target.closest(this.itemSelector);
-        if (!card) return;
-        const { clientX: x, clientY: y } = e.touches[0];
-        touchPreview = { card, x, y };
-        card.classList.add('gi-touch-preview');
-      }, { passive: true });
-      this.container.addEventListener('touchmove', (e) => {
-        if (!touchPreview) return;
-        const touch = e.touches[0];
-        if (e.touches.length !== 1 || Math.abs(touch.clientX - touchPreview.x) > 8 || Math.abs(touch.clientY - touchPreview.y) > 8) {
-          clearTouchPreview();
-        }
-      }, { passive: true });
-      this.container.addEventListener('touchend', clearTouchPreview, { passive: true });
-      this.container.addEventListener('touchcancel', clearTouchPreview, { passive: true });
-      window.addEventListener('blur', clearTouchPreview);
+      document.addEventListener('click', (e) => {
+        if (!this.container.contains(e.target)) this._clearCoverReveal();
+      });
     }
 
     // Touch swipe — finger-following, prevents browser back gesture

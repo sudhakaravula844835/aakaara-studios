@@ -17,6 +17,12 @@ The first photograph loads eagerly; the rest load lazily. Missing images keep
 their space and show a fallback. If the dimension index cannot load, the album
 still opens and learns dimensions from the images as they load.
 
+On touch devices, album covers start in black and white. The first tap reveals
+the color, title, location, and story text, which remain visible after release.
+The second tap opens the album. Selecting another cover, tapping outside the
+carousel, or closing the album resets the reveal. Desktop hover and keyboard
+activation retain their existing behavior.
+
 `images/gallery-manifest.json` records the displayed width and height of every
 numbered photograph in published Framed Stories albums. The mobile journal uses
 these dimensions to arrange photographs and reserve space before they load.
