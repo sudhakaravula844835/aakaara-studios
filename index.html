@@ -1624,12 +1624,17 @@
 <!-- ════════════════════ SERVICES OVERVIEW ════════════════════ -->
 <section class="section section-dark" id="services-overview" style="padding-top:4.5rem;padding-bottom:4.5rem;">
   <div class="container">
-    <div class="reveal" style="text-align:center;margin-bottom:2.5rem;">
+    <div class="reveal sov-intro">
       <div class="section-tag">What We Offer</div>
       <!-- SEO FIX: promoted div → h2; "Six Ways We Tell Your Story" is the Services section heading -->
       <h2 class="section-title" style="color:var(--ivory);">Six Ways We Tell<br>Your Story</h2>
       <div class="section-desc">From grand weddings to quiet intimate portraits — every session is crafted with intention.</div>
     </div>
+    <!-- Mobile (≤768px): .sov-grid becomes a compact single-column "contact sheet"
+         list (all six rows visible, no carousel) — see the MOBILE SERVICES INDEX
+         block in styles.css. The .sov-row wrapper groups each card's text content
+         so it can sit beside the stamp icon in that layout; desktop/tablet ignore
+         it and render the grid exactly as before. -->
     <div class="sov-grid reveal">
       <div class="sov-card">
         <div class="sov-stamp sov-stamp--wedding" aria-hidden="true">
@@ -1649,10 +1654,12 @@
           </svg>
         </div>
         <div class="sov-num">01</div>
+        <div class="sov-row">
         <h3 class="sov-title">Weddings</h3>
         <p class="sov-desc">Full-day coverage, second shooter, and a beautifully curated online gallery — every chapter of your day preserved.</p>
         <div class="sov-price">Starting from <strong>$2,500</strong></div>
         <a href="#contact" class="sov-link">Inquire <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
       </div>
       <div class="sov-card sov-card--couple">
         <div class="sov-stamp sov-stamp--couple" aria-hidden="true">
@@ -1684,6 +1691,7 @@
           </svg>
         </div>
         <div class="sov-num">02</div>
+        <div class="sov-row">
         <h3 class="sov-title">Couple Portraits</h3>
         <p class="sov-desc">From engagements to family milestones, we capture the evolving story of your love in New York's most iconic backdrops.</p>
         <div class="sov-tags">
@@ -1692,6 +1700,7 @@
         <a href="#contact" class="sov-link">Inquire <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         <a href="couple-portraits.html#couple-gallery" class="sov-link sov-link-view" onclick="sessionStorage.setItem('skipIntro','1'); sessionStorage.setItem('returnScrollY', window.scrollY)">View Work</a>
         <a href="couple-portraits.html#couple-experience" class="sov-link sov-link-view" onclick="sessionStorage.setItem('skipIntro','1'); sessionStorage.setItem('returnScrollY', window.scrollY)">The Experience</a>
+        </div>
       </div>
       <div class="sov-card sov-card--maternity">
         <div class="sov-stamp sov-stamp--maternity" aria-hidden="true">
@@ -1731,12 +1740,14 @@
           </svg>
         </div>
         <div class="sov-num">03</div>
+        <div class="sov-row">
         <h3 class="sov-title">Maternity</h3>
         <p class="sov-desc">From the radiant glow of maternity to the tender first days of a newborn, we create timeless portraits of new beginnings.</p>
         <div class="sov-tags">
           <span>New Born Baby Portraits</span>
         </div>
         <a href="#contact" class="sov-link">Inquire <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
       </div>
       <div class="sov-card sov-card--celebrations">
         <div class="sov-stamp sov-stamp--celebration" aria-hidden="true">
@@ -1760,6 +1771,7 @@
           </svg>
         </div>
         <div class="sov-num">04</div>
+        <div class="sov-row">
         <h3 class="sov-title">Celebrations</h3>
         <p class="sov-desc">From milestones to new beginnings, we capture the joy of your special occasions with a cinematic touch.</p>
         <div class="sov-tags">
@@ -1770,6 +1782,7 @@
           <span>Baby Shower</span>
         </div>
         <a href="#contact" class="sov-link">Inquire <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
       </div>
       <div class="sov-card">
         <div class="sov-stamp sov-stamp--commercial" aria-hidden="true">
@@ -1791,12 +1804,14 @@
           </svg>
         </div>
         <div class="sov-num">05</div>
+        <div class="sov-row">
         <h3 class="sov-title">Commercial</h3>
         <p class="sov-desc">Product photography, brand campaigns, and editorial content for businesses and creators who refuse to be ordinary.</p>
         <div class="sov-tags">
           <span>Brand Campaigns</span><span>Lookbooks</span><span>Social-First Content</span><span>Usage Rights Available</span>
         </div>
         <a href="#contact" class="sov-link">Inquire <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
       </div>
       <div class="sov-card">
         <div class="sov-stamp sov-stamp--conceptual" aria-hidden="true">
@@ -1819,12 +1834,14 @@
           </svg>
         </div>
         <div class="sov-num">06</div>
+        <div class="sov-row">
         <h3 class="sov-title">Conceptual</h3>
         <p class="sov-desc">Surreal, editorial, and experimental visual storytelling — for those who see photography as pure art, unbound by convention.</p>
         <div class="sov-tags">
           <span>Editorial</span><span>Artist Collabs</span><span>Portfolio Projects</span><span>Exhibition Prints</span>
         </div>
         <a href="#contact" class="sov-link">Inquire <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
       </div>
     </div>
     <div class="reveal" style="text-align:center;margin-top:4rem;">

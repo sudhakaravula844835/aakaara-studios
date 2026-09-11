@@ -422,6 +422,7 @@ body.intro-active #heroScroll { opacity: 0; }
   line-height: 1.85; margin-bottom: 3rem;
 }
 .section-dark .section-desc { color: rgba(250,246,241,0.5); }
+.sov-intro { text-align: center; margin-bottom: 2.5rem; }
 
 /* ═══════════════════════════════════════════════════════════
    PORTFOLIO - SECTION INTRO ANIMATION
@@ -1859,6 +1860,14 @@ body.intro-active #heroScroll { opacity: 0; }
   padding: 1.8rem 1.6rem;
   position: relative;
   transition: background 0.4s var(--ease);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+/* Groups title→link(s) so they can sit beside the stamp icon in the mobile
+   list layout (see MOBILE SERVICES INDEX below); on desktop it just
+   reproduces .sov-card's own flex/gap stacking so nothing shifts. */
+.sov-row {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -4461,44 +4470,79 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 }
 
 /* ═══════════════════════════════════════════════════════════
-   MOBILE SIX WAYS — 2-COLUMN COMPACT GRID (≤768px)
+   MOBILE SERVICES INDEX — compact "contact sheet" list (≤768px)
+   All six services as slim single-column rows, no swipe/motion — deliberately
+   different from the coverflow used for Portfolio/Framed Stories. A dashed
+   rule between rows echoes the sprocket-hole perforations already drawn into
+   the stamp icons. Above 768px this block is inert and .sov-grid renders as
+   the normal desktop/tablet grid defined earlier in this file.
    ═══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
   #services-overview.section { padding: var(--section-space-tablet) var(--page-gutter-tablet); }
-  #services-overview .section-title { font-size: 22px; }
+  #services-overview .sov-intro { margin-bottom: 1.25rem; }
+  #services-overview .section-title { font-size: 22px; margin-bottom: 0.5rem; }
 
-  /* 2 × 3 grid */
   .sov-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    display: block;
     background: transparent;
     border: none;
     border-radius: 0;
   }
   .sov-card {
-    padding: 16px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(201,149,107,0.1);
-    border-radius: 2px;
-    gap: 0.35rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.85rem 3.2rem 0.85rem 0.15rem;
+    background: transparent;
+    border-bottom: 1px dashed rgba(201,149,107,0.18);
   }
+  .sov-card:last-child { border-bottom: none; }
+  .sov-card::after { display: none; } /* desktop's divider line — rows use border-bottom instead */
+
   .sov-stamp {
-    width: 44px;
-    height: 44px;
-    top: 0.5rem;
-    left: 0.5rem;
+    position: static;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
   }
-  .sov-title {
-    font-size: 13px;
-    font-weight: 600;
-    margin-top: 2.8rem;
-    color: #c9956b;
+  .sov-num { display: none; } /* faint desktop watermark — redundant once rows are this compact */
+  .sov-row {
+    flex: 1;
+    min-width: 0;
+    gap: 0.15rem;
   }
-  .sov-desc { font-size: 12px; line-height: 1.6; }
-  .sov-num { font-size: 1.6rem; top: 0.5rem; right: 0.7rem; }
+
+  .sov-title { margin-top: 0; font-size: 0.92rem; }
+  .sov-desc {
+    font-size: 0.7rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
   .sov-tags { display: none; } /* hidden to save space on mobile */
-  .sov-price { font-size: 11px; }
-  .sov-link { font-size: 10px; min-height: 44px; display: flex; align-items: flex-end; }
+  .sov-price { font-size: 0.62rem; }
+  /* Couple Portraits' secondary links — still reachable via the main nav.
+     Combined-class selector so this reliably beats .sov-link's display:flex
+     below regardless of source order (both match these elements). */
+  .sov-link.sov-link-view { display: none; }
+  /* Primary CTA becomes a full-row-height tap zone with just the arrow —
+     "Inquire" stays in the DOM (still announced by screen readers) but
+     visually collapses so it doesn't compete with the row's own text. */
+  .sov-link {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 44px;
+    min-height: 44px;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -4523,6 +4567,15 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   color: rgba(250,246,241,0.5); /* Consistent with other subtitles */
   margin: 0 auto;
   text-align: center;
+}
+/* Compact on mobile — 1.1rem/1.8 line-height above wraps to 3-4 lines and
+   pushes the cards far down the screen before the user sees them. */
+@media (max-width: 768px) {
+  #services-overview .section-desc {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    max-width: 22rem;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════

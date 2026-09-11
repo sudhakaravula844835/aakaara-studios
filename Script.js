@@ -2618,7 +2618,7 @@ class EtherealCarousel {
     const isMobile = window.innerWidth <= 768;
     const isTablet = window.innerWidth <= 1024;
     const isVideoCarousel = this.container.id === 'videoCarousel';
-    
+
     // Portfolio cards need more breathing room and a clearer twist so the
     // side planes feel intentionally behind the hero frame.
     let offsetPx = activeW * (isVideoCarousel ? 0.82 : 0.9);
