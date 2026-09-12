@@ -8,6 +8,7 @@
   --champagne: #f2e6d9; --ivory: #faf6f1; --parch: #f0ebe4;
   --wine: #7a3b4e; --mauve: #9b7082; --sage: #8a9a7e;
   --saffron: #e0a458;
+  --text-muted-on-dark: #a69c92;
   --font-display: 'Cormorant Garamond', 'Georgia', serif;
   --font-body: 'Outfit', 'Helvetica Neue', sans-serif;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -186,7 +187,7 @@ nav.scrolled {
 .nav-links a:hover::after { width: 100%; }
 .nav-links a.nav-cta {
   font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--ivory); background: var(--rose);
+  color: var(--noir); background: var(--rose);
   padding: 0.55rem 1.4rem; border-radius: 2px; font-weight: 500;
   transition: all 0.4s;
 }
@@ -2657,7 +2658,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .footer-brand p {
   font-family: 'p22-mackinac-pro', var(--font-display);
   font-size: 0.9rem;
-  color: rgba(250, 246, 241, 0.45);
+  color: var(--text-muted-on-dark);
   line-height: 1.8;
   max-width: 280px;
 }
@@ -2694,12 +2695,12 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   background: var(--rose); opacity: 0.85;
 }
 .footer-col h5 { font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--rose); margin-bottom: 1rem; font-weight: 400; }
-.footer-col a { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: rgba(250,246,241,0.3); margin-bottom: 0.5rem; transition: color 0.3s; }
+.footer-col a { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted-on-dark); margin-bottom: 0.5rem; transition: color 0.3s; }
 .footer-col a svg { flex-shrink: 0; opacity: 0.5; transition: opacity 0.3s; }
 .footer-col a:hover svg { opacity: 1; }
 .footer-col a:hover { color: var(--rose); }
 .footer-bottom { border-top: 1px solid rgba(250,246,241,0.025); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
-.footer-bottom p { font-size: 0.7rem; color: rgba(250,246,241,0.12); letter-spacing: 0.06em; }
+.footer-bottom p { font-size: 0.7rem; color: var(--text-muted-on-dark); letter-spacing: 0.06em; }
 .footer-social { display: flex; gap: 0.8rem; }
 .footer-social a { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(250,246,241,0.04); display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
 .footer-social a:hover { border-color: var(--rose); background: rgba(201,149,107,0.06); }
