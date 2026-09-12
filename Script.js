@@ -1868,12 +1868,12 @@ function filterVideos(cat, btn) {
   }
 
   async function loadModalSrc(src, requestId) {
+    resetProgress();
     if (src) {
       await attachHLS(vmVideo, src, requestId);
       if (requestId !== modalRequestId) return;
       vmStage.classList.add('vm-has-video');
       syncPlayToggle();
-      if (vmFill) vmFill.style.width = '0%';
     } else {
       vmVideo.pause();
       if (activeHls) { activeHls.destroy(); activeHls = null; }
@@ -2003,6 +2003,7 @@ function filterVideos(cat, btn) {
     modalRequestId += 1;
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     modal.classList.remove('vm-open');
+    resetProgress();
     vmVideo.pause();
     if (activeHls) { activeHls.destroy(); activeHls = null; }
     vmVideo.src = '';
@@ -2073,18 +2074,32 @@ function filterVideos(cat, btn) {
     vmShare.addEventListener('click', copyShareUrl);
   }
 
+  function renderProgress(currentTime, duration) {
+    const time = Number.isFinite(currentTime) ? Math.max(0, currentTime) : 0;
+    const validDuration = Number.isFinite(duration) && duration > 0;
+    const elapsed = validDuration ? Math.min(time, duration) : 0;
+    const percent = validDuration ? (elapsed / duration) * 100 : 0;
+    if (vmFill) vmFill.style.width = `${percent}%`;
+    if (vmTime) vmTime.textContent = formatTime(elapsed);
+    if (vmTrack) vmTrack.setAttribute('aria-valuenow', String(Math.round(percent)));
+  }
+
+  function resetProgress() {
+    renderProgress(0, 0);
+  }
+
+  function syncProgress() {
+    if (!modal.classList.contains('vm-open')) return resetProgress();
+    renderProgress(vmVideo.currentTime, vmVideo.duration);
+  }
+
   if (vmVideo) {
-    if (vmTrack) {
-      vmTrack.setAttribute('role', 'slider');
-      vmTrack.setAttribute('aria-label', 'Video progress');
-      vmTrack.setAttribute('aria-valuemin', '0');
-      vmTrack.setAttribute('aria-valuemax', '100');
-    }
-    vmVideo.addEventListener('timeupdate', () => {
-      const pct = (vmVideo.currentTime / vmVideo.duration) * 100;
-      if (vmFill) vmFill.style.width = `${pct}%`;
-      if (vmTime) vmTime.textContent = formatTime(vmVideo.currentTime);
-      if (vmTrack) vmTrack.setAttribute('aria-valuenow', Math.round(pct));
+    resetProgress();
+    ['timeupdate', 'loadedmetadata', 'durationchange'].forEach(event => {
+      vmVideo.addEventListener(event, syncProgress);
+    });
+    ['loadstart', 'emptied'].forEach(event => {
+      vmVideo.addEventListener(event, resetProgress);
     });
     vmVideo.addEventListener('play', syncPlayToggle);
     vmVideo.addEventListener('pause', syncPlayToggle);
@@ -2092,15 +2107,18 @@ function filterVideos(cat, btn) {
 
   if (vmTrack) {
     vmTrack.addEventListener('click', (e) => {
+      if (!vmVideo || !Number.isFinite(vmVideo.duration) || vmVideo.duration <= 0) return;
       const rect = vmTrack.getBoundingClientRect();
-      const pos = (e.clientX - rect.left) / rect.width;
+      if (rect.width <= 0) return;
+      const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       vmVideo.currentTime = pos * vmVideo.duration;
+      syncProgress();
     });
   }
 
   // 5-second skip with on-screen overlay animation
   function triggerSkip(seconds) {
-    if (!vmVideo || !vmVideo.duration) return;
+    if (!vmVideo || !Number.isFinite(vmVideo.duration) || vmVideo.duration <= 0) return;
     vmVideo.currentTime = Math.max(0, Math.min(vmVideo.duration, vmVideo.currentTime + seconds));
     const overlay = seconds < 0 ? vmSkipBackOvl : vmSkipFwdOvl;
     if (overlay) {
