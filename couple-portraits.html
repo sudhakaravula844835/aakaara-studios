@@ -1219,6 +1219,11 @@
             background: rgba(214, 190, 170, 0.08);
         }
 
+        .masonry-grid:focus-visible {
+            outline: 2px solid #c9956b;
+            outline-offset: -3px;
+        }
+
         .masonry-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -2224,7 +2229,7 @@
       </div>
     </section>
 
-    <main class="masonry-grid">
+    <main class="masonry-grid" tabindex="0" aria-label="Couple portraits gallery">
         <!-- Abhinav & Megha -->
         <div class="work-item" data-location="central-park">
             <img src="/images/couple-portraits/abhinav-megha/1.jpg" alt="Couple embraces in a sunlit park, photography by Aakaara Studios." loading="lazy" decoding="async" width="1600" height="2400">

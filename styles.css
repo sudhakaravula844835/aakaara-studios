@@ -4869,6 +4869,10 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   background: linear-gradient(270deg, rgba(21, 17, 15, 1) 0%, rgba(21, 17, 15, 0.92) 34%, transparent 100%);
 }
 
+.lab-testimonial-track:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: -3px;
+}
 .lab-testimonial-track {
   position: relative;
   width: 100%;
