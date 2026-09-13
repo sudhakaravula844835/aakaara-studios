@@ -27,7 +27,7 @@ describe('video asset wiring', () => {
   });
 
   it('wires Hemanth pre-wedding to a shareable watch page slug', () => {
-    const card = getVideoCard('Hemanth');
+    const card = getVideoCard('Hemanth &amp; Lasya Priya');
 
     expect(card).toBeTruthy();
     expect(getAttr(card, 'data-vcat')).toBe('prewedding');

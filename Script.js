@@ -416,13 +416,6 @@ function ensureFlatpickrLibrary() {
   window.addEventListener('resize', updateHeroSpacing, { passive: true });
 })();
 
-// QA FIX: auto-assign aria-label to gallery items missing one for screen-reader accessibility
-document.querySelectorAll('.gallery-item:not([aria-label])').forEach(function(item) {
-  var title = item.dataset.title || '';
-  var type  = item.dataset.type  || '';
-  if (title) item.setAttribute('aria-label', type ? type + ': ' + title : title);
-});
-
 // ═══════ REVEAL ON SCROLL ═══════
 const revealObs = new IntersectionObserver((entries) => {
   let panelStaggerIndex = 0;
@@ -710,7 +703,7 @@ function initPortfolioStoryCards() {
     const category = item.dataset.cat || 'default';
     const defaults = portfolioNarrativeDefaults[category] || portfolioNarrativeDefaults.default;
     const custom = portfolioNarrativeLibrary[item.dataset.folder] || {};
-    const title = item.dataset.title || overlayBody.querySelector('h4')?.textContent?.trim() || '';
+    const title = item.dataset.title || overlayBody.querySelector('h3')?.textContent?.trim() || '';
     const kicker = item.dataset.type || custom.kicker || defaults.kicker;
     const scene = item.dataset.location || custom.scene || defaults.scene;
     const story = item.dataset.story || custom.story || defaults.story;
@@ -719,7 +712,7 @@ function initPortfolioStoryCards() {
     storyCard.className = 'gi-story-card';
     storyCard.append(
       createStoryElement('div', 'gi-kicker', kicker),
-      createStoryElement('h4', 'gi-editorial-title', title),
+      createStoryElement('h3', 'gi-editorial-title', title),
     );
 
     if (scene) {
@@ -2257,7 +2250,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
       if (!item.hasAttribute('tabindex')) item.setAttribute('tabindex', '0');
       if (!item.hasAttribute('role')) item.setAttribute('role', 'button');
       
-      if (!item.hasAttribute('aria-label')) {
+      if (!item.hasAttribute('aria-label') && !item.matches('.gallery-item')) {
         const title = item.dataset.title || '';
         const isComingSoon = item.dataset.comingSoon === 'true';
         const label = (isComingSoon ? 'Coming Soon: ' : labelPrefix) + title;

@@ -9,5 +9,30 @@ https://www.aakaarastudiosnyc.com/*  https://aakaarastudios.com/:splat  301!
 /admin/*              /admin/:splat            200
 /tools/*              /tools/:splat            200
 /board/*              /board/:splat            200
+# BEGIN GENERATED FILM ROUTES
+/films/pooja-amit-wedding  /films/generated/pooja-amit-wedding.html  200
+/films/vyshnavi-daniel  /films/generated/vyshnavi-daniel.html  200
+/films/abhinav-megha-wedding  /films/generated/abhinav-megha-wedding.html  200
+/films/abhinav-megha-prewedding  /films/generated/abhinav-megha-prewedding.html  200
+/films/hemanth-lasya  /films/generated/hemanth-lasya.html  200
+/films/manogna-rahul  /films/generated/manogna-rahul.html  200
+/films/suprith-pragnya  /films/generated/suprith-pragnya.html  200
+/films/akhila-subhash  /films/generated/akhila-subhash.html  200
+/films/praneetha-sharan  /films/generated/praneetha-sharan.html  200
+/films/soundarya-sharan  /films/generated/soundarya-sharan.html  200
+/films/rupa-housewarming  /films/generated/rupa-housewarming.html  200
+/films/neha-housewarming  /films/generated/neha-housewarming.html  200
+/films/bhargavi-housewarming  /films/generated/bhargavi-housewarming.html  200
+/films/first-birthday  /films/generated/first-birthday.html  200
+/films/mounika-harsha  /films/generated/mounika-harsha.html  200
+/films/sirisha-prasanth  /films/generated/sirisha-prasanth.html  200
+/films/sameeksha-nyc  /films/generated/sameeksha-nyc.html  200
+/films/sameeksha-chicago  /films/generated/sameeksha-chicago.html  200
+/films/darzi-suits  /films/generated/darzi-suits.html  200
+/films/karthik-concert  /films/generated/karthik-concert.html  200
+/films/get-away-in-nyc  /films/generated/get-away-in-nyc.html  200
+/films/the-other-side-of-the-grass-nyc  /films/generated/the-other-side-of-the-grass-nyc.html  200
+# END GENERATED FILM ROUTES
+
 /films/:slug          /films/watch.html?v=:slug  200
 /*                    /404.html                404

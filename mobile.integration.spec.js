@@ -180,10 +180,10 @@ for (const [label, device] of touchDevices) {
       await page.waitForTimeout(250);
       await expect(page.locator('#videoCarousel')).not.toHaveClass(/is-native-scroll/);
 
-      const beforeTitle = await page.locator('#videoCarousel .vw-card[data-ec-offset="0"] h4').textContent();
+      const beforeTitle = await page.locator('#videoCarousel .vw-card[data-ec-offset="0"] h3').textContent();
       await swipeCarousel(page, '#videoCarousel');
       await page.waitForTimeout(220);
-      const afterTitle = await page.locator('#videoCarousel .vw-card[data-ec-offset="0"] h4').textContent();
+      const afterTitle = await page.locator('#videoCarousel .vw-card[data-ec-offset="0"] h3').textContent();
       expect(afterTitle).not.toBe(beforeTitle);
 
       const weddingCard = page.locator('#videoCarousel .vw-card[data-vcat="wedding"][data-ec-offset="0"]').first();
@@ -233,10 +233,10 @@ for (const [label, device] of tabletDevices) {
       expect(carouselState.activeTransform).not.toBe('none');
       expect(carouselState.sideOpacity).toBeLessThan(1);
 
-      const beforeTitle = await page.locator('#videoCarousel .vw-card[data-ec-offset="0"] h4').textContent();
+      const beforeTitle = await page.locator('#videoCarousel .vw-card[data-ec-offset="0"] h3').textContent();
       await swipeCarousel(page, '#videoCarousel', { startXRatio: 0.78, endXRatio: 0.34, steps: 6 });
       await page.waitForTimeout(220);
-      const afterTitle = await page.locator('#videoCarousel .vw-card[data-ec-offset="0"] h4').textContent();
+      const afterTitle = await page.locator('#videoCarousel .vw-card[data-ec-offset="0"] h3').textContent();
       expect(afterTitle).not.toBe(beforeTitle);
 
       const weddingCard = page.locator('#videoCarousel .vw-card[data-vcat="wedding"][data-ec-offset="0"]').first();

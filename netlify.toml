@@ -1,6 +1,6 @@
 [build]
-  # No build step needed — site is static HTML/CSS/JS
-  command = "echo 'Static site — no build needed'"
+  # Generate crawler-readable film pages from the player catalogue
+  command = "node build/generate-film-pages.mjs"
   publish = "."
 
 # CDN FIX: Netlify automatically enables Brotli + Gzip compression for all
