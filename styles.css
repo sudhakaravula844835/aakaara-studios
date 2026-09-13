@@ -2358,7 +2358,7 @@ body.intro-active #heroScroll { opacity: 0; }
   position: relative;
   padding-top: 0.25rem;
 }
-.contact-info :is(h2, h3) {
+.contact-info > h2 {
   max-width: none;
   font-family: var(--font-display);
   font-weight: 300;
@@ -3124,7 +3124,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .section { padding: var(--section-space-tablet) var(--page-gutter-tablet); }
   .about-grid, .contact-grid { grid-template-columns: 1fr; grid-template-rows: auto; gap: 2rem; }
   .contact-info { position: static; padding-top: 0; }
-  .contact-info :is(h2, h3) {
+  .contact-info > h2 {
     font-size: clamp(2.8rem, 11vw, 5.1rem);
     white-space: normal;
   }
@@ -3252,7 +3252,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 
 /* ── Small phones (≤480px) — prevent text overflow, tighten spacing ── */
 @media (max-width: 480px) {
-  .contact-info :is(h2, h3) {
+  .contact-info > h2 {
     font-size: clamp(2.25rem, 15vw, 3.25rem);
     line-height: 0.96;
   }
