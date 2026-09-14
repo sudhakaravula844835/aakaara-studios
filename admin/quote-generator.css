@@ -521,3 +521,6 @@ input[data-field="hours"].hours-auto {
   letter-spacing: 0.05em;
   margin-bottom: 16px;
 }
+
+#quoteTrackingStatus { margin: 0; padding: 0.5rem 1rem; flex-shrink: 0; font-size: 13px; line-height: 1.5; max-width: 34rem; }
+#quoteTrackingStatus a { color: inherit; text-decoration: underline; }

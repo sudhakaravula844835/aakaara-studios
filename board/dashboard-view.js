@@ -7,11 +7,7 @@ import {
 // module-eval time.
 import { openDetailPanel } from './project-modal.js';
 
-// This view is the spiritual successor of the old admin/dashboard.html
-// "Client CRM" home page — same searchable card-grid look, ported onto
-// board's real project data. Unlike that page, board has no pre-booking
-// "lead" concept (every row in `projects` is already a booked client), so
-// there's no Sent/Rejected pipeline to filter by; stage is what's left.
+// Quotes and confirmed projects share the same searchable dashboard.
 let searchTerm = '';
 let activeFilter = 'all';
 let lastProjects = [];
@@ -27,6 +23,7 @@ function formatCurrency(amount) {
 // a second stage taxonomy alongside STAGE_COLUMNS.
 function stageGroup(stage) {
   if (stage === 'completed') return 'completed';
+  if (stage === 'quote_sent') return 'quote';
   if (stage === 'booked') return 'booked';
   return 'active';
 }
@@ -130,8 +127,8 @@ function renderCard(project) {
   priceRow.className = 'dash-card-price-row';
   const prices = document.createElement('div');
   prices.className = 'dash-card-prices';
-  prices.appendChild(priceCell('Quoted', project.quoted_price ? formatCurrency(project.quoted_price) : '—'));
-  prices.appendChild(priceCell('Confirmed', project.confirmed_price ? formatCurrency(project.confirmed_price) : '—'));
+  prices.appendChild(priceCell('Quoted', project.quoted_price != null ? formatCurrency(project.quoted_price) : '—'));
+  prices.appendChild(priceCell('Agreed', project.confirmed_price != null ? formatCurrency(project.confirmed_price) : '—'));
   priceRow.appendChild(prices);
 
   if (project.confirmed_price) {

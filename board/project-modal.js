@@ -237,11 +237,18 @@ export async function openProjectModal(project) {
   document.getElementById('firstSubEventSection').hidden = !!project;
 
   document.getElementById('fId').value = project ? project.id : '';
+  const stageSelect = document.getElementById('fProjectStage');
+  stageSelect.replaceChildren(...STAGE_COLUMNS.map(stage => new Option(stage.label, stage.key)));
+  stageSelect.value = project?.stage || 'booked';
+  form.dataset.initialStage = project?.stage || 'booked';
+  form.dataset.fromQuote = project?.source_quote_id ? 'true' : 'false';
+
   document.getElementById('fClientName').value = project ? project.client_name : '';
   document.getElementById('fClientEmail').value = project ? (project.client_email || '') : '';
   document.getElementById('fClientPhone').value = project ? (project.client_phone || '') : '';
   document.getElementById('fPackageTier').value = project ? (project.package_tier || '') : '';
   document.getElementById('fHoursBooked').value = project ? (project.hours_booked ?? '') : '';
+  document.getElementById('fQuotedPrice').readOnly = !!project?.source_quote_id;
   document.getElementById('fQuotedPrice').value = project ? (project.quoted_price ?? '') : '';
   document.getElementById('fConfirmedPrice').value = project ? (project.confirmed_price ?? '') : '';
   document.getElementById('fDepositAmount').value = project ? (project.deposit_amount ?? '') : '';
@@ -278,6 +285,7 @@ async function handleProjectFormSubmit(e) {
   e.preventDefault();
 
   const fields = {
+    stage: document.getElementById('fProjectStage').value,
     client_name: document.getElementById('fClientName').value.trim(),
     client_email: document.getElementById('fClientEmail').value.trim() || null,
     client_phone: document.getElementById('fClientPhone').value.trim() || null,
@@ -294,6 +302,17 @@ async function handleProjectFormSubmit(e) {
   };
 
   const editId = document.getElementById('fId').value;
+  if (document.getElementById('projectForm').dataset.fromQuote === 'true') delete fields.quoted_price;
+  if (fields.confirmed_price != null && (!Number.isFinite(fields.confirmed_price) || fields.confirmed_price < 0)) {
+    showErrorToast('Enter a valid nonnegative agreed price.');
+    return;
+  }
+  if (document.getElementById('projectForm').dataset.initialStage === 'quote_sent' && fields.stage !== 'quote_sent' && fields.confirmed_price == null) {
+    showErrorToast('Enter the agreed price before confirming this quote.');
+    document.getElementById('fConfirmedPrice').focus();
+    return;
+  }
+
   const firstSubEvent = {
     name: document.getElementById('fFirstSubEventName').value.trim(),
     event_date: document.getElementById('fFirstSubEventDate').value || null,

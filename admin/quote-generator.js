@@ -1,3 +1,4 @@
+import { trackQuote, quoteProjectPayload, hasQuoteChangedSinceLastSend } from './quote-tracking.js';
 import {
   parseDurationToHours,
   sumEventPhotos,
@@ -34,6 +35,13 @@ const DRAFT_CHECK_FIELD_IDS = [
 const DRAFT_ADDON_FIELDS = ['delEngagementNotes', 'delAddlHoursRate', 'delRushFee', 'delLiveFee'];
 
 // ── STATE ─────────────────────────────────────────────────────────
+let quoteTrackingId = crypto.randomUUID();
+// The payload actually saved to the Board under quoteTrackingId, last time a
+// send succeeded (null until then). Lets sendQuoteEmail tell an idempotent
+// retry of the same quote apart from a new quote typed into the still-open
+// form -- see hasQuoteChangedSinceLastSend.
+let quoteTrackingSnapshot = null;
+let sendingQuote = false;
 let dayCount = 0;
 let draftSaveTimer = null;
 let isApplyingDraft = false;
@@ -291,7 +299,7 @@ function updatePricingUI(pricing, inputs) {
 
 // ── DRAFT ─────────────────────────────────────────────────────────
 function collectDraftState() {
-  const state = {};
+  const state = { quoteTrackingId, quoteTrackingSnapshot };
   DRAFT_VALUE_FIELD_IDS.forEach(id => { const el = $(id); if (el) state[id] = el.value; });
   DRAFT_CHECK_FIELD_IDS.forEach(id => { const el = $(id); if (el) state[id] = el.checked; });
   DRAFT_ADDON_FIELDS.forEach(id => { const el = $(id); if (el) state[id] = el.value; });
@@ -312,6 +320,8 @@ function collectDraftState() {
 const LEGACY_DATA_HANDLING_NOTE = "Data Handling & Delivery: Client to provide two external hard disks (1–2TB capacity each) before the wedding date — one for the photography team to use for on-site data backup, and a second for RAW data delivery. Both drives formatted in exFAT for cross-platform compatibility. Photography team will return the RAW data drive to the client within one week of the event. Client assumes responsibility for drives once handed over for data transfer.";
 
 function applyDraftState(state) {
+  quoteTrackingId = state.quoteTrackingId || crypto.randomUUID();
+  quoteTrackingSnapshot = state.quoteTrackingSnapshot || null;
   isApplyingDraft = true;
   DRAFT_VALUE_FIELD_IDS.forEach(id => { const el = $(id); if (el && state[id] !== undefined) el.value = state[id]; });
   // Remove only the previous standard policy; preserve any custom notes.
@@ -1028,36 +1038,33 @@ function generatePDF(action) {
 }
 
 // ── CRM SAVE ──────────────────────────────────────────────────────
-function sendQuoteEmail() {
-  const quotes = readStorage(APP_SETTINGS.dashboardStorageKey) || [];
-  const maxId = quotes.reduce((m, q) => Math.max(m, q.id || 0), 0);
-  const dates = [...$('daysContainer').querySelectorAll('[data-field="date"]')]
-    .map(inp => inp.value).filter(Boolean).sort();
-  const pricing = calculatePricingSummary(getDays(), getPricingInputs());
-  const venueName = $('venueName').value.trim();
-  const city = $('location').value.trim();
-  const record = {
-    id: maxId + 1,
-    clientName: $('clientName').value,
-    clientEmail: $('clientEmail').value,
-    phone: $('clientPhone').value,
-    eventDate: dates[0] || '',
-    eventDateTo: dates[dates.length - 1] || '',
-    status: 'sent',
-    quotedPrice: pricing.total,
-    confirmedPrice: null,
-    shootType: $('eventType').value,
-    location: [venueName, city].filter(Boolean).join(', '),
-    quoteRef: $('quoteRef').value,
-    depositPaid: null,
-    followUpDate: null,
-    notes: '',
-  };
-  quotes.push(record);
-  writeStorage(APP_SETTINGS.dashboardStorageKey, quotes);
-  clearDraft();
-  generatePDF('download');
-
+async function sendQuoteEmail() {
+  if (sendingQuote) return;
+  sendingQuote = true;
+  const button = $('confirmSendBtn');
+  button.disabled = true;
+  const status = $('quoteTrackingStatus');
+  status.textContent = 'Saving quote to the Board…';
+  try {
+    clearTimeout(draftSaveTimer);
+    const state = collectDraftState();
+    const pricing = calculatePricingSummary(getDays(), getPricingInputs());
+    // The form stays open and its draft auto-restores after a send, so a
+    // second click can be either a retry of the same quote (keep the ID, so
+    // the Board dedupes it) or a new client typed into the same form (needs
+    // a fresh ID -- reusing the old one would silently return the previous
+    // client's project instead of creating this one).
+    if (hasQuoteChangedSinceLastSend(quoteTrackingSnapshot, state, pricing)) {
+      quoteTrackingId = crypto.randomUUID();
+      quoteTrackingSnapshot = null;
+      state.quoteTrackingId = quoteTrackingId;
+    }
+    localStorage.setItem(APP_SETTINGS.draftStorageKey, JSON.stringify(state));
+    const { supabase } = await import('../board/supabase-client.js');
+    await trackQuote(supabase, quoteTrackingId, state, pricing);
+    quoteTrackingSnapshot = JSON.stringify(quoteProjectPayload(state, pricing));
+    localStorage.setItem(APP_SETTINGS.draftStorageKey, JSON.stringify(collectDraftState()));
+    generatePDF('download');
   const clientName  = $('clientName').value.trim();
   const clientEmail = $('clientEmail').value.trim();
   const eventType   = $('eventType').value.trim();
@@ -1070,10 +1077,28 @@ function sendQuoteEmail() {
     `With warmth,\nSudhakar Avula\nAakaara Studios NYC\navala.sudhakar@gmail.com\n+1 (475) 332-2020`
   );
   const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(clientEmail)}&su=${subject}&body=${body}`;
-  setTimeout(() => { window.open(gmailUrl, '_blank'); }, 800);
+  const link = document.createElement('a');
+  link.href = gmailUrl;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.textContent = 'Open Gmail draft';
+  status.textContent = 'Saved to Board as Quote sent. Attach the downloaded PDF and send in Gmail. ';
+  status.appendChild(link);
+  window.open(gmailUrl, '_blank', 'noopener,noreferrer');
 
-  showToast('PDF downloaded — attach it in Gmail and send');
-  setTimeout(closePreview, 600);
+  showToast('Quote tracked — attach the PDF and send in Gmail');
+  } catch (error) {
+    status.textContent = error.message || 'Could not track quote. Please retry.';
+    const login = document.createElement('a');
+    login.href = '../board/login.html';
+    login.target = '_blank';
+    login.rel = 'noopener noreferrer';
+    login.textContent = ' Open Board sign-in';
+    status.appendChild(login);
+  } finally {
+    sendingQuote = false;
+    button.disabled = false;
+  }
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────
@@ -1230,6 +1255,8 @@ function init() {
   $('importBtn').addEventListener('click', importBrief);
   $('resetBtn').addEventListener('click', () => {
     if (!confirm('Reset all fields? This cannot be undone.')) return;
+    quoteTrackingId = crypto.randomUUID();
+    quoteTrackingSnapshot = null;
     clearDraft();
     $('daysContainer').querySelectorAll('.day-block').forEach(destroyDayFlatpickr);
     $('daysContainer').textContent = '';

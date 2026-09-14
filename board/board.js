@@ -51,7 +51,7 @@ async function fetchProfile(userId) {
 async function fetchProjects() {
   const { data, error } = await supabase
     .from('projects')
-    .select('id, client_name, client_email, client_phone, stage, video_editing_substatus, package_tier, hours_booked, quoted_price, confirmed_price, deposit_amount, balance_paid, contract_uploaded_at, quote_uploaded_at, raw_delivered_at, raw_delivery_link, expected_delivery_date, pm_id, sub_events(id, name, event_date, venue, photo_selection_status, photo_selected_count, photo_total_count)');
+    .select('id, source_quote_id, client_name, client_email, client_phone, stage, video_editing_substatus, package_tier, hours_booked, quoted_price, confirmed_price, deposit_amount, balance_paid, contract_uploaded_at, quote_uploaded_at, raw_delivered_at, raw_delivery_link, expected_delivery_date, pm_id, sub_events(id, name, event_date, venue, photo_selection_status, photo_selected_count, photo_total_count)');
   if (error) {
     showErrorToast('Could not load projects.');
     // null (not []) signals "fetch failed" distinctly from "fetch succeeded
@@ -140,6 +140,14 @@ async function handleDrop(e, newStage) {
   const projectId = e.dataTransfer.getData('text/plain');
   const card = document.querySelector(`.project-card[data-id="${projectId}"]`);
 
+  const project = currentProjects.find(item => item.id === projectId);
+  if (project?.stage === 'quote_sent' && newStage !== 'quote_sent' &&
+      (project.confirmed_price == null || !Number.isFinite(Number(project.confirmed_price)) || Number(project.confirmed_price) < 0)) {
+    showErrorToast('Enter the agreed price before confirming this quote.');
+    await openProjectModal(project);
+    return;
+  }
+
   if (card) {
     // Same-column no-op guard: dropping a card back into the column it
     // already lives in shouldn't hit Supabase at all.
@@ -205,7 +213,8 @@ function renderCounters(projects) {
   if (!container) return;
 
   const counts = [
-    { label: 'Active Weddings', value: projects.filter(p => p.stage !== 'completed').length },
+    { label: 'Quotes sent', value: projects.filter(p => p.stage === 'quote_sent').length },
+    { label: 'Active Weddings', value: projects.filter(p => p.stage !== 'completed' && p.stage !== 'quote_sent').length },
     { label: 'Waiting on Client', value: projects.filter(p => WAITING_ON_CLIENT_STAGES.includes(p.stage)).length },
     { label: 'Editing', value: projects.filter(p => p.stage === 'video_editing').length },
     { label: 'Final Delivery', value: projects.filter(p => p.stage === 'final_delivery').length },
@@ -236,12 +245,12 @@ function renderFinancialSummary(projects) {
   if (!summaryEl || !outstandingEl) return;
 
   const totalQuoted = projects.reduce((sum, p) => sum + (p.quoted_price || 0), 0);
-  const totalConfirmed = projects.reduce((sum, p) => sum + (p.confirmed_price || 0), 0);
+  const totalConfirmed = projects.filter(p => p.stage !== 'quote_sent').reduce((sum, p) => sum + (p.confirmed_price || 0), 0);
   // Amount still owed on a project = confirmed price minus whatever deposit
   // was already paid, not the full confirmed price -- a partial deposit
   // still leaves a balance, just a smaller one.
   const amountOwed = (p) => p.confirmed_price - (p.deposit_amount || 0);
-  const unpaidBalances = projects.filter(p => p.confirmed_price && !p.balance_paid && amountOwed(p) > 0);
+  const unpaidBalances = projects.filter(p => p.stage !== 'quote_sent' && p.confirmed_price && !p.balance_paid && amountOwed(p) > 0);
   const totalOutstanding = unpaidBalances.reduce((sum, p) => sum + amountOwed(p), 0);
 
   const stats = [

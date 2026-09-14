@@ -13,7 +13,7 @@ import { showErrorToast } from './board-shared.js';
 // inside the stage <select>'s change handler below. A future top-level call
 // to either in this file (e.g. outside an event handler) would be a real
 // hazard — a TDZ error at page load — so watch for that.
-import { openDetailPanel } from './project-modal.js';
+import { openDetailPanel, openProjectModal } from './project-modal.js';
 import { refreshProjects } from './board.js';
 
 let sortState = { column: null, direction: 1 };
@@ -108,6 +108,13 @@ function renderListRow(project) {
   select.addEventListener('change', async () => {
     const newStage = select.value;
     const previousStage = project.stage;
+    if (previousStage === 'quote_sent' && newStage !== 'quote_sent' &&
+        (project.confirmed_price == null || !Number.isFinite(Number(project.confirmed_price)) || Number(project.confirmed_price) < 0)) {
+      select.value = previousStage;
+      showErrorToast('Enter the agreed price before confirming this quote.');
+      await openProjectModal(project);
+      return;
+    }
     select.disabled = true;
     const { data, error } = await supabase.from('projects').update({ stage: newStage }).eq('id', project.id).select('id');
     select.disabled = false;

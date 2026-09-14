@@ -7,17 +7,17 @@ import {
 } from '../board-utils.js';
 
 describe('STAGE_COLUMNS', () => {
-  it('has exactly 8 stages in workflow order', () => {
+  it('has exactly 9 stages in workflow order', () => {
     expect(STAGE_COLUMNS.map(c => c.key)).toEqual([
-      'booked', 'shoot_completed', 'raw_delivered', 'photo_selection',
+      'quote_sent', 'booked', 'shoot_completed', 'raw_delivered', 'photo_selection',
       'song_finalization', 'video_editing', 'final_delivery', 'completed',
     ]);
   });
 });
 
 describe('stageIndex', () => {
-  it('returns 0 for booked', () => expect(stageIndex('booked')).toBe(0));
-  it('returns 7 for completed', () => expect(stageIndex('completed')).toBe(7));
+  it('returns 1 for booked', () => expect(stageIndex('booked')).toBe(1));
+  it('returns 8 for completed', () => expect(stageIndex('completed')).toBe(8));
   it('returns -1 for an unknown stage', () => expect(stageIndex('nonsense')).toBe(-1));
 });
 
@@ -27,9 +27,9 @@ describe('stageLabel', () => {
 });
 
 describe('progressSegments', () => {
-  it('booked is 1 of 8', () => expect(progressSegments('booked')).toEqual({ filled: 1, total: 8 }));
-  it('completed is 8 of 8', () => expect(progressSegments('completed')).toEqual({ filled: 8, total: 8 }));
-  it('an unknown stage is 0 of 8', () => expect(progressSegments('nonsense')).toEqual({ filled: 0, total: 8 }));
+  it('booked is 2 of 9', () => expect(progressSegments('booked')).toEqual({ filled: 2, total: 9 }));
+  it('completed is 9 of 9', () => expect(progressSegments('completed')).toEqual({ filled: 9, total: 9 }));
+  it('an unknown stage is 0 of 9', () => expect(progressSegments('nonsense')).toEqual({ filled: 0, total: 9 }));
 });
 
 describe('deriveWeddingDate', () => {
@@ -120,7 +120,7 @@ describe('photoSelectionLabel', () => {
 describe('synthesizeActivityLine', () => {
   it('formats a stage change using the friendly stage labels', () => {
     expect(synthesizeActivityLine({ field_changed: 'stage', old_value: 'booked', new_value: 'shoot_completed' }))
-      .toBe('Stage changed: Booked → Shoot Completed');
+      .toBe('Stage changed: Confirmed → Shoot Completed');
   });
   it('formats a video editing substatus change using the friendly substatus labels', () => {
     expect(synthesizeActivityLine({ field_changed: 'video_editing_substatus', old_value: 'not_started', new_value: 'in_progress' }))

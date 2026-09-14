@@ -885,3 +885,7 @@ body {
     align-items: stretch;
   }
 }
+
+/* Pre-booking quotes use a distinct badge from confirmed projects. */
+.dash-card.stage-quote { border-top-color: #c99769; }
+.dash-badge-quote { color: #e7bc94; background: rgba(201,151,105,.12); }

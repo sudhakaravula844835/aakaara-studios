@@ -27,3 +27,27 @@ Supabase MCP `apply_migration` tool in the order the files are numbered.
 - **Client** — no account. Access is a `client_access_token` (UUID) in the URL, validated
   inside every RPC call: `get_project_by_token`, `update_photo_selection`, `submit_song`,
   `post_client_comment`. Owner/PM can invalidate a leaked link with `regenerate_client_token`.
+
+## Quote tracking rollout
+
+Apply `supabase/migrations/20260913120000_quote_tracking.sql` to the same Supabase
+project used by `supabase-client.js` **before deploying this frontend**. It adds
+`source_quote_id`, the `quote_sent` stage and `create_quote_project(uuid,jsonb)`.
+Existing booked records keep their stage key; the interface calls it Confirmed.
+
+The quote generator requires an active Board owner/PM session. Send quote saves a
+shared Board record before downloading the PDF and opening a Gmail draft. Gmail
+still requires the user to attach and send; this is not email delivery tracking.
+The same draft UUID deduplicates retries without overwriting its original amount.
+Editing the still-open form for a different client after a successful send
+mints a fresh UUID automatically (`hasQuoteChangedSinceLastSend`), so a second
+send always lands as its own Board record even without clicking New Quote or
+Reset first. Old browser-only quotes are not migrated automatically.
+
+To confirm: open the dashboard card, choose Edit, set Status to Confirmed, enter
+Agreed price, and save. Original quote price is read-only for generated quotes.
+
+Local checks: `node --test tests/unit/quote-tracking.test.mjs` and
+`playwright test quote-tracking.spec.js`. Browser tests mock database calls and
+email handoffs. After applying the migration to a test database, run
+`vitest run board/test/quote-tracking.test.js` for real RLS and transaction checks.

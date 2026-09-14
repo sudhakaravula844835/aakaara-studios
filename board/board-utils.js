@@ -1,5 +1,6 @@
 export const STAGE_COLUMNS = [
-  { key: 'booked', label: 'Booked' },
+  { key: 'quote_sent', label: 'Quote sent' },
+  { key: 'booked', label: 'Confirmed' },
   { key: 'shoot_completed', label: 'Shoot Completed' },
   { key: 'raw_delivered', label: 'RAW Delivered' },
   { key: 'photo_selection', label: 'Photo Selection' },
