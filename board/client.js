@@ -1,4 +1,3 @@
-import { mountFilmReview } from './film-review.js';
 import { supabase } from './supabase-client.js';
 import {
   formatDate, stageLabel, STAGE_COLUMNS, SUBSTATUS_LABELS, photoSelectionLabel, stageIndex,
@@ -7,12 +6,6 @@ import { showErrorToast, showSuccessToast } from './board-shared.js';
 
 let token = '';
 let portalData = null;
-const photoDrafts = new Map();
-
-async function portalRpc(name, args) {
-  try { return await supabase.rpc(name, args); }
-  catch (error) { return { data: null, error }; }
-}
 
 const URL_PATTERN = /(https?:\/\/[^\s]+)/i;
 
@@ -30,26 +23,16 @@ function getTokenFromLocation() {
 }
 
 async function fetchProject() {
-  let data, error;
-  try { ({ data, error } = await portalRpc('get_project_by_token', { p_token: token })); }
-  catch (failure) { error = failure; }
-  if (error || !data) {
-    if (/invalid or revoked token/i.test(error?.message || '')) { renderInvalidToken(); return; }
-    if (portalData) { showErrorToast('Unable to refresh. Your work is still here. Please try again.'); return; }
-    const header = document.getElementById('clientProjectHeader');
-    header.innerHTML = '<p role="alert">We could not load your project. Please check your connection.</p><button class="portal-secondary" id="retryPortal">Try again</button>';
-    document.getElementById('retryPortal').onclick = fetchProject;
+  const { data, error } = await supabase.rpc('get_project_by_token', { p_token: token });
+  if (error) {
+    renderInvalidToken();
     return;
   }
-  const firstLoad = !portalData;
   portalData = data;
-  document.querySelectorAll('.client-section').forEach(section => { section.hidden = false; });
   renderPortal();
-  if (firstLoad) mountFilmReview(document.getElementById('filmReview'), { token, onChange: fetchProject });
 }
 
 function renderInvalidToken() {
-  document.querySelectorAll('.client-section').forEach(section => { section.hidden = true; });
   document.getElementById('clientProjectHeader').innerHTML = `
     <div class="client-muted">This project link is invalid or has been revoked.</div>
   `;
@@ -65,7 +48,6 @@ function renderPortal() {
   renderSubEvents();
   renderSongs();
   renderComments();
-  updateSongSlotNote();
 }
 
 function renderHeader() {
@@ -88,17 +70,7 @@ function renderHeader() {
   header.appendChild(meta);
 
   header.appendChild(renderNextStepBanner(project));
-  const journey = document.createElement('details');
-  journey.className = 'portal-journey';
-  const summary = document.createElement('summary');
-  const next = STAGE_COLUMNS[stageIndex(project.stage) + 1];
-  summary.textContent = `Your journey · ${stageLabel(project.stage)}${next ? ' → ' + next.label : ' · Complete'}`;
-  journey.append(summary, renderProjectTracker(project));
-  header.appendChild(journey);
-  const nav = document.createElement('nav');
-  nav.className = 'portal-nav'; nav.setAttribute('aria-label', 'Your project sections');
-  nav.innerHTML = '<a href="#photos">Photographs</a><a href="#music">Music</a><a href="#messages">Messages</a><a href="#filmReview">Film review</a>';
-  header.appendChild(nav);
+  header.appendChild(renderProjectTracker(project));
 
   const statusGrid = document.createElement('div');
   statusGrid.className = 'client-status-grid';
@@ -110,11 +82,11 @@ function renderHeader() {
   statusGrid.appendChild(renderStatusTile(
     'Photo Selection',
     summarizePhotoSelection(),
-    portalData.sub_events.some(event => event.photo_selected_count > 0) ? 'client-status-ready' : 'client-status-waiting'
+    'client-status-ready'
   ));
   statusGrid.appendChild(renderStatusTile(
     'Songs',
-    `${portalData.songs.length} suggested`,
+    `${Math.min(portalData.songs.length, 5)} of 5 suggested`,
     portalData.songs.length > 0 ? 'client-status-ready' : 'client-status-waiting'
   ));
   header.appendChild(statusGrid);
@@ -129,19 +101,7 @@ function renderHeader() {
     header.appendChild(link);
   }
 
-  const delivery = document.createElement('div');
-  delivery.className = 'portal-delivery';
-  const deliveryTitle = document.createElement('h2'); deliveryTitle.textContent = 'Your collection & documents';
-  const deliveryNote = document.createElement('p');
-  deliveryNote.textContent = project.expected_delivery_date ? `Expected delivery · ${formatDate(project.expected_delivery_date)}` : 'Your available gallery and project documents, together in one place.';
-  delivery.append(deliveryTitle, deliveryNote, renderDocumentLinks(project));
-  const raw = header.querySelector(':scope > .client-raw-link'); if (raw) delivery.appendChild(raw);
-  for (const [field, label] of [['final_gallery_url', 'View finished photographs'], ['final_film_url', 'Watch your film']]) {
-    if (!/^https?:\/\//i.test(project[field] || '')) continue;
-    const link = document.createElement('a'); link.className = 'client-raw-link portal-final-link';
-    link.href = project[field]; link.textContent = label; link.target = '_blank'; link.rel = 'noopener noreferrer'; delivery.appendChild(link);
-  }
-  header.appendChild(delivery);
+  header.appendChild(renderDocumentLinks(project));
 }
 
 // The links below hit the get-client-document edge function, which
@@ -236,8 +196,6 @@ function renderProjectTracker(project) {
 function nextStepCopy(project) {
   const selected = portalData.sub_events.reduce((sum, event) => sum + (event.photo_selected_count || 0), 0);
   const songsCount = portalData.songs.length;
-  if (project.stage === 'quote_sent') return { title: 'Your quote is ready to review.', body: 'Contact the studio with any questions. Your project timeline will begin once your booking is confirmed.' };
-  if (['final_delivery', 'completed'].includes(project.stage) && (project.final_gallery_url || project.final_film_url)) return { title: 'Your story is ready.', body: 'Open your finished photographs or film in Your collection & documents below.' };
 
   if (project.stage === 'booked' || project.stage === 'shoot_completed') {
     return {
@@ -251,8 +209,8 @@ function nextStepCopy(project) {
       : { title: 'RAW gallery is being prepared.', body: 'The gallery link will appear here as soon as it is ready.' };
   }
   if (project.stage === 'photo_selection') {
-    if (selected === 0 || portalData.sub_events.some(event => !event.photo_selected_count)) {
-      return { title: 'Select photos for editing.', body: 'Save a photo list for each event below. You can return to review or update your selections.' };
+    if (selected === 0) {
+      return { title: 'Select photos for editing.', body: 'Paste the photo numbers or filenames from the RAW gallery into the selection box.' };
     }
     return songsCount > 0
       ? { title: 'Selections received.', body: 'Your photo list and song suggestions are saved. Video editing will begin after studio review.' }
@@ -363,21 +321,7 @@ function renderSubEvents() {
 
     const input = document.createElement('textarea');
     input.className = 'form-input client-photo-list-input';
-    input.rows = 3;
-    input.id = `photos-${event.id}`;
-    const fieldLabel = document.createElement('label'); fieldLabel.htmlFor = input.id;
-    fieldLabel.textContent = 'Photo numbers or filenames'; form.appendChild(fieldLabel);
-    let saved = event.photo_selection_list || [];
-    if (!saved.length && portalData.sub_events.filter(item => item.name === event.name).length === 1) {
-      const prefix = `Photo selections for ${event.name}:\n`;
-      const legacy = [...portalData.comments].reverse().find(comment => comment.author_role === 'client' && comment.body.startsWith(prefix));
-      if (legacy) saved = parsePhotoNumbers(legacy.body.slice(prefix.length));
-    }
-    input.value = photoDrafts.get(event.id) ?? saved.join(', ');
-    if (saved.length) {
-      const savedNote = document.createElement('div'); savedNote.className = 'portal-saved';
-      savedNote.textContent = `${saved.length} photos saved · Review or edit your list below`; summary.appendChild(savedNote);
-    }
+    input.rows = 4;
     input.placeholder = 'Paste photo numbers: 0012, 0019, DSC_0244, IMG_1050';
     form.appendChild(input);
 
@@ -390,9 +334,8 @@ function renderSubEvents() {
 
     const liveCount = document.createElement('div');
     liveCount.className = 'client-live-count';
-    liveCount.textContent = `${parsePhotoNumbers(input.value).length} photos in this list`;
+    liveCount.textContent = '0 photos in this list';
     input.addEventListener('input', () => {
-      photoDrafts.set(event.id, input.value);
       const count = parsePhotoNumbers(input.value).length;
       liveCount.textContent = count === 1 ? '1 photo in this list' : `${count} photos in this list`;
     });
@@ -401,7 +344,7 @@ function renderSubEvents() {
     const submitBtn = document.createElement('button');
     submitBtn.className = 'btn-comment-post';
     submitBtn.type = 'submit';
-    submitBtn.textContent = saved.length ? 'Save changes' : 'Save selection';
+    submitBtn.textContent = 'Submit Selection';
     form.appendChild(submitBtn);
 
     row.appendChild(form);
@@ -432,15 +375,35 @@ async function updatePhotoSelection(event, value, button) {
   }
 
   button.disabled = true;
-  const { error } = await portalRpc('save_client_photo_selection', {
-    p_token: token, p_sub_event_id: event.id, p_photos: photoNumbers,
+  if (event.photo_total_count > 0) {
+    const { error } = await supabase.rpc('update_photo_selection', {
+      p_token: token,
+      p_sub_event_id: event.id,
+      p_selected_count: selectedCount,
+    });
+
+    if (error) {
+      button.disabled = false;
+      showErrorToast('Could not update photo selection — please try again.');
+      return;
+    }
+  }
+
+  const note = [
+    `Photo selections for ${event.name}:`,
+    photoNumbers.join(', '),
+  ].join('\n');
+  const { error: commentError } = await supabase.rpc('post_client_comment', {
+    p_token: token,
+    p_body: note,
   });
   button.disabled = false;
-  if (error) {
-    showErrorToast('Your selection could not be saved. Your list is still here; please try again.');
+
+  if (commentError) {
+    showErrorToast('Photo count saved, but the number list could not be posted.');
+    await fetchProject();
     return;
   }
-  photoDrafts.delete(event.id);
   await fetchProject();
   showSuccessToast('Photo list submitted.');
 }
@@ -448,7 +411,6 @@ async function updatePhotoSelection(event, value, button) {
 function renderSongSubEventOptions() {
   const selects = document.querySelectorAll('.song-sub-event-select');
   selects.forEach(select => {
-    const selectedValue = select.value;
     select.innerHTML = '';
 
     const general = document.createElement('option');
@@ -462,7 +424,6 @@ function renderSongSubEventOptions() {
       option.textContent = event.name;
       select.appendChild(option);
     });
-    select.value = selectedValue;
   });
 }
 
@@ -473,7 +434,7 @@ function renderSongs() {
   if (portalData.songs.length === 0) {
     const empty = document.createElement('div');
     empty.className = 'timeline-empty';
-    empty.textContent = 'Start with one song you love. You can add more later.';
+    empty.textContent = 'No songs yet.';
     container.appendChild(empty);
     return;
   }
@@ -488,25 +449,7 @@ function renderSongs() {
     status.className = 'client-muted';
     status.textContent = song.license_confirmed ? 'License confirmed' : 'License pending';
     row.appendChild(status);
-    if (!song.license_confirmed) {
-      const edit = document.createElement('details'); edit.className = 'portal-song-edit';
-      const summary = document.createElement('summary'); summary.textContent = 'Edit suggestion'; edit.appendChild(summary);
-      const form = document.createElement('form');
-      const title = document.createElement('input'); title.className = 'form-input'; title.value = song.title; title.required = true; title.setAttribute('aria-label', 'Song title');
-      const artist = document.createElement('textarea'); artist.className = 'form-input'; artist.value = song.artist || ''; artist.setAttribute('aria-label', 'Artist and reference link');
-      const save = document.createElement('button'); save.className = 'portal-secondary'; save.textContent = 'Save changes'; save.type = 'submit';
-      const remove = document.createElement('button'); remove.className = 'portal-secondary'; remove.textContent = 'Remove song'; remove.type = 'button';
-      const mutate = async (deleting) => {
-        save.disabled = remove.disabled = true;
-        const { error } = await portalRpc('edit_client_song', { p_token: token, p_song_id: song.id, p_title: title.value.trim(), p_artist: artist.value.trim() || null, p_remove: deleting });
-        save.disabled = remove.disabled = false;
-        if (error) { showErrorToast('Could not save the change. Please try again.'); return; }
-        await fetchProject(); showSuccessToast(deleting ? 'Song removed.' : 'Song updated.');
-      };
-      form.onsubmit = event => { event.preventDefault(); mutate(false); };
-      remove.onclick = () => { if (window.confirm('Remove this song suggestion?')) mutate(true); };
-      form.append(title, artist, save, remove); edit.appendChild(form); row.appendChild(edit);
-    }
+
     container.appendChild(row);
   });
 }
@@ -542,20 +485,15 @@ function renderSongText(row, song) {
 async function handleSongSubmit(e) {
   e.preventDefault();
   const submitBtn = document.querySelector('#songForm button[type="submit"]');
-  const incomplete = [...document.querySelectorAll('.client-song-slot')].find(slot =>
-    !slot.querySelector('.song-title-input').value.trim() && [...slot.querySelectorAll('input')].some(input => input.value.trim()));
-  if (incomplete) { showErrorToast('Please add a title for each song.'); incomplete.querySelector('.song-title-input').focus(); return; }
   const slotData = getFilledSongSlots();
   if (slotData.length === 0) {
     showErrorToast('Add at least one song title.');
     return;
   }
 
-  if (portalData.songs.length + slotData.length > 5) { showErrorToast('You can save up to five songs. Edit or remove an existing suggestion first.'); return; }
   submitBtn.disabled = true;
   for (const song of slotData) {
-    const { error } = await portalRpc('save_client_song', {
-      p_submission_id: song.slot.dataset.submissionId ||= crypto.randomUUID(),
+    const { error } = await supabase.rpc('submit_song', {
       p_token: token,
       p_sub_event_id: song.subEventId || null,
       p_title: song.title,
@@ -566,9 +504,6 @@ async function handleSongSubmit(e) {
       showErrorToast('Could not add one of the songs — please try again.');
       return;
     }
-    delete song.slot.dataset.submissionId;
-    song.slot.querySelectorAll('input').forEach(input => { input.value = ''; });
-    updateSongSlotNote();
   }
   submitBtn.disabled = false;
 
@@ -585,7 +520,6 @@ function getFilledSongSlots() {
       const artist = slot.querySelector('.song-artist-input').value.trim();
       const songUrl = slot.querySelector('.song-url-input').value.trim();
       return {
-        slot,
         subEventId: slot.querySelector('.song-sub-event-select').value,
         title,
         artistPayload: [artist, songUrl ? `YouTube: ${songUrl}` : ''].filter(Boolean).join('\n') || null,
@@ -596,7 +530,7 @@ function getFilledSongSlots() {
 
 function updateSongSlotNote() {
   const count = getFilledSongSlots().length;
-  document.getElementById('songSlotNote').textContent = `${portalData?.songs.length || 0} saved · ${count} new · 5 songs maximum`;
+  document.getElementById('songSlotNote').textContent = `${count} of 5 slots filled`;
 }
 
 function renderComments() {
@@ -627,12 +561,6 @@ function renderComments() {
     author.className = 'feed-author-name';
     author.textContent = comment.author_label || '?';
     content.appendChild(author);
-    if (comment.created_at && !Number.isNaN(Date.parse(comment.created_at))) {
-      const time = document.createElement('time'); time.className = 'client-muted';
-      time.dateTime = comment.created_at;
-      time.textContent = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(comment.created_at));
-      content.appendChild(time);
-    }
 
     const body = document.createElement('div');
     body.className = 'feed-body';
@@ -652,7 +580,7 @@ async function handleCommentSubmit(e) {
 
   const submitBtn = document.querySelector('#clientCommentForm button[type="submit"]');
   submitBtn.disabled = true;
-  const { error } = await portalRpc('post_client_comment', {
+  const { error } = await supabase.rpc('post_client_comment', {
     p_token: token,
     p_body: body,
   });
@@ -670,21 +598,6 @@ async function handleCommentSubmit(e) {
 
 document.addEventListener('DOMContentLoaded', async () => {
   token = getTokenFromLocation();
-  document.querySelectorAll('.client-section').forEach(section => { section.hidden = true; });
-  const slots = [...document.querySelectorAll('.client-song-slot')];
-  slots.forEach((slot, index) => {
-    slot.hidden = index > 0;
-    ['Event', 'Song title', 'Artist (optional)', 'Song link (optional)'].forEach((text, field) => {
-      const input = slot.querySelectorAll('select, input')[field]; input.id = `song-${index}-${field}`;
-      const label = document.createElement('label'); label.htmlFor = input.id; label.textContent = text;
-      const wrap = document.createElement('div'); wrap.className = 'portal-field'; input.before(wrap); wrap.append(label, input);
-    });
-  });
-  document.getElementById('addSong').onclick = () => {
-    const next = slots.find(slot => slot.hidden);
-    if (next) { next.hidden = false; next.querySelector('input').focus(); }
-    document.getElementById('addSong').hidden = !slots.some(slot => slot.hidden);
-  };
   document.getElementById('songForm').addEventListener('submit', handleSongSubmit);
   document.getElementById('clientCommentForm').addEventListener('submit', handleCommentSubmit);
   document.getElementById('songSlots').addEventListener('input', updateSongSlotNote);

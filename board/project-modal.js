@@ -1,4 +1,3 @@
-import { mountFilmReview } from './film-review.js';
 import { supabase } from './supabase-client.js';
 import {
   validateProjectForm, validateSubEventForm, formatDate,
@@ -259,14 +258,11 @@ export async function openProjectModal(project) {
   renderFileStatus('fContractStatus', project, 'contract', project?.contract_uploaded_at);
   renderFileStatus('fQuoteStatus', project, 'quote', project?.quote_uploaded_at);
   document.getElementById('fRawDeliveredAt').value = project ? (project.raw_delivered_at || '') : '';
-  document.getElementById('fFinalGalleryUrl').value = project?.final_gallery_url || '';
-  document.getElementById('fFinalFilmUrl').value = project?.final_film_url || '';
   document.getElementById('fRawDeliveryLink').value = project ? (project.raw_delivery_link || '') : '';
   document.getElementById('fExpectedDeliveryDate').value = project ? (project.expected_delivery_date || '') : '';
   document.getElementById('fFirstSubEventName').value = '';
   document.getElementById('fFirstSubEventDate').value = '';
   document.getElementById('fFirstSubEventVenue').value = '';
-  document.getElementById('fFirstSubEventPhotoTotal').value = '';
 
   document.getElementById('projectTrackerSection').hidden = !project;
   const trackerContainer = document.getElementById('projectTracker');
@@ -300,8 +296,6 @@ async function handleProjectFormSubmit(e) {
     deposit_amount: document.getElementById('fDepositAmount').value ? Number(document.getElementById('fDepositAmount').value) : null,
     balance_paid: document.getElementById('fBalancePaid').checked,
     raw_delivered_at: document.getElementById('fRawDeliveredAt').value || null,
-    final_gallery_url: document.getElementById('fFinalGalleryUrl').value.trim() || null,
-    final_film_url: document.getElementById('fFinalFilmUrl').value.trim() || null,
     raw_delivery_link: document.getElementById('fRawDeliveryLink').value.trim() || null,
     expected_delivery_date: document.getElementById('fExpectedDeliveryDate').value || null,
     pm_id: document.getElementById('fPmId').value || null,
@@ -323,7 +317,6 @@ async function handleProjectFormSubmit(e) {
     name: document.getElementById('fFirstSubEventName').value.trim(),
     event_date: document.getElementById('fFirstSubEventDate').value || null,
     venue: document.getElementById('fFirstSubEventVenue').value.trim() || null,
-    photo_total_count: Number(document.getElementById('fFirstSubEventPhotoTotal').value) || 0,
   };
 
   const { valid, errors } = validateProjectForm(fields, {
@@ -433,7 +426,6 @@ export function getCurrentDetailProjectId() {
 
 export async function openDetailPanel(project) {
   currentDetailProject = project;
-  mountFilmReview(document.getElementById('staffFilmReview'), {projectId: project.id, staff: true, onChange: () => { renderActivityFeed(); refreshProjects(); }});
   document.getElementById('detailClientName').textContent = project.client_name;
   document.getElementById('detailBackdrop').classList.add('open');
   await renderSubEventsTimeline();
@@ -552,7 +544,6 @@ function openSubEventModal(subEvent) {
   document.getElementById('seDate').value = subEvent ? (subEvent.event_date || '') : '';
   document.getElementById('seVenue').value = subEvent ? (subEvent.venue || '') : '';
   document.getElementById('seCrew').value = subEvent ? (subEvent.crew || '') : '';
-  document.getElementById('sePhotoTotal').value = subEvent?.photo_total_count || '';
   document.getElementById('subEventModalBackdrop').classList.add('open');
 }
 
@@ -574,7 +565,6 @@ async function handleSubEventFormSubmit(e) {
     event_date: document.getElementById('seDate').value || null,
     venue: document.getElementById('seVenue').value.trim() || null,
     crew: document.getElementById('seCrew').value.trim() || null,
-    photo_total_count: Number(document.getElementById('sePhotoTotal').value) || 0,
   };
 
   const { valid, errors } = validateSubEventForm(fields);

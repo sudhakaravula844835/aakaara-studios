@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="../styles.css">
   <link rel="stylesheet" href="board.css">
 </head>
-<body class="client-portal">
+<body>
 
   <header class="board-header">
     <div>
@@ -22,14 +22,14 @@
       <div class="client-muted">Loading project...</div>
     </section>
 
-    <section class="client-section" id="photos">
-      <h2 class="detail-section-title">Your photographs</h2>
+    <section class="client-section">
+      <div class="detail-section-title">Choose Photos for Editing</div>
       <div class="client-section-note">Paste the photo numbers or filenames exactly as shown in the RAW gallery.</div>
       <div class="client-sub-events" id="clientSubEvents"></div>
     </section>
 
     <section class="client-section">
-      <h2 class="detail-section-title" id="music">The soundtrack to your story</h2>
+      <div class="detail-section-title">Song Suggestions</div>
       <div class="client-section-note">Suggest up to 5 songs. YouTube links help the editor find the exact version.</div>
       <div class="songs-list" id="clientSongsList"></div>
       <form class="client-song-slots-form" id="songForm">
@@ -70,7 +70,7 @@
             <input class="form-input song-url-input" type="url" placeholder="YouTube or song link">
           </div>
         </div>
-        <button type="button" class="portal-secondary" id="addSong">Add another song</button><div class="client-song-actions">
+        <div class="client-song-actions">
           <div class="client-muted" id="songSlotNote">0 of 5 slots filled</div>
           <button type="submit" class="btn-comment-post">Submit Songs</button>
         </div>
@@ -78,17 +78,15 @@
     </section>
 
     <section class="client-section">
-      <h2 class="detail-section-title" id="messages">A conversation with the studio</h2>
+      <div class="detail-section-title">Notes for the Studio</div>
       <div class="activity-feed" id="clientComments"></div>
       <form class="comment-composer" id="clientCommentForm">
-        <label for="clientCommentBody">Your message</label><textarea class="comment-input" id="clientCommentBody" placeholder="Add a comment&hellip;" required></textarea>
+        <textarea class="comment-input" id="clientCommentBody" placeholder="Add a comment&hellip;" required></textarea>
         <div class="comment-composer-row">
-          <button type="submit" class="btn-comment-post">Send message</button>
+          <button type="submit" class="btn-comment-post">Post</button>
         </div>
       </form>
     </section>
-
-    <section class="client-section" id="filmReview"></section>
   </main>
 
   <div class="toast-container" id="toastContainer"></div>
