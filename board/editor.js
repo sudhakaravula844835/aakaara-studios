@@ -1,3 +1,4 @@
+import { mountFilmReview } from './film-review.js';
 import { supabase } from './supabase-client.js';
 import {
   formatDate, deriveWeddingDate, stageLabel, SUBSTATUS_LABELS, synthesizeActivityLine,
@@ -409,6 +410,7 @@ async function handleCommentSubmit(e) {
 
 async function openProjectDetail(project) {
   currentDetailProject = project;
+  mountFilmReview(document.getElementById('staffFilmReview'), {projectId: project.id, staff: true, onChange: () => { renderActivityFeed(); resyncCurrentDetailProject(); }});
   document.getElementById('detailClientName').textContent = project.client_name;
   document.getElementById('detailBackdrop').classList.add('open');
   renderSubstatusControl();

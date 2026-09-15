@@ -889,3 +889,89 @@ body {
 /* Pre-booking quotes use a distinct badge from confirmed projects. */
 .dash-card.stage-quote { border-top-color: #c99769; }
 .dash-badge-quote { color: #e7bc94; background: rgba(201,151,105,.12); }
+
+/* Client portal: quiet editorial hierarchy, scoped away from the team board. */
+.client-portal .client-portal-main { max-width: 1120px; padding: 40px 28px 72px; margin: auto; }
+.client-portal .client-project-name { font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.1; }
+.client-portal .client-project-meta { margin-top: 12px; }
+.client-portal .client-next-step { border-radius: 2px; border-left: 3px solid #c9956b; padding: 24px; margin-top: 28px; }
+.client-portal .client-next-step-title { font-family: var(--font-display); font-size: 1.85rem; }
+.client-portal .client-next-step-body { max-width: 65ch; font-size: 1rem; }
+.client-portal :is(.client-muted,.client-section-note,.timeline-meta,.client-count-total,.client-live-count,.client-project-meta,.client-status-label,.client-next-step-label,.client-tracker-status) { color: #bdb4ab; }
+.client-portal .client-section { padding: 28px 0; margin: 0; }
+.client-portal .detail-section-title { font-family: var(--font-display); font-weight: 400; font-size: 2rem; letter-spacing: 0; text-transform: none; margin: 0 0 16px; }
+.client-portal .client-section-note { font-size: 1rem; }
+.client-portal .client-sub-event-row { grid-template-columns: minmax(180px, .7fr) minmax(0, 1fr); padding: 24px; border-radius: 2px; align-items: start; }
+.client-portal .client-photo-list-form { min-width: 0; grid-template-columns: 1fr auto; }
+.client-portal .client-photo-list-form > label { grid-column: 1 / -1; }
+.client-portal label { display: block; color: #d9cec3; font-size: .875rem; margin-bottom: 8px; }
+.client-portal .form-input,.client-portal .comment-input { font-size: 16px; min-height: 44px; width: 100%; }
+.client-portal .client-song-slot { grid-template-columns: 28px 1fr 1fr; align-items: end; padding: 20px; border: 1px solid #40342b; }
+.client-portal .client-song-slot[hidden],.client-portal [hidden] { display: none !important; }
+.client-portal .portal-field { min-width: 0; }
+.client-portal .portal-field:nth-last-child(-n+2) { grid-column: auto; }
+.client-portal .client-song-slot-number { align-self: start; grid-row: span 2; }
+.client-portal :is(button,a,summary) { touch-action: manipulation; }
+.client-portal :is(button,summary,.portal-nav a,.client-raw-link) { min-height: 44px; cursor: pointer; }
+.client-portal :is(button,a,summary,input,select,textarea):focus-visible { outline: 2px solid #efc59f; outline-offset: 4px; }
+.portal-secondary { background: transparent; color: #e6bc99; border: 1px solid #78604c; padding: 10px 16px; font: inherit; margin-top: 16px; }
+.portal-secondary:hover { background: #2b211b; }
+.portal-nav { display: flex; gap: 24px; flex-wrap: wrap; border-bottom: 1px solid #49392c; margin-top: 16px; }
+.portal-nav a { display: inline-flex; align-items: center; color: #e6bc99; text-decoration: none; }
+.portal-nav a:hover { text-decoration: underline; }
+.portal-journey { margin-top: 20px; }
+.portal-journey summary { color: #d9cec3; padding: 12px 0; font-size: .9rem; }
+.client-portal .client-tracker-waiting,.client-portal .client-status-waiting { opacity: 1; }
+.portal-delivery { margin-top: 24px; }
+.portal-delivery h2 { font: 400 1.5rem var(--font-display); color: #f5e9dd; }
+.portal-delivery p { color: #bdb4ab; font-size: .9rem; }
+.client-portal .client-raw-link { display: inline-flex; align-items: center; color: #e6bc99; font-size: .9rem; }
+.portal-saved { color: #add5bb; font-size: .875rem; margin-top: 12px; }
+.client-portal .feed-body { overflow-wrap: anywhere; line-height: 1.6; }
+.client-portal .feed-row { padding: 16px 0; }
+.client-portal .client-status-value { font-size: 1rem; }
+@media(max-width:768px) {
+  .client-portal .client-portal-main { padding: 24px 20px 48px; }
+  .client-portal .client-status-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+  .client-portal .client-status-tile { padding: 12px 8px; }
+  .client-portal .client-status-label { font-size: .65rem; letter-spacing: .02em; }
+  .client-portal .client-status-value { font-size: .85rem; }
+  .client-portal .client-sub-event-row { grid-template-columns: 1fr; padding: 16px; }
+  .client-portal .client-photo-list-form { grid-template-columns: 1fr; }
+  .client-portal .client-song-slot { grid-template-columns: 24px minmax(0,1fr); padding: 16px; }
+  .client-portal .portal-field { grid-column: 2 !important; }
+  .client-portal .client-song-slot-number { grid-row: 1; }
+  .client-portal .client-next-step { padding: 18px; }
+  .client-portal .client-document-links { flex-wrap: wrap; }
+}
+.portal-final-link { margin-right: 24px; }
+.portal-song-edit { width: 100%; }
+.portal-song-edit summary { padding: 12px 0; color: #e6bc99; }
+.portal-song-edit form { display: grid; gap: 12px; }
+.client-portal .song-row { flex-wrap: wrap; }
+.client-portal .portal-nav { position: static; transform: none; opacity: 1; visibility: visible; width: auto; height: auto; background: transparent; padding: 0; display: flex; }
+.client-portal .btn-comment-post { color: #edc6a6; border-color: #80634d; }
+.client-portal :is(.timeline-empty,.feed-empty) { color: #bdb4ab; }
+
+.client-portal .portal-delivery > .client-raw-link { margin-right: 24px; }
+/* Versioned film review, shared by the client portal and staff detail panel. */
+.film-review { color: #eee2d6; }
+.review-help,.review-status { color: #bdb4ab; font-size: .9rem; line-height: 1.6; }
+.review-status:empty { display: none; }
+.review-status { border-left: 2px solid #d3a47e; padding-left: 12px; }
+.review-card { border: 1px solid #554031; margin: 20px 0; background: #14110f; }
+.review-card-heading { cursor: pointer; padding: 20px; min-height: 44px; font: 400 1.5rem var(--font-display); overflow-wrap: anywhere; }
+.review-card-body { padding: 0 20px 20px; }
+.review-badge { color: #edc6a6; font-size: .85rem; }
+.review-note { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }
+.review-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid #8a674b; color: #edc6a6; background: #241b15; font: inherit; font-size: .9rem; text-decoration: none; cursor: pointer; }
+.review-button:hover { background: #35261c; }
+.review-button:disabled { opacity: .6; cursor: wait; }
+.review-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.review-form { display: grid; gap: 16px; margin-top: 24px; }
+.review-field { display: grid !important; gap: 8px; font-size: .9rem; color: #d9cec3; }
+.review-field .form-input { width: 100%; min-width: 0; min-height: 44px; font-size: 16px; }
+.review-feedback { margin-top: 20px; padding: 16px; border-left: 2px solid #ad855e; background: #1d1814; }
+.review-video { width: 100%; display: block; margin-top: 16px; max-height: 440px; }
+.film-review :is(button,a,summary,input,textarea,select):focus-visible { outline: 2px solid #efc59f; outline-offset: 4px; }
+.review-prepare { padding-top: 24px; border-top: 1px solid #554031; }
