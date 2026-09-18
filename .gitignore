@@ -7,6 +7,8 @@ __pycache__/
 .venv/
 videos/
 images_original_backup/
+# Raw shoot dumps kept locally as source for resized web copies — never commit full-res originals
+images/couple-portraits/Suprith-pragna/
 # Ignore local video source files
 *.mp4
 *.mov
