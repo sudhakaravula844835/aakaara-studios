@@ -162,6 +162,10 @@ function renderProjectTracker(project) {
   tracker.className = 'client-project-tracker';
   tracker.setAttribute('aria-label', 'Project progress tracker');
 
+  if (project.stage === 'declined') {
+    tracker.textContent = 'Quote declined';
+    return tracker;
+  }
   const currentIndex = Math.max(stageIndex(project.stage), 0);
   STAGE_COLUMNS.forEach((stage, index) => {
     const item = document.createElement('div');
@@ -234,6 +238,7 @@ function nextStepCopy(project) {
   if (project.stage === 'completed') {
     return { title: 'Project completed.', body: 'Your project has reached final delivery. You can still leave a note if needed.' };
   }
+  if (project.stage === 'declined') return { title: 'This quote is closed.', body: 'Contact the studio if you would like to revisit your plans.' };
   return { title: 'Project is in progress.', body: 'Track each studio step here as your project moves forward.' };
 }
 

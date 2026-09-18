@@ -10,6 +10,10 @@ export const STAGE_COLUMNS = [
   { key: 'completed', label: 'Completed' },
 ];
 
+// Closed quotes are not a step in the production timeline.
+export const PROJECT_STAGES = [...STAGE_COLUMNS, { key: 'declined', label: 'Declined' }];
+export const isUnconfirmedStage = stage => ['quote_sent', 'declined'].includes(stage);
+
 export const SUBSTATUS_LABELS = {
   not_started: 'Not Started',
   in_progress: 'In Progress',
@@ -23,7 +27,7 @@ export function stageIndex(stage) {
 }
 
 export function stageLabel(stage) {
-  const col = STAGE_COLUMNS.find(c => c.key === stage);
+  const col = PROJECT_STAGES.find(c => c.key === stage);
   return col ? col.label : stage;
 }
 
@@ -105,7 +109,7 @@ export function synthesizeActivityLine(entry) {
 
 export function flattenSubEventsByMonth(projects, year, month) {
   const entries = [];
-  (projects || []).forEach(project => {
+  (projects || []).filter(project => project.stage !== 'declined').forEach(project => {
     (project.sub_events || []).forEach(se => {
       if (!se.event_date) return;
       const d = new Date(se.event_date + 'T00:00:00');

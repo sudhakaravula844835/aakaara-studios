@@ -1,11 +1,11 @@
 import {
-  STAGE_COLUMNS, stageLabel, formatDate, deriveWeddingDate, compareProjectsByDate,
+  PROJECT_STAGES, isUnconfirmedStage, stageLabel, formatDate, deriveWeddingDate, compareProjectsByDate,
 } from './board-utils.js';
 // Same board.js <-> project-modal.js import cycle documented in
 // list-view.js and project-modal.js — safe here because openDetailPanel is
 // only invoked from inside a card click/keydown handler, never at
 // module-eval time.
-import { openDetailPanel } from './project-modal.js';
+import { openDetailPanel, openProjectModal } from './project-modal.js';
 
 // Quotes and confirmed projects share the same searchable dashboard.
 let searchTerm = '';
@@ -17,11 +17,9 @@ function formatCurrency(amount) {
   return `$${Math.round(amount).toLocaleString('en-US')}`;
 }
 
-// Collapses the 8 kanban stages down to the 3 colors the old CRM used for
-// its status badges (confirmed/sent/rejected) so a glance at the grid still
-// reads as "done / just booked / everything in between", without inventing
-// a second stage taxonomy alongside STAGE_COLUMNS.
+// Status badges distinguish open quotes, closed quotes, and production.
 function stageGroup(stage) {
+  if (stage === 'declined') return 'declined';
   if (stage === 'completed') return 'completed';
   if (stage === 'quote_sent') return 'quote';
   if (stage === 'booked') return 'booked';
@@ -53,11 +51,12 @@ function renderFilterPills() {
   const container = document.getElementById('dashFilterPills');
   if (!container) return;
   container.innerHTML = '';
-  [{ key: 'all', label: 'All' }, ...STAGE_COLUMNS].forEach(({ key, label }) => {
+  [{ key: 'all', label: 'All' }, ...PROJECT_STAGES].forEach(({ key, label }) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'dash-filter-pill' + (activeFilter === key ? ' active' : '');
     btn.textContent = label;
+    btn.setAttribute('aria-pressed', String(activeFilter === key));
     btn.addEventListener('click', () => {
       activeFilter = key;
       renderFilterPills();
@@ -99,7 +98,7 @@ function renderCard(project) {
   card.tabIndex = 0;
   card.addEventListener('click', () => openDetailPanel(project));
   card.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetailPanel(project); }
+    if (e.target === card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openDetailPanel(project); }
   });
 
   const top = document.createElement('div');
@@ -131,7 +130,7 @@ function renderCard(project) {
   prices.appendChild(priceCell('Agreed', project.confirmed_price != null ? formatCurrency(project.confirmed_price) : '—'));
   priceRow.appendChild(prices);
 
-  if (project.confirmed_price) {
+  if (!isUnconfirmedStage(project.stage) && project.confirmed_price) {
     const balanceBadge = document.createElement('span');
     balanceBadge.className = `dash-balance-badge ${project.balance_paid ? 'dash-balance-paid' : 'dash-balance-due'}`;
     balanceBadge.textContent = project.balance_paid ? 'Balance Paid' : 'Balance Due';
@@ -139,6 +138,19 @@ function renderCard(project) {
   }
   card.appendChild(priceRow);
 
+  if (isUnconfirmedStage(project.stage)) {
+    const action = document.createElement('button');
+    action.type = 'button';
+    action.className = 'btn btn-secondary dash-quote-action';
+    action.textContent = project.stage === 'declined' ? 'Reopen quote' : 'Mark as declined';
+    action.addEventListener('click', async event => {
+      event.stopPropagation();
+      await openProjectModal(project);
+      document.getElementById('fProjectStage').value = project.stage === 'declined' ? 'quote_sent' : 'declined';
+      document.getElementById('fProjectStage').focus();
+    });
+    card.appendChild(action);
+  }
   return card;
 }
 

@@ -60,6 +60,22 @@ for(const width of [390,1440])test(`dashboard quote confirmation at ${width}px`,
  `}));
  await page.goto('/board/index.html');
  await expect(page.locator('.dash-card')).toContainText('Quote sent');
+ await page.getByRole('button', {name:'Mark as declined', exact:true}).click();
+ await expect(page.locator('#fProjectStage')).toHaveValue('declined');
+ await page.locator('#projectForm').evaluate(f=>f.requestSubmit());
+ await expect(page.locator('.dash-card')).toContainText('Declined');
+ expect(await page.evaluate(()=>window.updates[0].confirmed_price)).toBeNull();
+ await page.getByRole('button', {name:'Declined', exact:true}).click();
+ await expect(page.locator('.dash-card')).toHaveCount(1);
+ await page.screenshot({path:`/tmp/declined-quote-${width}.png`});
+ await page.getByRole('button', {name:'Reopen quote', exact:true}).click();
+ await expect(page.locator('#fProjectStage')).toHaveValue('quote_sent');
+ await page.locator('#projectForm').evaluate(f=>f.requestSubmit());
+ await expect(page.locator('.dash-card')).toHaveCount(0);
+ await page.getByRole('button', {name:'All', exact:true}).click();
+ await expect(page.locator('.dash-card')).toContainText('Quote sent');
+ await page.evaluate(()=>window.updates=[]);
+
  await page.evaluate(async()=>{const {openProjectModal}=await import('/board/project-modal.js');await openProjectModal({id:'p1',source_quote_id:'q1',client_name:'Quote Client',stage:'quote_sent',quoted_price:4500,confirmed_price:null,sub_events:[]});});
  await expect(page.locator('#fQuotedPrice')).toHaveAttribute('readonly','');
  await page.locator('#fProjectStage').selectOption('booked');

@@ -1,6 +1,6 @@
 import { supabase } from './supabase-client.js';
 import {
-  STAGE_COLUMNS, SUBSTATUS_LABELS, formatDate, deriveWeddingDate, compareProjectsByField, progressSegments,
+  PROJECT_STAGES, isUnconfirmedStage, SUBSTATUS_LABELS, formatDate, deriveWeddingDate, compareProjectsByField, progressSegments,
 } from './board-utils.js';
 import { showErrorToast } from './board-shared.js';
 // Circular import: board.js imports renderListView from this module, and
@@ -94,7 +94,7 @@ function renderListRow(project) {
   const stageCell = document.createElement('td');
   const select = document.createElement('select');
   select.className = 'list-stage-select';
-  STAGE_COLUMNS.forEach(col => {
+  PROJECT_STAGES.forEach(col => {
     const option = document.createElement('option');
     option.value = col.key;
     option.textContent = col.label;
@@ -108,7 +108,7 @@ function renderListRow(project) {
   select.addEventListener('change', async () => {
     const newStage = select.value;
     const previousStage = project.stage;
-    if (previousStage === 'quote_sent' && newStage !== 'quote_sent' &&
+    if (isUnconfirmedStage(previousStage) && !isUnconfirmedStage(newStage) &&
         (project.confirmed_price == null || !Number.isFinite(Number(project.confirmed_price)) || Number(project.confirmed_price) < 0)) {
       select.value = previousStage;
       showErrorToast('Enter the agreed price before confirming this quote.');

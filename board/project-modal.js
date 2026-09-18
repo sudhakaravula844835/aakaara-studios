@@ -2,7 +2,7 @@ import { supabase } from './supabase-client.js';
 import {
   validateProjectForm, validateSubEventForm, formatDate,
   photoSelectionLabel, synthesizeActivityLine,
-  STAGE_COLUMNS, SUBSTATUS_LABELS, stageIndex,
+  STAGE_COLUMNS, PROJECT_STAGES, isUnconfirmedStage, SUBSTATUS_LABELS, stageIndex,
 } from './board-utils.js';
 import { showErrorToast, showSuccessToast, getCurrentProfile } from './board-shared.js';
 // Circular import: board.js imports openProjectModal/openDetailPanel/etc from
@@ -195,6 +195,10 @@ function renderProjectTracker(project) {
   tracker.className = 'client-project-tracker';
   tracker.setAttribute('aria-label', 'Project stage tracker');
 
+  if (project.stage === 'declined') {
+    tracker.textContent = 'Quote declined · You can reopen it by changing the stage to Quote sent.';
+    return tracker;
+  }
   const currentIndex = Math.max(stageIndex(project.stage), 0);
   STAGE_COLUMNS.forEach((stage, index) => {
     const item = document.createElement('div');
@@ -238,7 +242,7 @@ export async function openProjectModal(project) {
 
   document.getElementById('fId').value = project ? project.id : '';
   const stageSelect = document.getElementById('fProjectStage');
-  stageSelect.replaceChildren(...STAGE_COLUMNS.map(stage => new Option(stage.label, stage.key)));
+  stageSelect.replaceChildren(...PROJECT_STAGES.map(stage => new Option(stage.label, stage.key)));
   stageSelect.value = project?.stage || 'booked';
   form.dataset.initialStage = project?.stage || 'booked';
   form.dataset.fromQuote = project?.source_quote_id ? 'true' : 'false';
@@ -307,7 +311,7 @@ async function handleProjectFormSubmit(e) {
     showErrorToast('Enter a valid nonnegative agreed price.');
     return;
   }
-  if (document.getElementById('projectForm').dataset.initialStage === 'quote_sent' && fields.stage !== 'quote_sent' && fields.confirmed_price == null) {
+  if (isUnconfirmedStage(document.getElementById('projectForm').dataset.initialStage) && !isUnconfirmedStage(fields.stage) && fields.confirmed_price == null) {
     showErrorToast('Enter the agreed price before confirming this quote.');
     document.getElementById('fConfirmedPrice').focus();
     return;

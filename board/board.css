@@ -889,3 +889,16 @@ body {
 /* Pre-booking quotes use a distinct badge from confirmed projects. */
 .dash-card.stage-quote { border-top-color: #c99769; }
 .dash-badge-quote { color: #e7bc94; background: rgba(201,151,105,.12); }
+
+/* Closed quotes remain readable without looking like active production. */
+.dash-card.stage-declined { border-top-color: #c99898; }
+.dash-badge-declined { color: #e6b8b8; background: rgba(201, 152, 152, .12); }
+
+.dash-quote-action {
+  margin-top: 16px; min-height: 44px; width: 100%;
+  color: #e7bc94; background: rgba(201,151,105,.08);
+  border: 1px solid #76583d; border-radius: 6px;
+  font: inherit; cursor: pointer; transition: background 150ms;
+}
+.dash-quote-action:hover { background: rgba(201,151,105,.18); }
+.dash-quote-action:focus-visible { outline: 2px solid #e7bc94; outline-offset: 3px; }

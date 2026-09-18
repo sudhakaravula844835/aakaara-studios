@@ -1,6 +1,6 @@
 import { supabase } from './supabase-client.js';
 import {
-  STAGE_COLUMNS, SUBSTATUS_LABELS, progressSegments,
+  PROJECT_STAGES, isUnconfirmedStage, SUBSTATUS_LABELS, progressSegments,
   deriveWeddingDate, formatDate, compareProjectsByDate,
 } from './board-utils.js';
 import { showErrorToast, setCurrentProfile } from './board-shared.js';
@@ -66,7 +66,7 @@ function renderColumns() {
   const container = document.getElementById('boardColumns');
   container.innerHTML = '';
 
-  STAGE_COLUMNS.forEach(col => {
+  PROJECT_STAGES.forEach(col => {
     const columnEl = document.createElement('div');
     columnEl.className = 'board-column';
     columnEl.dataset.stage = col.key;
@@ -141,7 +141,7 @@ async function handleDrop(e, newStage) {
   const card = document.querySelector(`.project-card[data-id="${projectId}"]`);
 
   const project = currentProjects.find(item => item.id === projectId);
-  if (project?.stage === 'quote_sent' && newStage !== 'quote_sent' &&
+  if (isUnconfirmedStage(project?.stage) && !isUnconfirmedStage(newStage) &&
       (project.confirmed_price == null || !Number.isFinite(Number(project.confirmed_price)) || Number(project.confirmed_price) < 0)) {
     showErrorToast('Enter the agreed price before confirming this quote.');
     await openProjectModal(project);
@@ -183,7 +183,7 @@ async function handleDrop(e, newStage) {
 }
 
 function renderBoard() {
-  STAGE_COLUMNS.forEach(col => {
+  PROJECT_STAGES.forEach(col => {
     const columnCardsEl = document.querySelector(`.board-column-cards[data-stage="${col.key}"]`);
     if (!columnCardsEl) return;
     columnCardsEl.innerHTML = '';
@@ -214,7 +214,7 @@ function renderCounters(projects) {
 
   const counts = [
     { label: 'Quotes sent', value: projects.filter(p => p.stage === 'quote_sent').length },
-    { label: 'Active Weddings', value: projects.filter(p => p.stage !== 'completed' && p.stage !== 'quote_sent').length },
+    { label: 'Active Weddings', value: projects.filter(p => p.stage !== 'completed' && !isUnconfirmedStage(p.stage)).length },
     { label: 'Waiting on Client', value: projects.filter(p => WAITING_ON_CLIENT_STAGES.includes(p.stage)).length },
     { label: 'Editing', value: projects.filter(p => p.stage === 'video_editing').length },
     { label: 'Final Delivery', value: projects.filter(p => p.stage === 'final_delivery').length },
@@ -245,12 +245,12 @@ function renderFinancialSummary(projects) {
   if (!summaryEl || !outstandingEl) return;
 
   const totalQuoted = projects.reduce((sum, p) => sum + (p.quoted_price || 0), 0);
-  const totalConfirmed = projects.filter(p => p.stage !== 'quote_sent').reduce((sum, p) => sum + (p.confirmed_price || 0), 0);
+  const totalConfirmed = projects.filter(p => !isUnconfirmedStage(p.stage)).reduce((sum, p) => sum + (p.confirmed_price || 0), 0);
   // Amount still owed on a project = confirmed price minus whatever deposit
   // was already paid, not the full confirmed price -- a partial deposit
   // still leaves a balance, just a smaller one.
   const amountOwed = (p) => p.confirmed_price - (p.deposit_amount || 0);
-  const unpaidBalances = projects.filter(p => p.stage !== 'quote_sent' && p.confirmed_price && !p.balance_paid && amountOwed(p) > 0);
+  const unpaidBalances = projects.filter(p => !isUnconfirmedStage(p.stage) && p.confirmed_price && !p.balance_paid && amountOwed(p) > 0);
   const totalOutstanding = unpaidBalances.reduce((sum, p) => sum + amountOwed(p), 0);
 
   const stats = [
