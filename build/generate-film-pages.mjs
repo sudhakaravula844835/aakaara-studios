@@ -12,10 +12,16 @@ const films = vm.runInNewContext(`(${match[1]})`, Object.create(null), { timeout
 const escape = text => String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const site = 'https://aakaarastudios.com';
 const routes = [];
+// A couple with several films (wedding + pre-wedding) shares one name, so qualify the
+// title with the category only where names collide. Matches the player's runtime title.
+const nameCounts = new Map();
+for (const { title } of Object.values(films)) nameCounts.set(title, (nameCounts.get(title) || 0) + 1);
 mkdirSync(resolve(root, 'films/generated'), { recursive: true });
 for (const [slug, film] of Object.entries(films)) {
   if (!/^[a-z0-9-]+$/.test(slug)) throw new Error(`Invalid film slug: ${slug}`);
-  const title = `${film.title} — Aakaara Studios NYC`;
+  const title = nameCounts.get(film.title) > 1
+    ? `${film.title} — ${film.category} · Aakaara Studios NYC`
+    : `${film.title} — Aakaara Studios NYC`;
   const description = `${film.type} · ${film.category}. Watch ${film.title} by Aakaara Studios NYC.`;
   const image = new URL(film.poster || '/images/og-cover.jpg', site).href;
   const url = `${site}/films/${slug}`;
