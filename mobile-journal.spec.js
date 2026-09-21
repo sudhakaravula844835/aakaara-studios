@@ -101,6 +101,12 @@ test.describe('Framed Stories mobile journal coverage', () => {
   });
 
   test('coming-soon albums retain their notice after browsing a live story', async ({ page }) => {
+    // No coming-soon album is published right now, so add one to the grid for this check.
+    await page.locator('#galleryGrid').evaluate(grid => grid.insertAdjacentHTML('beforeend', `
+      <a href="#" class="gallery-item gi-2" data-cat="wedding" data-title="Pooja &amp; Amit" data-type="Wedding" data-folder="/images/weddings/pooja-amit" data-count="10" data-static="true" data-coming-soon="true">
+        <div class="gi-bg"></div>
+        <div class="gi-overlay"><div><h3>Pooja &amp; Amit</h3><p>Wedding</p></div></div>
+      </a>`));
     await openAlbum(page);
     await closeJournal(page);
     await openAlbum(page, '.gallery-item[data-folder="/images/weddings/pooja-amit"]');

@@ -1,7 +1,40 @@
 const { test, expect } = require('@playwright/test');
 
+// index.html ships no multi-chapter film right now: the "Wedding Weekend" placeholder was a
+// Coming Soon card and has been removed. Splice an equivalent card into the served page so
+// the chapters feature stays covered; drop this fixture once a real multi-chapter film is live.
+const PRE_WEDDING_ANCHOR = '<!-- PRE-WEDDING VIDEOS -->';
+const WEDDING_WEEKEND_CARD = `
+      <div class="vw-card vw-gi-5" data-vcat="wedding" data-video="" data-title="Wedding Weekend" data-type="Haldi Film" data-poster="">
+        <div class="vw-poster vw-gi-5"></div>
+        <div class="vw-play-wrap">
+          <div class="vw-play-ring"></div>
+          <div class="vw-play-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="vw-overlay">
+          <div class="vw-badge">Wedding</div>
+          <h3>Wedding Weekend</h3>
+          <p>Haldi Film</p>
+        </div>
+        <div class="vw-duration">Full Film</div>
+        <div class="vw-chapters">
+          <button class="vw-chapter active" data-label="Haldi" data-video="" data-type="Haldi Film"></button>
+          <button class="vw-chapter" data-label="Sangeet" data-video="" data-type="Sangeet Film"></button>
+          <button class="vw-chapter" data-label="Wedding" data-video="" data-type="Wedding Film"></button>
+        </div>
+      </div>
+
+      `;
+
 test.describe('Multi-chapter video projects', () => {
   test.beforeEach(async ({ page }) => {
+    await page.route(url => url.pathname === '/', async route => {
+      const response = await route.fetch();
+      const html = (await response.text()).replace(PRE_WEDDING_ANCHOR, WEDDING_WEEKEND_CARD + PRE_WEDDING_ANCHOR);
+      await route.fulfill({ status: response.status(), contentType: 'text/html; charset=utf-8', body: html });
+    });
     await page.goto('/');
     await expect(page.locator('#intro')).toBeHidden({ timeout: 10000 });
     await page.locator('#video-works').scrollIntoViewIfNeeded();

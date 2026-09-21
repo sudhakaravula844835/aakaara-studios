@@ -185,9 +185,9 @@ Global functions exposed to inline HTML:
 
 **New gallery project:** Copy `<a class="gallery-item">` inside `#galleryGrid`, set `data-cat`, `data-title`, `data-type`, `data-folder`, `data-count`. Place images as `1.jpg`…`N.jpg` in folder.
 
-**New video card:** Copy `<div class="vw-card">` inside `#vwGrid`, set `data-vcat`, `data-video` (HLS `.m3u8` or empty for "Coming Soon"), `data-poster`, `data-title`, `data-type`.
+**New video card:** Copy `<div class="vw-card">` inside `#vwGrid`, set `data-vcat`, `data-video` (HLS `.m3u8`), `data-poster`, `data-title`, `data-type`. Coming-soon works (empty `data-video`, "Coming Soon" `.vw-duration`; gallery items with `data-coming-soon="true"`) were removed from `index.html` on 2026-09-21 — the CSS/JS for them is intact, so re-adding one just works. Original markup: `git show 0480bac:index.html`.
 
-**New multi-event wedding project (Haldi/Sangeet/Wedding, etc.):** Instead of one `.vw-card` per film, author a single `.vw-card` (its own `data-video`/`data-type` should point at the default/hero film) and add a nested `<div class="vw-chapters">` with one `<button class="vw-chapter" data-label="..." data-video="..." data-type="...">` per event. Mark exactly one chapter `active` to control which film plays by default when the modal opens. The grid tile auto-shows an "N Films" badge; the video modal auto-shows chapter tabs. See the "Wedding Weekend" placeholder card in `index.html` for a working example.
+**New multi-event wedding project (Haldi/Sangeet/Wedding, etc.):** Instead of one `.vw-card` per film, author a single `.vw-card` (its own `data-video`/`data-type` should point at the default/hero film) and add a nested `<div class="vw-chapters">` with one `<button class="vw-chapter" data-label="..." data-video="..." data-type="...">` per event. Mark exactly one chapter `active` to control which film plays by default when the modal opens. The grid tile auto-shows an "N Films" badge; the video modal auto-shows chapter tabs. No live example ships in `index.html` right now; `video-chapters.spec.js` splices a sample "Wedding Weekend" card into the page as a test fixture — copy its markup.
 
 **Gradient fallback classes:** Gallery `gi-1`–`gi-8`; video `vw-gi-1`–`vw-gi-8`. Defined in `styles.css`. Reuse or add following same pattern.
 
