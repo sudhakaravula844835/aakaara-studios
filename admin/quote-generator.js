@@ -753,11 +753,13 @@ function generatePDF(action) {
     checkPageBreak(40);
     sectionHeader('SCOPE OF COVERAGE');
     scopeItems.forEach(item => {
-      checkPageBreak(14);
+      doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+      const lines = doc.splitTextToSize(item, cW - 16);
+      checkPageBreak(4 + lines.length * 10);
       doc.setFontSize(8); doc.setFont('helvetica', 'normal');
       sf(...COPPER); doc.circle(mL + 5, y - 2.5, 2, 'F');
-      sc(...CREAM); doc.text(item, mL + 16, y);
-      y += 14;
+      sc(...CREAM); doc.text(lines, mL + 16, y, { lineHeightFactor: 1.25 });
+      y += 4 + lines.length * 10;
     });
   }
 
