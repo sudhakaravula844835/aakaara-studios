@@ -28,7 +28,7 @@ function stageGroup(stage) {
 
 function firstDatedSubEvent(subEvents) {
   if (!subEvents || !subEvents.length) return null;
-  const dated = [...subEvents].filter(e => e.event_date).sort((a, b) => (a.event_date < b.event_date ? -1 : 1));
+  const dated = subEvents.filter(e => e.event_date).sort((a, b) => a.event_date.localeCompare(b.event_date));
   return dated[0] || null;
 }
 
@@ -42,7 +42,7 @@ function matchesSearch(project) {
     project.client_name,
     project.package_tier,
     formatDate(deriveWeddingDate(project.sub_events)),
-    firstDatedSubEvent(project.sub_events)?.venue,
+    ...(project.sub_events || []).map(e => e.venue),
   ].filter(Boolean).join(' ').toLowerCase();
   return haystack.includes(searchTerm);
 }
@@ -146,8 +146,10 @@ function renderCard(project) {
     action.addEventListener('click', async event => {
       event.stopPropagation();
       await openProjectModal(project);
-      document.getElementById('fProjectStage').value = project.stage === 'declined' ? 'quote_sent' : 'declined';
-      document.getElementById('fProjectStage').focus();
+      const stageSelect = document.getElementById('fProjectStage');
+      if (!stageSelect) return;
+      stageSelect.value = project.stage === 'declined' ? 'quote_sent' : 'declined';
+      stageSelect.focus();
     });
     card.appendChild(action);
   }
