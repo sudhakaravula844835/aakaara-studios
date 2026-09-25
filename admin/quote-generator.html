@@ -141,6 +141,21 @@
         <label class="del-check"><input type="checkbox" id="delEngagement"> Engagement / Pre-Wedding Session</label>
         <input type="text" id="delEngagementNotes" class="addon-notes hidden" placeholder="Session details…">
       </div>
+      <div class="addon-row addon-subrow hidden" id="delEngagementOptions">
+        <div class="addon-rate">
+          <label for="delEngagementPricing">Session pricing</label>
+          <select id="delEngagementPricing">
+            <option value="complimentary">Complimentary</option>
+            <option value="charged">Charged</option>
+          </select>
+        </div>
+        <div class="addon-rate hidden" id="delEngagementFeeWrap">
+          <label for="delEngagementFee">Session fee</label>
+          <input type="number" id="delEngagementFee" inputmode="decimal" min="1" step="50" placeholder="TBD">
+          <span>$</span>
+        </div>
+        <label class="del-check"><input type="checkbox" id="delEngagementOutsideNyc"> Outside NYC — client covers travel &amp; accommodation</label>
+      </div>
 
       <div class="addon-row">
         <label class="del-check"><input type="checkbox" id="delAddlHours" checked> Extra coverage — 2 complimentary hours</label>

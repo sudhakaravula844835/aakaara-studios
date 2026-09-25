@@ -26,13 +26,17 @@ export function generateQuoteRef(existingRefs) {
   return `${prefix}${String(max + 1).padStart(3, '0')}`;
 }
 
-export function calculatePricingSummary(days, { model, hourlyRate, flatRate, travelType, travelAmount, livestreamSelected = false, livestreamFee }) {
+export function calculatePricingSummary(days, { model, hourlyRate, flatRate, travelType, travelAmount, livestreamSelected = false, livestreamFee, engagementSelected = false, engagementCharged = false, engagementFee }) {
   const rate = parseFloat(hourlyRate) || 0;
   const flat = parseFloat(flatRate) || 0;
   const travel = travelType === 'fixed' ? (parseFloat(travelAmount) || 0) : 0;
   const enteredLiveFee = parseFloat(livestreamFee);
   const liveFee = livestreamSelected && Number.isFinite(enteredLiveFee) && enteredLiveFee > 0 ? enteredLiveFee : 0;
   const livestreamPending = livestreamSelected && liveFee === 0;
+  const engagementIsCharged = engagementSelected && engagementCharged;
+  const enteredEngmtFee = parseFloat(engagementFee);
+  const engmtFee = engagementIsCharged && Number.isFinite(enteredEngmtFee) && enteredEngmtFee > 0 ? enteredEngmtFee : 0;
+  const engagementPending = engagementIsCharged && engmtFee === 0;
 
   const dayBreakdown = days.map((day, i) => {
     const hours = parseFloat(day.hours) || 0;
@@ -49,9 +53,9 @@ export function calculatePricingSummary(days, { model, hourlyRate, flatRate, tra
   const baseTotal = model === 'hourly' ? totalHours * rate : flat;
   // Payment schedules belong in the contract. Complimentary extra hours do
   // not reduce the scheduled coverage price or add a speculative overtime fee.
-  const total = baseTotal + travel + liveFee;
+  const total = baseTotal + travel + liveFee + engmtFee;
 
-  return { model, hourlyRate: rate, flatRate: flat, travelType, travelAmount: travel, livestreamFee: liveFee, livestreamPending, totalHours, totalPhotos, baseTotal, total, dayBreakdown };
+  return { model, hourlyRate: rate, flatRate: flat, travelType, travelAmount: travel, livestreamFee: liveFee, livestreamPending, engagementFee: engmtFee, engagementPending, totalHours, totalPhotos, baseTotal, total, dayBreakdown };
 }
 
 export function computeInvestmentBoxHeight(pricing, showIntro) {

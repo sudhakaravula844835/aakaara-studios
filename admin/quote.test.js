@@ -81,6 +81,22 @@ describe('calculatePricingSummary', () => {
     expect(r.livestreamFee).toBe(0);
     expect(r.livestreamPending).toBe(false);
   });
+  it('treats a selected engagement session as complimentary unless charged', () => {
+    const r = calculatePricingSummary(twoHourlyDays, { model: 'hourly', hourlyRate: 300, engagementSelected: true, engagementCharged: false, engagementFee: 500 });
+    expect(r.total).toBe(4200);
+    expect(r.engagementFee).toBe(0);
+    expect(r.engagementPending).toBe(false);
+  });
+  it('adds a charged engagement session fee to the total', () => {
+    const r = calculatePricingSummary(twoHourlyDays, { model: 'hourly', hourlyRate: 300, engagementSelected: true, engagementCharged: true, engagementFee: '500' });
+    expect(r.total).toBe(4700);
+    expect(r.engagementFee).toBe(500);
+  });
+  it('marks a charged engagement session without a fee as pending', () => {
+    const r = calculatePricingSummary(twoHourlyDays, { model: 'hourly', hourlyRate: 300, engagementSelected: true, engagementCharged: true, engagementFee: '' });
+    expect(r.total).toBe(4200);
+    expect(r.engagementPending).toBe(true);
+  });
   it('keeps scheduled coverage fully priced; complimentary extra hours do not reduce it', () => {
     const r = calculatePricingSummary([{ hours: 20 }], { model: 'hourly', hourlyRate: 400 });
     expect(r.totalHours).toBe(20);

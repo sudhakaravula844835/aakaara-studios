@@ -346,6 +346,8 @@ input[data-field="hours"].hours-auto {
   border-bottom: 1px solid #1a1a18;
 }
 .addon-row:last-child { border-bottom: none; }
+.addon-subrow { flex-wrap: wrap; padding-left: 24px; }
+.addon-subrow.hidden { display: none; }
 .addon-rate {
   display: flex;
   align-items: center;

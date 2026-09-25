@@ -30,9 +30,9 @@ const DRAFT_VALUE_FIELD_IDS = [
 const DRAFT_CHECK_FIELD_IDS = [
   'delEdited', 'delRaw', 'delGallery', 'delSneakPeek', 'delTeaser',
   'delDoc', 'delTraditional', 'delHighlight', 'delDrone', 'delLive',
-  'delSecondShooter', 'delEngagement', 'delAddlHours', 'delRush', 'showIntro',
+  'delSecondShooter', 'delEngagement', 'delEngagementOutsideNyc', 'delAddlHours', 'delRush', 'showIntro',
 ];
-const DRAFT_ADDON_FIELDS = ['delEngagementNotes', 'delAddlHoursRate', 'delRushFee', 'delLiveFee'];
+const DRAFT_ADDON_FIELDS = ['delEngagementNotes', 'delEngagementPricing', 'delEngagementFee', 'delAddlHoursRate', 'delRushFee', 'delLiveFee'];
 
 // ── STATE ─────────────────────────────────────────────────────────
 let quoteTrackingId = crypto.randomUUID();
@@ -223,6 +223,9 @@ function getPricingInputs() {
     travelAmount: parseFloat($('travelAmount').value) || 0,
     livestreamSelected: $('delLive').checked,
     livestreamFee: $('delLiveFee').value,
+    engagementSelected: $('delEngagement').checked,
+    engagementCharged: $('delEngagementPricing').value === 'charged',
+    engagementFee: $('delEngagementFee').value,
   };
 }
 
@@ -243,6 +246,7 @@ function updatePricingUI(pricing, inputs) {
   if (inputs.travelType === 'separate') metaParts.push('Travel separate');
   if (inputs.travelType === 'included') metaParts.push('Travel included');
   if (pricing.livestreamPending) metaParts.push('Livestream fee separate');
+  if (pricing.engagementPending) metaParts.push('Engagement fee separate');
   $('totalMeta').textContent = metaParts.join(' · ');
 
   const preview = $('pricingPreview');
@@ -275,6 +279,11 @@ function updatePricingUI(pricing, inputs) {
 
   if (inputs.livestreamSelected) addRow('Livestream (paid add-on)', pricing.livestreamPending
     ? 'Fee to be confirmed — excluded from estimate' : `$${pricing.livestreamFee.toLocaleString()}`);
+  if (inputs.engagementSelected) addRow('Engagement / Pre-Wedding Session', pricing.engagementPending
+    ? 'Fee to be confirmed — excluded from estimate' : getEngagementPriceLabel(pricing));
+  if (inputs.engagementSelected && $('delEngagementOutsideNyc').checked) {
+    addRow('Engagement travel & accommodation', 'Outside NYC — covered by client');
+  }
   if ($('delAddlHours').checked) {
     addRow('Complimentary extra coverage', '2 hours total per booking — no charge');
     addRow('Further extra coverage', `$${getOvertimeRate().toLocaleString()}/hour after the free hours`);
@@ -441,6 +450,20 @@ function getLivestreamDetail() {
     : `Paid add-on: $${pricing.livestreamFee.toLocaleString()}`;
 }
 
+function getEngagementPriceLabel(pricing) {
+  if ($('delEngagementPricing').value !== 'charged') return 'Complimentary';
+  return pricing.engagementPending ? 'Fee TBD' : `$${pricing.engagementFee.toLocaleString()}`;
+}
+
+const ENGAGEMENT_TRAVEL_NOTE = 'Shoot outside NYC: client covers travel & accommodation, same as the wedding';
+
+function getEngagementDetail() {
+  const pricing = calculatePricingSummary(getDays(), getPricingInputs());
+  const parts = [$('delEngagementNotes').value.trim() || 'Pre-wedding couple shoot', getEngagementPriceLabel(pricing)];
+  if ($('delEngagementOutsideNyc').checked) parts.push(ENGAGEMENT_TRAVEL_NOTE);
+  return parts.join(' · ');
+}
+
 function getDeliverableRows() {
   const rows = [];
 
@@ -478,7 +501,7 @@ function getDeliverableRows() {
   del('delSecondShooter', 'Second Shooter', 'Additional photographer');
 
   if ($('delEngagement').checked) {
-    rows.push({ label: 'Engagement Session', detail: $('delEngagementNotes').value || 'Pre-wedding couple shoot' });
+    rows.push({ label: 'Engagement Session', detail: getEngagementDetail() });
   }
   if ($('delAddlHours').checked) {
     rows.push({ label: 'Complimentary Extra Coverage', detail: '2 hours total per booking; no charge' });
@@ -571,7 +594,7 @@ function generatePDF(action) {
   if ($('delLive').checked)         scopeItems.push(`Livestream — private streaming link (${getLivestreamDetail()})`);
   if ($('delAddlHours').checked)    scopeItems.push('2 complimentary extra hours total per booking, shared across all event days');
   if ($('delSecondShooter').checked) scopeItems.push('Second photographer for full coverage');
-  if ($('delEngagement').checked)   scopeItems.push($('delEngagementNotes').value || 'Engagement session — pre-wedding couple shoot');
+  if ($('delEngagement').checked)   scopeItems.push(`Engagement / pre-wedding session — ${getEngagementDetail()}`);
 
   let currentPage = 1;
   const SAFE_Y = H - 60;
@@ -841,7 +864,11 @@ function generatePDF(action) {
       const fee = parseFloat($('delRushFee').value);
       addonRows.push(['Rush / Priority Delivery', 'Paid add-on', fee > 0 ? `$${fee.toLocaleString()}` : 'Fee TBD']);
     }
-    if (hasEngmt) addonRows.push(['Engagement / Pre-Wedding Session', $('delEngagementNotes').value.trim(), '']);
+    if (hasEngmt) {
+      const engmtDetail = [$('delEngagementNotes').value.trim(), $('delEngagementOutsideNyc').checked ? ENGAGEMENT_TRAVEL_NOTE : '']
+        .filter(Boolean).join('. ');
+      addonRows.push(['Engagement / Pre-Wedding Session', engmtDetail, pricing.engagementPending ? 'Fee quoted separately' : getEngagementPriceLabel(pricing)]);
+    }
     doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
     const rows = addonRows.map(([title, detail, value]) => {
       const lines = detail ? doc.splitTextToSize(detail, cW - 170) : [];
@@ -894,6 +921,13 @@ function generatePDF(action) {
     checkPageBreak(18);
     doc.setFontSize(8); doc.setFont('helvetica', 'normal'); sc(...CREAM);
     doc.text('Livestream fee is quoted separately and is not included in this estimate.', mL + 12, y);
+    y += 18;
+  }
+
+  if (pricing.engagementPending) {
+    checkPageBreak(18);
+    doc.setFontSize(8); doc.setFont('helvetica', 'normal'); sc(...CREAM);
+    doc.text('Engagement session fee is quoted separately and is not included in this estimate.', mL + 12, y);
     y += 18;
   }
 
@@ -1120,6 +1154,8 @@ function toggleAddonFields() {
   $('delLiveFeeWrap').classList.toggle('hidden', !$('delLive').checked);
   $('livestreamHelp').classList.toggle('hidden', !$('delLive').checked);
   $('delEngagementNotes').classList.toggle('hidden', !$('delEngagement').checked);
+  $('delEngagementOptions').classList.toggle('hidden', !$('delEngagement').checked);
+  $('delEngagementFeeWrap').classList.toggle('hidden', $('delEngagementPricing').value !== 'charged');
   $('delAddlHoursRateWrap').classList.toggle('hidden', !$('delAddlHours').checked);
   $('delRushFeeWrap').classList.toggle('hidden', !$('delRush').checked);
 }
@@ -1227,7 +1263,7 @@ function init() {
       recalcTotal();
       scheduleDraftSave();
     }
-    if (['delEngagement', 'delAddlHours', 'delRush', 'delLive'].includes(e.target.id)) {
+    if (['delEngagement', 'delEngagementPricing', 'delAddlHours', 'delRush', 'delLive'].includes(e.target.id)) {
       toggleAddonFields();
       recalcTotal();
       scheduleDraftSave();
@@ -1267,7 +1303,11 @@ function init() {
       if (el.tagName === 'SELECT') { el.selectedIndex = 0; } else { el.value = ''; }
     });
     DRAFT_CHECK_FIELD_IDS.forEach(id => { const el = $(id); if (el) el.checked = false; });
-    DRAFT_ADDON_FIELDS.forEach(id => { const el = $(id); if (el) el.value = ''; });
+    DRAFT_ADDON_FIELDS.forEach(id => {
+      const el = $(id);
+      if (!el) return;
+      if (el.tagName === 'SELECT') { el.selectedIndex = 0; } else { el.value = ''; }
+    });
     $('timeline').value = $('timeline').defaultValue;
     $('dataHandling').value = $('dataHandling').defaultValue;
     $('galleryDelivery').value = $('galleryDelivery').defaultValue;
