@@ -430,6 +430,7 @@ export function getCurrentDetailProjectId() {
 
 export async function openDetailPanel(project) {
   currentDetailProject = project;
+  resetDeleteButton();
   document.getElementById('detailClientName').textContent = project.client_name;
   document.getElementById('detailBackdrop').classList.add('open');
   await renderSubEventsTimeline();
@@ -439,6 +440,60 @@ export async function openDetailPanel(project) {
 function closeDetailPanel() {
   document.getElementById('detailBackdrop').classList.remove('open');
   currentDetailProject = null;
+  resetDeleteButton();
+}
+
+// Two-click confirm, same as the admin quote dashboard: first click arms the
+// button ("Sure?"), it auto-reverts after 5s, a second click within 5s deletes.
+let deleteConfirmTimer = null;
+
+function resetDeleteButton() {
+  clearTimeout(deleteConfirmTimer);
+  deleteConfirmTimer = null;
+  const btn = document.getElementById('detailDeleteBtn');
+  btn.textContent = 'Delete';
+  btn.classList.remove('confirming');
+  btn.disabled = false;
+}
+
+async function handleDeleteProjectClick() {
+  const btn = document.getElementById('detailDeleteBtn');
+  if (!currentDetailProject) return;
+
+  if (!btn.classList.contains('confirming')) {
+    btn.textContent = 'Sure?';
+    btn.classList.add('confirming');
+    deleteConfirmTimer = setTimeout(resetDeleteButton, 5000);
+    return;
+  }
+
+  clearTimeout(deleteConfirmTimer);
+  btn.disabled = true;
+  const project = currentDetailProject;
+
+  // Sub-events, editors, comments and activity rows cascade in the DB.
+  // .select('id') so an RLS-filtered delete (zero rows) is caught, not
+  // reported as success.
+  const { data, error } = await supabase
+    .from('projects')
+    .delete()
+    .eq('id', project.id)
+    .select('id');
+  if (error || !data?.length) {
+    showErrorToast('Could not delete project — please try again.');
+    resetDeleteButton();
+    return;
+  }
+
+  // Uploaded PDFs live outside the DB cascade. Best-effort: a leftover file
+  // is harmless and only reachable by owner/pm.
+  await supabase.storage
+    .from('project-documents')
+    .remove([`${project.id}/contract.pdf`, `${project.id}/quote.pdf`]);
+
+  closeDetailPanel();
+  showSuccessToast(`Deleted ${project.client_name}.`);
+  refreshProjects();
 }
 
 export async function renderSubEventsTimeline() {
@@ -630,6 +685,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('detailCopyLinkBtn').addEventListener('click', copyClientLink);
   document.getElementById('detailClose').addEventListener('click', closeDetailPanel);
   document.getElementById('detailEditBtn').addEventListener('click', () => openProjectModal(currentDetailProject));
+  document.getElementById('detailDeleteBtn').addEventListener('click', handleDeleteProjectClick);
   document.getElementById('detailBackdrop').addEventListener('click', (e) => {
     if (e.target.id === 'detailBackdrop') closeDetailPanel();
   });

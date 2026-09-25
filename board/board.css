@@ -269,6 +269,13 @@ body {
   display: flex; align-items: center; justify-content: center; font-size: 0.7rem;
 }
 .detail-edit:hover { border-color: var(--rose); color: var(--rose); }
+.detail-delete {
+  background: none; border: 1px solid rgba(201,149,107,0.15); color: rgba(250,246,241,0.4);
+  border-radius: 4px; height: 30px; padding: 0 0.65rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 0.7rem;
+}
+.detail-delete:hover, .detail-delete.confirming { border-color: #e07a6a; color: #e07a6a; }
+.detail-delete:disabled { opacity: 0.5; cursor: wait; }
 .detail-section { margin-bottom: 2rem; }
 .detail-section-title {
   font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--rose);
