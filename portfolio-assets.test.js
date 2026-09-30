@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const html = readFileSync(join(process.cwd(), 'index.html'), 'utf8');
@@ -28,6 +28,20 @@ describe('portfolio asset wiring', () => {
 
     for (let index = 1; index <= count; index += 1) {
       expect(existsSync(join(process.cwd(), folder, `${index}.jpg`))).toBe(true);
+    }
+  });
+
+  it('keeps MRGA gallery images within the web delivery budget', () => {
+    const item = getGalleryItem('Mrga');
+    const folder = getAttr(item, 'data-folder');
+    const count = Number(getAttr(item, 'data-count'));
+    const maxBytes = 2 * 1024 * 1024;
+
+    expect(item).toBeTruthy();
+    for (let index = 1; index <= count; index += 1) {
+      const imagePath = join(process.cwd(), folder, `${index}.jpg`);
+      expect(existsSync(imagePath)).toBe(true);
+      expect(statSync(imagePath).size).toBeLessThanOrEqual(maxBytes);
     }
   });
 });
