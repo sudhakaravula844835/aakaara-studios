@@ -233,6 +233,18 @@ function ensureFlatpickrLibrary() {
     return;
   }
 
+  // Skip intro if directly arriving via anchor hash (e.g. #contact, #video-works, #portfolio)
+  if (window.location.hash && window.location.hash !== '#' && window.location.hash !== '#home') {
+    revealHeroImmediately();
+    requestAnimationFrame(() => {
+      const target = document.querySelector(window.location.hash);
+      if (target) {
+        setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 50);
+      }
+    });
+    return;
+  }
+
   if (shouldSkipIntro) {
     revealHeroImmediately();
     return;

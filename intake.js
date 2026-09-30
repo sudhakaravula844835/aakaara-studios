@@ -247,6 +247,7 @@ function addEventRow(list) {
   nameInput.className    = 'event-name';
   nameInput.placeholder  = 'Event name (e.g. Ceremony)';
   nameInput.autocomplete = 'off';
+  nameInput.setAttribute('aria-label', 'Event name');
 
   nameGroup.appendChild(nameInput);
 
@@ -260,6 +261,7 @@ function addEventRow(list) {
   hoursInput.max         = '24';
   hoursInput.step        = '0.5';
   hoursInput.placeholder = 'Hrs';
+  hoursInput.setAttribute('aria-label', 'Event duration in hours');
 
   const hoursSpan = document.createElement('span');
   hoursSpan.className   = 'event-hours-label';

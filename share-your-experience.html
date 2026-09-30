@@ -13,6 +13,7 @@
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Share your experience working with Aakaara Studios NYC and tell us what made your photography or film session memorable.">
   <title>Share Your Experience · Aakaara Studios NYC</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -164,6 +165,8 @@
       font-size: 1.8rem;
       color: rgba(201, 149, 107, 0.25);
       cursor: pointer;
+      min-width: 44px;
+      min-height: 44px;
       padding: 0;
       line-height: 1;
       transition: color 0.15s;
@@ -184,10 +187,11 @@
       accent-color: var(--rose);
     }
 
-    .consent-row p {
+    .consent-row label {
       font-size: 0.85rem;
       color: rgba(250, 246, 241, 0.5);
       line-height: 1.5;
+      cursor: pointer;
     }
 
     .submit-btn {
@@ -320,7 +324,7 @@
 
         <div class="consent-row">
           <input type="checkbox" id="consent" name="consent" value="yes" required>
-          <p>I give Aakaara Studios permission to display this testimonial on their website and social media.</p>
+          <label for="consent">I give Aakaara Studios permission to display this testimonial on their website and social media.</label>
         </div>
 
         <button type="submit" class="submit-btn">Send My Testimonial</button>

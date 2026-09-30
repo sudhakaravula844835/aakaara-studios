@@ -4035,7 +4035,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .ethereal-carousel .vw-card[data-ec-offset="-1"] .vw-duration { opacity: 0; }
   .ethereal-carousel .vw-card[data-ec-offset="1"] .vw-play-wrap,
   .ethereal-carousel .vw-card[data-ec-offset="-1"] .vw-play-wrap { transform: translate(-50%, -50%) scale(0.76); opacity: 0.62; }
-  .ec-nav { width: 42px; height: 42px; opacity: 0.85; }
+  .ec-nav { width: 44px; height: 44px; opacity: 0.85; }
   .ec-nav:hover { transform: translateY(-50%); }
 }
 
@@ -4089,8 +4089,8 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
     letter-spacing: 0.07em;
   }
   #videoCarousel .ec-nav {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     background: rgba(9,8,11,0.34);
     border-color: rgba(201,149,107,0.16);
     opacity: 0.78;
@@ -4118,7 +4118,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   }
   .vw-filters button {
     width: 100%;
-    min-height: 36px;
+    min-height: 44px;
     font-size: 0.45rem;
     padding: 0.5rem 0.62rem;
     letter-spacing: 0.14em;
@@ -4132,8 +4132,8 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
     letter-spacing: 0.12em;
   }
   #videoCarousel .ec-nav {
-    width: 34px;
-    height: 34px;
+    width: 44px;
+    height: 44px;
   }
   #videoCarousel .ec-prev { left: 0.25rem; }
   #videoCarousel .ec-next { right: 0.25rem; }

@@ -2,7 +2,10 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    environment: 'jsdom',
+    environment: 'node',
+    pool: 'vmThreads',
+    fileParallelism: false,
+    isolate: false,
     include: ['**/*.test.js'],
     exclude: ['**/node_modules/**', '**/dist/**', '**/*.spec.js', '**/.claude/**'],
     setupFiles: ['./board/test/vitest.setup.js'],

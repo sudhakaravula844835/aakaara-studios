@@ -151,7 +151,7 @@ select option { background: var(--umber); }
 .add-event-btn {
   background: none; border: none; color: var(--rose);
   font-size: 0.8rem; letter-spacing: 0.08em; cursor: pointer;
-  padding: 4px 0; font-family: var(--font-body); transition: opacity 0.2s;
+  min-height: 44px; padding: 4px 0; font-family: var(--font-body); transition: opacity 0.2s;
 }
 .add-event-btn:hover { color: var(--rose-light); }
 .event-hours-label { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }

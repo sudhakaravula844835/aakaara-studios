@@ -17,7 +17,7 @@ function getAttr(markup, attr) {
 describe('portfolio asset wiring', () => {
   it.each([
     ['Shreya'],
-    ['Sanjana &amp; Shubash'],
+    ['Sanjana &amp; Subhash'],
   ])('keeps %s live when the maternity images exist', (title) => {
     const item = getGalleryItem(title);
     const folder = getAttr(item, 'data-folder');
