@@ -764,13 +764,15 @@ body.intro-active #heroScroll { opacity: 0; }
 .sw-gallery-stage::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background-image: inherit; /* Dynamically pulls the current photo */
+  inset: -8%;
+  background-image: var(--sw-gallery-backdrop, none);
   background-size: cover;
   background-position: center;
-  filter: blur(80px) brightness(0.3);
-  opacity: 0.6;
-  z-index: 1;
+  filter: blur(58px) saturate(0.82) brightness(0.38);
+  opacity: 0.56;
+  transform: scale(1.08);
+  z-index: 0;
+  pointer-events: none;
 }
 .gallery-item:hover .gi-bg { transform: scale(1.05); filter: grayscale(0%) brightness(1) contrast(1); }
 /* ─── FIX 1: View Pill ─────────────────────────────────────────────────────
@@ -2725,15 +2727,15 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 /* MOBILE FIX: added min-height/padding so close button meets 44px touch target on all devices */
 .sw-gallery-close { display: flex; align-items: center; gap: 0.5rem; font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(250,246,241,0.4); cursor: pointer; transition: color 0.3s; background: none; border: none; font-family: var(--font-body); white-space: nowrap; min-height: 44px; padding-inline: 0.25rem; }
 .sw-gallery-close:hover { color: var(--rose); }
-.sw-gallery-stage { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.sw-gallery-img { position: absolute; inset: -5%; background-size: cover; background-position: center; background-repeat: no-repeat; will-change: transform; transition: background-image 0s; }
+.sw-gallery-stage { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; isolation: isolate; background: radial-gradient(circle at 50% 44%, rgba(201,149,107,0.07), transparent 52%), #08070a; }
+.sw-gallery-img { position: absolute; inset: -5%; z-index: 1; background-size: cover; background-position: center; background-repeat: no-repeat; will-change: transform; transition: background-image 0s; }
 .sw-gallery-img.sw-img-enter { animation: swImgIn 0.72s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .sw-gallery-img.sw-img-exit  { animation: swImgOut 0.3s cubic-bezier(0.87, 0, 0.13, 1) both; }
 @keyframes swImgIn  { from { opacity: 0; transform: scale(1.05); } to { opacity: 1; transform: scale(1); } }
 @keyframes swImgOut { from { opacity: 1; } to { opacity: 0; transform: scale(0.975); } }
-.sw-gallery-stage::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 38%; background: linear-gradient(to top, rgba(9,8,11,0.92), transparent); z-index: 2; pointer-events: none; }
+.sw-gallery-stage::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 18%, rgba(8,7,10,0.22) 55%, rgba(8,7,10,0.78) 100%), linear-gradient(to bottom, rgba(8,7,10,0.58), transparent 24%, transparent 64%, rgba(8,7,10,0.94)); z-index: 2; pointer-events: none; }
 .sw-gallery-stage.sw-bg-anim::before { animation: swBgZoom 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-@keyframes swBgZoom { from { transform: scale(1.15); opacity: 0; } to { transform: scale(1); opacity: 0.6; } }
+@keyframes swBgZoom { from { transform: scale(1.16); opacity: 0.18; } to { transform: scale(1.08); opacity: 0.56; } }
 .sw-gallery-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 5; width: 52px; height: 52px; border-radius: 50%; border: 1px solid rgba(250,246,241,0.08); background: rgba(9,8,11,0.4); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; cursor: pointer; color: rgba(250,246,241,0.5); transition: all 0.4s cubic-bezier(0.16,1,0.3,1); }
 .sw-gallery-nav:hover { border-color: var(--rose); color: var(--rose); background: rgba(9,8,11,0.7); transform: translateY(-50%) scale(1.08); }
 .sw-gallery-prev { left: 2.5rem; }
@@ -4440,7 +4442,8 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 
 /* ═══════ STATIC GALLERY MODE ═══════ */
 .sw-gallery.sw-static .sw-gallery-img {
-    inset: 12% 15%; /* Reduced size */
+    inset: 0;
+    background-size: auto calc(100% - clamp(8rem, 17vh, 10rem)) !important;
     transform: none !important; /* Disable parallax */
 }
 .sw-gallery.sw-static .sw-gallery-img.sw-img-enter {
@@ -4449,6 +4452,10 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 @keyframes swImgInStatic {
     from { opacity: 0; filter: blur(5px); }
     to { opacity: 1; filter: blur(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sw-gallery-stage.sw-bg-anim::before { animation: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════

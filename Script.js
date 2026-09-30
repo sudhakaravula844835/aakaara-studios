@@ -861,6 +861,15 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
   let _dockBoundMoveFn = null;
   const photoJournal = window.createPhotoJournal?.({ gallery, onClose: closeSwGallery });
 
+  function updateGalleryBackdrop(url, animate) {
+    const safeUrl = String(url).replace(/(["\\])/g, '\\$1');
+    stage.style.setProperty('--sw-gallery-backdrop', `url("${safeUrl}")`);
+    if (!animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    stage.classList.remove('sw-bg-anim');
+    void stage.offsetWidth;
+    stage.classList.add('sw-bg-anim');
+  }
+
   function openSwGallery(work) {
     lastFocusedElement = document.activeElement;
     // Turn the tapped cover from black & white to color, and keep it that way
@@ -905,6 +914,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       if (noticeTitle) noticeTitle.textContent = work.dataset.title || '';
       galleryCounter.textContent = "";
       if (galleryImg) galleryImg.style.backgroundImage = 'none';
+      stage.style.removeProperty('--sw-gallery-backdrop');
       document.body.style.overflow = 'hidden';
       swIsOpen = true;
       // Focus close button for accessibility
@@ -941,13 +951,22 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     const progressFill = document.getElementById('swProgressFill');
     if (progressFill) progressFill.style.width = `${((index + 1) / swImages.length) * 100}%`;
 
-    // Update thumbnails immediately
+    // Keep the stage anchored. Element.scrollIntoView() used to scroll this
+    // overflow-hidden ancestor horizontally, exposing a blank strip on the right.
+    stage.scrollLeft = 0;
+    stage.scrollTop = 0;
+
+    // Update thumbnails immediately, scrolling only the filmstrip container.
     document.querySelectorAll('.sw-strip-thumb').forEach((t, i) => {
       t.classList.toggle('active', i === index);
-      if (i === index) t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      if (i === index && galleryStrip) {
+        const centeredLeft = t.offsetLeft - (galleryStrip.clientWidth - t.offsetWidth) / 2;
+        galleryStrip.scrollTo({ left: Math.max(0, centeredLeft), behavior: 'smooth' });
+      }
     });
 
     if (isFirst) {
+        updateGalleryBackdrop(url, true);
         galleryImg.style.backgroundImage = `url('${url}')`;
         galleryImg.style.backgroundSize = "contain";
         galleryImg.classList.add('sw-img-enter');
@@ -960,6 +979,7 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
 
     galleryImg.addEventListener('animationend', () => {
         if (swImages[swIndex] !== url) return; // Prevent race conditions
+        updateGalleryBackdrop(url, true);
         galleryImg.style.backgroundImage = `url('${url}')`;
         galleryImg.style.backgroundSize = "contain";
         galleryImg.classList.remove('sw-img-exit');
@@ -1017,6 +1037,8 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
       gallery.className = gallery.className.replace(/gi-\d+/g, '').trim();
       
       galleryImg.style.backgroundImage = '';
+      stage.style.removeProperty('--sw-gallery-backdrop');
+      stage.classList.remove('sw-bg-anim');
       if (dockRAF) { cancelAnimationFrame(dockRAF); dockRAF = null; dockRAFRunning = false; }
       if (galleryStrip) {
         galleryStrip.innerHTML = '';
