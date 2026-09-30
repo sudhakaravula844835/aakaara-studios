@@ -750,16 +750,20 @@ const galleryObserver = new IntersectionObserver((entries, observer) => {
       const ext = item.dataset.ext || 'jpg';
       const coverSrc = item.dataset.cover || (folder ? `${folder}/1.${ext}` : null);
       if (coverSrc) {
+        const assetVersion = item.dataset.assetVersion;
+        const versionedCoverSrc = assetVersion
+          ? `${coverSrc}?v=${encodeURIComponent(assetVersion)}`
+          : coverSrc;
         const bg = item.querySelector('.gi-bg');
         if (bg) {
           const img = new Image();
           img.decoding = 'async';
           img.onload = function() {
-            bg.style.backgroundImage = `url('${coverSrc}')`;
+            bg.style.backgroundImage = `url('${versionedCoverSrc}')`;
             if (item.dataset.bgSize) bg.style.backgroundSize = item.dataset.bgSize;
             if (item.dataset.bgPos) bg.style.backgroundPosition = item.dataset.bgPos;
           };
-          img.src = coverSrc;
+          img.src = versionedCoverSrc;
         }
       }
       observer.unobserve(item);
@@ -881,11 +885,15 @@ document.querySelectorAll('[data-bg-src]').forEach(el => {
     const folder = work.dataset.folder || 'images/default';
     const count = parseInt(work.dataset.count || '1', 10);
     const ext = work.dataset.ext || 'jpg';
+    const assetVersion = work.dataset.assetVersion;
     const isStatic = work.dataset.static === 'true';
     const isComingSoon = work.dataset.comingSoon === 'true';
 
     // Build image array
-    swImages = Array.from({ length: count }, (_, i) => `${folder}/${i + 1}.${ext}`);
+    swImages = Array.from({ length: count }, (_, i) => {
+      const src = `${folder}/${i + 1}.${ext}`;
+      return assetVersion ? `${src}?v=${encodeURIComponent(assetVersion)}` : src;
+    });
     
     swIndex = 0;
     galleryTitle.textContent = work.dataset.title || '';
