@@ -3324,7 +3324,6 @@ let portfolioCarousel, videoCarousel;
 
   const title = document.getElementById('portfolioTitle');
   const desc = document.getElementById('portfolioDesc');
-  const filters = document.querySelectorAll('.portfolio-filters button');
 
   // Wrap title words in mask containers for cinematic rise reveal
   if (title && !title.querySelector('.word-mask')) {
@@ -3348,10 +3347,9 @@ let portfolioCarousel, videoCarousel;
       if (entry.isIntersecting) {
         portfolioSection.classList.add('is-animated');
 
-        // Stagger: accent line first, then words, then desc, then filters
+        // Stagger: accent line first, then words, then desc (filter pills stagger via CSS animation-delay)
         wordInners.forEach((inner, i) => { inner.style.transitionDelay = `${300 + i * 180}ms`; });
         if (desc) desc.style.transitionDelay = '750ms';
-        filters.forEach((button, i) => { button.style.transitionDelay = `${900 + i * 55}ms`; });
 
         portfolioObserver.unobserve(portfolioSection);
       }
