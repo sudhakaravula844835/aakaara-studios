@@ -5193,3 +5193,40 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
     text-align: left;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   PORTFOLIO - PASTEL BACKGROUND
+   Light pastel stage for the black & white portfolio cards.
+   ═══════════════════════════════════════════════════════════ */
+#portfolio {
+  --pf-bg-top: #f6ebe4;
+  --pf-bg-mid: #efdcd2;
+  --pf-ink: var(--umber);
+  background: linear-gradient(170deg, var(--pf-bg-top), var(--pf-bg-mid) 55%, var(--pf-bg-top));
+  color: var(--pf-ink);
+}
+#portfolio .section-tag { color: #a8744c; }
+#portfolio .section-desc { color: rgba(30, 26, 22, 0.62); }
+#portfolio .portfolio-filters button {
+  color: rgba(30, 26, 22, 0.6);
+  border-color: rgba(30, 26, 22, 0.14);
+  background: rgba(255, 255, 255, 0.35);
+}
+#portfolio .portfolio-filters button:hover,
+#portfolio .portfolio-filters button.active {
+  color: #8a5a36;
+  background: rgba(201, 149, 107, 0.16);
+  border-color: rgba(201, 149, 107, 0.6);
+}
+#portfolio .ec-nav {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(201, 149, 107, 0.4);
+  color: #8a5a36;
+}
+#portfolio .ec-counter {
+  color: rgba(30, 26, 22, 0.5);
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(30, 26, 22, 0.08);
+}
+#portfolio .ec-counter-current { color: #8a5a36; }
+#portfolioCarousel .gallery-item { box-shadow: 0 24px 50px -24px rgba(30, 26, 22, 0.45); }
