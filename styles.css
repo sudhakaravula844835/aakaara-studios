@@ -5198,12 +5198,28 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
    PORTFOLIO - PASTEL BACKGROUND
    Light pastel stage for the black & white portfolio cards.
    ═══════════════════════════════════════════════════════════ */
+/* Registered so the gradient stops can transition between category tones. */
+@property --pf-bg-top { syntax: '<color>'; inherits: false; initial-value: #f6ebe4; }
+@property --pf-bg-mid { syntax: '<color>'; inherits: false; initial-value: #efdcd2; }
 #portfolio {
   --pf-bg-top: #f6ebe4;
   --pf-bg-mid: #efdcd2;
   --pf-ink: var(--umber);
   background: linear-gradient(170deg, var(--pf-bg-top), var(--pf-bg-mid) 55%, var(--pf-bg-top));
   color: var(--pf-ink);
+  transition: --pf-bg-top 0.8s var(--ease), --pf-bg-mid 0.8s var(--ease);
+}
+/* Each category gets its own pastel tone; "All" stays blush. */
+#portfolio:has(.portfolio-filters [data-filter="wedding"].active)      { --pf-bg-top: #f8e9eb; --pf-bg-mid: #f0d4d9; } /* peony */
+#portfolio:has(.portfolio-filters [data-filter="engagement"].active)   { --pf-bg-top: #f3e8ee; --pf-bg-mid: #e3d0db; } /* mauve */
+#portfolio:has(.portfolio-filters [data-filter="couple"].active)       { --pf-bg-top: #fbefe5; --pf-bg-mid: #f5dcc7; } /* apricot */
+#portfolio:has(.portfolio-filters [data-filter="maternity"].active)    { --pf-bg-top: #ecf5f0; --pf-bg-mid: #d7eadf; } /* mint */
+#portfolio:has(.portfolio-filters [data-filter="graduation"].active)   { --pf-bg-top: #ecf2f8; --pf-bg-mid: #d8e5f1; } /* sky */
+#portfolio:has(.portfolio-filters [data-filter="housewarming"].active) { --pf-bg-top: #fbf4df; --pf-bg-mid: #f3e4bd; } /* haldi */
+#portfolio:has(.portfolio-filters [data-filter="brand"].active)        { --pf-bg-top: #f2f1ef; --pf-bg-mid: #e2e0dc; } /* platinum */
+#portfolio:has(.portfolio-filters [data-filter="conceptual"].active)   { --pf-bg-top: #f0ebf7; --pf-bg-mid: #ded3ed; } /* wisteria */
+@media (prefers-reduced-motion: reduce) {
+  #portfolio { transition: none; }
 }
 #portfolio .section-tag { color: #a8744c; }
 #portfolio .section-desc { color: rgba(30, 26, 22, 0.62); }
