@@ -314,7 +314,7 @@ body::after {
   position: relative; z-index: 1;
   text-align: center; padding: 3rem 2rem; max-width: 440px;
 }
-.not-found h2 {
+.not-found h1 {
   font-family: var(--font-display);
   font-size: 2rem; font-weight: 300; color: var(--ivory);
   letter-spacing: 0.02em; margin-bottom: 0.75rem;
@@ -503,7 +503,7 @@ const film    = VIDEOS[slug];
 if (!film) {
   wrap.innerHTML = `
     <div class="not-found">
-      <h2>Film not found.</h2>
+      <h1>Film not found.</h1>
       <p>This link may be incorrect, or the film hasn't been published yet.</p>
       <a href="/#video-works">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
