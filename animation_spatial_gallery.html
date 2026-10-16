@@ -140,6 +140,15 @@
       will-change: transform, opacity;
     }
 
+    @media (min-width: 900px) {
+      .gallery-card {
+        width: 35rem;
+        margin-left: -17.5rem;
+        margin-top: -12.324rem;
+        border-radius: 1.2rem;
+      }
+    }
+
     .gallery-card::before {
       content: "";
       position: absolute;
@@ -150,6 +159,19 @@
       pointer-events: none;
       z-index: 0;
     }
+
+    .gallery-card__video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .gallery-card--video::before { z-index: 1; }
+    .gallery-card--video .gallery-card__copy { z-index: 2; }
 
     .gallery-card::after {
       content: "";
@@ -194,10 +216,92 @@
       color: rgba(255, 255, 255, 0.56);
     }
 
+    .gallery-controls { display: none; }
+
+    /* Tablet framing also covers an iPad with a trackpad attached. */
+    @media (max-width: 1199px), (max-width: 1366px) and (any-pointer: coarse) {
+      .study--gallery {
+        --gallery-card-width: min(43vw, 30rem, 52svh);
+        height: 100svh;
+        min-height: 32rem;
+        overflow: hidden;
+      }
+      .study--gallery .study-head { padding: max(1.75rem, env(safe-area-inset-top)) 2rem 0; max-width: none; }
+      .study--gallery .study-head h1 { font-size: clamp(2.8rem, 5.5vw, 4rem); max-width: 22ch; }
+      .study--gallery .gallery-stage { inset: 10rem 0 6.5rem; overflow: hidden; }
+      .study--gallery .helix-field { perspective: calc(var(--gallery-card-width) * 3.392857); perspective-origin: 38% 48%; }
+      .study--gallery .gallery-card {
+        width: var(--gallery-card-width);
+        left: 38%;
+        margin-left: calc(var(--gallery-card-width) * -0.5);
+        margin-top: calc(var(--gallery-card-width) * -0.352113);
+        border-radius: 1.15rem;
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+      }
+      .study--gallery .gallery-card__copy { left: 1rem; right: 1rem; bottom: 1rem; }
+      .study--gallery .gallery-card__title { font-size: 1.65rem; }
+      .study--gallery .gallery-card__subtitle { font-size: 0.65rem; letter-spacing: 0.09em; }
+      .study--gallery .study-meta { display: none; }
+      .gallery-controls {
+        display: flex;
+        position: absolute;
+        bottom: max(1.25rem, env(safe-area-inset-bottom));
+        left: 2rem;
+        right: 2rem;
+        z-index: 5;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+      .gallery-controls button {
+        display: grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        flex: 0 0 48px;
+        border: 1px solid rgba(201, 149, 107, 0.4);
+        border-radius: 50%;
+        color: var(--text);
+        background: rgba(201, 149, 107, 0.06);
+        cursor: pointer;
+        touch-action: manipulation;
+      }
+      .gallery-controls button:disabled { opacity: 0.28; cursor: default; }
+      .gallery-controls button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+      .gallery-controls button:active:not(:disabled) { background: rgba(201, 149, 107, 0.2); }
+      .gallery-controls svg { width: 20px; height: 20px; }
+      .gallery-controls__status { text-align: center; font-family: Arial, sans-serif; }
+      #galleryCount { font-size: 0.75rem; letter-spacing: 0.24em; color: var(--accent); }
+      #galleryGesture { margin-top: 0.55rem; font-size: 0.75rem; color: rgba(245, 238, 232, 0.7); }
+    }
+
+    @media (max-width: 599px), (max-width: 959px) and (max-height: 500px) {
+      .study--gallery { --gallery-card-width: min(80vw, 26rem); }
+      .study--gallery .study-head { padding: max(1.5rem, env(safe-area-inset-top)) 1.375rem 0; gap: 0.75rem; }
+      .study--gallery .study-kicker { font-size: 0.62rem; letter-spacing: 0.25em; }
+      .study--gallery .study-head h1 { font-size: clamp(2.4rem, 10vw, 3.2rem); max-width: 17ch; line-height: 0.98; }
+      .study--gallery .gallery-stage { inset: 9.25rem 0 6.5rem; }
+      .study--gallery .helix-field { perspective-origin: 50% 48%; }
+      .study--gallery .gallery-card { left: 50%; border-radius: 1rem; }
+      .study--gallery .gallery-card__eyebrow { font-size: 0.59rem; }
+      .study--gallery .gallery-card__title { font-size: 1.5rem; }
+      .study--gallery .gallery-card__subtitle { font-size: 0.61rem; }
+      .gallery-controls { left: 1.375rem; right: 1.375rem; }
+    }
+
+    @media (max-width: 959px) and (max-height: 500px) {
+      .study--gallery { --gallery-card-width: min(44vw, 65svh); min-height: 0; }
+      .study--gallery .study-head { padding-top: max(0.8rem, env(safe-area-inset-top)); gap: 0.3rem; }
+      .study--gallery .study-head h1 { max-width: none; font-size: 1.8rem; }
+      .study--gallery .gallery-stage { inset: 5rem 0 4rem; }
+      .gallery-controls { bottom: max(0.5rem, env(safe-area-inset-bottom)); }
+      #galleryGesture { margin-top: 0.2rem; }
+    }
+
   </style>
 </head>
 <body>
-  <main class="study">
+  <main class="study study--gallery">
     <header class="study-head">
       <p class="study-kicker">Spatial Gallery Study</p>
       <h1><em>Aakaara</em> in cinematic orbit.</h1>
@@ -206,8 +310,12 @@
     <section class="gallery-stage" aria-label="3D spatial gallery study">
       <div class="helix-field" id="helixField">
 
-        <article class="gallery-card"
+        <article class="gallery-card gallery-card--video"
           style="background-image: linear-gradient(180deg, rgba(12,8,8,0.02), rgba(12,8,8,0.32)), url('/images/couple-portraits/karthik-Sunayana/1.jpg')">
+          <video class="gallery-card__video" autoplay muted loop playsinline preload="metadata"
+            poster="/images/couple-portraits/karthik-Sunayana/1.jpg" aria-hidden="true">
+            <source src="videos/abhigna-nyc.mp4" type="video/mp4">
+          </video>
           <div class="gallery-card__copy">
             <p class="gallery-card__eyebrow">Frame 01</p>
             <h3 class="gallery-card__title">Weddings</h3>
@@ -251,10 +359,31 @@
           </div>
         </article>
 
+        <article class="gallery-card"
+          style="background-image: linear-gradient(180deg, rgba(12,8,8,0.03), rgba(12,8,8,0.38)), url('/images/conceptual/sameeksha-nyc-library/3.jpg')">
+          <div class="gallery-card__copy">
+            <p class="gallery-card__eyebrow">Frame 06</p>
+            <h3 class="gallery-card__title">Conceptual</h3>
+            <p class="gallery-card__subtitle">Art beyond the frame</p>
+          </div>
+        </article>
+
       </div>
     </section>
 
     <div class="study-meta">Scroll to explore</div>
+    <nav class="gallery-controls" aria-label="Gallery navigation">
+      <button type="button" id="galleryPrevious" aria-label="Previous card" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>
+      </button>
+      <div class="gallery-controls__status">
+        <p id="galleryCount" role="status" aria-live="polite" aria-atomic="true">01 / 06</p>
+        <p id="galleryGesture">Swipe up to explore</p>
+      </div>
+      <button type="button" id="galleryNext" aria-label="Next card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg>
+      </button>
+    </nav>
   </main>
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -433,8 +562,8 @@
 
   /* ─── Service card container ─────────────────────────────── */
   .svc-card {
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
   }
 
   .svc-card-inner {
@@ -519,7 +648,118 @@
     padding: 0.17rem 0.48rem;
     border-radius: 1rem;
   }
+
+  /* On touch screens and compact windows, service details stay in normal flow. */
+  @media (max-width: 1199px), (max-width: 1366px) and (any-pointer: coarse) {
+    .study--services {
+      height: auto;
+      min-height: 100svh;
+      padding: 3rem clamp(1rem, 4vw, 3rem) 4rem;
+    }
+
+    .study--services .study-head {
+      max-width: 64rem;
+      margin: 0 auto 2rem;
+      padding: 0;
+    }
+
+    .study--services .study-head h1 {
+      max-width: 15ch;
+      font-size: clamp(2.4rem, 6vw, 3.75rem);
+      line-height: 1;
+    }
+
+    .study--services .gallery-stage,
+    .study--services .helix-field {
+      position: relative;
+      inset: auto;
+      perspective: none;
+      pointer-events: auto;
+    }
+
+    .study--services .helix-field {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      max-width: 64rem;
+      margin: 0 auto;
+    }
+
+    .study--services .svc-card {
+      position: relative;
+      top: auto;
+      left: auto;
+      width: auto;
+      min-width: 0;
+      aspect-ratio: auto;
+      margin: 0;
+      border-radius: 1.25rem;
+      box-shadow: none;
+      transform: none !important;
+      opacity: 1 !important;
+      z-index: auto !important;
+      transition: none !important;
+      will-change: auto;
+    }
+
+    .study--services .svc-card-inner {
+      position: relative;
+      inset: auto;
+      height: 100%;
+      gap: 1.25rem;
+      padding: clamp(1.25rem, 3vw, 2rem);
+    }
+
+    .study--services .svc-body { gap: 0.7rem; }
+    .study--services .svc-num { color: var(--accent); }
+    .study--services .svc-title { font-size: 1.9rem; line-height: 1.08; }
+    .study--services .svc-desc {
+      max-width: 42ch;
+      font-size: 0.9375rem;
+      line-height: 1.65;
+      color: rgba(245, 238, 232, 0.78);
+    }
+    .study--services .svc-price { font-size: 0.875rem; }
+    .study--services .svc-tag {
+      font-size: 0.625rem;
+      line-height: 1.4;
+      letter-spacing: 0.1em;
+      padding: 0.35rem 0.65rem;
+      color: var(--accent);
+    }
+    .study--services .study-meta { display: none; }
+  }
+
+  @media (max-width: 599px), (max-height: 500px) and (max-width: 959px) {
+    .study--services .helix-field { grid-template-columns: minmax(0, 1fr); }
+  }
 </style>
+
+<script>
+// One continuous helix for both galleries: equal offsets follow the same path.
+// Positive offsets wait below/right; negative offsets recede above/left.
+function spiralProps(offset) {
+  var angle = offset * Math.PI * 55 / 180;
+  var distance = Math.abs(offset);
+  // Local position adjustment for the third slot; zero at slots two and four.
+  var thirdSlot = offset > 1 && offset < 3
+    ? Math.pow(Math.sin(Math.PI * (offset - 1) / 2), 2) : 0;
+  var fade = Math.max(0, Math.min(1, (4.5 - distance) / 0.75));
+  return {
+    // Shift the second slot right, blending smoothly into adjacent positions.
+    tx: 34 * Math.sin(angle) + (offset > 0 && offset < 2
+      ? 4 * Math.pow(Math.sin(Math.PI * offset / 2), 2) : 0) + 12.85 * thirdSlot,
+    ty: -25 + 52 * offset + 32.7 * thirdSlot,
+    tz: -650 * (1 - Math.cos(angle)),
+    // Open the second slot toward the viewer, easing away toward adjacent slots.
+    ry: offset * 55 + (offset > 0 && offset < 2
+      ? -10 * Math.pow(Math.sin(Math.PI * offset / 2), 2) : 0),
+    // Card 3 recedes behind card 2, then returns to full size along the path.
+    sc: 1 - 0.28 * thirdSlot,
+    op: fade * fade * (3 - 2 * fade)
+  };
+}
+</script>
 
 <script>
 /* ─── Section 2 orbit — Six Ways We Tell Your Story ──────────
@@ -529,33 +769,8 @@
 (function () {
   'use strict';
 
-  var SLOTS2 = [
-    { tx:   7, ty: -200, tz: -2050, ry: -180, sc: 1.00, op: 0.00 },
-    { tx: -29, ty: -165, tz: -1900, ry: -140, sc: 1.00, op: 1.00 },
-    { tx: -47, ty: -120, tz: -1700, ry: -110, sc: 1.00, op: 1.00 },
-    { tx: -30, ty:  -15, tz:  -500, ry:  -55, sc: 1.00, op: 1.00 },
-    { tx:   0, ty:  -25, tz:     0, ry:    0, sc: 1.00, op: 1.00 },
-    { tx:  30, ty:   15, tz:  -500, ry:   55, sc: 1.20, op: 1.00 },
-    { tx:  47, ty:  120, tz: -1700, ry:  110, sc: 1.00, op: 1.00 },
-    { tx:  29, ty:  165, tz: -1900, ry:  140, sc: 0.80, op: 1.00 },
-    { tx:   7, ty:  200, tz: -2050, ry:  180, sc: 0.70, op: 1.00 },
-  ];
-
-  function lerp2(a, b, t) { return a + (b - a) * t; }
-
-  function slotProps2(slotOffset) {
-    var clamped = Math.max(-4, Math.min(4, slotOffset));
-    var idx = clamped + 4;
-    var lo  = Math.floor(idx);
-    var hi  = Math.min(8, lo + 1);
-    var t   = idx - lo;
-    var A   = SLOTS2[lo], B = SLOTS2[hi];
-    return {
-      tx: lerp2(A.tx, B.tx, t), ty: lerp2(A.ty, B.ty, t),
-      tz: lerp2(A.tz, B.tz, t), ry: lerp2(A.ry, B.ry, t),
-      sc: lerp2(A.sc, B.sc, t), op: lerp2(A.op, B.op, t),
-    };
-  }
+  var slotProps2 = spiralProps;
+  var compactServices = window.matchMedia('(max-width: 1199px), (max-width: 1366px) and (any-pointer: coarse)');
 
   function buildTransform2(p) {
     return (
@@ -584,20 +799,28 @@
 
   /* ─── Render ─────────────────────────────────────────────── */
   function applyFrame2() {
+    if (compactServices.matches) return;
     cards2.forEach(function (card, i) {
       var p = slotProps2(i - lerpedP);
       card.style.transform = buildTransform2(p);
       card.style.opacity   = p.op.toFixed(3);
-      card.style.zIndex    = String(Math.round(p.tz + 2000));
+      card.style.zIndex    = String(Math.round(p.tz + 3000));
     });
     if (counter) {
       counter.textContent = String(Math.round(lerpedP) + 1).padStart(2, '0');
     }
   }
 
-  function tick2() {
-    if (Math.abs(targetP - lerpedP) > 0.0001) {
-      lerpedP += (targetP - lerpedP) * 0.07;
+  var previousTime2 = 0;
+  function tick2(time) {
+    time = time || performance.now();
+    var dt = Math.min(64, Math.max(0, time - (previousTime2 || time - 16.667)));
+    previousTime2 = time;
+    if (!compactServices.matches && Math.abs(targetP - lerpedP) > 0.0001) {
+      var smoothing = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 1 : 1 - Math.exp(-dt / 160);
+      lerpedP += (targetP - lerpedP) * smoothing;
+      if (Math.abs(targetP - lerpedP) < 0.001) lerpedP = targetP;
       applyFrame2();
     }
     requestAnimationFrame(tick2);
@@ -605,9 +828,9 @@
 
   /* ─── Scroll hijack (capture — runs before section 1's bubble listener) ── */
   window.addEventListener('wheel', function (e) {
-    if (!s2InView) return;
+    if (compactServices.matches || !s2InView || e.ctrlKey || Math.abs(studyEl.getBoundingClientRect().top) > window.innerHeight * 0.49) return;
 
-    var dy = e.deltaMode === 1 ? e.deltaY * 20 : e.deltaY;
+    var dy = e.deltaY * (e.deltaMode === 1 ? 20 : e.deltaMode === 2 ? window.innerHeight : 1);
 
     if (!locked) {
       if      (targetP >= MAX && dy < 0) { locked = true; }
@@ -615,8 +838,8 @@
       else { return; }
     }
 
-    if (targetP >= MAX && dy > 0) { locked = false; return; }
-    if (targetP <= 0  && dy < 0) { locked = false; return; }
+    if (targetP >= MAX && dy > 0 && Math.abs(targetP - lerpedP) < 0.01) { locked = false; return; }
+    if (targetP <= 0 && dy < 0 && Math.abs(targetP - lerpedP) < 0.01) { locked = false; return; }
 
     e.preventDefault();
     e.stopImmediatePropagation();
@@ -626,45 +849,58 @@
   /* ─── IntersectionObserver: in-view flag + lazy boot ───────── */
   var booted = false;
 
+  function bootOrbit2() {
+    if (booted || compactServices.matches) return;
+    booted = true;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      applyFrame2();
+      tick2();
+      return;
+    }
+
+    setTimeout(function () {
+      cards2.forEach(function (card, i) {
+        setTimeout(function () {
+          if (compactServices.matches) return;
+          card.style.transition = 'opacity 700ms ease';
+          card.style.opacity = slotProps2(i - lerpedP).op.toFixed(3);
+        }, i * 110);
+      });
+      setTimeout(function () {
+        cards2.forEach(function (c) { c.style.transition = ''; });
+        tick2();
+      }, (NUM - 1) * 110 + 780);
+    }, 220);
+  }
+
   var io = new IntersectionObserver(function (entries) {
     s2InView = entries[0].intersectionRatio >= 0.5;
-
-    if (!booted && entries[0].isIntersecting) {
-      booted = true;
-
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        cards2.forEach(function (card, i) {
-          var p = slotProps2(i);
-          card.style.opacity   = p.op.toFixed(3);
-          card.style.transform = buildTransform2(p);
-        });
-        tick2();
-        return;
-      }
-
-      setTimeout(function () {
-        cards2.forEach(function (card, i) {
-          setTimeout(function () {
-            card.style.transition = 'opacity 700ms ease';
-            card.style.opacity    = slotProps2(i).op.toFixed(3);
-          }, i * 110);
-        });
-        setTimeout(function () {
-          cards2.forEach(function (c) { c.style.transition = ''; });
-          tick2();
-        }, (NUM - 1) * 110 + 780);
-      }, 220);
-    }
+    if (entries[0].isIntersecting) bootOrbit2();
   }, { threshold: [0.3, 0.5] });
 
-  io.observe(studyEl);
+  function syncServiceMode() {
+    if (compactServices.matches) {
+      cards2.forEach(function (card) {
+        ['transform', 'opacity', 'z-index', 'transition'].forEach(function (property) {
+          card.style.removeProperty(property);
+        });
+      });
+      return;
+    }
 
-  /* ─── Place cards at initial positions, hidden ────────────── */
-  cards2.forEach(function (card, i) {
-    var p = slotProps2(i);
-    card.style.opacity   = '0';
-    card.style.transform = buildTransform2(p);
-  });
+    // Restore the same orbit progress when a compact window becomes desktop.
+    applyFrame2();
+    if (!booted) {
+      cards2.forEach(function (card) { card.style.opacity = '0'; });
+      var rect = studyEl.getBoundingClientRect();
+      if (rect.bottom > 0 && rect.top < window.innerHeight) bootOrbit2();
+    }
+  }
+
+  compactServices.addEventListener('change', syncServiceMode);
+  syncServiceMode();
+  io.observe(studyEl);
 
 })();
 </script>
@@ -673,54 +909,124 @@
 (function () {
   'use strict';
 
-  /* ─── Slot positions ──────────────────────────────────────────────
-     9 slots: −4 (upper-left past) → 0 (featured centre) → +4 (lower-right future).
-     Array index = slotOffset + 4.
-     tx  : lateral offset in vw  (positive = right)
-     ty  : vertical offset in %  (of card's own height, positive = down)
-     tz  : depth in px (negative = further from viewer)
-     ry  : Y-axis rotation in degrees (monotonically spread — no direction reversals)
-     sc  : scale
-     op  : opacity
-  ──────────────────────────────────────────────────────────────── */
-  var SLOTS = [
-    { tx:   7, ty: -200, tz:  -2050, ry: -180, sc: 1.00, op: 0.00 }, // −4
-    { tx: -29, ty: -165, tz: -1900, ry: -140, sc: 1.00, op: 1.00 }, // −3
-    { tx: -47, ty: -120,  tz: -1700, ry: -110, sc: 1.00, op: 1.00 }, // −2
-    { tx: -30, ty:  -15, tz:  -500, ry:  -55, sc: 1.00, op: 1.00 }, // −1
-    { tx:   0, ty:  -25, tz:     0, ry:    0, sc: 1.00, op: 1.00 }, //  0 FEATURED
-    { tx:  30, ty:   15, tz:  -500, ry:   55, sc: 1.20, op: 1.00 }, // +1
-    { tx:  47, ty:  120, tz: -1700, ry:  110, sc: 1.00, op: 1.00 }, // +2
-    { tx:  29, ty:  165, tz: -1900, ry:  140, sc: 0.80, op: 1.00 }, // +3
-    { tx:  7,  ty:  200, tz: -2050, ry:  180, sc: 0.70, op: 1.00 }, // +4
+  // Desktop positions around one shared spiral. Positive offsets approach
+  // the featured card; negative offsets recede into the arc above it.
+  // tx: vw, ty: % of card height, tz: px, ry: degrees.
+  var compactGallery = window.matchMedia('(max-width: 1199px), (max-width: 1366px) and (any-pointer: coarse)');
+  var phoneGallery = window.matchMedia('(max-width: 599px), (max-width: 959px) and (max-height: 500px)');
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var waitingSlots = [
+    spiralProps(1),
+    { tx: 39.53, ty: 77.52, tz: -610,  ry: 95 },  // 3: behind card 2
+    { tx: 28,    ty: 159,   tz: -1500, ry: 146 }, // 4: below and to the left
+    { tx: -6.32, ty: 227,   tz: -1700, ry: 180 }, // 5: below/left, facing back
+    { tx: -40.64, ty: 295,  tz: -1900, ry: 214 }  // 6: continues the same outward arc
   ];
+  // Past cards follow this same receding arc, including card 1 when 6 is featured.
+  // Keep receding in depth instead of swinging back toward the viewer.
+  var pastSlots = [
+    spiralProps(0),
+    { tx: -34.61, ty: -110.22, tz: -529.5,  ry: -46.62 },
+    { tx: -51.81, ty: -240.91, tz: -1492.4, ry: -99.42 },
+    { tx: -30.21, ty: -260.74, tz: -1630.9, ry: -134.72 },
+    { tx: 0,      ty: -320.20, tz: -2142.5, ry: -180 },
+    { tx: 30.21,  ty: -379.66, tz: -2654.1, ry: -225.28 }
+  ];
+  // The sixth point extends each previous segment at the same slope, preserving
+  // the approved positions AND tangents for cards 1–5.
+  var pathKeys = ['tx', 'ty', 'tz', 'ry'];
+  var entryAngle = 55 * Math.PI / 180;
+  var entrySlope = {
+    tx: 34 * entryAngle * Math.cos(entryAngle),
+    ty: 52,
+    tz: -650 * entryAngle * Math.sin(entryAngle),
+    ry: 55
+  };
+  // Shape-preserving tangents prevent a stop or reversal between positions.
+  function pathTangents(slots, firstSlope) {
+    return slots.map(function (slot, index) {
+      var tangent = {};
+      pathKeys.forEach(function (key) {
+        if (index === 0) {
+          tangent[key] = firstSlope[key];
+        } else if (index === slots.length - 1) {
+          tangent[key] = slot[key] - slots[index - 1][key];
+        } else {
+          var before = slot[key] - slots[index - 1][key];
+          var after = slots[index + 1][key] - slot[key];
+          tangent[key] = before * after <= 0 ? 0 : 2 * before * after / (before + after);
+        }
+      });
+      return tangent;
+    });
+  }
+  var waitingTangents = pathTangents(waitingSlots, entrySlope);
+  var pastTangents = pathTangents(pastSlots, {
+    tx: -34 * entryAngle, ty: -52, tz: 0, ry: -55
+  });
+  // Phone slots use the same renderer with a tighter arc and two previews.
+  var phoneWaiting = [
+    spiralProps(0),
+    { tx: 11, ty: 55, tz: -650, ry: 35 },
+    { tx: -2, ty: 110, tz: -1250, ry: 65 },
+    { tx: -8, ty: 155, tz: -1800, ry: 140 },
+    { tx: -18, ty: 180, tz: -2200, ry: 180 },
+    { tx: -28, ty: 205, tz: -2600, ry: 220 }
+  ];
+  var phonePast = [
+    spiralProps(0),
+    { tx: -12, ty: -105, tz: -700, ry: -40 },
+    { tx: -9, ty: -180, tz: -1400, ry: -90 },
+    { tx: -4, ty: -225, tz: -1800, ry: -140 },
+    { tx: 0, ty: -255, tz: -2200, ry: -180 },
+    { tx: 4, ty: -285, tz: -2600, ry: -220 }
+  ];
+  var phoneWaitingTangents = pathTangents(phoneWaiting, { tx: 14, ty: 80, tz: 0, ry: 42 });
+  var phonePastTangents = pathTangents(phonePast, { tx: -14, ty: -80, tz: 0, ry: -42 });
 
-  /* ─── Helpers ─────────────────────────────────────────────────── */
-  function lerp(a, b, t) { return a + (b - a) * t; }
+  function samplePath(p, slots, tangents, position) {
+    position = Math.min(position, slots.length - 1);
+    var segment = Math.min(slots.length - 2, Math.floor(position));
+    var t = position - segment;
+    var t2 = t * t, t3 = t2 * t;
+    pathKeys.forEach(function (key) {
+      p[key] = (2 * t3 - 3 * t2 + 1) * slots[segment][key]
+        + (t3 - 2 * t2 + t) * tangents[segment][key]
+        + (-2 * t3 + 3 * t2) * slots[segment + 1][key]
+        + (t3 - t2) * tangents[segment + 1][key];
+    });
+    p.sc = 1; // Perspective depth supplies the gradual size reduction.
+    return p;
+  }
 
-  function slotProps(slotOffset) {
-    var clamped = Math.max(-4, Math.min(4, slotOffset));
-    var idx     = clamped + 4;          // 0–8
-    var lo      = Math.floor(idx);
-    var hi      = Math.min(8, lo + 1);
-    var t       = idx - lo;
-    var A = SLOTS[lo], B = SLOTS[hi];
-    return {
-      tx: lerp(A.tx, B.tx, t),
-      ty: lerp(A.ty, B.ty, t),
-      tz: lerp(A.tz, B.tz, t),
-      ry: lerp(A.ry, B.ry, t),
-      sc: lerp(A.sc, B.sc, t),
-      op: lerp(A.op, B.op, t),
-    };
+  function slotProps(offset) {
+    var p = spiralProps(offset);
+    if (phoneGallery.matches) {
+      p = offset < 0
+        ? samplePath(p, phonePast, phonePastTangents, -offset)
+        : samplePath(p, phoneWaiting, phoneWaitingTangents, offset);
+      var visible = Math.max(0, Math.min(1, (2.5 - Math.abs(offset)) / 1.5));
+      p.op = visible * visible * (3 - 2 * visible);
+      return p;
+    }
+    if (offset < 0) return samplePath(p, pastSlots, pastTangents, -offset);
+    if (offset <= 1) return p;
+    return samplePath(p, waitingSlots, waitingTangents, offset - 1);
   }
 
   function buildTransform(p) {
+    if (compactGallery.matches) {
+      // Scale x, z and perspective together so tablet cards retain their shape.
+      return 'translateX(' + (p.tx * cardWidth * 0.03).toFixed(3) + 'px) '
+        + 'translateY(' + p.ty.toFixed(3) + '%) '
+        + 'translateZ(' + (p.tz * cardWidth / 560).toFixed(2) + 'px) '
+        + 'rotateY(' + p.ry.toFixed(3) + 'deg) scale(' + p.sc.toFixed(4) + ')';
+    }
     return (
-      'translateX(' + p.tx.toFixed(2) + 'vw) ' +
-      'translateY(' + p.ty.toFixed(2) + '%) ' +
-      'translateZ(' + p.tz.toFixed(0) + 'px) ' +
-      'rotateY('    + p.ry.toFixed(1) + 'deg) ' +
+      'translateX(' + p.tx.toFixed(3) + 'vw) ' +
+      'translateY(' + p.ty.toFixed(3) + '%) ' +
+      'translateZ(' + p.tz.toFixed(2) + 'px) ' +
+      'rotateY('    + p.ry.toFixed(3) + 'deg) ' +
       'scale('      + p.sc.toFixed(4) + ')'
     );
   }
@@ -730,8 +1036,15 @@
   var cards = Array.prototype.slice.call(
     field.querySelectorAll('.gallery-card')
   );
-  var NUM_CARDS    = cards.length;   // 5
-  var MAX_PROGRESS = NUM_CARDS - 1;  // 4
+  var NUM_CARDS    = cards.length;
+  var MAX_PROGRESS = NUM_CARDS - 1;
+  var cardWidth = cards[0].offsetWidth;
+  var finalPan = field.offsetHeight * 0.1 + cards[0].offsetHeight * 0.25;
+  var previousButton = document.getElementById('galleryPrevious');
+  var nextButton = document.getElementById('galleryNext');
+  var galleryCount = document.getElementById('galleryCount');
+  var galleryGesture = document.getElementById('galleryGesture');
+  var announcedCard = -1;
 
   /* ─── Progress state ─────────────────────────────────────────── */
   var SENSITIVITY    = 0.005;   // deltaY of 200 → advance 1 card
@@ -742,28 +1055,76 @@
 
   /* ─── Render ──────────────────────────────────────────────────── */
   function applyFrame() {
+    // Open space above the featured card as the earlier cards recede.
+    // Retain the approved card-5 framing, then hold it through card 6.
+    var panProgress = Math.max(0, Math.min(1, (lerpedProgress - 1) / 3));
+    var pan = panProgress * panProgress * (3 - 2 * panProgress);
+    field.style.transform = phoneGallery.matches
+      ? '' : 'translateY(' + (finalPan * pan).toFixed(3) + 'px)';
     cards.forEach(function (card, i) {
       var offset = i - lerpedProgress;
       var p      = slotProps(offset);
       card.style.transform = buildTransform(p);
       card.style.opacity   = p.op.toFixed(3);
-      // Depth-based z-index: featured (tz=0) → 2000, deepest (tz=-1680) → 320
-      card.style.zIndex    = String(Math.round(p.tz + 2000));
+      // Keep the featured card in front of cards farther along either arc.
+      card.style.zIndex    = String(Math.round(p.tz + 3000));
     });
+    var currentCard = Math.round(lerpedProgress);
+    if (currentCard !== announcedCard) {
+      announcedCard = currentCard;
+      galleryCount.textContent = String(currentCard + 1).padStart(2, '0') + ' / ' + String(NUM_CARDS).padStart(2, '0');
+      galleryGesture.textContent = currentCard === MAX_PROGRESS ? 'Swipe up to continue' : 'Swipe up to explore';
+      cards.forEach(function (card, index) { card.setAttribute('aria-hidden', String(index !== currentCard)); });
+    }
+    previousButton.disabled = targetProgress <= 0;
+    nextButton.disabled = targetProgress >= MAX_PROGRESS;
   }
 
-  function tick() {
-    if (Math.abs(targetProgress - lerpedProgress) > 0.0001) {
-      lerpedProgress += (targetProgress - lerpedProgress) * 0.07;
+  function updateLayout() {
+    cardWidth = cards[0].offsetWidth;
+    finalPan = field.offsetHeight * 0.1 + cards[0].offsetHeight * 0.25;
+    if (!entryActive) applyFrame();
+  }
+  compactGallery.addEventListener('change', updateLayout);
+  phoneGallery.addEventListener('change', updateLayout);
+  window.addEventListener('resize', updateLayout);
+
+  var previousTime = 0;
+  var frameRequest = null;
+
+  // One frame loop while moving; restart with a fresh clock after resting.
+  function requestTick() {
+    if (reducedMotion.matches) {
+      if (frameRequest !== null) cancelAnimationFrame(frameRequest);
+      frameRequest = null;
+      previousTime = 0;
+      lerpedProgress = targetProgress;
+      applyFrame();
+      return;
+    }
+    if (frameRequest === null && !entryActive) {
+      frameRequest = requestAnimationFrame(tick);
+    }
+  }
+
+  function tick(time) {
+    frameRequest = null;
+    var dt = Math.min(64, Math.max(0, time - (previousTime || time - 16.667)));
+    previousTime = time;
+    if (targetProgress !== lerpedProgress) {
+      var smoothing = 1 - Math.exp(-dt / 160);
+      lerpedProgress += (targetProgress - lerpedProgress) * smoothing;
+      if (Math.abs(targetProgress - lerpedProgress) < 0.00001) lerpedProgress = targetProgress;
       applyFrame();
     }
-    requestAnimationFrame(tick);
+    if (targetProgress !== lerpedProgress) requestTick();
+    else previousTime = 0;
   }
 
   /* ─── Scroll hijack ───────────────────────────────────────────── */
   window.addEventListener('wheel', function (e) {
-    if (!s1InView) return;
-    var dy = e.deltaMode === 1 ? e.deltaY * 20 : e.deltaY;
+    if (!s1InView || e.ctrlKey || Math.abs(studyS1.getBoundingClientRect().top) > window.innerHeight * 0.49) return;
+    var dy = e.deltaY * (e.deltaMode === 1 ? 20 : e.deltaMode === 2 ? window.innerHeight : 1);
 
     if (!scrollLocked) {
       // Re-lock if user scrolls back into the orbit range
@@ -778,11 +1139,11 @@
     }
 
     // Release when orbit is complete
-    if (targetProgress >= MAX_PROGRESS && dy > 0) {
+    if (targetProgress >= MAX_PROGRESS && dy > 0 && Math.abs(targetProgress - lerpedProgress) < 0.01) {
       scrollLocked = false;
       return;
     }
-    if (targetProgress <= 0 && dy < 0) {
+    if (targetProgress <= 0 && dy < 0 && Math.abs(targetProgress - lerpedProgress) < 0.01) {
       scrollLocked = false;
       return;
     }
@@ -790,10 +1151,36 @@
     e.preventDefault();
     targetProgress = Math.max(0, Math.min(MAX_PROGRESS,
       targetProgress + dy * SENSITIVITY));
+    finishEntry();
+    requestTick();
   }, { passive: false });
 
+  function stepCard(direction) {
+    targetProgress = Math.max(0, Math.min(MAX_PROGRESS, Math.round(targetProgress) + direction));
+    scrollLocked = true;
+    finishEntry();
+    applyFrame();
+    requestTick();
+  }
+  previousButton.addEventListener('click', function () { stepCard(-1); });
+  nextButton.addEventListener('click', function () { stepCard(1); });
+
   /* ─── Entry animation ─────────────────────────────────────────── */
+  var entryTimers = [];
+  var entryActive = false;
+
+  function finishEntry() {
+    if (!entryActive) return;
+    entryActive = false;
+    entryTimers.forEach(function (timer) { clearTimeout(timer); });
+    entryTimers = [];
+    cards.forEach(function (card) { card.style.transition = ''; });
+    applyFrame();
+    requestTick();
+  }
+
   function boot() {
+    applyFrame(); // Establish depth order before the entry fade.
     // 1. Place cards at initial positions, invisible
     cards.forEach(function (card, i) {
       var p = slotProps(i); // progress=0, so slotOffset=i
@@ -801,23 +1188,178 @@
       card.style.transform = buildTransform(p);
     });
 
-    // 2. After short pause, fade each card in with a stagger
-    setTimeout(function () {
-      cards.forEach(function (card, i) {
-        setTimeout(function () {
-          card.style.transition = 'opacity 700ms ease';
-          card.style.opacity    = slotProps(i).op.toFixed(3);
-        }, i * 110);
-      });
+    // Any interaction can finish the intro immediately. Cancel its pending
+    // fades so they cannot overwrite the opacity of a card already in motion.
+    entryActive = true;
+    cards.forEach(function (card, i) {
+      entryTimers.push(setTimeout(function () {
+        card.style.transition = 'opacity 700ms ease';
+        card.style.opacity = slotProps(i).op.toFixed(3);
+      }, 220 + i * 110));
+    });
+    entryTimers.push(setTimeout(finishEntry,
+      220 + (NUM_CARDS - 1) * 110 + 700 + 80));
+  }
 
-      // 3. Once all fades complete, strip transitions and start the loop
-      // Last card fade starts at (NUM_CARDS-1)*110ms, lasts 700ms, +80ms buffer
-      var loopDelay = (NUM_CARDS - 1) * 110 + 700 + 80;
-      setTimeout(function () {
-        cards.forEach(function (card) { card.style.transition = ''; });
-        tick();
-      }, loopDelay);
-    }, 220);
+  /* ─── Touch input ────────────────────────────────────────── */
+  function installSpiralTouch(options) {
+    'use strict';
+    var element = options.element;
+    var win = options.window || element.ownerDocument.defaultView;
+    var maximum = options.max;
+    var gesture = null;
+    var threshold = 6;
+    var interactive = 'a,button,input,select,textarea,summary,video,audio,' +
+      '[contenteditable]:not([contenteditable="false"]),[role="button"],' +
+      '[role="link"],[tabindex]';
+  
+    function clamp(value, minimum, maximumValue) {
+      return Math.max(minimum, Math.min(maximumValue, value));
+    }
+  
+    function eligible() {
+      return (!options.enabled || options.enabled()) &&
+        (!options.isVisible || options.isVisible());
+    }
+  
+    function findTouch(touches, identifier) {
+      for (var i = 0; i < touches.length; i++) {
+        if (touches[i].identifier === identifier) return touches[i];
+      }
+      return null;
+    }
+  
+    function cancel() {
+      if (gesture && gesture.captured) {
+        options.onSettle(clamp(Math.round(gesture.progress), 0, maximum));
+      }
+      gesture = null;
+    }
+  
+    function start(event) {
+      if (event.touches.length !== 1) {
+        cancel();
+        return;
+      }
+      if (!eligible()) return;
+      var target = event.target;
+      if (target && target.nodeType !== 1) target = target.parentElement;
+      if (target && target.closest && target.closest(interactive)) return;
+      var touch = event.touches[0];
+      gesture = {
+        identifier: touch.identifier,
+        x: touch.clientX,
+        y: touch.clientY,
+        lastY: touch.clientY,
+        lastTime: event.timeStamp,
+        velocity: 0,
+        captured: false
+      };
+    }
+  
+    function move(event) {
+      if (!gesture) return;
+      if (event.touches.length !== 1) {
+        cancel();
+        return;
+      }
+      if (!eligible()) {
+        cancel();
+        return;
+      }
+      var touch = findTouch(event.touches, gesture.identifier);
+      if (!touch) {
+        cancel();
+        return;
+      }
+      var dx = touch.clientX - gesture.x;
+      var travel = gesture.y - touch.clientY; // An upward finger advances.
+      var elapsed = event.timeStamp - gesture.lastTime;
+      if (elapsed > 0) {
+        var sampleVelocity = (gesture.lastY - touch.clientY) / elapsed;
+        gesture.velocity = elapsed > 120 ? sampleVelocity
+          : 0.6 * sampleVelocity + 0.4 * gesture.velocity;
+      }
+      gesture.lastY = touch.clientY;
+      gesture.lastTime = event.timeStamp;
+  
+      if (!gesture.captured) {
+        if (Math.max(Math.abs(dx), Math.abs(travel)) < threshold) return;
+        if (Math.abs(dx) >= Math.abs(travel)) {
+          gesture = null; // Let a horizontal gesture remain native.
+          return;
+        }
+        var progress = clamp(options.getProgress(), 0, maximum);
+        if ((progress <= 0.001 && travel < 0) ||
+            (progress >= maximum - 0.001 && travel > 0)) {
+          gesture = null; // Outward motion at an endpoint scrolls the page.
+          return;
+        }
+        if (!event.cancelable) {
+          gesture = null;
+          return;
+        }
+        gesture.captured = true;
+        gesture.originProgress = progress;
+        gesture.originIndex = Math.round(progress);
+        gesture.minimum = Math.max(0, gesture.originIndex - 1);
+        gesture.maximum = Math.min(maximum, gesture.originIndex + 1);
+        gesture.distance = options.getStepDistance
+          ? Math.max(1, options.getStepDistance())
+          : clamp(element.clientHeight * 0.4, 180, 360);
+        gesture.progress = progress;
+        if (options.onCapture) options.onCapture();
+      }
+      if (!event.cancelable) {
+        cancel();
+        return;
+      }
+      event.preventDefault();
+      gesture.progress = clamp(gesture.originProgress + travel / gesture.distance,
+        gesture.minimum, gesture.maximum);
+      options.onDrag(gesture.progress);
+    }
+  
+    function end(event) {
+      if (!gesture) return;
+      if (findTouch(event.touches, gesture.identifier)) return;
+      if (!gesture.captured) {
+        gesture = null;
+        return;
+      }
+      var touch = findTouch(event.changedTouches, gesture.identifier);
+      var travel = gesture.y - (touch ? touch.clientY : gesture.lastY);
+      var velocity = event.timeStamp - gesture.lastTime <= 100 ? gesture.velocity : 0;
+      var enoughTravel = Math.abs(travel) >= gesture.distance * 0.22;
+      var flick = Math.abs(travel) >= 12 && Math.abs(velocity) >= 0.45 &&
+        travel * velocity > 0;
+      var next = gesture.originIndex;
+      if (enoughTravel || flick) next += travel > 0 ? 1 : -1;
+      gesture = null;
+      options.onSettle(clamp(next, 0, maximum));
+    }
+  
+    function interrupted() {
+      cancel();
+    }
+  
+    element.addEventListener('touchstart', start, { passive: true });
+    element.addEventListener('touchmove', move, { passive: false });
+    element.addEventListener('touchend', end, { passive: true });
+    element.addEventListener('touchcancel', interrupted, { passive: true });
+    win.addEventListener('resize', cancel);
+  
+    return {
+      cancel: cancel,
+      destroy: function () {
+        cancel();
+        element.removeEventListener('touchstart', start);
+        element.removeEventListener('touchmove', move);
+        element.removeEventListener('touchend', end);
+        element.removeEventListener('touchcancel', interrupted);
+        win.removeEventListener('resize', cancel);
+      }
+    };
   }
 
   /* ─── In-view tracking for section 1 ────────────────────────── */
@@ -828,15 +1370,30 @@
     }, { threshold: [0.3, 0.5] }).observe(studyS1);
   }
 
+  installSpiralTouch({
+    element: studyS1,
+    enabled: function () { return compactGallery.matches; },
+    isVisible: function () {
+      return s1InView && Math.abs(studyS1.getBoundingClientRect().top) < window.innerHeight * 0.25;
+    },
+    max: MAX_PROGRESS,
+    getProgress: function () { return lerpedProgress; },
+    onCapture: function () { finishEntry(); scrollLocked = true; },
+    onDrag: function (progress) {
+      targetProgress = lerpedProgress = progress;
+      applyFrame();
+    },
+    onSettle: function (progress) { targetProgress = progress; applyFrame(); requestTick(); }
+  });
+
+  reducedMotion.addEventListener('change', function () {
+    finishEntry();
+    requestTick();
+  });
+
   /* ─── Boot ────────────────────────────────────────────────────── */
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    // Skip entry animation — place cards directly and start loop
-    cards.forEach(function (card, i) {
-      var p = slotProps(i);
-      card.style.opacity   = p.op.toFixed(3);
-      card.style.transform = buildTransform(p);
-    });
-    tick();
+  if (reducedMotion.matches) {
+    applyFrame();
   } else {
     boot();
   }
