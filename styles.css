@@ -5195,75 +5195,123 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 }
 
 /* ═══════════════════════════════════════════════════════════
-   PORTFOLIO - PASTEL BACKGROUND
-   Light pastel stage for the black & white portfolio cards.
+   PORTFOLIO - CATEGORY BACKGROUNDS
+   Opens on a blush stage ("All"); each filter category fades the
+   section to its own dark & moody tone, with ink/pill/glass tokens
+   flipping to light so contrast holds on both.
    ═══════════════════════════════════════════════════════════ */
-/* Registered so the gradient stops can transition between category tones. */
-@property --pf-bg-top { syntax: '<color>'; inherits: false; initial-value: #f6ebe4; }
-@property --pf-bg-mid { syntax: '<color>'; inherits: false; initial-value: #efdcd2; }
+/* Registered so every token can transition between category themes. */
+@property --pf-bg-top    { syntax: '<color>'; inherits: true; initial-value: #f6ebe4; }
+@property --pf-bg-mid    { syntax: '<color>'; inherits: true; initial-value: #efdcd2; }
+@property --pf-ink       { syntax: '<color>'; inherits: true; initial-value: #1e1a16; }
+@property --pf-muted     { syntax: '<color>'; inherits: true; initial-value: rgba(30, 26, 22, 0.62); }
+@property --pf-accent    { syntax: '<color>'; inherits: true; initial-value: #8a5a36; }
+@property --pf-tag       { syntax: '<color>'; inherits: true; initial-value: #a8744c; }
+@property --pf-pill-top  { syntax: '<color>'; inherits: true; initial-value: rgba(255, 255, 255, 0.85); }
+@property --pf-pill-bot  { syntax: '<color>'; inherits: true; initial-value: rgba(250, 238, 231, 0.75); }
+@property --pf-pill-edge { syntax: '<color>'; inherits: true; initial-value: rgba(255, 255, 255, 0.7); }
+@property --pf-pill-hl   { syntax: '<color>'; inherits: true; initial-value: rgba(255, 255, 255, 0.9); }
+@property --pf-act-top   { syntax: '<color>'; inherits: true; initial-value: rgba(232, 205, 186, 0.9); }
+@property --pf-act-bot   { syntax: '<color>'; inherits: true; initial-value: rgba(242, 222, 209, 0.9); }
+@property --pf-shade     { syntax: '<color>'; inherits: true; initial-value: rgba(120, 78, 52, 0.18); }
+@property --pf-glass     { syntax: '<color>'; inherits: true; initial-value: rgba(255, 255, 255, 0.55); }
+
 #portfolio {
+  /* Blush (light) theme: the default for "All" */
   --pf-bg-top: #f6ebe4;
   --pf-bg-mid: #efdcd2;
-  --pf-ink: var(--umber);
+  --pf-ink: #1e1a16;
+  --pf-muted: rgba(30, 26, 22, 0.62);
+  --pf-accent: #8a5a36;
+  --pf-tag: #a8744c;
+  --pf-pill-top: rgba(255, 255, 255, 0.85);
+  --pf-pill-bot: rgba(250, 238, 231, 0.75);
+  --pf-pill-edge: rgba(255, 255, 255, 0.7);
+  --pf-pill-hl: rgba(255, 255, 255, 0.9);
+  --pf-act-top: rgba(232, 205, 186, 0.9);
+  --pf-act-bot: rgba(242, 222, 209, 0.9);
+  --pf-shade: rgba(120, 78, 52, 0.18);
+  --pf-glass: rgba(255, 255, 255, 0.55);
   background: linear-gradient(170deg, var(--pf-bg-top), var(--pf-bg-mid) 55%, var(--pf-bg-top));
   color: var(--pf-ink);
-  transition: --pf-bg-top 0.8s var(--ease), --pf-bg-mid 0.8s var(--ease);
+  transition-property: --pf-bg-top, --pf-bg-mid, --pf-ink, --pf-muted, --pf-accent, --pf-tag,
+    --pf-pill-top, --pf-pill-bot, --pf-pill-edge, --pf-pill-hl, --pf-act-top, --pf-act-bot,
+    --pf-shade, --pf-glass;
+  transition-duration: 0.8s;
+  transition-timing-function: var(--ease);
 }
-/* Each category gets its own pastel tone; "All" stays blush. */
-#portfolio:has(.portfolio-filters [data-filter="wedding"].active)      { --pf-bg-top: #f8e9eb; --pf-bg-mid: #f0d4d9; } /* peony */
-#portfolio:has(.portfolio-filters [data-filter="engagement"].active)   { --pf-bg-top: #f3e8ee; --pf-bg-mid: #e3d0db; } /* mauve */
-#portfolio:has(.portfolio-filters [data-filter="couple"].active)       { --pf-bg-top: #fbefe5; --pf-bg-mid: #f5dcc7; } /* apricot */
-#portfolio:has(.portfolio-filters [data-filter="maternity"].active)    { --pf-bg-top: #ecf5f0; --pf-bg-mid: #d7eadf; } /* mint */
-#portfolio:has(.portfolio-filters [data-filter="graduation"].active)   { --pf-bg-top: #ecf2f8; --pf-bg-mid: #d8e5f1; } /* sky */
-#portfolio:has(.portfolio-filters [data-filter="housewarming"].active) { --pf-bg-top: #fbf4df; --pf-bg-mid: #f3e4bd; } /* haldi */
-#portfolio:has(.portfolio-filters [data-filter="brand"].active)        { --pf-bg-top: #f2f1ef; --pf-bg-mid: #e2e0dc; } /* platinum */
-#portfolio:has(.portfolio-filters [data-filter="conceptual"].active)   { --pf-bg-top: #f0ebf7; --pf-bg-mid: #ded3ed; } /* wisteria */
+
+/* Dark & moody theme tokens shared by every category */
+#portfolio:has(.portfolio-filters button.active:not([data-filter="all"])) {
+  --pf-ink: #faf6f1;
+  --pf-muted: rgba(250, 246, 241, 0.6);
+  --pf-accent: #dbb08a;
+  --pf-tag: #c9956b;
+  --pf-pill-top: rgba(255, 255, 255, 0.1);
+  --pf-pill-bot: rgba(255, 255, 255, 0.03);
+  --pf-pill-edge: rgba(255, 255, 255, 0.12);
+  --pf-pill-hl: rgba(255, 255, 255, 0.14);
+  --pf-act-top: rgba(201, 149, 107, 0.3);
+  --pf-act-bot: rgba(201, 149, 107, 0.14);
+  --pf-shade: rgba(0, 0, 0, 0.45);
+  --pf-glass: rgba(9, 8, 11, 0.45);
+}
+/* Per-category moody tones */
+#portfolio:has(.portfolio-filters [data-filter="wedding"].active)      { --pf-bg-top: #1f0d11; --pf-bg-mid: #4a1d25; } /* wine */
+#portfolio:has(.portfolio-filters [data-filter="engagement"].active)   { --pf-bg-top: #1a1020; --pf-bg-mid: #3d2346; } /* plum */
+#portfolio:has(.portfolio-filters [data-filter="couple"].active)       { --pf-bg-top: #1a110c; --pf-bg-mid: #3d2618; } /* cognac */
+#portfolio:has(.portfolio-filters [data-filter="maternity"].active)    { --pf-bg-top: #0c1712; --pf-bg-mid: #1f3a2c; } /* forest */
+#portfolio:has(.portfolio-filters [data-filter="graduation"].active)   { --pf-bg-top: #0b111c; --pf-bg-mid: #1c2d48; } /* midnight */
+#portfolio:has(.portfolio-filters [data-filter="housewarming"].active) { --pf-bg-top: #1c140a; --pf-bg-mid: #4a3314; } /* amber dusk */
+#portfolio:has(.portfolio-filters [data-filter="brand"].active)        { --pf-bg-top: #101011; --pf-bg-mid: #2b2b2e; } /* graphite */
+#portfolio:has(.portfolio-filters [data-filter="conceptual"].active)   { --pf-bg-top: #08171a; --pf-bg-mid: #18393f; } /* deep teal */
 @media (prefers-reduced-motion: reduce) {
   #portfolio { transition: none; }
 }
-#portfolio .section-tag { color: #a8744c; }
-#portfolio .section-desc { color: rgba(30, 26, 22, 0.62); }
-/* Raised pills: top highlight + warm drop shadow; active pill sits pressed in. */
+
+#portfolio .section-tag { color: var(--pf-tag); }
+#portfolio .section-desc { color: var(--pf-muted); }
+/* Raised pills: top highlight + layered drop shadow; active pill sits pressed in. */
 #portfolio .portfolio-filters button {
-  color: rgba(30, 26, 22, 0.62);
-  border-color: rgba(255, 255, 255, 0.7);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(250, 238, 231, 0.75));
+  color: var(--pf-muted);
+  border-color: var(--pf-pill-edge);
+  background: linear-gradient(180deg, var(--pf-pill-top), var(--pf-pill-bot));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 1px 2px rgba(120, 78, 52, 0.12),
-    0 4px 10px -2px rgba(120, 78, 52, 0.18);
-  transition: color 0.15s, background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.2s;
+    inset 0 1px 0 var(--pf-pill-hl),
+    0 1px 2px var(--pf-shade),
+    0 4px 10px -2px var(--pf-shade);
+  transition: color 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.2s;
 }
 #portfolio .portfolio-filters button:hover {
-  color: #8a5a36;
+  color: var(--pf-accent);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    0 2px 4px rgba(120, 78, 52, 0.14),
-    0 10px 20px -6px rgba(120, 78, 52, 0.28);
+    inset 0 1px 0 var(--pf-pill-hl),
+    0 2px 4px var(--pf-shade),
+    0 10px 20px -6px var(--pf-shade);
 }
 #portfolio .portfolio-filters button.active {
-  color: #8a5a36;
+  color: var(--pf-accent);
   border-color: rgba(201, 149, 107, 0.55);
-  background: linear-gradient(180deg, rgba(232, 205, 186, 0.9), rgba(242, 222, 209, 0.9));
+  background: linear-gradient(180deg, var(--pf-act-top), var(--pf-act-bot));
   box-shadow:
-    inset 0 2px 5px rgba(120, 78, 52, 0.22),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.6),
-    0 1px 0 rgba(255, 255, 255, 0.7);
+    inset 0 2px 5px var(--pf-shade),
+    inset 0 -1px 0 var(--pf-pill-hl),
+    0 1px 0 var(--pf-pill-hl);
 }
 #portfolio.is-animated .portfolio-filters button.active { transform: translateY(0); }
 #portfolio .portfolio-filters button:focus-visible {
-  outline: 2px solid #a8744c;
+  outline: 2px solid var(--pf-tag);
   outline-offset: 3px;
 }
 #portfolio .ec-nav {
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--pf-glass);
   border-color: rgba(201, 149, 107, 0.4);
-  color: #8a5a36;
+  color: var(--pf-accent);
 }
 #portfolio .ec-counter {
-  color: rgba(30, 26, 22, 0.5);
-  background: rgba(255, 255, 255, 0.55);
-  border-color: rgba(30, 26, 22, 0.08);
+  color: var(--pf-muted);
+  background: var(--pf-glass);
+  border-color: var(--pf-pill-edge);
 }
-#portfolio .ec-counter-current { color: #8a5a36; }
-#portfolioCarousel .gallery-item { box-shadow: 0 24px 50px -24px rgba(30, 26, 22, 0.45); }
+#portfolio .ec-counter-current { color: var(--pf-accent); }
+#portfolioCarousel .gallery-item { box-shadow: 0 24px 50px -20px var(--pf-shade), 0 36px 70px -30px var(--pf-shade); }
