@@ -1110,7 +1110,7 @@ async function sendQuoteEmail() {
     `Hi ${firstName},\n\n` +
     `Thank you so much for reaching out to Aakaara Studios! Please find the quote attached for your upcoming ${eventType.toLowerCase()}.\n\n` +
     `Feel free to review it and let me know if you have any questions — I'd love to be part of your special day!\n\n` +
-    `With warmth,\nSudhakar Avula\nAakaara Studios NYC\navala.sudhakar@gmail.com\n+1 (475) 332-2020`
+    `With warmth,\nSudhakar Avula\nAakaara Studios NYC\ninfo@aakaarastudiosnyc.com\n+1 (475) 332-2020`
   );
   const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(clientEmail)}&su=${subject}&body=${body}`;
   const link = document.createElement('a');
