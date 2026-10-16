@@ -3756,3 +3756,13 @@ let portfolioCarousel, videoCarousel;
 
   servicesObserver.observe(servicesSection);
 })();
+
+// ═══════ COUPLE PORTRAITS LINKS: SKIP INTRO + REMEMBER SCROLL ═══════
+// Delegated instead of inline onclick: Netlify's Pretty URLs rewrite
+// re-quotes inline handlers on .html links and breaks them in production.
+document.addEventListener('click', (e) => {
+  const link = e.target.closest('a[href*="couple-portraits"]');
+  if (!link) return;
+  sessionStorage.setItem('skipIntro', '1');
+  sessionStorage.setItem('returnScrollY', String(window.scrollY));
+});
