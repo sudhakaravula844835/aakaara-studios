@@ -3,6 +3,61 @@ https://aakaarastudiosnyc.com/*  https://aakaarastudios.com/:splat  301!
 http://www.aakaarastudiosnyc.com/*  https://aakaarastudios.com/:splat  301!
 https://www.aakaarastudiosnyc.com/*  https://aakaarastudios.com/:splat  301!
 
+# Internal files — publish = "." deploys the whole repo, so hide everything
+# that isn't part of the public site. Forced (!) because the files exist.
+# Must stay above /board/* and the /* catch-all (first match wins).
+/docs/*                    /404.html  404!
+/tests/*                   /404.html  404!
+/output/*                  /404.html  404!
+/build/*                   /404.html  404!
+/scripts/*                 /404.html  404!
+/components/*              /404.html  404!
+/gallery-preview/*         /404.html  404!
+/netlify/*                 /404.html  404!
+/.superpowers/*            /404.html  404!
+/.vscode/*                 /404.html  404!
+/board/test/*              /404.html  404!
+/board/supabase/*          /404.html  404!
+/board/README.md           /404.html  404!
+/board/.env.example        /404.html  404!
+/AGENTS.md                 /404.html  404!
+/CLAUDE.md                 /404.html  404!
+/CLAUDE.original.md        /404.html  404!
+/GEMINI.md                 /404.html  404!
+/.cursorrules              /404.html  404!
+/.windsurfrules            /404.html  404!
+/.mcp.json                 /404.html  404!
+/.gitignore                /404.html  404!
+/.netlifyignore            /404.html  404!
+/package.json              /404.html  404!
+/package-lock.json         /404.html  404!
+/deno.lock                 /404.html  404!
+/netlify.toml              /404.html  404!
+/playwright.config.js      /404.html  404!
+/vitest.config.mjs         /404.html  404!
+/qa_quote.js               /404.html  404!
+/animation_check.js        /404.html  404!
+/animation_check.html      /404.html  404!
+/animation_spatial_gallery.html  /404.html  404!
+/timeline-concept.html     /404.html  404!
+/logo_dinesh.html          /404.html  404!
+/about-redesign.spec.js    /404.html  404!
+/cover-color.spec.js       /404.html  404!
+/gallery.spec.js           /404.html  404!
+/mobile-journal.spec.js    /404.html  404!
+/mobile.integration.spec.js  /404.html  404!
+/quote-generator.spec.js   /404.html  404!
+/quote-tracking.spec.js    /404.html  404!
+/video-chapters.spec.js    /404.html  404!
+/video-progress.spec.js    /404.html  404!
+/deploy-exposure.test.js   /404.html  404!
+/film-metadata.test.js     /404.html  404!
+/intake.test.js            /404.html  404!
+/location-guide.test.js    /404.html  404!
+/portfolio-assets.test.js  /404.html  404!
+/video-assets.test.js      /404.html  404!
+/video-focus-rail.test.js  /404.html  404!
+
 /the-experience.html   /couple-portraits.html   301
 /couple-portraits      /couple-portraits.html   301
 /index.html            /                        301
