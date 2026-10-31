@@ -3,7 +3,8 @@ const { test, expect } = require('@playwright/test');
 // index.html ships no multi-chapter film right now: the "Wedding Weekend" placeholder was a
 // Coming Soon card and has been removed. Splice an equivalent card into the served page so
 // the chapters feature stays covered; drop this fixture once a real multi-chapter film is live.
-const PRE_WEDDING_ANCHOR = '<!-- PRE-WEDDING VIDEOS -->';
+// Spliced in as the first wedding film so it sits at the carousel centre after filtering.
+const WEDDING_ANCHOR = '<!-- WEDDING VIDEO -->';
 const WEDDING_WEEKEND_CARD = `
       <div class="vw-card vw-gi-5" data-vcat="wedding" data-video="" data-title="Wedding Weekend" data-type="Haldi Film" data-poster="">
         <div class="vw-poster vw-gi-5"></div>
@@ -28,11 +29,22 @@ const WEDDING_WEEKEND_CARD = `
 
       `;
 
+// Clicking a card one step off-centre slides it to the centre instead of opening it,
+// so centre it first; the result no longer depends on how many wedding films ship.
+async function openCard(card) {
+  const offset = await card.getAttribute('data-ec-offset');
+  if (offset === '1' || offset === '-1') {
+    await card.click();
+    await expect(card).toHaveAttribute('data-ec-offset', '0');
+  }
+  await card.click();
+}
+
 test.describe('Multi-chapter video projects', () => {
   test.beforeEach(async ({ page }) => {
     await page.route(url => url.pathname === '/', async route => {
       const response = await route.fetch();
-      const html = (await response.text()).replace(PRE_WEDDING_ANCHOR, WEDDING_WEEKEND_CARD + PRE_WEDDING_ANCHOR);
+      const html = (await response.text()).replace(WEDDING_ANCHOR, WEDDING_ANCHOR + WEDDING_WEEKEND_CARD);
       await route.fulfill({ status: response.status(), contentType: 'text/html; charset=utf-8', body: html });
     });
     await page.goto('/');
@@ -66,7 +78,7 @@ test.describe('Multi-chapter video projects', () => {
   });
 
   test('opens the modal on the default chapter and lists chapter tabs', async ({ page }) => {
-    await page.locator('.vw-card[data-title="Wedding Weekend"]').click();
+    await openCard(page.locator('.vw-card[data-title="Wedding Weekend"]'));
     await expect(page.locator('#videoModal')).toHaveClass(/vm-open/);
 
     const tabs = page.locator('#vmChapters .vm-chapter-tab');
@@ -77,7 +89,7 @@ test.describe('Multi-chapter video projects', () => {
   });
 
   test('switches chapters in place without closing the modal', async ({ page }) => {
-    await page.locator('.vw-card[data-title="Wedding Weekend"]').click();
+    await openCard(page.locator('.vw-card[data-title="Wedding Weekend"]'));
     await expect(page.locator('#videoModal')).toHaveClass(/vm-open/);
 
     const tabs = page.locator('#vmChapters .vm-chapter-tab');
@@ -93,20 +105,20 @@ test.describe('Multi-chapter video projects', () => {
 
   test('resets to the default chapter when reopened', async ({ page }) => {
     const card = page.locator('.vw-card[data-title="Wedding Weekend"]');
-    await card.click();
+    await openCard(card);
     await page.locator('#vmChapters .vm-chapter-tab').nth(2).click(); // Wedding
     await expect(page.locator('#vmSubtitle')).toHaveText('Wedding Film');
 
     await page.locator('#vmClose').click();
     await expect(page.locator('#videoModal')).not.toHaveClass(/vm-open/);
 
-    await card.click();
+    await openCard(card);
     await expect(page.locator('#vmSubtitle')).toHaveText('Haldi Film');
     await expect(page.locator('#vmChapters .vm-chapter-tab').nth(0)).toHaveClass(/active/);
   });
 
   test('single-video cards still open without a chapter tab row', async ({ page }) => {
-    await page.locator('.vw-card[data-title="Pooja & Amit"]').click();
+    await openCard(page.locator('.vw-card[data-title="Pooja & Amit"]'));
     await expect(page.locator('#videoModal')).toHaveClass(/vm-open/);
     await expect(page.locator('#vmChapters')).toBeHidden();
   });
