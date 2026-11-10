@@ -619,6 +619,9 @@ const portfolioNarrativeDefaults = {
 };
 
 const portfolioNarrativeLibrary = {
+  '/images/weddings/manishanthan-harshini': {
+    story: 'Temple stone, rich silk, and a family gathered close around every ritual.'
+  },
   '/images/weddings/abhinav-megha': {
     story: 'A poised beginning that opened into a celebration full of warmth.'
   },
