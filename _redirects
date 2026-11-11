@@ -66,6 +66,7 @@ https://www.aakaarastudiosnyc.com/*  https://aakaarastudios.com/:splat  301!
 /board/*              /board/:splat            200
 # BEGIN GENERATED FILM ROUTES
 /films/pradyumn-anusha-wedding  /films/generated/pradyumn-anusha-wedding.html  200
+/films/rohith-harshitha-wedding  /films/generated/rohith-harshitha-wedding.html  200
 /films/pooja-amit-wedding  /films/generated/pooja-amit-wedding.html  200
 /films/vyshnavi-daniel  /films/generated/vyshnavi-daniel.html  200
 /films/abhinav-megha-wedding  /films/generated/abhinav-megha-wedding.html  200
