@@ -625,6 +625,9 @@ const portfolioNarrativeLibrary = {
   '/images/weddings/abhinav-megha': {
     story: 'A poised beginning that opened into a celebration full of warmth.'
   },
+  '/images/weddings/Pradyuma-ausha': {
+    story: 'A backyard first look, a ceremony at home, and family gathered close.'
+  },
   '/images/weddings/bhavya-subodh': {
     story: 'Sacred rituals, steady glances, and a room that kept leaning closer.'
   },
