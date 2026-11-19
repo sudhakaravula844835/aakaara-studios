@@ -3898,6 +3898,162 @@ document.addEventListener('click', (e) => {
   sessionStorage.setItem('returnScrollY', String(window.scrollY));
 });
 
+// ═══════ SERVICES SPIRAL (desktop) ═══════
+// Ordinary page scrolling through #services-overview's tall .sov-track turns the
+// six service cards around the helix from animation_spatial_gallery.html while
+// .sov-stage stays pinned. Desktop only: compact screens, touch devices and
+// reduced motion keep the existing grid/list. No scroll input is intercepted.
+(function() {
+  const section = document.getElementById('services-overview');
+  const track = section && section.querySelector('.sov-track');
+  const grid = section && section.querySelector('.sov-grid');
+  if (!section || !track || !grid) return;
+  const cards = Array.from(grid.querySelectorAll('.sov-card'));
+  const counter = section.querySelector('[data-sov-current]');
+  const STEPS = cards.length - 1;
+  const COMPACT_QUERY = '(max-width: 1199px), (max-width: 1366px) and (any-pointer: coarse)';
+  const compact = window.matchMedia(COMPACT_QUERY);
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  // ── Copied verbatim from animation_spatial_gallery.html (spiralProps, createSpiralSpring) ──
+  // One continuous helix: positive offsets wait below/right; negative offsets recede above/left.
+  function spiralProps(offset) {
+    var angle = offset * Math.PI * 55 / 180;
+    var distance = Math.abs(offset);
+    // Local position adjustment for the third slot; zero at slots two and four.
+    var thirdSlot = offset > 1 && offset < 3
+      ? Math.pow(Math.sin(Math.PI * (offset - 1) / 2), 2) : 0;
+    var fade = Math.max(0, Math.min(1, (4.5 - distance) / 0.75));
+    return {
+      // Shift the second slot right, blending smoothly into adjacent positions.
+      tx: 34 * Math.sin(angle) + (offset > 0 && offset < 2
+        ? 4 * Math.pow(Math.sin(Math.PI * offset / 2), 2) : 0) + 12.85 * thirdSlot,
+      ty: -25 + 52 * offset + 32.7 * thirdSlot,
+      tz: -650 * (1 - Math.cos(angle)),
+      // Open the second slot toward the viewer, easing away toward adjacent slots.
+      ry: offset * 55 + (offset > 0 && offset < 2
+        ? -10 * Math.pow(Math.sin(Math.PI * offset / 2), 2) : 0),
+      // Card 3 recedes behind card 2, then returns to full size along the path.
+      sc: 1 - 0.28 * thirdSlot,
+      op: fade * fade * (3 - 2 * fade)
+    };
+  }
+
+  // Critically damped spring (units: cards, cards/s): continuous velocity, settles
+  // exactly on the target with no overshoot, requests frames only while moving.
+  function createSpiralSpring(render) {
+    var FREQUENCY = 14; // rad/s ≈ 0.45 s response, settles in ~0.75 s
+    var position = 0, velocity = 0, target = 0;
+    var frame = null, lastTime = 0;
+
+    function step(time) {
+      frame = null;
+      var dt = lastTime ? Math.min(0.064, Math.max(0, (time - lastTime) / 1000)) : 1 / 60;
+      lastTime = time;
+      // Exact solution of the critically damped spring over dt (frame-rate independent).
+      var offset = position - target;
+      var drift = velocity + FREQUENCY * offset;
+      var decay = Math.exp(-FREQUENCY * dt);
+      position = target + (offset + drift * dt) * decay;
+      velocity = (drift - FREQUENCY * (offset + drift * dt)) * decay;
+      if (Math.abs(position - target) < 0.0005 && Math.abs(velocity) < 0.01) {
+        position = target; // sub-pixel from the slot: land exactly on it
+        velocity = 0;
+      }
+      render(position);
+      if (position !== target || velocity !== 0) frame = requestAnimationFrame(step);
+      else lastTime = 0;
+    }
+
+    return {
+      // Glide to `next`. Pass a velocity (cards/s) to hand off a finger's speed.
+      moveTo: function (next, handoffVelocity) {
+        target = next;
+        if (typeof handoffVelocity === 'number') velocity = handoffVelocity;
+        if (frame === null && (position !== target || velocity !== 0)) {
+          frame = requestAnimationFrame(step);
+        }
+      },
+      // Place instantly and stop any glide.
+      jumpTo: function (next) {
+        if (frame !== null) cancelAnimationFrame(frame);
+        frame = null;
+        lastTime = 0;
+        position = target = next;
+        velocity = 0;
+        render(position);
+      }
+    };
+  }
+  // ── end of copied helpers ──
+
+  let on = false;
+  let trackTop = 0;
+  let stepPx = 1;
+
+  // Track geometry is re-read on every use: images and fonts above the section
+  // can still change its document position after load.
+  function measure() {
+    trackTop = track.getBoundingClientRect().top + window.scrollY;
+    stepPx = Math.max(1, (track.offsetHeight - window.innerHeight) / STEPS);
+  }
+  function progressForScroll(scrollY) {
+    return Math.max(0, Math.min(STEPS, (scrollY - trackTop) / stepPx));
+  }
+  function scrollYForStep(step) {
+    return trackTop + step * stepPx;
+  }
+
+  function render(position) {
+    if (!on) return;
+    cards.forEach((card, i) => {
+      const p = spiralProps(i - position);
+      card.style.transform =
+        'translateX(' + p.tx.toFixed(2) + 'vw) ' +
+        'translateY(' + p.ty.toFixed(2) + '%) ' +
+        'translateZ(' + p.tz.toFixed(0) + 'px) ' +
+        'rotateY(' + p.ry.toFixed(1) + 'deg) ' +
+        'scale(' + p.sc.toFixed(4) + ')';
+      card.style.opacity = p.op.toFixed(3);
+      card.style.zIndex = String(Math.round(p.tz + 3000));
+    });
+    const current = Math.round(position);
+    section.dataset.sovPosition = String(current);
+    if (counter) counter.textContent = String(current + 1).padStart(2, '0');
+  }
+  const spring = createSpiralSpring(render);
+
+  function follow() {
+    if (!on) return;
+    measure();
+    spring.moveTo(progressForScroll(window.scrollY));
+  }
+
+  function setSpiralMode(next) {
+    if (next === on) return;
+    on = next;
+    section.classList.toggle('sov-spiral-on', on);
+    document.documentElement.classList.toggle('sov-snap', on);
+    if (on) {
+      measure();
+      spring.jumpTo(progressForScroll(window.scrollY)); // no glide from 01 on a restored scroll
+      return;
+    }
+    cards.forEach(card => ['transform', 'opacity', 'z-index'].forEach(prop => card.style.removeProperty(prop)));
+    delete section.dataset.sovPosition;
+  }
+  function syncMode() { setSpiralMode(!compact.matches && !reducedMotion.matches); }
+
+  syncMode();
+  compact.addEventListener('change', syncMode);
+  reducedMotion.addEventListener('change', syncMode);
+  window.addEventListener('scroll', follow, { passive: true });
+  window.addEventListener('resize', follow, { passive: true });
+  window.addEventListener('load', follow);
+  // The intro locks scrolling (body.intro-active) for ~4s; re-measure once it ends.
+  new MutationObserver(follow).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+})();
+
 // ═══════ A11Y: FILTER PILLS ANNOUNCE THEIR STATE ═══════
 // a11y audit #09: several code paths toggle `.active` on filter buttons;
 // mirror it into aria-pressed so screen readers hear which filter is on.

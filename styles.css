@@ -2010,6 +2010,94 @@ body.intro-active #heroScroll { opacity: 0; }
 
 /* Conceptual — golden spiral, deep wine */
 .sov-stamp--conceptual { color: var(--mauve); transform: rotate(0deg) scale(1); }
+
+/* ═══════════════════════════════════════════════════════════
+   SERVICES SPIRAL (desktop) — #services-overview.sov-spiral-on
+   Script.js adds the class only at ≥1200px with a fine pointer and no
+   reduced-motion preference. Ordinary page scrolling through the tall
+   .sov-track turns the six cards; .sov-stage stays pinned meanwhile.
+   Geometry and motion come from animation_spatial_gallery.html.
+   ═══════════════════════════════════════════════════════════ */
+#services-overview.sov-spiral-on {
+  --sov-steps: 5;
+  --sov-step-h: 50vh;
+  padding-top: 0 !important;    /* the track starts at the section top (overrides inline padding) */
+}
+#services-overview.sov-spiral-on .sov-track {
+  position: relative;
+  height: calc(100vh + var(--sov-steps) * var(--sov-step-h));
+}
+#services-overview.sov-spiral-on .sov-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: clip;               /* cards far out on the arc never widen the page */
+}
+#services-overview.sov-spiral-on .sov-intro {
+  position: relative;
+  z-index: 4000;                /* above every card (card z-index ≤ 3000) */
+  max-width: 24rem;
+  padding-top: 6.5rem;          /* clear the fixed nav */
+  text-align: left;
+  pointer-events: none;
+}
+#services-overview.sov-spiral-on .sov-grid {
+  position: absolute;
+  inset: 0;
+  display: block;
+  perspective: 1900px;
+  perspective-origin: 50% 48%;
+  overflow: visible;
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+#services-overview.sov-spiral-on .sov-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 35rem;
+  aspect-ratio: 1.42;
+  margin: -12.324rem 0 0 -17.5rem;
+  border-radius: 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+  justify-content: flex-end;
+  padding: 1.6rem 1.8rem 1.5rem;
+  will-change: transform, opacity;
+}
+/* Per-service tints, as on the study page */
+#services-overview.sov-spiral-on .sov-card:nth-child(1) { background: radial-gradient(circle at 68% 28%, rgba(201,149,107,0.13), transparent 45%), linear-gradient(148deg, #1c1410 0%, #0d0907 100%); }
+#services-overview.sov-spiral-on .sov-card:nth-child(2) { background: radial-gradient(circle at 32% 70%, rgba(108,93,140,0.14), transparent 40%), linear-gradient(148deg, #14121c 0%, #0a0910 100%); }
+#services-overview.sov-spiral-on .sov-card:nth-child(3) { background: radial-gradient(circle at 60% 38%, rgba(100,140,120,0.1), transparent 42%), linear-gradient(148deg, #111815 0%, #090e0c 100%); }
+#services-overview.sov-spiral-on .sov-card:nth-child(4) { background: radial-gradient(circle at 40% 55%, rgba(201,149,80,0.1), transparent 40%), linear-gradient(148deg, #1a1510 0%, #0e0c08 100%); }
+#services-overview.sov-spiral-on .sov-card:nth-child(5) { background: radial-gradient(circle at 55% 35%, rgba(140,140,160,0.09), transparent 40%), linear-gradient(148deg, #131316 0%, #0b0b0e 100%); }
+#services-overview.sov-spiral-on .sov-card:nth-child(6) { background: radial-gradient(circle at 38% 62%, rgba(90,110,160,0.1), transparent 42%), linear-gradient(148deg, #111318 0%, #09090e 100%); }
+#services-overview.sov-spiral-on .sov-sa,
+#services-overview.sov-spiral-on .sov-sa-sep { display: inline; }
+#services-overview.sov-spiral-on .sov-meaning { display: block; }
+#services-overview.sov-spiral-on .sov-counter {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  position: absolute;
+  left: var(--page-gutter-desktop);
+  bottom: 2rem;
+  z-index: 4000;
+  font-size: 0.75rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ivory-soft);
+  pointer-events: none;
+}
+#services-overview.sov-spiral-on .sov-counter::before {
+  content: '';
+  width: 2.6rem;
+  height: 1px;
+  background: rgba(201, 149, 107, 0.25);
+}
+
 .sov-cta {
   display: inline-flex;
   align-items: center;
