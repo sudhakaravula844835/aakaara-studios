@@ -4025,20 +4025,28 @@ document.addEventListener('click', (e) => {
   }
   const spring = createSpiralSpring(render);
 
+  // The orbit follows the scroll; once scrolling pauses it settles on the
+  // nearest whole card. Only the orbit moves — the page is never scrolled for
+  // the visitor (snap points here caught slow trackpad/wheel scrolling).
+  const SETTLE_DELAY_MS = 150;
+  let settleTimer = null;
   function follow() {
     if (!on) return;
     measure();
     spring.moveTo(progressForScroll(window.scrollY));
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(() => {
+      if (on) spring.moveTo(Math.round(progressForScroll(window.scrollY)));
+    }, SETTLE_DELAY_MS);
   }
 
   function setSpiralMode(next) {
     if (next === on) return;
     on = next;
     section.classList.toggle('sov-spiral-on', on);
-    document.documentElement.classList.toggle('sov-snap', on);
     if (on) {
       measure();
-      spring.jumpTo(progressForScroll(window.scrollY)); // no glide from 01 on a restored scroll
+      spring.jumpTo(Math.round(progressForScroll(window.scrollY))); // no glide from 01 on a restored scroll
       return;
     }
     cards.forEach(card => ['transform', 'opacity', 'z-index'].forEach(prop => card.style.removeProperty(prop)));
@@ -4047,12 +4055,24 @@ document.addEventListener('click', (e) => {
   function syncMode() { setSpiralMode(!compact.matches && !reducedMotion.matches); }
 
   // Keyboard: tabbing to a card's link scrolls that card to the front of the orbit.
+  // Mouse presses also focus links; scrolling then would move the card out from
+  // under the pointer and lose the click, so only keyboard focus counts.
+  // Track the last input type ourselves rather than relying on the browser's
+  // :focus-visible heuristic, which proved unreliable at focusin time in Chrome.
+  let lastInputWasKeyboard = false;
+  document.addEventListener('keydown', () => { lastInputWasKeyboard = true; }, true);
+  document.addEventListener('pointerdown', () => { lastInputWasKeyboard = false; }, true);
   grid.addEventListener('focusin', (e) => {
-    if (!on) return;
+    if (!on || !lastInputWasKeyboard) return;
     const index = cards.indexOf(e.target.closest('.sov-card'));
     if (index < 0) return;
-    measure();
-    window.scrollTo({ top: Math.round(scrollYForStep(index)) });
+    // Run after the browser's own focus scroll-into-view, which would otherwise
+    // cancel this smooth scroll when it lands later (seen under load in Chrome).
+    requestAnimationFrame(() => {
+      if (!on || document.activeElement !== e.target) return;
+      measure();
+      window.scrollTo({ top: Math.round(scrollYForStep(index)) });
+    });
   });
 
   syncMode();

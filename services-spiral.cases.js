@@ -127,35 +127,93 @@ module.exports = function defineSpiralTests(test, expect) {
     });
 
     test('stops on a whole card', async ({ page }) => {
+      // The orbit settles on the nearest card when scrolling pauses; the page itself stays put.
       await page.goto('/');
       const y1 = await stepY(page, 1);
       const y2 = await stepY(page, 2);
       await jump(page, y1);
       await page.waitForTimeout(600);
       await page.mouse.move(720, 450);
-      await page.mouse.wheel(0, Math.round((y2 - y1) / 2));
+      await page.mouse.wheel(0, Math.round((y2 - y1) * 0.4));
       await page.waitForTimeout(SETTLE_MS);
       const y = await page.evaluate(() => window.scrollY);
-      const landed = Math.abs(y - y1) <= 2 ? '1' : Math.abs(y - y2) <= 2 ? '2' : `between (${y}; steps at ${y1}, ${y2})`;
-      expect(landed === '1' || landed === '2', landed).toBe(true);
-      expect(await position(page)).toBe(landed);
+      expect(y, 'page must not be snapped').toBeGreaterThan(y1 + 20);
+      expect(y).toBeLessThan(y2 - 20);
+      expect(await position(page)).toBe('1');
+      const front = await page.locator('#services-overview .sov-card').nth(1).evaluate(e => e.style.transform);
+      expect(front).toMatch(/rotateY\(0(\.0)?deg\)/); // browsers normalise 0.0deg → 0deg
     });
 
-    test('tabbing to Inquire brings the card forward', async ({ page }) => {
+    test('slow wheel scrolling is never pulled back', async ({ page }) => {
+      await page.goto('/');
+      await jump(page, await stepY(page, 1));
+      await page.waitForTimeout(600);
+      await page.mouse.move(720, 450);
+      let last = await page.evaluate(() => window.scrollY);
+      for (let i = 0; i < 8; i++) {
+        await page.mouse.wheel(0, 100);
+        await page.waitForTimeout(500);
+        const y = await page.evaluate(() => window.scrollY);
+        expect(y, `wheel ${i + 1}`).toBeGreaterThan(last + 50);
+        last = y;
+      }
+    });
+
+    test('slow scroll leaves and approaches the section freely', async ({ page }) => {
+      await page.goto('/');
+      const lastY = await stepY(page, STEPS);
+      await jump(page, lastY);
+      await page.waitForTimeout(600);
+      await page.mouse.move(720, 450);
+      await page.mouse.wheel(0, 150);
+      await page.waitForTimeout(1000);
+      expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(lastY + 120);
+      const above = (await stepY(page, 0)) - 250;
+      await jump(page, above);
+      await page.waitForTimeout(1000);
+      expect(Math.abs(await page.evaluate(() => window.scrollY) - above)).toBeLessThanOrEqual(2);
+    });
+
+    test('pressing the mouse on a side card link does not move the page', async ({ page }) => {
       await page.goto('/');
       await jump(page, await stepY(page, 0));
-      await page.waitForTimeout(600);
-      const link = page.locator('#services-overview .sov-card').nth(4).locator('.sov-link');
-      await link.focus();
       await page.waitForTimeout(SETTLE_MS);
-      expect(await position(page)).toBe('4');
-      const op = await page.locator('#services-overview .sov-card').nth(4).evaluate(e => Number(e.style.opacity));
-      expect(op).toBeGreaterThanOrEqual(0.99);
-      const box = await link.boundingBox();
-      expect(box.y).toBeGreaterThanOrEqual(0);
-      expect(box.y + box.height).toBeLessThanOrEqual(900);
-      expect(box.x).toBeGreaterThanOrEqual(0);
-      expect(box.x + box.width).toBeLessThanOrEqual(1440);
+      const box = await page.locator('#services-overview .sov-card').nth(1).locator('.sov-link').first().boundingBox();
+      const before = await page.evaluate(() => window.scrollY);
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.down();
+      await page.waitForTimeout(400);
+      const during = await page.evaluate(() => window.scrollY);
+      await page.mouse.up();
+      expect(during).toBe(before);
+    });
+
+    test.describe('keyboard focus', () => {
+      // Under load, Chrome's own focus scroll-into-view used to cancel the
+      // spiral's scroll; Script.js now defers it a frame. No retries needed.
+
+      test('tabbing to Inquire brings the card forward', async ({ page }) => {
+        await page.goto('/');
+        await jump(page, await stepY(page, 0));
+        await page.waitForTimeout(600);
+        // Keyboard focus without relying on Tab order (Chrome's Tab start point
+        // drifted in long serial runs): a key press first makes the next focus
+        // count as keyboard focus (:focus-visible), as it does for Tab users.
+        const link = page.locator('#services-overview .sov-card').nth(4).locator('.sov-link').first();
+        await page.bringToFront();
+        await page.keyboard.press('Shift');
+        await link.focus();
+          // A ~1800px smooth scroll plus the spring can exceed 1.5s on a busy machine.
+        await expect.poll(() => position(page), { timeout: 5000 }).toBe('4');
+        await page.waitForTimeout(600); // let the orbit finish settling
+        const op = await page.locator('#services-overview .sov-card').nth(4).evaluate(e => Number(e.style.opacity));
+        expect(op).toBeGreaterThanOrEqual(0.99);
+        const box = await link.boundingBox();
+        expect(box.y).toBeGreaterThanOrEqual(0);
+        expect(box.y + box.height).toBeLessThanOrEqual(900);
+        expect(box.x).toBeGreaterThanOrEqual(0);
+        expect(box.x + box.width).toBeLessThanOrEqual(1440);
+      });
     });
 
     test('nav Services link lands on card 01', async ({ page }) => {
@@ -233,7 +291,7 @@ module.exports = function defineSpiralTests(test, expect) {
       await expect(page.locator('#services-overview .sov-track .sov-stage .sov-grid .sov-card')).toHaveCount(CARDS);
       await expect(page.locator('#services-overview .sov-intro .section-title')).toContainText('Five Ways');
       await expect(page.locator('#services-overview .sov-card--maternity')).toHaveCount(0);
-      await expect(page.locator('#services-overview .sov-track > .sov-step')).toHaveCount(CARDS);
+      await expect(page.locator('#services-overview .sov-step')).toHaveCount(0); // no snap points: they caught slow scrolling
       await expect(page.locator('#services-overview [data-sov-current]')).toHaveText('01');
       const langs = await page.locator('#services-overview .sov-sa').evaluateAll(els => els.map(e => e.getAttribute('lang')));
       expect(langs).toEqual(Array(CARDS).fill('sa-Latn'));

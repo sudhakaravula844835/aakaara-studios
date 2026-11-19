@@ -1921,7 +1921,7 @@ body.intro-active #heroScroll { opacity: 0; }
 }
 /* Services spiral hooks: shown only inside #services-overview.sov-spiral-on
    (desktop), so phones/tablets/reduced motion keep today's layout exactly. */
-.sov-sa, .sov-sa-sep, .sov-meaning, .sov-counter, .sov-step { display: none; }
+.sov-sa, .sov-sa-sep, .sov-meaning, .sov-counter { display: none; }
 .sov-card::after {
   content: '';
   position: absolute;
@@ -2112,25 +2112,6 @@ body.intro-active #heroScroll { opacity: 0; }
   color: var(--ivory-soft);
   pointer-events: none;
 }
-/* Settle on a whole card: proximity snap points at each step. html's
-   scroll-padding-top (80px) shifts where a snap point lands, so each marker
-   sits 80px lower to make the snapped scrollY equal Script.js's
-   scrollYForStep(n) = track top + n × step height. */
-html.sov-snap { scroll-snap-type: y proximity; }
-#services-overview.sov-spiral-on .sov-step {
-  display: block;
-  position: absolute;
-  left: 0;
-  width: 1px;
-  height: 1px;
-  pointer-events: none;
-  scroll-snap-align: start;
-}
-#services-overview.sov-spiral-on .sov-step:nth-of-type(1) { top: calc(80px + 0 * var(--sov-step-h)); }
-#services-overview.sov-spiral-on .sov-step:nth-of-type(2) { top: calc(80px + 1 * var(--sov-step-h)); }
-#services-overview.sov-spiral-on .sov-step:nth-of-type(3) { top: calc(80px + 2 * var(--sov-step-h)); }
-#services-overview.sov-spiral-on .sov-step:nth-of-type(4) { top: calc(80px + 3 * var(--sov-step-h)); }
-#services-overview.sov-spiral-on .sov-step:nth-of-type(5) { top: calc(80px + 4 * var(--sov-step-h)); }
 #services-overview.sov-spiral-on .sov-counter::before {
   content: '';
   width: 2.6rem;

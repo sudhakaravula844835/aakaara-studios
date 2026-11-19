@@ -146,11 +146,11 @@ Portfolio + video grids wrapped in `.ethereal-carousel`, driven by `EtherealCaro
 
 ### Services Spiral (`#services-overview`, desktop only)
 
-"Five Ways We Tell Your Story" (Maternity card removed 2026-11-19) becomes a scroll-driven 3D spiral on desktop: `Script.js` adds `.sov-spiral-on` (and `html.sov-snap`) only when the screen is ≥1200px with a fine pointer and no `prefers-reduced-motion`. Phones keep the contact-sheet list and tablets the 2-column grid — the same five `.sov-card`s, no second copy of the content.
+"Five Ways We Tell Your Story" (Maternity card removed 2026-11-19) becomes a scroll-driven 3D spiral on desktop: `Script.js` adds `.sov-spiral-on` only when the screen is ≥1200px with a fine pointer and no `prefers-reduced-motion`. Phones keep the contact-sheet list and tablets the 2-column grid — the same five `.sov-card`s, no second copy of the content.
 
 - `.sov-track` is `100vh + (cards − 1) × 50vh` tall (`--sov-steps`, `--sov-step-h`); `.sov-stage` is sticky. Page scroll → orbit position 0–4 → critically damped spring → `spiralProps()` (both copied from `animation_spatial_gallery.html`). No wheel capture.
-- `.sov-step` markers are proximity snap points so scrolling rests on a whole card; they sit 80px low to cancel `html { scroll-padding-top: 80px }`.
-- `data-sov-position` on the section and `[data-sov-current]` expose the current card (tests use them). Focusing a card's link scrolls it to the front.
+- When scrolling pauses (150ms) the orbit — not the page — settles on the nearest whole card. Don't add CSS scroll-snap here: proximity snap points caught slow trackpad/wheel scrolling (review, Nov 2026).
+- `data-sov-position` on the section and `[data-sov-current]` expose the current card (tests use them). Keyboard focus on a card's link (last input was a key, not a pointer) scrolls it to the front, one frame after the browser's own focus scroll; mouse presses don't, so clicks on side cards land.
 - Sanskrit name/meaning lines (`.sov-sa`, `.sov-meaning`) show only in spiral mode.
 - `services_viewed` (GA) observes `.sov-intro`, since the tall track can never be 50% visible.
 - Tests: `services-spiral.cases.js`, run by `services-spiral.spec.js` (Chromium) and `services-spiral.webkit.spec.js` (WebKit).
