@@ -9,6 +9,12 @@
   --wine: #7a3b4e; --mauve: #9b7082; --sage: #8a9a7e;
   --saffron: #e0a458;
   --text-muted-on-dark: #a69c92;
+  /* a11y audit #07: gold/saffron variants that pass WCAG AA on cream/ivory
+     (light --rose is only 2.1:1 there). Ratios are vs --champagne. */
+  --bronze: #9a6a45;        /* 3.8:1 — large text (≥24px) and field outlines */
+  --bronze-deep: #7a4e2c;   /* 5.8:1 — body-size gold text */
+  --saffron-deep: #8a5a1c;  /* 4.8:1 — saffron text */
+  --ivory-soft: rgba(250,246,241,0.65); /* secondary text on dark (was 0.38–0.48) */
   --font-display: 'Cormorant Garamond', 'Georgia', serif;
   --font-body: 'Outfit', 'Helvetica Neue', sans-serif;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -54,6 +60,22 @@ body {
 body.intro-active { overflow: hidden; }
 a { text-decoration: none; color: inherit; }
 button { border: none; cursor: pointer; font-family: inherit; background: none; }
+/* Visually hidden but read by screen readers */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+/* a11y audit #19: skip link — off-screen until focused */
+.skip-link {
+  position: fixed; top: 0.75rem; left: 0.75rem; z-index: 10010;
+  padding: 0.7rem 1.1rem; border-radius: 2px;
+  background: var(--rose); color: var(--noir);
+  font-family: var(--font-body); font-size: 0.8rem; font-weight: 500; letter-spacing: 0.06em;
+  transform: translateY(-200%);
+  transition: transform 0.2s;
+}
+.skip-link:focus { transform: translateY(0); outline: 2px solid var(--ivory); outline-offset: 2px; }
+main:focus { outline: none; } /* programmatic focus target of the skip link */
 
 /* ═══════════════════════════════════════════════════════════
    CINEMATIC INTRO OVERLAY
@@ -174,7 +196,7 @@ nav.scrolled {
 .nav-links { display: flex; gap: 2.2rem; align-items: center; }
 .nav-links a {
   font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
-  color: rgba(250,246,241,0.45); font-weight: 300;
+  color: var(--ivory-soft); font-weight: 300;
   transition: color 0.4s; position: relative;
 }
 .nav-links a::after {
@@ -356,7 +378,7 @@ body.intro-active #heroScroll { opacity: 0; }
   font-size: 0.47rem;
   letter-spacing: 0.13em;
   text-transform: uppercase;
-  color: rgba(155, 112, 130, 0.6); /* Changed from --rose to --mauve */
+  color: #b89aa8; /* light mauve, 6.7:1 on dark (was mauve @60%, 2.4:1) */
   border: 1px solid rgba(155, 112, 130, 0.2); /* Changed from --rose to --mauve */
   padding: 0.18rem 0.55rem;
   border-radius: 20px;
@@ -364,11 +386,11 @@ body.intro-active #heroScroll { opacity: 0; }
 /* Card-specific tag colors to match stamps */
 .sov-card--couple .sov-tags span,
 .sov-card--maternity .sov-tags span {
-  color: rgba(232, 196, 168, 0.7); /* --blush */
+  color: var(--blush);
   border-color: rgba(232, 196, 168, 0.25); /* --blush */
 }
 .sov-card--celebrations .sov-tags span {
-  color: rgba(224, 164, 88, 0.7); /* --saffron */
+  color: var(--saffron);
   border-color: rgba(224, 164, 88, 0.25); /* --saffron */
 }
 /* Commercial and Conceptual tags already use --mauve, which is the default. */
@@ -376,7 +398,7 @@ body.intro-active #heroScroll { opacity: 0; }
 /* Pricing anchor */
 .sov-price {
   font-size: 0.68rem;
-  color: rgba(250,246,241,0.2);
+  color: var(--ivory-soft);
   letter-spacing: 0.06em;
   margin: 0.1rem 0 0.2rem;
 }
@@ -413,6 +435,8 @@ body.intro-active #heroScroll { opacity: 0; }
   font-size: 0.55rem; letter-spacing: 0.5em;
   text-transform: uppercase; color: var(--rose); margin-bottom: 1rem;
 }
+.section-warm .section-tag,
+#contact .section-tag { color: var(--bronze-deep); }
 .section-title {
   font-family: var(--font-display); font-weight: 300;
   font-size: clamp(2rem, 4vw, 2.8rem); letter-spacing: 0.04em;
@@ -1692,9 +1716,9 @@ body.intro-active #heroScroll { opacity: 0; }
   max-width: 38rem;
 }
 .about-sanskrit { font-size: 1.1rem; margin-top: 2rem; letter-spacing: 0.04em; line-height: 2.2; }
-.about-sanskrit .telugu { font-family: 'p22-mackinac-pro', 'Noto Sans Telugu', sans-serif; color: var(--saffron); font-weight: 400; font-size: 1.3em; }
+.about-sanskrit .telugu { font-family: 'p22-mackinac-pro', 'Noto Sans Telugu', sans-serif; color: var(--saffron-deep); font-weight: 400; font-size: 1.3em; }
 .about-sanskrit .devnag { font-family: 'p22-mackinac-pro', 'Noto Sans Devanagari', sans-serif; color: var(--wine); font-weight: 400; font-size: 1.15em; }
-.about-sanskrit .english { font-family: var(--font-display); font-style: italic; color: var(--rose); font-weight: 400; }
+.about-sanskrit .english { font-family: var(--font-display); font-style: italic; color: var(--bronze-deep); font-weight: 400; }
 .about-symbolism {
   margin-top: 2rem;
   padding-top: 2rem;
@@ -1706,7 +1730,7 @@ body.intro-active #heroScroll { opacity: 0; }
   gap: 0.8rem;
   font-family: var(--font-display);
   font-size: 1.1rem;
-  color: var(--rose);
+  color: var(--bronze-deep);
   font-weight: 400;
   margin: 0 0 0.5rem;
 }
@@ -1722,8 +1746,8 @@ body.intro-active #heroScroll { opacity: 0; }
   padding-left: calc(4px + 0.8rem); /* Align with text, not dots */
 }
 .about-stats { display: flex; gap: 3rem; margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid rgba(30,26,22,0.05); }
-.about-stats .stat :is(h3, h4) { font-family: var(--font-display); font-weight: 300; font-size: 2rem; color: var(--rose); line-height: 1; }
-.about-stats .stat p { font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(30,26,22,0.38); margin-top: 0.3rem; }
+.about-stats .stat :is(h3, h4, .stat-num) { font-family: var(--font-display); font-weight: 300; font-size: 2rem; color: var(--bronze); line-height: 1; }
+.about-stats .stat p { font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(30,26,22,0.7); margin-top: 0.3rem; }
 .about-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1735,16 +1759,18 @@ body.intro-active #heroScroll { opacity: 0; }
   align-items: center;
   justify-content: center;
   min-height: 44px;
-  font-size: 0.62rem;
+  font-size: 0.75rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   text-decoration: none;
   transition: color 0.35s var(--ease), background-color 0.35s var(--ease), border-color 0.35s var(--ease), transform 0.35s var(--ease);
 }
+/* a11y audit #01: dark text on gold (7.6:1) — ivory on gold was 2.44:1 */
 .about-cta-primary {
   padding: 0.75rem 1.4rem;
   background: var(--rose);
-  color: var(--ivory);
+  color: var(--noir);
+  font-weight: 500;
   border: 1px solid var(--rose);
   border-radius: 2px;
 }
@@ -1799,7 +1825,7 @@ body.intro-active #heroScroll { opacity: 0; }
   font-weight: 300;
   font-style: italic;
   letter-spacing: 0.18em;
-  color: #c9956b;
+  color: var(--bronze);
   display: inline-block;
   position: relative;
   overflow: hidden;
@@ -1932,7 +1958,7 @@ body.intro-active #heroScroll { opacity: 0; }
 }
 .sov-desc {
   font-size: 0.72rem;
-  color: rgba(250,246,241,0.45);
+  color: var(--ivory-soft);
   line-height: 1.7;
   flex: 1;
 }
@@ -1943,7 +1969,7 @@ body.intro-active #heroScroll { opacity: 0; }
   font-size: 0.52rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(201,149,107,0.5);
+  color: var(--rose);
   margin-top: 0.4rem;
   transition: color 0.3s, gap 0.3s var(--ease);
 }
@@ -1988,7 +2014,7 @@ body.intro-active #heroScroll { opacity: 0; }
   font-size: 0.58rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(250,246,241,0.35);
+  color: var(--ivory-soft);
   border-bottom: 1px solid rgba(201,149,107,0.15);
   padding-bottom: 0.3rem;
   transition: color 0.3s, border-color 0.3s;
@@ -2410,7 +2436,7 @@ body.intro-active #heroScroll { opacity: 0; }
   font-size: 0.51rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(30,26,22,0.58);
+  color: rgba(30,26,22,0.72);
   background: rgba(250,246,241,0.48);
 }
 .contact-details { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -2434,8 +2460,8 @@ body.intro-active #heroScroll { opacity: 0; }
   background: rgba(250,246,241,0.58);
 }
 .cd-icon svg { width: 14px; height: 14px; }
-.contact-detail :is(h3, h5) { font-weight: 450; font-size: 0.82rem; color: rgba(30,26,22,0.82); }
-.contact-detail p { font-size: 0.7rem; color: rgba(30,26,22,0.42); margin: 0; }
+.contact-detail :is(h3, h5, .cd-title) { font-weight: 450; font-size: 0.82rem; color: rgba(30,26,22,0.82); }
+.contact-detail p { font-size: 0.7rem; color: rgba(30,26,22,0.68); margin: 0; }
 .contact-form {
   position: relative;
   display: flex;
@@ -2470,7 +2496,7 @@ body.intro-active #heroScroll { opacity: 0; }
   font-size: 0.62rem;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--rose);
+  color: var(--bronze-deep);
   white-space: nowrap;
 }
 .contact-form-head p {
@@ -2478,19 +2504,23 @@ body.intro-active #heroScroll { opacity: 0; }
   margin: 0;
   font-size: 0.73rem;
   line-height: 1.55;
-  color: rgba(30,26,22,0.48);
+  color: rgba(30,26,22,0.68);
 }
 .form-row { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 .form-group { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 0.34rem; }
 .date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; }
-.form-group label { font-size: 0.54rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(30,26,22,0.48); font-weight: 500; }
+/* a11y audit #07/#08: labels 12px @ 4.5:1+, field outlines ≥3:1, required marks */
+.form-group label { font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(30,26,22,0.72); font-weight: 500; }
+.form-group label .req { color: var(--bronze-deep); }
+.form-group label .form-optional { text-transform: none; letter-spacing: 0.02em; font-weight: 400; }
+.contact-form-head .req { color: var(--bronze-deep); }
 .form-group input, .form-group select, .form-group textarea {
   width: 100%;
   font-family: var(--font-body);
   font-weight: 350;
   font-size: 0.84rem;
   padding: 0.78rem 0.88rem;
-  border: 1px solid rgba(30,26,22,0.12);
+  border: 1px solid var(--bronze);
   border-radius: 6px;
   background: rgba(255,255,255,0.52);
   color: var(--umber);
@@ -2498,14 +2528,14 @@ body.intro-active #heroScroll { opacity: 0; }
   outline: none;
 }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-  border-color: rgba(201,149,107,0.72);
+  border-color: var(--bronze-deep);
   background: rgba(255,255,255,0.82);
   box-shadow: 0 0 0 4px rgba(201,149,107,0.1);
 }
 .form-group textarea { resize: vertical; min-height: 108px; line-height: 1.55; }
 /* Style the placeholder text to match the theme */
 .form-group input::placeholder, .form-group textarea::placeholder {
-  color: rgba(30, 26, 22, 0.34); opacity: 1;
+  color: rgba(30, 26, 22, 0.62); opacity: 1;
 }
 .form-submit {
   position: relative;
@@ -2714,7 +2744,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   border-radius: 50%;
   background: var(--rose); opacity: 0.85;
 }
-.footer-col :is(h3, h5) { font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--rose); margin-bottom: 1rem; font-weight: 400; }
+.footer-col :is(h3, h5, .footer-col-title) { font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--rose); margin-bottom: 1rem; font-weight: 400; }
 .footer-col a { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted-on-dark); margin-bottom: 0.5rem; transition: color 0.3s; }
 .footer-col a svg { flex-shrink: 0; opacity: 0.5; transition: opacity 0.3s; }
 .footer-col a:hover svg { opacity: 1; }
@@ -3167,7 +3197,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   footer { padding: 2.5rem 1.5rem 1.5rem; }
   .footer-logo-container { margin-bottom: 0.6rem; }
   .footer-brand p { line-height: 1.6; }
-  .footer-col :is(h3, h5) { margin-bottom: 0.6rem; }
+  .footer-col :is(h3, h5, .footer-col-title) { margin-bottom: 0.6rem; }
   .footer-col a { margin-bottom: 0.3rem; }
   .about-stats { gap: 2rem; }
   .about-actions { flex-direction: column; align-items: stretch; margin-top: 1.5rem; text-align: center; max-width: 20rem; }
@@ -3245,6 +3275,11 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .ec-next { right: 0.5rem; }
 
   .nav-links.show { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: rgba(9,8,11,1); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 2rem; gap: 1.5rem; max-height: 85vh; overflow-y: auto; isolation: isolate; }
+  /* a11y audit #11: 44px-tall tap rows (were 18px text with gaps between) */
+  .nav-links.show { gap: 0.2rem; }
+  .nav-links.show a:not(.nav-cta) { display: flex; align-items: center; min-height: 44px; }
+  .nav-links.show a:not(.nav-cta)::after { bottom: 8px; }
+  .nav-links.show a.nav-cta { margin-top: 0.8rem; min-height: 44px; display: inline-flex; align-items: center; align-self: flex-start; }
 
   /* Disable custom cursor on touch devices */
   .gallery-item { cursor: pointer; }
@@ -3332,7 +3367,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .vw-filters { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
 .vw-filters button {
   font-size: 0.56rem; letter-spacing: 0.22em; text-transform: uppercase;
-  color: rgba(250,246,241,0.32); font-weight: 300;
+  color: var(--ivory-soft); font-weight: 300;
   padding: 0.5rem 1.3rem; border: 1px solid rgba(250,246,241,0.09);
   border-radius: 0; background: transparent; outline: none;
   transition: color 0.1s cubic-bezier(0.16, 1, 0.3, 1),
@@ -3705,9 +3740,15 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   position: fixed; inset: 0; z-index: 10002;
   display: flex; align-items: center; justify-content: center;
   opacity: 0; pointer-events: none;
-  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  /* a11y audit #06: visibility:hidden after the fade so the closed player's
+     controls leave the tab order (JS also toggles `inert`). */
+  visibility: hidden;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.4s;
 }
-.video-modal.vm-open { opacity: 1; pointer-events: auto; }
+.video-modal.vm-open {
+  opacity: 1; pointer-events: auto; visibility: visible;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s;
+}
 .vm-backdrop {
   position: absolute; inset: 0;
   background: rgba(9,8,11,0.96);
@@ -3815,6 +3856,21 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 /* Toggle video/placeholder visibility */
 .vm-stage.vm-has-video .vm-placeholder { display: none; }
 .vm-stage.vm-has-video #vmVideo { display: block; }
+/* a11y audit #02: load-failure state — readable message + retry, never "coming soon" */
+.vm-stage.vm-load-error .vm-placeholder p {
+  font-size: 0.8rem; letter-spacing: 0.08em; text-transform: none;
+  color: rgba(250,246,241,0.8);
+}
+.vm-retry {
+  min-height: 44px; padding: 0.6rem 1.4rem;
+  font-family: var(--font-body); font-size: 0.75rem; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--noir); background: var(--rose); border-radius: 2px;
+  transition: background 0.3s;
+}
+.vm-retry:hover { background: var(--rose-light); }
+.vm-retry:focus-visible { outline: 2px solid var(--rose-light); outline-offset: 3px; }
+.vm-retry[hidden] { display: none; }
 
 /* Custom Video Controls */
 .vm-controls {
@@ -3824,7 +3880,8 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   display: flex; align-items: center; gap: 1rem;
   opacity: 0; transition: opacity 0.3s;
 }
-.vm-stage:hover .vm-controls { opacity: 1; }
+.vm-stage:hover .vm-controls,
+.vm-stage:focus-within .vm-controls { opacity: 1; } /* keyboard users must see the control they're on */
 /* MOBILE FIX: give each control button an explicit 44×44px touch target — icons are only 16–18px
    without this, all play/skip/mute/fullscreen buttons are untappable on small screens */
 .vm-ctrl-btn {
@@ -3877,6 +3934,8 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   cursor: pointer; position: relative; border-radius: 2px;
   transition: height 0.2s;
 }
+/* a11y audit #11: 3px line, but a ≥24px-tall hit area (SC 2.5.8) */
+.vm-progress-track::before { content: ''; position: absolute; left: 0; right: 0; top: -11px; bottom: -11px; }
 .vm-progress-track:hover { height: 5px; }
 .vm-progress-fill { height: 100%; background: var(--rose); width: 0%; border-radius: 2px; position: relative; }
 .vm-progress-fill::after { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 8px; height: 8px; background: var(--ivory); border-radius: 50%; opacity: 0; transition: opacity 0.2s; }
@@ -4352,7 +4411,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 }
 .sov-link-view {
     color: var(--ivory) !important;
-    opacity: 0.6;
+    opacity: 0.75;
     border-bottom: 1px solid rgba(250, 246, 241, 0.2);
     padding-bottom: 2px;
     transition: all 0.4s var(--ease);
@@ -4497,7 +4556,12 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 @media (max-width: 768px) {
   /* MOBILE FIX: was 38×38px — raised to 44×44px to meet touch-target minimum */
   .back-to-top { bottom: 1.5rem; right: 1.5rem; width: 44px; height: 44px; }
+  /* a11y audit #20: don't sit on the inquiry card next to "Send Message" */
+  .back-to-top.visible.over-form { opacity: 0; transform: translateY(10px); pointer-events: none; }
 }
+/* Hidden states also leave the tab order (the button was an invisible tab stop) */
+.back-to-top:not(.visible) { visibility: hidden; }
+@media (max-width: 768px) { .back-to-top.visible.over-form { visibility: hidden; } }
 
 /* ═══════════════════════════════════════════════════════════
    MOBILE SERVICES INDEX — compact "contact sheet" list (≤768px)
@@ -4624,7 +4688,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   font-size: 0.58rem;
   letter-spacing: 0.26em;
   text-transform: uppercase;
-  color: rgba(250, 246, 241, 0.42);
+  color: var(--ivory-soft);
   white-space: nowrap;
 }
 .lab-section-rail span:nth-child(2) {

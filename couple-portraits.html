@@ -29,7 +29,7 @@
     <meta property="og:image:height" content="630">
     <!-- SEO FIX: og:image:alt updated to describe the page content, not the generic tagline -->
     <meta property="og:image:alt" content="Aakaara Studios NYC — NYC couple portrait photographer, Central Park and Brooklyn.">
-    <meta property="og:url" content="https://aakaarastudios.com/couple-portraits.html">
+    <meta property="og:url" content="https://aakaarastudios.com/couple-portraits">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Aakaara Studios NYC">
     <!-- SEO FIX: og:locale added — required for Facebook/LinkedIn geo-targeted audiences -->
@@ -38,7 +38,7 @@
     <meta name="twitter:title" content="NYC Couple Portrait Photographer — Aakaara Studios NYC">
     <meta name="twitter:description" content="Cinematic couple portrait sessions in New York City, with engagement and anniversary photography across Central Park, DUMBO, and the Brooklyn Bridge.">
     <meta name="twitter:image" content="https://aakaarastudios.com/images/og-cover.jpg">
-    <link rel="canonical" href="https://aakaarastudios.com/couple-portraits.html">
+    <link rel="canonical" href="https://aakaarastudios.com/couple-portraits">
     <title>NYC Couple Portrait Photographer | Aakaara Studios NYC</title>
     <!-- SEO FIX: theme-color matches the site's dark background for consistent brand feel in mobile Chrome -->
     <meta name="theme-color" content="#09080b">
@@ -49,14 +49,14 @@
       "@context": "https://schema.org",
       "@type": "CollectionPage",
       "name": "NYC Couple Portrait Photographer — Aakaara Studios NYC",
-      "url": "https://aakaarastudios.com/couple-portraits.html",
+      "url": "https://aakaarastudios.com/couple-portraits",
       "description": "Cinematic couple portrait sessions in New York City — engagement, anniversary, and editorial-style photography at Central Park, DUMBO, Brooklyn Bridge, and beyond.",
       "isPartOf": { "@id": "https://aakaarastudios.com/#business" },
       "breadcrumb": {
         "@type": "BreadcrumbList",
         "itemListElement": [
           { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://aakaarastudios.com/" },
-          { "@type": "ListItem", "position": 2, "name": "Couple Portraits", "item": "https://aakaarastudios.com/couple-portraits.html" }
+          { "@type": "ListItem", "position": 2, "name": "Couple Portraits", "item": "https://aakaarastudios.com/couple-portraits" }
         ]
       }
     }
@@ -339,7 +339,7 @@
             justify-content: center;
             min-height: 46px;
             padding: 0.8rem 1.35rem;
-            font-size: 0.62rem;
+            font-size: 0.75rem;
             letter-spacing: 0.19em;
             text-transform: uppercase;
             text-decoration: none;
@@ -350,9 +350,11 @@
                 transform 0.35s var(--ease);
         }
 
+        /* a11y audit #01: dark text on gold (7.6:1) — ivory on gold was 2.44:1 */
         .cp-cta-primary {
             background: var(--rose);
-            color: var(--ivory);
+            color: var(--noir);
+            font-weight: 500;
             border: 1px solid var(--rose);
         }
 
@@ -2203,27 +2205,27 @@
         <div class="nyc-preview">
           <div class="nyc-preview-img active nyc-cp" data-preview-aspect="1371 / 2056" data-preview-width="21rem">
             <div class="preview-bg" style="background-image: url('/images/nyc/cp.jpg');"></div>
-            <div class="nyc-preview-info"><h5>Central Park</h5><div class="tag-line">Best · Golden Hour · Spring &amp; Autumn</div><a href="https://maps.google.com/?q=Central+Park+New+York" target="_blank" class="nyc-maps-link">Maps</a></div>
+            <div class="nyc-preview-info"><h5>Central Park</h5><div class="tag-line">Best · Golden Hour · Spring &amp; Autumn</div><a href="https://maps.google.com/?q=Central+Park+New+York" target="_blank" class="nyc-maps-link" rel="noopener" aria-label="Open Central Park in Google Maps (new tab)">Maps</a></div>
           </div>
           <div class="nyc-preview-img nyc-dumbo" data-preview-aspect="1371 / 2056" data-preview-width="21rem">
             <div class="preview-bg" style="background-image: url('/images/nyc/dumbo.jpg');"></div>
-            <div class="nyc-preview-info"><h5>DUMBO</h5><div class="tag-line">Best · Sunrise · Blue Hour</div><a href="https://maps.google.com/?q=DUMBO+Brooklyn" target="_blank" class="nyc-maps-link">Maps</a></div>
+            <div class="nyc-preview-info"><h5>DUMBO</h5><div class="tag-line">Best · Sunrise · Blue Hour</div><a href="https://maps.google.com/?q=DUMBO+Brooklyn" target="_blank" class="nyc-maps-link" rel="noopener" aria-label="Open DUMBO in Google Maps (new tab)">Maps</a></div>
           </div>
           <div class="nyc-preview-img nyc-bb" data-preview-aspect="1375 / 2056" data-preview-width="21rem">
             <div class="preview-bg" style="background-image: url('/images/nyc/bb.jpg');"></div>
-            <div class="nyc-preview-info"><h5>Brooklyn Bridge</h5><div class="tag-line">Best · Early Morning · Sunset</div><a href="https://maps.google.com/?q=Brooklyn+Bridge" target="_blank" class="nyc-maps-link">Maps</a></div>
+            <div class="nyc-preview-info"><h5>Brooklyn Bridge</h5><div class="tag-line">Best · Early Morning · Sunset</div><a href="https://maps.google.com/?q=Brooklyn+Bridge" target="_blank" class="nyc-maps-link" rel="noopener" aria-label="Open Brooklyn Bridge in Google Maps (new tab)">Maps</a></div>
           </div>
           <div class="nyc-preview-img nyc-subway" data-preview-aspect="1371 / 2056" data-preview-width="21rem">
             <div class="preview-bg" style="background-image: url('/images/nyc/subway.jpg');"></div>
-            <div class="nyc-preview-info"><h5>NYC Subway</h5><div class="tag-line">Best · Off-Peak · Any Season</div><a href="https://maps.google.com/?q=Grand+Central+Station" target="_blank" class="nyc-maps-link">Maps</a></div>
+            <div class="nyc-preview-info"><h5>NYC Subway</h5><div class="tag-line">Best · Off-Peak · Any Season</div><a href="https://maps.google.com/?q=Grand+Central+Station" target="_blank" class="nyc-maps-link" rel="noopener" aria-label="Open NYC Subway in Google Maps (new tab)">Maps</a></div>
           </div>
           <div class="nyc-preview-img nyc-lib" data-preview-aspect="1600 / 2400" data-preview-width="21rem">
             <div class="preview-bg" style="background-image: url('/images/nyc/lib.jpg');"></div>
-            <div class="nyc-preview-info"><h5>NYC Public Library</h5><div class="tag-line">Best · Weekdays · Soft Light</div><a href="https://maps.google.com/?q=New+York+Public+Library" target="_blank" class="nyc-maps-link">Maps</a></div>
+            <div class="nyc-preview-info"><h5>NYC Public Library</h5><div class="tag-line">Best · Weekdays · Soft Light</div><a href="https://maps.google.com/?q=New+York+Public+Library" target="_blank" class="nyc-maps-link" rel="noopener" aria-label="Open NYC Public Library in Google Maps (new tab)">Maps</a></div>
           </div>
           <div class="nyc-preview-img nyc-st" data-preview-aspect="1920 / 1079" data-preview-width="32rem">
             <div class="preview-bg" style="background-image: url('/images/nyc/st.jpg');"></div>
-            <div class="nyc-preview-info"><h5>NYC Streets</h5><div class="tag-line">Best · Blue Hour · Rainy Evenings</div><a href="https://maps.google.com/?q=Times+Square+NYC" target="_blank" class="nyc-maps-link">Maps</a></div>
+            <div class="nyc-preview-info"><h5>NYC Streets</h5><div class="tag-line">Best · Blue Hour · Rainy Evenings</div><a href="https://maps.google.com/?q=Times+Square+NYC" target="_blank" class="nyc-maps-link" rel="noopener" aria-label="Open NYC Streets in Google Maps (new tab)">Maps</a></div>
           </div>
         </div>
       </div>
@@ -2356,22 +2358,22 @@
             <div class="work-caption">Yogesh & Rishitha</div>
         </div>
 
-        <!-- Suprith & Pragnya -->
+        <!-- Pragna & Suprith -->
         <div class="work-item" data-location="central-park">
-            <img src="/images/couple-portraits/suprith-pragnya/1.jpg" alt="Suprith & Pragnya enjoying a walk in Central Park." loading="lazy" decoding="async" width="4439" height="6658">
-            <div class="work-caption">Suprith & Pragnya</div>
+            <img src="/images/couple-portraits/suprith-pragnya/1.jpg" alt="Pragna & Suprith enjoying a walk in Central Park." loading="lazy" decoding="async" width="4439" height="6658">
+            <div class="work-caption">Pragna & Suprith</div>
         </div>
         <div class="work-item" data-location="central-park">
             <img src="/images/couple-portraits/suprith-pragnya/2.jpg" alt="A candid moment between a couple in a New York park." loading="lazy" decoding="async" width="7008" height="4672">
-            <div class="work-caption">Suprith & Pragnya</div>
+            <div class="work-caption">Pragna & Suprith</div>
         </div>
         <div class="work-item" data-location="central-park">
-            <img src="/images/couple-portraits/suprith-pragnya/3.jpg" alt="Suprith & Pragnya in an intimate portrait by Aakaara Studios." loading="lazy" decoding="async" width="4439" height="6658">
-            <div class="work-caption">Suprith & Pragnya</div>
+            <img src="/images/couple-portraits/suprith-pragnya/3.jpg" alt="Pragna & Suprith in an intimate portrait by Aakaara Studios." loading="lazy" decoding="async" width="4439" height="6658">
+            <div class="work-caption">Pragna & Suprith</div>
         </div>
         <div class="work-item" data-location="central-park">
-            <img src="/images/couple-portraits/suprith-pragnya/4.jpg" alt="Suprith & Pragnya photographed in New York City." loading="lazy" decoding="async" width="4439" height="6658">
-            <div class="work-caption">Suprith & Pragnya</div>
+            <img src="/images/couple-portraits/suprith-pragnya/4.jpg" alt="Pragna & Suprith photographed in New York City." loading="lazy" decoding="async" width="4439" height="6658">
+            <div class="work-caption">Pragna & Suprith</div>
         </div>
 
         <!-- Vyshnavi & Shiva -->

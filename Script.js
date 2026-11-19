@@ -1758,6 +1758,8 @@ function filterVideos(cat, btn) {
   const vmSkipFwdBtn  = document.getElementById('vmSkipFwdBtn');
   const vmSkipBackOvl = document.getElementById('vmSkipBack');
   const vmSkipFwdOvl  = document.getElementById('vmSkipFwd');
+  const vmPlaceholderText = document.getElementById('vmPlaceholderText');
+  const vmRetry  = document.getElementById('vmRetry');
   if (!modal) return;
 
   var activeHls = null; // Track active HLS instance for cleanup
@@ -1765,6 +1767,14 @@ function filterVideos(cat, btn) {
   var modalRequestId = 0;
   var modalLastFocusedEl = null;
   var currentShareUrl = '';
+  // a11y audit #02: a load error must never look like "coming soon".
+  // loadAttempt bumps on every attach/teardown so late errors from an old
+  // source are ignored; each film gets one automatic retry before the
+  // "didn't load" state with a Try again button.
+  var loadAttempt = 0;
+  var currentModalSrc = '';
+  var retriedThisSrc = false;
+  const FILM_RETRY_DELAY_MS = 600;
   const YT_ARROW_SKIP = 5;
   const YT_JL_SKIP = 10;
   const YT_VOLUME_STEP = 0.05;
@@ -1800,21 +1810,73 @@ function filterVideos(cat, btn) {
     });
   }
 
-  async function attachHLS(videoEl, src, requestId) {
+  // Stage shows one of: the video ('video'), "Video coming soon" for cards with
+  // no film ('soon'), or "This film didn't load" + Try again ('error').
+  function setStageState(state) {
+    vmStage.classList.toggle('vm-has-video', state === 'video');
+    vmStage.classList.toggle('vm-load-error', state === 'error');
+    if (vmPlaceholderText) {
+      vmPlaceholderText.textContent = state === 'error' ? 'This film didn’t load.' : 'Video coming soon';
+    }
+    if (vmRetry) vmRetry.hidden = state !== 'error';
+  }
+
+  // Detach any source without `src = ''`, which itself raises MediaError 4.
+  function teardownMedia() {
+    loadAttempt += 1;
     if (activeHls) { activeHls.destroy(); activeHls = null; }
+    vmVideo.pause();
+    if (vmVideo.hasAttribute('src')) {
+      vmVideo.removeAttribute('src');
+      vmVideo.load();
+    }
+  }
+
+  function handleLoadFailure(attempt, reason) {
+    if (attempt !== loadAttempt) return; // superseded by a newer load or a close
+    if (!modal.classList.contains('vm-open') || !currentModalSrc) return;
+    const requestId = modalRequestId;
+    teardownMedia();
+    if (!retriedThisSrc) {
+      retriedThisSrc = true;
+      window.setTimeout(() => {
+        if (requestId === modalRequestId) startModalLoad(currentModalSrc, requestId);
+      }, FILM_RETRY_DELAY_MS);
+      return;
+    }
+    console.warn('[film] playback failed after retry:', reason);
+    setStageState('error');
+    syncPlayToggle();
+  }
+
+  async function startModalLoad(src, requestId) {
+    setStageState('video');
+    const attempt = loadAttempt + 1;
+    try {
+      await attachHLS(vmVideo, src, requestId, attempt);
+    } catch (err) {
+      if (requestId === modalRequestId) handleLoadFailure(attempt, err && err.message);
+    }
+  }
+
+  async function attachHLS(videoEl, src, requestId, attempt) {
+    if (activeHls) { activeHls.destroy(); activeHls = null; }
+    loadAttempt = attempt;
     if (src.includes('.m3u8')) {
       if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
-        // Safari native HLS
+        // Native HLS (Safari, and Chrome builds that ship it). Errors arrive
+        // through the <video> 'error' listener below.
         videoEl.src = src;
         videoEl.load();
         videoEl.play().catch(function(){});
         return;
       }
 
-      const HlsCtor = await ensureHlsLibrary();
-      if (requestId !== modalRequestId || !HlsCtor || !HlsCtor.isSupported()) return;
+      const HlsCtor = await ensureHlsLibrary(); // rejection → startModalLoad's catch
+      if (requestId !== modalRequestId) return;
+      if (!HlsCtor || !HlsCtor.isSupported()) throw new Error('HLS playback unsupported');
 
-      activeHls = new HlsCtor({
+      const hls = new HlsCtor({
         maxBufferLength: 60,
         maxMaxBufferLength: 600,
         fragLoadingMaxRetry: 6,
@@ -1824,12 +1886,13 @@ function filterVideos(cat, btn) {
         manifestLoadingMaxRetry: 3,
         abrEwmaDefaultEstimate: 1500000,
       });
-      activeHls.loadSource(src);
-      activeHls.attachMedia(videoEl);
-      activeHls.on(HlsCtor.Events.MANIFEST_PARSED, function() { videoEl.play().catch(function(){}); });
-      activeHls.on(HlsCtor.Events.ERROR, function(event, data) {
-        var hls = activeHls;
-        if (!hls) return;
+      activeHls = hls;
+      var mediaRecoveries = 0;
+      hls.loadSource(src);
+      hls.attachMedia(videoEl);
+      hls.on(HlsCtor.Events.MANIFEST_PARSED, function() { videoEl.play().catch(function(){}); });
+      hls.on(HlsCtor.Events.ERROR, function(event, data) {
+        if (hls !== activeHls) return;
         if (!data.fatal) {
           // Non-fatal buffer stall: nudge playback position to unblock decoder
           if (data.details === 'bufferStalledError' && !videoEl.paused) {
@@ -1837,14 +1900,13 @@ function filterVideos(cat, btn) {
           }
           return;
         }
-        if (data.type === HlsCtor.ErrorTypes.NETWORK_ERROR) {
-          hls.startLoad();
-        } else if (data.type === HlsCtor.ErrorTypes.MEDIA_ERROR) {
+        // Fatal network errors have already used hls.js's own retries (config above).
+        if (data.type === HlsCtor.ErrorTypes.MEDIA_ERROR && mediaRecoveries < 1) {
+          mediaRecoveries += 1;
           hls.recoverMediaError();
-        } else {
-          activeHls = null;
-          hls.destroy();
+          return;
         }
+        handleLoadFailure(attempt, data.details || data.type);
       });
       return;
     }
@@ -1910,18 +1972,33 @@ function filterVideos(cat, btn) {
 
   async function loadModalSrc(src, requestId) {
     resetProgress();
+    currentModalSrc = src || '';
+    retriedThisSrc = false;
     if (src) {
-      await attachHLS(vmVideo, src, requestId);
+      await startModalLoad(src, requestId);
       if (requestId !== modalRequestId) return;
-      vmStage.classList.add('vm-has-video');
       syncPlayToggle();
     } else {
-      vmVideo.pause();
-      if (activeHls) { activeHls.destroy(); activeHls = null; }
-      vmVideo.src = '';
-      vmStage.classList.remove('vm-has-video');
+      teardownMedia();
+      setStageState('soon');
       syncPlayToggle();
     }
+  }
+
+  // Native-HLS / MP4 errors (hls.js reports its own through Hls.Events.ERROR).
+  vmVideo.addEventListener('error', () => {
+    if (activeHls || !vmVideo.hasAttribute('src')) return;
+    handleLoadFailure(loadAttempt, 'MediaError ' + (vmVideo.error ? vmVideo.error.code : '?'));
+  });
+
+  if (vmRetry) {
+    vmRetry.addEventListener('click', async () => {
+      if (!currentModalSrc) return;
+      const requestId = ++modalRequestId;
+      const src = currentModalSrc;
+      modal.focus({ preventScroll: true }); // the button hides itself; keep focus in the player
+      await loadModalSrc(src, requestId);
+    });
   }
 
   function renderChapterTabs(chapters, defaultChapter) {
@@ -1961,7 +2038,7 @@ function filterVideos(cat, btn) {
     textarea.setAttribute('readonly', '');
     textarea.style.position = 'fixed';
     textarea.style.top = '-999px';
-    document.body.appendChild(textarea);
+    modal.appendChild(textarea); // inside the dialog so the focus guard leaves it alone
     textarea.select();
     const copied = document.execCommand('copy');
     textarea.remove();
@@ -2045,10 +2122,9 @@ function filterVideos(cat, btn) {
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     modal.classList.remove('vm-open');
     resetProgress();
-    vmVideo.pause();
-    if (activeHls) { activeHls.destroy(); activeHls = null; }
-    vmVideo.src = '';
-    vmStage.classList.remove('vm-has-video');
+    currentModalSrc = '';
+    teardownMedia();
+    setStageState('soon');
     document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
     document.body.style.position = '';
@@ -2275,6 +2351,46 @@ function filterVideos(cat, btn) {
 
   document.addEventListener('keydown', handleModalKeydown);
 
+  // a11y audit #06: the closed player is only faded out, so make it inert to
+  // drop its 7 controls from the tab order and the accessibility tree.
+  // Derived from `vm-open` so every open/close path stays in sync.
+  function syncModalInert() {
+    if (modal.classList.contains('vm-open')) modal.removeAttribute('inert');
+    else modal.setAttribute('inert', '');
+  }
+  syncModalInert();
+  new MutationObserver(syncModalInert).observe(modal, { attributes: true, attributeFilter: ['class'] });
+
+  // a11y audit #05: keep keyboard focus inside the open player (aria-modal
+  // alone doesn't), wrapping from the last control to the first.
+  const MODAL_FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  function modalFocusables() {
+    return Array.from(modal.querySelectorAll(MODAL_FOCUSABLE)).filter(el =>
+      !el.disabled && !el.closest('[hidden]') && el.getClientRects().length > 0 &&
+      getComputedStyle(el).visibility !== 'hidden');
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab' || !modal.classList.contains('vm-open')) return;
+    const items = modalFocusables();
+    if (!items.length) { e.preventDefault(); modal.focus({ preventScroll: true }); return; }
+    const first = items[0];
+    const last = items[items.length - 1];
+    const active = document.activeElement;
+    const outside = !modal.contains(active);
+    if (e.shiftKey && (outside || active === first || active === modal)) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && (outside || active === last)) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+  document.addEventListener('focusin', (e) => {
+    if (modal.classList.contains('vm-open') && !modal.contains(e.target)) {
+      modal.focus({ preventScroll: true });
+    }
+  });
+
   document.querySelectorAll('.vw-card').forEach(c => c.addEventListener('click', () => openModal(c)));
   vmClose.addEventListener('click', closeModal);
   vmBg.addEventListener('click', closeModal);
@@ -2286,6 +2402,8 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     e.preventDefault();
     const t = document.querySelector(this.getAttribute('href'));
     if (t) t.scrollIntoView({ behavior: 'smooth' });
+    // a11y audit #19: the skip link must move focus, not just scroll
+    if (t && this.classList.contains('skip-link')) t.focus({ preventScroll: true });
     document.getElementById('navLinks').classList.remove('show');
   });
 });
@@ -3378,9 +3496,16 @@ let portfolioCarousel, videoCarousel;
     const text = videoEyebrow.textContent.trim();
     videoEyebrow.textContent = '';
 
+    // a11y audit #10: screen readers get the phrase once, not 13 single letters.
+    const label = document.createElement('span');
+    label.className = 'sr-only';
+    label.textContent = text;
+    videoEyebrow.appendChild(label);
+
     [...text].forEach((char, i) => {
       const span = document.createElement('span');
       span.className = 'video-tag-letter';
+      span.setAttribute('aria-hidden', 'true');
       span.textContent = char === ' ' ? '\u00A0' : char;
       span.style.transitionDelay = `${80 + i * 34}ms`;
       videoEyebrow.appendChild(span);
@@ -3772,3 +3897,29 @@ document.addEventListener('click', (e) => {
   sessionStorage.setItem('skipIntro', '1');
   sessionStorage.setItem('returnScrollY', String(window.scrollY));
 });
+
+// ═══════ A11Y: FILTER PILLS ANNOUNCE THEIR STATE ═══════
+// a11y audit #09: several code paths toggle `.active` on filter buttons;
+// mirror it into aria-pressed so screen readers hear which filter is on.
+(function() {
+  const buttons = document.querySelectorAll('.portfolio-filters button, .vw-filters button, .filter-bar .filter-btn');
+  if (!buttons.length) return;
+  const sync = (b) => b.setAttribute('aria-pressed', b.classList.contains('active') ? 'true' : 'false');
+  const observer = new MutationObserver(records => records.forEach(r => sync(r.target)));
+  buttons.forEach(b => {
+    sync(b);
+    observer.observe(b, { attributes: true, attributeFilter: ['class'] });
+  });
+})();
+
+// ═══════ A11Y: BACK-TO-TOP STAYS OFF THE INQUIRY FORM ═══════
+// a11y audit #20: at phone widths the floating button covered the corner of
+// the form card next to "Send Message"; hide it while the form is on screen.
+(function() {
+  const btn = document.getElementById('backToTop');
+  const form = document.getElementById('contactForm');
+  if (!btn || !form || typeof IntersectionObserver === 'undefined') return;
+  new IntersectionObserver((entries) => {
+    entries.forEach(entry => btn.classList.toggle('over-form', entry.isIntersecting));
+  }).observe(form);
+})();

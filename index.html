@@ -125,7 +125,8 @@
 <noscript><style>.reveal { opacity: 1 !important; transform: none !important; }</style></noscript>
 </head>
 <body class="intro-active">
-<div class="cursor-follow" id="cursorFollow">View</div>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<div class="cursor-follow" id="cursorFollow" aria-hidden="true">View</div>
 
 <!-- ════════════════════ CINEMATIC INTRO ════════════════════ -->
 <div class="intro-overlay" id="intro">
@@ -171,7 +172,7 @@
 </nav>
 
 <!-- ════════════════════ HERO ════════════════════ -->
-<main id="main-content">
+<main id="main-content" tabindex="-1">
 <section class="hero" id="home">
   <div class="hero-grain"></div>
   <div class="hero-bg-mark" id="heroBgMark">
@@ -561,10 +562,10 @@
           </div>
         </div>
       </a>
-      <a href="#" class="gallery-item gi-7" data-cat="couple" data-title="Suprith &amp; Pragnya" data-type="Couple Portrait" data-folder="/images/couple-portraits/suprith-pragnya" data-count="26" data-static="true" onclick="openSwGallery(this); return false;">
+      <a href="#" class="gallery-item gi-7" data-cat="couple" data-title="Pragna &amp; Suprith" data-type="Couple Portrait · Central Park, NYC" data-folder="/images/couple-portraits/suprith-pragnya" data-count="26" data-static="true" onclick="openSwGallery(this); return false;">
         <div class="gi-bg"></div>
         <span class="gi-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l6-6 4 4 4-4 4 4"/></svg>26 photos</span>
-        <div class="gi-overlay"><div><h3>Suprith & Pragnya</h3><p>Couple Portrait</p></div></div>
+        <div class="gi-overlay"><div><h3>Pragna & Suprith</h3><p>Couple Portrait · Central Park, NYC</p></div></div>
       </a>
       <a href="#" class="gallery-item gi-8" data-cat="couple" data-title="Vyshnavi &amp; Shiva" data-type="Couple Portrait" data-folder="/images/couple-portraits/vyshnavi-shiva" data-count="25" data-static="true" onclick="openSwGallery(this); return false;">
         <div class="gi-bg"></div>
@@ -957,8 +958,8 @@
   <div class="container">
     <div class="video-intro" id="videoIntro">
       <div class="section-tag" id="videoEyebrow">Moving Images</div>
-      <!-- SEO FIX: promoted div → h2; "Video Works" is a primary section heading -->
-      <h2 class="section-title" id="videoTitle" style="color:var(--ivory)">Video Works</h2>
+      <!-- SEO FIX: promoted div → h2; "Films" (matches the nav label) is a primary section heading -->
+      <h2 class="section-title" id="videoTitle" style="color:var(--ivory)">Films</h2>
       <div class="section-desc" id="videoDesc" style="max-width: 580px;">Cinematic films for weddings, engagements & life's most intimate milestones.</div>
     </div>
 
@@ -1069,7 +1070,7 @@
           <h3>Abhinav & Megha</h3>
           <p>Pre-Wedding Film</p>
         </div>
-        <div class="vw-duration">full film</div>
+        <div class="vw-duration">Full Film</div>
       </div>
       <div class="vw-card vw-gi-5" data-vcat="prewedding" data-video="https://videos.aakaarastudiosnyc.com/f69dbfbe-f635-4966-b525-7d62802c8899/playlist.m3u8" data-title="Siri &amp; Tharun" data-type="Sitha Kalyanam · Pre-Wedding Film · NYC" data-poster="/images/video-covers/prewedding/Siri-Tharun.jpg" data-share-slug="siri-tharun">
         <div class="vw-poster vw-gi-5"></div>
@@ -1114,7 +1115,7 @@
           <h3>Hemanth &amp; Lasya Priya</h3>
           <p>Pre-Wedding Film</p>
         </div>
-        <div class="vw-duration">full film</div>
+        <div class="vw-duration">Full Film</div>
       </div>
       <div class="vw-card vw-gi-4" data-vcat="prewedding" data-video="https://videos.aakaarastudiosnyc.com/5f0d36d9-b2bb-491b-aa4d-8e67d78a73aa/playlist.m3u8" data-title="Manogna &amp; Rahul" data-type="Pre-Wedding Film" data-poster="/images/video-covers/prewedding/nikitha-arun.jpg" data-share-slug="manogna-rahul">
         <div class="vw-poster vw-gi-4"></div>
@@ -1132,7 +1133,7 @@
         <div class="vw-duration">Full Film</div>
       </div>
 
-      <div class="vw-card vw-gi-5" data-vcat="prewedding" data-video="https://videos.aakaarastudiosnyc.com/2b8a87cf-cc32-4851-aaf7-af3a5081fb89/playlist.m3u8" data-title="Suprith &amp; Pragnya" data-type="Pre-Wedding Film" data-poster="/images/video-covers/prewedding/suprith-pragnya.jpg" data-share-slug="suprith-pragnya">
+      <div class="vw-card vw-gi-5" data-vcat="prewedding" data-video="https://videos.aakaarastudiosnyc.com/2b8a87cf-cc32-4851-aaf7-af3a5081fb89/playlist.m3u8" data-title="Pragna &amp; Suprith" data-type="Pre-Wedding Film" data-poster="/images/video-covers/prewedding/suprith-pragnya.jpg" data-share-slug="suprith-pragnya">
         <div class="vw-poster vw-gi-5"></div>
         <div class="vw-play-wrap">
           <div class="vw-play-ring"></div>
@@ -1142,7 +1143,7 @@
         </div>
         <div class="vw-overlay">
           <div class="vw-badge">Pre-Wedding</div>
-          <h3>Suprith & Pragnya</h3>
+          <h3>Pragna & Suprith</h3>
           <p>Pre-Wedding Film</p>
         </div>
         <div class="vw-duration">Full Film</div>
@@ -1160,7 +1161,7 @@
           <h3>Akhila & Subhash</h3>
           <p>Pre-Wedding Film</p>
         </div>
-        <div class="vw-duration">full film</div>
+        <div class="vw-duration">Full Film</div>
       </div>
       <div class="vw-card vw-gi-4" data-vcat="prewedding" data-video="https://vz-757250d0-999.b-cdn.net/ab5c8475-2b31-45b6-8054-1eeaf87359bd/playlist.m3u8" data-title="Manish &amp; Sreeja" data-type="Pre-Wedding Film · NYC" data-poster="/images/video-covers/prewedding/Manish-Sreeja.jpg">
         <div class="vw-poster vw-gi-4"></div>
@@ -1495,7 +1496,7 @@
 -->
 
 <!-- ════════════ CINEMATIC VIDEO MODAL ════════════ -->
-<div class="video-modal" id="videoModal" role="dialog" aria-modal="true" aria-label="Video player">
+<div class="video-modal" id="videoModal" role="dialog" aria-modal="true" aria-label="Video player" inert>
   <div class="vm-backdrop" id="vmBackdrop"></div>
   <div class="vm-player">
     <div class="vm-header">
@@ -1521,7 +1522,8 @@
         <div class="vm-placeholder-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="0.8"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         </div>
-        <p>Video coming soon</p>
+        <p id="vmPlaceholderText" aria-live="polite">Video coming soon</p>
+        <button type="button" class="vm-retry" id="vmRetry" hidden>Try again</button>
       </div>
       <!-- Skip Overlays (YouTube-style on-screen indicators) -->
       <div class="vm-skip-overlay vm-skip-back" id="vmSkipBack">
@@ -1583,8 +1585,8 @@
         </div>
         <div class="about-panel about-panel--symbolism reveal">
           <div class="about-sanskrit">
-            <span class="telugu" lang="te">ఆకారం(Ākāram)</span> <span style="color:rgba(30,26,22,0.12)">·</span>
-            <span class="devnag" lang="hi">आकार</span> <span style="color:rgba(30,26,22,0.12)">·</span>
+            <span class="telugu" lang="te">ఆకారం(Ākāram)</span> <span style="color:rgba(30,26,22,0.12)" aria-hidden="true">·</span>
+            <span class="devnag" lang="hi">आकार</span> <span style="color:rgba(30,26,22,0.12)" aria-hidden="true">·</span>
             <span class="english">Giving Shape to What You Feel</span>
           </div>
           <div class="about-symbolism">
@@ -1599,9 +1601,9 @@
         </div>
         <div class="about-panel about-panel--stats reveal">
           <div class="about-stats">
-            <div class="stat"><h3>200+</h3><p>Stories captured</p></div>
-            <div class="stat"><h3>4</h3><p>Years of craft</p></div>
-            <div class="stat"><h3>3</h3><p>Countries</p></div>
+            <div class="stat"><div class="stat-num">200+</div><p>Stories captured</p></div>
+            <div class="stat"><div class="stat-num">4</div><p>Years of craft</p></div>
+            <div class="stat"><div class="stat-num">3</div><p>Countries</p></div>
           </div>
           <div class="about-actions">
             <a href="#contact" class="about-cta about-cta-primary">Book a Session</a>
@@ -1986,12 +1988,12 @@
 <!-- ════════════════════ TESTIMONIALS ════════════════════ -->
 <section class="lab-testimonials-study reveal" id="testimonials">
   <div class="lab-section-rail" style="grid-template-columns: 1fr; text-align: center;">
-    <span style="text-align: center;">© Testimonials</span>
+    <span style="text-align: center;"><span aria-hidden="true">© </span>Kind Words</span>
   </div>
 
   <div class="lab-testimonial-wrapper" style="--testimonial-card-count: 4;">
     <div class="lab-testimonial-stage">
-      <h2 class="lab-testimonial-word">Testimonials</h2>
+      <h2 class="lab-testimonial-word">Kind Words</h2>
       <div class="lab-testimonial-mobile-head">
         <div class="lab-testimonial-mobile-kicker">Kind Words</div>
         <h3>What the session actually felt like.</h3>
@@ -2049,10 +2051,10 @@
             <footer>
               <div class="lab-quote-person">
                 <div class="lab-quote-avatar">
-                  <img src="/images/couple-portraits/suprith-pragnya/1.jpg" alt="Portrait of Suprith and Pragnya." width="4439" height="6658" loading="lazy" decoding="async">
+                  <img src="/images/couple-portraits/suprith-pragnya/1.jpg" alt="Portrait of Pragna and Suprith." width="4439" height="6658" loading="lazy" decoding="async">
                 </div>
                 <div class="lab-quote-meta">
-                  <strong>Suprith &amp; Pragnya</strong>
+                  <strong>Pragna &amp; Suprith</strong>
                   <span>Portrait Session · Central Park</span>
                 </div>
               </div>
@@ -2095,28 +2097,34 @@
           <span>NYC + travel</span>
         </div>
         <div class="contact-details">
-          <div class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><h3>New York City</h3><p>Available for travel worldwide</p></div></div>
-          <a href="mailto:info@aakaarastudiosnyc.com" class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div><h3>info@aakaarastudiosnyc.com</h3><p>We respond within 24 hours</p></div></a>
-          <a href="tel:+14753322020" class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg></div><div><h3>+1 (475) 332-2020</h3><p>Mon–Sat, 10am–7pm EST</p></div></a>
-          <a href="https://www.instagram.com/sudhakar_3697?igsh=MWxodHZrOWlhcmpzOA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="var(--rose)" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke="var(--rose)" stroke-width="1.5"/><circle cx="17.5" cy="6.5" r="1.5" fill="var(--rose)"/></svg></div><div><h3>@sudhakar_3697</h3><p>Follow us on Instagram</p></div></a>
+          <div class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><p class="cd-title">New York City</p><p>Available for travel worldwide</p></div></div>
+          <a href="mailto:info@aakaarastudiosnyc.com" class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div><p class="cd-title">info@aakaarastudiosnyc.com</p><p>We respond within 24 hours</p></div></a>
+          <a href="tel:+14753322020" class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg></div><div><p class="cd-title">+1 (475) 332-2020</p><p>Mon–Sat, 10am–7pm EST</p></div></a>
+          <a href="https://www.instagram.com/sudhakar_3697?igsh=MWxodHZrOWlhcmpzOA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="contact-detail"><div class="cd-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="var(--rose)" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke="var(--rose)" stroke-width="1.5"/><circle cx="17.5" cy="6.5" r="1.5" fill="var(--rose)"/></svg></div><div><p class="cd-title">@sudhakar_3697</p><p>Follow us on Instagram</p></div></a>
         </div>
       </div>
       <form id="contactForm" class="contact-form" action="https://formspree.io/f/xlgwznnz" method="POST">
         <div class="contact-form-head">
           <span>Inquiry Form</span>
-          <p>Share the essentials and we will follow up with availability, creative direction, and next steps.</p>
+          <p>Share the essentials and we will follow up with availability, creative direction, and next steps. Fields marked <span class="req" aria-hidden="true">*</span><span class="sr-only">with an asterisk</span> are required.</p>
         </div>
         <input type="hidden" name="_subject" value="New inquiry from aakaarastudios.com">
         <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <div class="form-row"><div class="form-group"><label for="contactName">Your Name</label><input id="contactName" type="text" name="name" placeholder="Full name" required></div><div class="form-group"><label for="contactEmail">Email</label><input id="contactEmail" type="email" name="email" placeholder="you@email.com" required></div></div>
+        <div class="form-row"><div class="form-group"><label for="contactName">Your Name <span class="req" aria-hidden="true">*</span></label><input id="contactName" type="text" name="name" placeholder="Full name" autocomplete="name" required></div><div class="form-group"><label for="contactEmail">Email <span class="req" aria-hidden="true">*</span></label><input id="contactEmail" type="email" name="email" placeholder="you@email.com" autocomplete="email" required></div></div>
         <div class="form-row">
-          <div class="form-group"><label for="contactEventType">Event Type</label><select id="contactEventType" name="event_type" required><option value="">Select a service</option><option>Wedding</option><option>Couple Portrait</option><option>Maternity</option><option>Baby Shower</option><option>Housewarming</option><option>First Birthday</option><option>Sweet Sixteen</option><option>Commercial</option><option>Conceptual</option><option>Other</option></select></div>
+          <div class="form-group"><label for="contactEventType">Event Type <span class="req" aria-hidden="true">*</span></label><select id="contactEventType" name="event_type" required>
+            <option value="">Select a service</option>
+            <optgroup label="Weddings &amp; couples"><option>Wedding</option><option>Engagement / Pre-Wedding</option><option>Couple Portrait</option></optgroup>
+            <optgroup label="Family &amp; milestones"><option>Family Portraits</option><option>Maternity</option><option>Newborn</option><option>Baby Shower</option><option>Gender Reveal</option><option>First Birthday</option><option>Sweet Sixteen</option><option>Graduation</option><option>Housewarming</option></optgroup>
+            <optgroup label="Creative &amp; brand"><option>Commercial</option><option>Brand Collab</option><option>Conceptual</option></optgroup>
+            <option>Other</option>
+          </select></div>
           <div class="form-group">
-            <label for="dateFrom">Preferred Dates</label>
+            <label for="dateFrom">Preferred Dates <span class="form-optional">(optional)</span></label>
             <div class="date-grid"><input type="text" id="dateFrom" name="date_from" placeholder="From" aria-label="Preferred start date"><input type="text" id="dateTo" name="date_to" placeholder="To" aria-label="Preferred end date"></div>
           </div>
         </div>
-        <div class="form-group"><label for="contactMessage">Tell Us Your Story</label><textarea id="contactMessage" name="message" placeholder="Share a bit about your vision — we'd love to know what makes your celebration special..." required></textarea></div>
+        <div class="form-group"><label for="contactMessage">Tell Us Your Story <span class="req" aria-hidden="true">*</span></label><textarea id="contactMessage" name="message" placeholder="Share a bit about your vision — we'd love to know what makes your celebration special..." required></textarea></div>
         <button type="submit" class="form-submit"><span>Send Message</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
         <div id="formStatus"></div>
       </form>
@@ -2144,9 +2152,9 @@
         </div>
         <p>Giving shape to what you feel.<br>A photography sanctuary where love and art converge.</p>
       </div>
-      <div class="footer-col"><h3>Navigate</h3><a href="#home">Home</a><a href="#portfolio">Portfolio</a><a href="#video-works">Films</a><a href="couple-portraits.html">Couple Portraits</a><a href="#about">About</a><a href="#services-overview">Services</a><a href="#contact">Contact</a></div>
-      <div class="footer-col"><h3>Services</h3><a href="#services-overview">Weddings</a><a href="#services-overview">Couples</a><a href="#services-overview">Maternity</a><a href="#services-overview">Celebrations</a><a href="#services-overview">Commercial</a><a href="#services-overview">Conceptual</a></div>
-      <div class="footer-col"><h3>Connect</h3>
+      <div class="footer-col"><p class="footer-col-title">Navigate</p><a href="#home">Home</a><a href="#portfolio">Portfolio</a><a href="#video-works">Films</a><a href="couple-portraits.html">Couple Portraits</a><a href="#about">About</a><a href="#services-overview">Services</a><a href="#contact">Contact</a></div>
+      <div class="footer-col"><p class="footer-col-title">Services</p><a href="#services-overview">Weddings</a><a href="#services-overview">Couple Portraits</a><a href="#services-overview">Maternity</a><a href="#services-overview">Celebrations</a><a href="#services-overview">Commercial</a><a href="#services-overview">Conceptual</a></div>
+      <div class="footer-col"><p class="footer-col-title">Connect</p>
         <a href="https://www.instagram.com/sudhakar_3697?igsh=MWxodHZrOWlhcmpzOA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg> Instagram</a>
         <a href="https://youtube.com/@aakaarastudiosnyc?si=PFY_7hF7zYPeYz_l" target="_blank" rel="noopener noreferrer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg> YouTube</a>
         <a href="mailto:info@aakaarastudiosnyc.com"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13 2 4"/></svg> Email Us</a>

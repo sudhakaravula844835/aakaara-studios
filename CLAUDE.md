@@ -159,6 +159,9 @@ intro won't replay + scroll position restored on return.
 
 HLS (`.m3u8`) via `hls.js` on supported browsers, native `<video src>` on Safari. `activeHls` destroyed on close to prevent memory leaks. Video cards have muted hover-preview inline.
 
+- **Load errors**: one automatic retry, then "This film didn't load." + `#vmRetry` (`.vm-load-error`). "Video coming soon" is only for cards with an empty `data-video`. Detach media with `teardownMedia()` — never `src = ''` (raises MediaError 4).
+- **Accessibility**: `inert` is derived from the `vm-open` class (MutationObserver) and Tab is trapped inside the open player; keep new controls inside `#videoModal`.
+
 **Keyboard shortcuts** (modal open): `Space`/`K` = play/pause, `J`/`←` = skip back 5s, `L`/`→` = skip forward 5s, `F` = fullscreen, `M` = mute.
 
 ### Contact Form
@@ -208,6 +211,7 @@ CSS vars in `:root` at top of `styles.css`. Use vars (`var(--rose)`, `var(--ivor
 --ease: cubic-bezier(0.16, 1, 0.3, 1);
 ```
 
+- **Contrast tokens** (WCAG AA, Nov 2026 audit): on cream/ivory use `--bronze-deep` for body-size gold text, `--bronze` for large text and field outlines, `--saffron-deep` for saffron; light `--rose` is only ~2:1 there. On dark, secondary text uses `--ivory-soft` (0.65), not 0.38–0.48. Gold buttons take dark (`--noir`) text.
 - Responsive breakpoints: `1024px` (tablet), `768px` (mobile), `480px` (small phone).
 - `@media (max-width: 768px)` block near bottom of `styles.css` — all mobile overrides there.
 - `backdrop-filter` used throughout; pair with `-webkit-backdrop-filter` + solid fallback `background` for Firefox Android:
