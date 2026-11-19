@@ -144,6 +144,17 @@ Portfolio + video grids wrapped in `.ethereal-carousel`, driven by `EtherealCaro
 
 `.cs-wrapper` is `700vh` tall (intentional, all screen sizes). `.cs-sticky-zone` is `position: sticky; top: 0; height: 100vh`. JS reads `scrollY` vs `wrapTop`, translates each `.cs-panel` via `translateY()` for slide-over wipe. Videos are HLS streams via `hls.js` with image/gradient fallback chain.
 
+### Services Spiral (`#services-overview`, desktop only)
+
+"Six Ways We Tell Your Story" becomes a scroll-driven 3D spiral on desktop: `Script.js` adds `.sov-spiral-on` (and `html.sov-snap`) only when the screen is ≥1200px with a fine pointer and no `prefers-reduced-motion`. Phones keep the contact-sheet list and tablets the 2-column grid — the same six `.sov-card`s, no second copy of the content.
+
+- `.sov-track` is `100vh + 5 × 50vh` tall (`--sov-steps`, `--sov-step-h`); `.sov-stage` is sticky. Page scroll → orbit position 0–5 → critically damped spring → `spiralProps()` (both copied from `animation_spatial_gallery.html`). No wheel capture.
+- `.sov-step` markers are proximity snap points so scrolling rests on a whole card; they sit 80px low to cancel `html { scroll-padding-top: 80px }`.
+- `data-sov-position` on the section and `[data-sov-current]` expose the current card (tests use them). Focusing a card's link scrolls it to the front.
+- Sanskrit name/meaning lines (`.sov-sa`, `.sov-meaning`) show only in spiral mode.
+- `services_viewed` (GA) observes `.sov-intro`, since the tall track can never be 50% visible.
+- Tests: `services-spiral.cases.js`, run by `services-spiral.spec.js` (Chromium) and `services-spiral.webkit.spec.js` (WebKit).
+
 ### Intro Animation & Sub-page Navigation
 
 `body.intro-active` locks scroll during 4s intro. Skipped when `sessionStorage.getItem('skipIntro') === '1'`. When linking to `couple-portraits.html`, always set both:
