@@ -4093,9 +4093,18 @@ document.addEventListener('click', (e) => {
     return samplePath(p, waitingSlots, waitingTangents, offset - 1);
   }
 
+  // Our cards are smaller than the study's (35rem), but they travel the study's
+  // exact path: ty is a % of the STUDY card's height, not of our card's, so the
+  // vertical spacing stays the same and smaller cards simply overlap less.
+  var pathCardHeight = 394;
+  function measurePath() {
+    var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    pathCardHeight = 35 * rem / 1.42;
+  }
+
   function buildTransform(p) {
     return 'translateX(' + p.tx.toFixed(3) + 'vw) ' +
-      'translateY(' + p.ty.toFixed(3) + '%) ' +
+      'translateY(' + (p.ty * pathCardHeight / 100).toFixed(2) + 'px) ' +
       'translateZ(' + p.tz.toFixed(2) + 'px) ' +
       'rotateY(' + p.ry.toFixed(3) + 'deg) ' +
       'scale(' + p.sc.toFixed(4) + ')';
@@ -4241,7 +4250,8 @@ document.addEventListener('click', (e) => {
   /* ─── Desktop on / off ───────────────────────────────────────── */
   function updateLayout() {
     if (!on) return;
-    finalPan = field.offsetHeight * 0.1 + cards[0].offsetHeight * 0.25;
+    measurePath();
+    finalPan = field.offsetHeight * 0.1 + pathCardHeight * 0.25;
     applyFrame();
   }
   function setMode(next) {

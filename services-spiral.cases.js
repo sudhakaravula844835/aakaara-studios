@@ -41,15 +41,24 @@ module.exports = function defineSpiralTests(test, expect) {
       expect(height).toBe(900); // one screen, like the study
     });
 
-    test('cards are the study size and the front card faces forward', async ({ page }) => {
+    test('cards are 28rem (80% of the study) and the front card faces forward', async ({ page }) => {
       await page.goto('/');
       await arrive(page);
       const card = page.locator('#services-overview .sov-orbit-card').first();
       const [w, h] = await card.evaluate(e => [e.offsetWidth, e.offsetHeight]);
-      expect(w).toBe(560);
-      expect(Math.abs(h - 394)).toBeLessThanOrEqual(1);
+      expect(w).toBe(448);
+      expect(Math.abs(h - 315.5)).toBeLessThanOrEqual(1);
       expect(await card.evaluate(e => e.style.transform)).toMatch(/rotateY\(0(\.0+)?deg\)/);
       expect(await position(page)).toBe('0');
+    });
+
+    test('smaller cards still travel the study path', async ({ page }) => {
+      await page.goto('/');
+      await arrive(page);
+      // Card 2 waits at ty = 27% of the STUDY card height (35rem / 1.42 ≈ 394.4px).
+      const ty = await page.locator('#services-overview .sov-orbit-card').nth(1)
+        .evaluate(e => parseFloat(/translateY\(([-\d.]+)px\)/.exec(e.style.transform)[1]));
+      expect(Math.abs(ty - 0.27 * 394.37)).toBeLessThanOrEqual(0.5);
     });
 
     test('one wheel gesture turns one card and holds the page', async ({ page }) => {

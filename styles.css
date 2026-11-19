@@ -2017,6 +2017,8 @@ body.intro-active #heroScroll { opacity: 0; }
    ═══════════════════════════════════════════════════════════ */
 .sov-orbit { display: none; }
 #services-overview.sov-orbit-on {
+  --sov-orbit-card-w: 28rem;    /* 80% of the study's 35rem cards, so turning cards
+                                   overlap less; the orbit path stays the study's */
   position: relative;
   height: 100vh;
   padding: 0 !important;        /* one screen, like the study (overrides inline padding) */
@@ -2105,12 +2107,12 @@ body.intro-active #heroScroll { opacity: 0; }
 }
 .sov-orbit-card {
   position: absolute;
-  width: 35rem;
+  width: var(--sov-orbit-card-w);
   aspect-ratio: 1.42;
   top: 50%;
   left: 50%;
-  margin-top: -12.324rem;
-  margin-left: -17.5rem;
+  margin-top: calc(var(--sov-orbit-card-w) * -0.352113);  /* half the card height */
+  margin-left: calc(var(--sov-orbit-card-w) * -0.5);
   overflow: hidden;
   border-radius: 1.2rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
