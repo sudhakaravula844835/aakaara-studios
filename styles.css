@@ -2019,6 +2019,8 @@ body.intro-active #heroScroll { opacity: 0; }
 #services-overview.sov-orbit-on {
   --sov-orbit-card-w: 28rem;    /* 80% of the study's 35rem cards, so turning cards
                                    overlap less; the orbit path stays the study's */
+  --sov-orbit-spacing: 0.88;    /* spread of the path (1 = the study's): drawn in so the
+                                   smaller cards sit close without piling up */
   position: relative;
   height: 100vh;
   padding: 0 !important;        /* one screen, like the study (overrides inline padding) */

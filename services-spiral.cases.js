@@ -52,13 +52,16 @@ module.exports = function defineSpiralTests(test, expect) {
       expect(await position(page)).toBe('0');
     });
 
-    test('smaller cards still travel the study path', async ({ page }) => {
+    test('cards travel the study path, drawn in to 0.88 of its spread', async ({ page }) => {
       await page.goto('/');
       await arrive(page);
-      // Card 2 waits at ty = 27% of the STUDY card height (35rem / 1.42 ≈ 394.4px).
-      const ty = await page.locator('#services-overview .sov-orbit-card').nth(1)
-        .evaluate(e => parseFloat(/translateY\(([-\d.]+)px\)/.exec(e.style.transform)[1]));
-      expect(Math.abs(ty - 0.27 * 394.37)).toBeLessThanOrEqual(0.5);
+      // Card 2 waits at ty = 27% of the STUDY card height (35rem / 1.42 ≈ 394.4px)
+      // and tx = 34·sin(55°) + 4 vw, both × 0.88.
+      const t = await page.locator('#services-overview .sov-orbit-card').nth(1).evaluate(e => e.style.transform);
+      const ty = parseFloat(/translateY\(([-\d.]+)px\)/.exec(t)[1]);
+      const tx = parseFloat(/translateX\(([-\d.]+)vw\)/.exec(t)[1]);
+      expect(Math.abs(ty - 0.27 * 394.37 * 0.88)).toBeLessThanOrEqual(0.5);
+      expect(Math.abs(tx - (34 * Math.sin(55 * Math.PI / 180) + 4) * 0.88)).toBeLessThanOrEqual(0.01);
     });
 
     test('one wheel gesture turns one card and holds the page', async ({ page }) => {

@@ -4093,18 +4093,21 @@ document.addEventListener('click', (e) => {
     return samplePath(p, waitingSlots, waitingTangents, offset - 1);
   }
 
-  // Our cards are smaller than the study's (35rem), but they travel the study's
-  // exact path: ty is a % of the STUDY card's height, not of our card's, so the
-  // vertical spacing stays the same and smaller cards simply overlap less.
+  // Our cards are smaller than the study's (35rem) and the path's spread is set
+  // separately: ty is a % of the STUDY card's height (not ours), and both tx and
+  // ty are multiplied by --sov-orbit-spacing (1 = the study's spacing). The
+  // curve's shape, depth (tz) and turns (ry) stay the study's.
   var pathCardHeight = 394;
+  var spacing = 1;
   function measurePath() {
     var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
     pathCardHeight = 35 * rem / 1.42;
+    spacing = parseFloat(getComputedStyle(section).getPropertyValue('--sov-orbit-spacing')) || 1;
   }
 
   function buildTransform(p) {
-    return 'translateX(' + p.tx.toFixed(3) + 'vw) ' +
-      'translateY(' + (p.ty * pathCardHeight / 100).toFixed(2) + 'px) ' +
+    return 'translateX(' + (p.tx * spacing).toFixed(3) + 'vw) ' +
+      'translateY(' + (p.ty * pathCardHeight * spacing / 100).toFixed(2) + 'px) ' +
       'translateZ(' + p.tz.toFixed(2) + 'px) ' +
       'rotateY(' + p.ry.toFixed(3) + 'deg) ' +
       'scale(' + p.sc.toFixed(4) + ')';
@@ -4251,7 +4254,7 @@ document.addEventListener('click', (e) => {
   function updateLayout() {
     if (!on) return;
     measurePath();
-    finalPan = field.offsetHeight * 0.1 + pathCardHeight * 0.25;
+    finalPan = field.offsetHeight * 0.1 + pathCardHeight * spacing * 0.25;
     applyFrame();
   }
   function setMode(next) {
