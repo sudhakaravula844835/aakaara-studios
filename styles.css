@@ -2019,7 +2019,7 @@ body.intro-active #heroScroll { opacity: 0; }
    Geometry and motion come from animation_spatial_gallery.html.
    ═══════════════════════════════════════════════════════════ */
 #services-overview.sov-spiral-on {
-  --sov-steps: 5;
+  --sov-steps: 4;              /* five cards → four steps */
   --sov-step-h: 50vh;
   padding-top: 0 !important;    /* the track starts at the section top (overrides inline padding) */
 }
@@ -2067,13 +2067,12 @@ body.intro-active #heroScroll { opacity: 0; }
   padding: 1.6rem 1.8rem 1.5rem;
   will-change: transform, opacity;
 }
-/* Per-service tints, as on the study page */
+/* Per-service tints, as on the study page (Weddings, Couple Portraits, Celebrations, Commercial, Conceptual) */
 #services-overview.sov-spiral-on .sov-card:nth-child(1) { background: radial-gradient(circle at 68% 28%, rgba(201,149,107,0.13), transparent 45%), linear-gradient(148deg, #1c1410 0%, #0d0907 100%); }
 #services-overview.sov-spiral-on .sov-card:nth-child(2) { background: radial-gradient(circle at 32% 70%, rgba(108,93,140,0.14), transparent 40%), linear-gradient(148deg, #14121c 0%, #0a0910 100%); }
-#services-overview.sov-spiral-on .sov-card:nth-child(3) { background: radial-gradient(circle at 60% 38%, rgba(100,140,120,0.1), transparent 42%), linear-gradient(148deg, #111815 0%, #090e0c 100%); }
-#services-overview.sov-spiral-on .sov-card:nth-child(4) { background: radial-gradient(circle at 40% 55%, rgba(201,149,80,0.1), transparent 40%), linear-gradient(148deg, #1a1510 0%, #0e0c08 100%); }
-#services-overview.sov-spiral-on .sov-card:nth-child(5) { background: radial-gradient(circle at 55% 35%, rgba(140,140,160,0.09), transparent 40%), linear-gradient(148deg, #131316 0%, #0b0b0e 100%); }
-#services-overview.sov-spiral-on .sov-card:nth-child(6) { background: radial-gradient(circle at 38% 62%, rgba(90,110,160,0.1), transparent 42%), linear-gradient(148deg, #111318 0%, #09090e 100%); }
+#services-overview.sov-spiral-on .sov-card:nth-child(3) { background: radial-gradient(circle at 40% 55%, rgba(201,149,80,0.1), transparent 40%), linear-gradient(148deg, #1a1510 0%, #0e0c08 100%); }
+#services-overview.sov-spiral-on .sov-card:nth-child(4) { background: radial-gradient(circle at 55% 35%, rgba(140,140,160,0.09), transparent 40%), linear-gradient(148deg, #131316 0%, #0b0b0e 100%); }
+#services-overview.sov-spiral-on .sov-card:nth-child(5) { background: radial-gradient(circle at 38% 62%, rgba(90,110,160,0.1), transparent 42%), linear-gradient(148deg, #111318 0%, #09090e 100%); }
 #services-overview.sov-spiral-on .sov-sa,
 #services-overview.sov-spiral-on .sov-sa-sep { display: inline; }
 #services-overview.sov-spiral-on .sov-meaning { display: block; }
@@ -2132,7 +2131,6 @@ html.sov-snap { scroll-snap-type: y proximity; }
 #services-overview.sov-spiral-on .sov-step:nth-of-type(3) { top: calc(80px + 2 * var(--sov-step-h)); }
 #services-overview.sov-spiral-on .sov-step:nth-of-type(4) { top: calc(80px + 3 * var(--sov-step-h)); }
 #services-overview.sov-spiral-on .sov-step:nth-of-type(5) { top: calc(80px + 4 * var(--sov-step-h)); }
-#services-overview.sov-spiral-on .sov-step:nth-of-type(6) { top: calc(80px + 5 * var(--sov-step-h)); }
 #services-overview.sov-spiral-on .sov-counter::before {
   content: '';
   width: 2.6rem;

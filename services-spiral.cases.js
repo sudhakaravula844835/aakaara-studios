@@ -5,12 +5,14 @@
 module.exports = function defineSpiralTests(test, expect) {
   const skipIntro = () => sessionStorage.setItem('skipIntro', '1');
   const SETTLE_MS = 1500;
+  const CARDS = 5;              // Maternity removed 2026-11-19: five services
+  const STEPS = CARDS - 1;
 
   // Document Y at which the orbit shows card `step` (0–5), measured in-page.
   const stepY = (page, step) => page.evaluate(n => {
     const track = document.querySelector('#services-overview .sov-track');
     const top = track.getBoundingClientRect().top + window.scrollY;
-    return Math.round(top + n * (track.offsetHeight - window.innerHeight) / 5);
+    return Math.round(top + n * (track.offsetHeight - window.innerHeight) / (document.querySelectorAll('#services-overview .sov-card').length - 1));
   }, step);
   const jump = (page, y) => page.evaluate(top => window.scrollTo({ top, behavior: 'instant' }), y);
   const position = page => page.locator('#services-overview').getAttribute('data-sov-position');
@@ -24,9 +26,10 @@ module.exports = function defineSpiralTests(test, expect) {
       const section = page.locator('#services-overview');
       await expect(section).toHaveClass(/sov-spiral-on/);
       const trackH = await page.locator('#services-overview .sov-track').evaluate(t => t.offsetHeight);
-      expect(Math.abs(trackH - 3.5 * 900) / (3.5 * 900)).toBeLessThanOrEqual(0.02);
+      const expectedH = (1 + STEPS * 0.5) * 900; // 100vh stage + 50vh per step
+      expect(Math.abs(trackH - expectedH) / expectedH).toBeLessThanOrEqual(0.02);
       const transforms = await page.locator('#services-overview .sov-card').evaluateAll(els => els.map(e => e.style.transform));
-      expect(transforms).toHaveLength(6);
+      expect(transforms).toHaveLength(CARDS);
       for (const t of transforms) expect(t).toContain('rotateY');
       await expect(section).toHaveAttribute('data-sov-position', '0');
       await expect(page.locator('#services-overview .sov-meaning').first()).toBeVisible();
@@ -66,7 +69,7 @@ module.exports = function defineSpiralTests(test, expect) {
       await page.goto('/');
       await page.keyboard.press('End');
       await page.waitForTimeout(SETTLE_MS * 2);
-      expect(await position(page)).toBe('5');
+      expect(await position(page)).toBe(String(STEPS));
       await jump(page, await stepY(page, 0));
       await page.waitForTimeout(SETTLE_MS);
       expect(await position(page)).toBe('0');
@@ -196,14 +199,14 @@ module.exports = function defineSpiralTests(test, expect) {
         await page.addInitScript(skipIntro);
         await page.goto('/');
         const cards = page.locator('#services-overview .sov-card');
-        await expect(cards).toHaveCount(6);
+        await expect(cards).toHaveCount(CARDS);
         const sizes = await cards.evaluateAll(els => els.map(e => [e.offsetWidth, e.offsetHeight]));
         for (const [w, h] of sizes) {
           expect(Math.abs(w - 342)).toBeLessThanOrEqual(2);
           expect(h).toBeLessThanOrEqual(96);
         }
         const meanings = page.locator('#services-overview .sov-meaning');
-        await expect(meanings).toHaveCount(6);
+        await expect(meanings).toHaveCount(CARDS);
         const displays = await meanings.evaluateAll(els => els.map(e => getComputedStyle(e).display));
         expect(displays.every(d => d === 'none')).toBe(true);
         await expect(page.locator('#services-overview')).not.toHaveClass(/sov-spiral-on/);
@@ -227,11 +230,13 @@ module.exports = function defineSpiralTests(test, expect) {
     test('markup carries the spiral hooks', async ({ page }) => {
       await page.addInitScript(skipIntro);
       await page.goto('/');
-      await expect(page.locator('#services-overview .sov-track .sov-stage .sov-grid .sov-card')).toHaveCount(6);
-      await expect(page.locator('#services-overview .sov-track > .sov-step')).toHaveCount(6);
+      await expect(page.locator('#services-overview .sov-track .sov-stage .sov-grid .sov-card')).toHaveCount(CARDS);
+      await expect(page.locator('#services-overview .sov-intro .section-title')).toContainText('Five Ways');
+      await expect(page.locator('#services-overview .sov-card--maternity')).toHaveCount(0);
+      await expect(page.locator('#services-overview .sov-track > .sov-step')).toHaveCount(CARDS);
       await expect(page.locator('#services-overview [data-sov-current]')).toHaveText('01');
       const langs = await page.locator('#services-overview .sov-sa').evaluateAll(els => els.map(e => e.getAttribute('lang')));
-      expect(langs).toEqual(Array(6).fill('sa-Latn'));
+      expect(langs).toEqual(Array(CARDS).fill('sa-Latn'));
     });
   });
 };

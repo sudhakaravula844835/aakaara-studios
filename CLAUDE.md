@@ -146,9 +146,9 @@ Portfolio + video grids wrapped in `.ethereal-carousel`, driven by `EtherealCaro
 
 ### Services Spiral (`#services-overview`, desktop only)
 
-"Six Ways We Tell Your Story" becomes a scroll-driven 3D spiral on desktop: `Script.js` adds `.sov-spiral-on` (and `html.sov-snap`) only when the screen is ≥1200px with a fine pointer and no `prefers-reduced-motion`. Phones keep the contact-sheet list and tablets the 2-column grid — the same six `.sov-card`s, no second copy of the content.
+"Five Ways We Tell Your Story" (Maternity card removed 2026-11-19) becomes a scroll-driven 3D spiral on desktop: `Script.js` adds `.sov-spiral-on` (and `html.sov-snap`) only when the screen is ≥1200px with a fine pointer and no `prefers-reduced-motion`. Phones keep the contact-sheet list and tablets the 2-column grid — the same five `.sov-card`s, no second copy of the content.
 
-- `.sov-track` is `100vh + 5 × 50vh` tall (`--sov-steps`, `--sov-step-h`); `.sov-stage` is sticky. Page scroll → orbit position 0–5 → critically damped spring → `spiralProps()` (both copied from `animation_spatial_gallery.html`). No wheel capture.
+- `.sov-track` is `100vh + (cards − 1) × 50vh` tall (`--sov-steps`, `--sov-step-h`); `.sov-stage` is sticky. Page scroll → orbit position 0–4 → critically damped spring → `spiralProps()` (both copied from `animation_spatial_gallery.html`). No wheel capture.
 - `.sov-step` markers are proximity snap points so scrolling rests on a whole card; they sit 80px low to cancel `html { scroll-padding-top: 80px }`.
 - `data-sov-position` on the section and `[data-sov-current]` expose the current card (tests use them). Focusing a card's link scrolls it to the front.
 - Sanskrit name/meaning lines (`.sov-sa`, `.sov-meaning`) show only in spiral mode.
