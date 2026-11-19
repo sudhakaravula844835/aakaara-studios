@@ -3988,6 +3988,76 @@ document.addEventListener('click', (e) => {
     };
   }
   // ── end of copied helpers ──
+  // ── Also from animation_spatial_gallery.html (section 1, desktop paths) ──
+  // Waiting cards approach along a hand-tuned arc (card 3 tucks behind card 2);
+  // past cards keep receding in depth instead of swinging back toward the viewer.
+  // tx: vw, ty: % of card height, tz: px, ry: degrees.
+  var waitingSlots = [
+    spiralProps(1),
+    { tx: 39.53, ty: 77.52, tz: -610,  ry: 95 },  // 3: behind card 2
+    { tx: 28,    ty: 159,   tz: -1500, ry: 146 }, // 4: below and to the left
+    { tx: -6.32, ty: 227,   tz: -1700, ry: 180 }, // 5: below/left, facing back
+    { tx: -40.64, ty: 295,  tz: -1900, ry: 214 }  // 6: continues the same outward arc
+  ];
+  var pastSlots = [
+    spiralProps(0),
+    { tx: -34.61, ty: -110.22, tz: -529.5,  ry: -46.62 },
+    { tx: -51.81, ty: -240.91, tz: -1492.4, ry: -99.42 },
+    { tx: -30.21, ty: -260.74, tz: -1630.9, ry: -134.72 },
+    { tx: 0,      ty: -320.20, tz: -2142.5, ry: -180 },
+    { tx: 30.21,  ty: -379.66, tz: -2654.1, ry: -225.28 }
+  ];
+  var pathKeys = ['tx', 'ty', 'tz', 'ry'];
+  var entryAngle = 55 * Math.PI / 180;
+  var entrySlope = {
+    tx: 34 * entryAngle * Math.cos(entryAngle),
+    ty: 52,
+    tz: -650 * entryAngle * Math.sin(entryAngle),
+    ry: 55
+  };
+  // Shape-preserving tangents prevent a stop or reversal between positions.
+  function pathTangents(slots, firstSlope) {
+    return slots.map(function (slot, index) {
+      var tangent = {};
+      pathKeys.forEach(function (key) {
+        if (index === 0) {
+          tangent[key] = firstSlope[key];
+        } else if (index === slots.length - 1) {
+          tangent[key] = slot[key] - slots[index - 1][key];
+        } else {
+          var before = slot[key] - slots[index - 1][key];
+          var after = slots[index + 1][key] - slot[key];
+          tangent[key] = before * after <= 0 ? 0 : 2 * before * after / (before + after);
+        }
+      });
+      return tangent;
+    });
+  }
+  var waitingTangents = pathTangents(waitingSlots, entrySlope);
+  var pastTangents = pathTangents(pastSlots, { tx: -34 * entryAngle, ty: -52, tz: 0, ry: -55 });
+
+  function samplePath(p, slots, tangents, position) {
+    position = Math.min(position, slots.length - 1);
+    var segment = Math.min(slots.length - 2, Math.floor(position));
+    var t = position - segment;
+    var t2 = t * t, t3 = t2 * t;
+    pathKeys.forEach(function (key) {
+      p[key] = (2 * t3 - 3 * t2 + 1) * slots[segment][key]
+        + (t3 - 2 * t2 + t) * tangents[segment][key]
+        + (-2 * t3 + 3 * t2) * slots[segment + 1][key]
+        + (t3 - t2) * tangents[segment + 1][key];
+    });
+    p.sc = 1; // Perspective depth supplies the gradual size reduction.
+    return p;
+  }
+
+  function slotProps(offset) {
+    var p = spiralProps(offset);
+    if (offset < 0) return samplePath(p, pastSlots, pastTangents, -offset);
+    if (offset <= 1) return p;
+    return samplePath(p, waitingSlots, waitingTangents, offset - 1);
+  }
+  // ── end of section 1 paths ──
 
   let on = false;
   let trackTop = 0;
@@ -4008,8 +4078,14 @@ document.addEventListener('click', (e) => {
 
   function render(position) {
     if (!on) return;
+    // As on the study page: hold the framing on card 1, then pan the field down
+    // to open space above the featured card as the earlier cards recede.
+    const panProgress = Math.max(0, Math.min(1, (position - 1) / Math.max(1, STEPS - 1)));
+    const pan = panProgress * panProgress * (3 - 2 * panProgress);
+    const finalPan = grid.offsetHeight * 0.1 + cards[0].offsetHeight * 0.25;
+    grid.style.transform = 'translateY(' + (finalPan * pan).toFixed(3) + 'px)';
     cards.forEach((card, i) => {
-      const p = spiralProps(i - position);
+      const p = slotProps(i - position);
       card.style.transform =
         'translateX(' + p.tx.toFixed(2) + 'vw) ' +
         'translateY(' + p.ty.toFixed(2) + '%) ' +
@@ -4050,6 +4126,7 @@ document.addEventListener('click', (e) => {
       return;
     }
     cards.forEach(card => ['transform', 'opacity', 'z-index'].forEach(prop => card.style.removeProperty(prop)));
+    grid.style.removeProperty('transform');
     delete section.dataset.sovPosition;
   }
   function syncMode() { setSpiralMode(!compact.matches && !reducedMotion.matches); }

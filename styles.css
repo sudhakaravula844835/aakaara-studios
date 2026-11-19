@@ -2033,14 +2033,20 @@ body.intro-active #heroScroll { opacity: 0; }
   height: 100vh;
   overflow: clip;               /* cards far out on the arc never widen the page */
 }
+/* As on the study page, the words sit at the page edge in the column left of
+   the front card (centred, 35rem wide), so they never run into it. */
 #services-overview.sov-spiral-on .sov-intro {
-  position: relative;
+  position: absolute;
+  top: 6.5rem;                  /* clear the fixed nav */
+  left: 0;                      /* the stage already starts at the page gutter */
   z-index: 4000;                /* above every card (card z-index ≤ 3000) */
-  max-width: 24rem;
-  padding-top: 6.5rem;          /* clear the fixed nav */
+  width: calc(50% - 17.5rem - 2.5rem); /* stops 2.5rem short of the front card */
+  margin: 0;
   text-align: left;
   pointer-events: none;
 }
+#services-overview.sov-spiral-on .sov-intro .section-title { font-size: clamp(2rem, 2.9vw, 2.8rem); }
+#services-overview.sov-spiral-on .sov-intro .section-title br { display: none; }
 #services-overview.sov-spiral-on .sov-grid {
   position: absolute;
   inset: 0;
@@ -2077,7 +2083,7 @@ body.intro-active #heroScroll { opacity: 0; }
 #services-overview.sov-spiral-on .sov-sa-sep { display: inline; }
 #services-overview.sov-spiral-on .sov-meaning { display: block; }
 /* Card look — study-page proportions on site fonts and audit-safe colours */
-#services-overview.sov-spiral-on .sov-intro .section-desc { margin: 0; max-width: 22rem; text-align: left; }
+#services-overview.sov-spiral-on .sov-intro .section-desc { margin: 0; max-width: 100%; text-align: left; }
 #services-overview.sov-spiral-on .sov-num,
 #services-overview.sov-spiral-on .sov-card::after { display: none; }
 #services-overview.sov-spiral-on .sov-stamp { top: 1.4rem; left: 1.6rem; width: 68px; height: 68px; }
@@ -2103,7 +2109,7 @@ body.intro-active #heroScroll { opacity: 0; }
   align-items: center;
   gap: 0;
   position: absolute;
-  left: var(--page-gutter-desktop);
+  left: 0;                      /* lines up with the heading at the page gutter */
   bottom: 2rem;
   z-index: 4000;
   font-size: 0.75rem;
