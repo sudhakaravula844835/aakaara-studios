@@ -43,6 +43,7 @@ module.exports = function defineSpiralTests(test, expect) {
       await expect(section(page)).toHaveClass(/sov-orbit-on/);
       await expect(page.locator('#services-overview .sov-orbit')).toBeVisible();
       await expect(page.locator('#services-overview .sov-grid')).toBeHidden();
+      await expect(page.locator('#services-overview .sov-orbit-title')).toHaveText('Five Ways We Tell Your Story');
       const titles = await page.locator('#services-overview .sov-orbit-card h3').allTextContents();
       expect(titles.map(t => t.split('/').pop().trim())).toEqual(TITLES);
       const height = await section(page).evaluate(s => s.offsetHeight);

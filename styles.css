@@ -2072,7 +2072,7 @@ body.intro-active #heroScroll { opacity: 0; }
   max-width: 10ch;
   color: #f5eee8;
 }
-.sov-orbit-title em { color: #c9956b; font-style: italic; font-weight: 400; }
+.sov-orbit-title em { color: #c9956b; font-style: italic; font-weight: 400; white-space: nowrap; } /* "Your Story" stays on one line */
 .sov-orbit-meta {
   position: absolute;
   bottom: 2rem;
