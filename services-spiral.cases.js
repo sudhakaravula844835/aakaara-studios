@@ -116,6 +116,65 @@ module.exports = function defineSpiralTests(test, expect) {
     }
   });
 
+  test.describe('Services spiral — settling, focus, anchors, analytics', () => {
+    test.use({ viewport: { width: 1440, height: 900 }, hasTouch: false });
+    test.beforeEach(async ({ page }) => {
+      await page.addInitScript(skipIntro);
+      await page.route(/googletagmanager\.com/, route => route.abort()); // keep test events out of real analytics
+    });
+
+    test('stops on a whole card', async ({ page }) => {
+      await page.goto('/');
+      const y1 = await stepY(page, 1);
+      const y2 = await stepY(page, 2);
+      await jump(page, y1);
+      await page.waitForTimeout(600);
+      await page.mouse.move(720, 450);
+      await page.mouse.wheel(0, Math.round((y2 - y1) / 2));
+      await page.waitForTimeout(SETTLE_MS);
+      const y = await page.evaluate(() => window.scrollY);
+      const landed = Math.abs(y - y1) <= 2 ? '1' : Math.abs(y - y2) <= 2 ? '2' : `between (${y}; steps at ${y1}, ${y2})`;
+      expect(landed === '1' || landed === '2', landed).toBe(true);
+      expect(await position(page)).toBe(landed);
+    });
+
+    test('tabbing to Inquire brings the card forward', async ({ page }) => {
+      await page.goto('/');
+      await jump(page, await stepY(page, 0));
+      await page.waitForTimeout(600);
+      const link = page.locator('#services-overview .sov-card').nth(4).locator('.sov-link');
+      await link.focus();
+      await page.waitForTimeout(SETTLE_MS);
+      expect(await position(page)).toBe('4');
+      const op = await page.locator('#services-overview .sov-card').nth(4).evaluate(e => Number(e.style.opacity));
+      expect(op).toBeGreaterThanOrEqual(0.99);
+      const box = await link.boundingBox();
+      expect(box.y).toBeGreaterThanOrEqual(0);
+      expect(box.y + box.height).toBeLessThanOrEqual(900);
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(1440);
+    });
+
+    test('nav Services link lands on card 01', async ({ page }) => {
+      await page.goto('/');
+      await page.locator('#navbar a[href="#services-overview"]').click();
+      await page.waitForTimeout(SETTLE_MS * 2);
+      expect(await position(page)).toBe('0');
+      const navBottom = await page.locator('#navbar').evaluate(n => n.getBoundingClientRect().bottom);
+      const titleTop = await page.locator('#services-overview .sov-intro .section-title').evaluate(t => t.getBoundingClientRect().top);
+      expect(titleTop).toBeGreaterThanOrEqual(navBottom);
+    });
+
+    test('services_viewed still fires', async ({ page }) => {
+      await page.goto('/');
+      await jump(page, await stepY(page, 0));
+      await page.waitForTimeout(SETTLE_MS);
+      const events = await page.evaluate(() => (window.dataLayer || [])
+        .filter(a => a && a[0] === 'event' && a[1] === 'services_viewed').length);
+      expect(events).toBe(1);
+    });
+  });
+
   test.describe('Services spiral — after the intro', () => {
     test.use({ viewport: { width: 1440, height: 900 }, hasTouch: false });
 

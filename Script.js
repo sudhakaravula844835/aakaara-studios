@@ -3885,7 +3885,9 @@ let portfolioCarousel, videoCarousel;
     });
   }, { threshold: 0.5 });
 
-  servicesObserver.observe(servicesSection);
+  // Observe the heading block, not the section: on desktop the section is a
+  // ~350vh spiral track that can never be 50% visible.
+  servicesObserver.observe(servicesSection.querySelector('.sov-intro') || servicesSection);
 })();
 
 // ═══════ COUPLE PORTRAITS LINKS: SKIP INTRO + REMEMBER SCROLL ═══════
@@ -4043,6 +4045,15 @@ document.addEventListener('click', (e) => {
     delete section.dataset.sovPosition;
   }
   function syncMode() { setSpiralMode(!compact.matches && !reducedMotion.matches); }
+
+  // Keyboard: tabbing to a card's link scrolls that card to the front of the orbit.
+  grid.addEventListener('focusin', (e) => {
+    if (!on) return;
+    const index = cards.indexOf(e.target.closest('.sov-card'));
+    if (index < 0) return;
+    measure();
+    window.scrollTo({ top: Math.round(scrollYForStep(index)) });
+  });
 
   syncMode();
   compact.addEventListener('change', syncMode);
