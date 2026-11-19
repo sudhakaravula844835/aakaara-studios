@@ -68,6 +68,9 @@
 <!-- PERF FIX: Flatpickr CSS removed from here — injected lazily by Script.js when the date picker is first focused, saving one render-blocking stylesheet request on every page load. -->
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Outfit:wght@200;300;400;500;600&family=Noto+Sans+Telugu:wght@300;400&family=Noto+Sans+Devanagari:wght@300;400&display=swap" rel="stylesheet">
 <!-- PERF FIX: TypeKit CSS removed from index.html — Adobe font kit is unused here (styles.css uses Cormorant Garamond + Outfit from Google Fonts). Typekit still loaded in couple-portraits.html where it is used. Removing saves 1 render-blocking cross-origin stylesheet request. -->
+<!-- Adobe Fonts kit, for Cesso in the desktop services orbit's subtitles (as on the study page).
+     Loaded without blocking render: media="print" switches to "all" once it arrives. -->
+<link rel="stylesheet" href="https://use.typekit.net/ffu1awu.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="/styles.css">
 <!-- SEO FIX: theme-color surfaces brand gold in Android Chrome's address bar and
      in the "Install as app" prompt — minor but reinforces brand identity -->
@@ -1617,15 +1620,72 @@
 
 <!-- ════════════════════ SERVICES OVERVIEW ════════════════════ -->
 <section class="section section-dark" id="services-overview" style="padding-top:4.5rem;padding-bottom:4.5rem;">
-  <!-- Services spiral (desktop): .sov-track/.sov-stage only take effect when Script.js adds
-       .sov-spiral-on — compact screens and reduced motion render the grid/list as before. -->
-  <div class="sov-track">
-  <div class="sov-stage">
+  <!-- Services orbit (desktop only): a copy of the first spiral on
+       animation_spatial_gallery.html — same cards, size, paths and wheel behaviour.
+       Script.js adds .sov-orbit-on (≥1200px, fine pointer), which shows this and hides
+       the services list below; phones and tablets keep the list. Each card's video
+       keeps its file in data-src until the card first reaches the front. -->
+  <div class="sov-orbit">
+    <header class="sov-orbit-head">
+      <p class="sov-orbit-kicker">What We Offer</p>
+      <h2 class="sov-orbit-title"><em>Aakaara</em> in cinematic orbit.</h2>
+    </header>
+    <div class="sov-orbit-stage" aria-label="Our work, in orbit">
+      <div class="sov-orbit-field">
+      <article class="sov-orbit-card" style="background-image: url('/media/spatial-gallery/wedding-showreel.jpg')">
+        <video class="sov-orbit-video" muted loop playsinline preload="none" poster="/media/spatial-gallery/wedding-showreel.jpg" aria-hidden="true">
+          <source data-src="/media/spatial-gallery/wedding-showreel.mp4" type="video/mp4">
+        </video>
+        <div class="sov-orbit-copy">
+          <h3 class="sov-orbit-card-title"><span class="sov-orbit-sa" lang="sa-Latn">Vivāha</span><span class="sov-orbit-sep" aria-hidden="true">&nbsp;/ </span>Weddings</h3>
+          <p class="sov-orbit-sub">The sacred union</p>
+        </div>
+      </article>
+      <article class="sov-orbit-card" style="background-image: url('/media/spatial-gallery/vyshnavi-daniel.jpg')">
+        <video class="sov-orbit-video" muted loop playsinline preload="none" poster="/media/spatial-gallery/vyshnavi-daniel.jpg" aria-hidden="true">
+          <source data-src="/media/spatial-gallery/vyshnavi-daniel.mp4" type="video/mp4">
+        </video>
+        <div class="sov-orbit-copy">
+          <h3 class="sov-orbit-card-title"><span class="sov-orbit-sa" lang="sa-Latn">Vāgdāna</span><span class="sov-orbit-sep" aria-hidden="true">&nbsp;/ </span>Engagement</h3>
+          <p class="sov-orbit-sub">A promise, given in words</p>
+        </div>
+      </article>
+      <article class="sov-orbit-card" style="background-image: url('/media/spatial-gallery/prewedding-showreel.jpg')">
+        <video class="sov-orbit-video" muted loop playsinline preload="none" poster="/media/spatial-gallery/prewedding-showreel.jpg" aria-hidden="true">
+          <source data-src="/media/spatial-gallery/prewedding-showreel.mp4" type="video/mp4">
+        </video>
+        <div class="sov-orbit-copy">
+          <h3 class="sov-orbit-card-title"><span class="sov-orbit-sa" lang="sa-Latn">Śṛṅgāra</span><span class="sov-orbit-sep" aria-hidden="true">&nbsp;/ </span>Pre-wedding</h3>
+          <p class="sov-orbit-sub">Love, the first of the nine rasas</p>
+        </div>
+      </article>
+      <article class="sov-orbit-card" style="background-image: url('/media/spatial-gallery/celebrations-showreel.jpg')">
+        <video class="sov-orbit-video" muted loop playsinline preload="none" poster="/media/spatial-gallery/celebrations-showreel.jpg" aria-hidden="true">
+          <source data-src="/media/spatial-gallery/celebrations-showreel.mp4" type="video/mp4">
+        </video>
+        <div class="sov-orbit-copy">
+          <h3 class="sov-orbit-card-title"><span class="sov-orbit-sa" lang="sa-Latn">Utsava</span><span class="sov-orbit-sep" aria-hidden="true">&nbsp;/ </span>Celebrations</h3>
+          <p class="sov-orbit-sub">Every milestone, a festival</p>
+        </div>
+      </article>
+      <article class="sov-orbit-card" style="background-image: url('/media/spatial-gallery/conceptual-showreel.jpg')">
+        <video class="sov-orbit-video" muted loop playsinline preload="none" poster="/media/spatial-gallery/conceptual-showreel.jpg" aria-hidden="true">
+          <source data-src="/media/spatial-gallery/conceptual-showreel.mp4" type="video/mp4">
+        </video>
+        <div class="sov-orbit-copy">
+          <h3 class="sov-orbit-card-title"><span class="sov-orbit-sa" lang="sa-Latn">Kalpanā</span><span class="sov-orbit-sep" aria-hidden="true">&nbsp;/ </span>Conceptual</h3>
+          <p class="sov-orbit-sub">Imagination, given form</p>
+        </div>
+      </article>
+      </div>
+    </div>
+    <p class="sov-orbit-meta" aria-hidden="true">Scroll to explore</p>
+  </div>
   <div class="container">
     <div class="reveal sov-intro">
       <div class="section-tag">What We Offer</div>
       <!-- SEO FIX: promoted div → h2; "Five Ways We Tell Your Story" is the Services section heading -->
-      <h2 class="section-title" style="color:var(--ivory);">Five Ways We Tell <br>Your Story</h2>
+      <h2 class="section-title" style="color:var(--ivory);">Five Ways We Tell<br>Your Story</h2>
       <div class="section-desc">From grand weddings to quiet intimate portraits — every session is crafted with intention.</div>
     </div>
     <!-- Mobile (≤768px): .sov-grid becomes a compact single-column "contact sheet"
@@ -1653,8 +1713,7 @@
         </div>
         <div class="sov-num">01</div>
         <div class="sov-row">
-        <h3 class="sov-title"><span class="sov-sa" lang="sa-Latn">Vivāha</span><span class="sov-sa-sep" aria-hidden="true"> / </span>Weddings</h3>
-        <p class="sov-meaning">The sacred union</p>
+        <h3 class="sov-title">Weddings</h3>
         <p class="sov-desc">Full-day coverage, second shooter, and a beautifully curated online gallery — every chapter of your day preserved.</p>
         <div class="sov-price">Starting from <strong>$2,500</strong></div>
         <a href="#contact" class="sov-link">Inquire <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
@@ -1691,8 +1750,7 @@
         </div>
         <div class="sov-num">02</div>
         <div class="sov-row">
-        <h3 class="sov-title"><span class="sov-sa" lang="sa-Latn">Yugala</span><span class="sov-sa-sep" aria-hidden="true"> / </span>Couple Portraits</h3>
-        <p class="sov-meaning">Two, as one pair</p>
+        <h3 class="sov-title">Couple Portraits</h3>
         <p class="sov-desc">From engagements to family milestones, we capture the evolving story of your love in New York's most iconic backdrops.</p>
         <div class="sov-tags">
           <span>Family Portraits</span>
@@ -1723,10 +1781,9 @@
             <text x="40" y="66" text-anchor="middle" font-size="4" font-family="var(--font-display)" letter-spacing="0.25em" fill="currentColor" opacity="0.5">SCENE IV</text>
           </svg>
         </div>
-        <div class="sov-num">04</div>
+        <div class="sov-num">03</div>
         <div class="sov-row">
-        <h3 class="sov-title"><span class="sov-sa" lang="sa-Latn">Utsava</span><span class="sov-sa-sep" aria-hidden="true"> / </span>Celebrations</h3>
-        <p class="sov-meaning">Every milestone, a festival</p>
+        <h3 class="sov-title">Celebrations</h3>
         <p class="sov-desc">From milestones to new beginnings, we capture the joy of your special occasions with a cinematic touch.</p>
         <div class="sov-tags">
           <span>House Warming</span>
@@ -1757,10 +1814,9 @@
             <text x="40" y="66" text-anchor="middle" font-size="4" font-family="var(--font-display)" letter-spacing="0.25em" fill="currentColor" opacity="0.5">SCENE V</text>
           </svg>
         </div>
-        <div class="sov-num">05</div>
+        <div class="sov-num">04</div>
         <div class="sov-row">
-        <h3 class="sov-title"><span class="sov-sa" lang="sa-Latn">Śilpa</span><span class="sov-sa-sep" aria-hidden="true"> / </span>Commercial</h3>
-        <p class="sov-meaning">Craft, made with intent</p>
+        <h3 class="sov-title">Commercial</h3>
         <p class="sov-desc">Product photography, brand campaigns, and editorial content for businesses and creators who refuse to be ordinary.</p>
         <div class="sov-tags">
           <span>Brand Campaigns</span><span>Lookbooks</span><span>Social-First Content</span><span>Usage Rights Available</span>
@@ -1788,10 +1844,9 @@
             <text x="40" y="12" text-anchor="middle" font-size="4" font-family="var(--font-display)" letter-spacing="0.25em" fill="currentColor" opacity="0.5">SCENE VI</text>
           </svg>
         </div>
-        <div class="sov-num">06</div>
+        <div class="sov-num">05</div>
         <div class="sov-row">
-        <h3 class="sov-title"><span class="sov-sa" lang="sa-Latn">Kalpanā</span><span class="sov-sa-sep" aria-hidden="true"> / </span>Conceptual</h3>
-        <p class="sov-meaning">Imagination, given form</p>
+        <h3 class="sov-title">Conceptual</h3>
         <p class="sov-desc">Surreal, editorial, and experimental visual storytelling — for those who see photography as pure art, unbound by convention.</p>
         <div class="sov-tags">
           <span>Editorial</span><span>Artist Collabs</span><span>Portfolio Projects</span><span>Exhibition Prints</span>
@@ -1800,11 +1855,6 @@
         </div>
       </div>
     </div>
-    <p class="sov-counter" aria-hidden="true"><span data-sov-current>01</span>&thinsp;/&thinsp;05 · Scroll</p>
-  </div>
-  </div>
-  </div>
-  <div class="container">
     <div class="reveal" style="text-align:center;margin-top:4rem;">
       <a href="#video-works" class="sov-cta">
         <span>Explore our Video work in Detail</span>

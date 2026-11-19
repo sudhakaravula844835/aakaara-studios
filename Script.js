@@ -3885,9 +3885,7 @@ let portfolioCarousel, videoCarousel;
     });
   }, { threshold: 0.5 });
 
-  // Observe the heading block, not the section: on desktop the section is a
-  // ~350vh spiral track that can never be 50% visible.
-  servicesObserver.observe(servicesSection.querySelector('.sov-intro') || servicesSection);
+  servicesObserver.observe(servicesSection);
 })();
 
 // ═══════ COUPLE PORTRAITS LINKS: SKIP INTRO + REMEMBER SCROLL ═══════
@@ -3900,24 +3898,23 @@ document.addEventListener('click', (e) => {
   sessionStorage.setItem('returnScrollY', String(window.scrollY));
 });
 
-// ═══════ SERVICES SPIRAL (desktop) ═══════
-// Ordinary page scrolling through #services-overview's tall .sov-track turns the
-// six service cards around the helix from animation_spatial_gallery.html while
-// .sov-stage stays pinned. Desktop only: compact screens, touch devices and
-// reduced motion keep the existing grid/list. No scroll input is intercepted.
-(function() {
-  const section = document.getElementById('services-overview');
-  const track = section && section.querySelector('.sov-track');
-  const grid = section && section.querySelector('.sov-grid');
-  if (!section || !track || !grid) return;
-  const cards = Array.from(grid.querySelectorAll('.sov-card'));
-  const counter = section.querySelector('[data-sov-current]');
-  const STEPS = cards.length - 1;
-  const COMPACT_QUERY = '(max-width: 1199px), (max-width: 1366px) and (any-pointer: coarse)';
-  const compact = window.matchMedia(COMPACT_QUERY);
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+// ═══════ SERVICES ORBIT (desktop) ═══════
+// A copy of the first spiral on animation_spatial_gallery.html, desktop part:
+// same helix, hand-tuned waiting/past paths, field pan, spring, wheel capture
+// and video loading. Shown only at ≥1200px with a fine pointer (.sov-orbit-on);
+// phones and tablets keep the services list. Keep in step with the study page.
+(function () {
+  'use strict';
+  var section = document.getElementById('services-overview');
+  var field = section && section.querySelector('.sov-orbit-field');
+  if (!section || !field) return;
+  var cards = Array.prototype.slice.call(field.querySelectorAll('.sov-orbit-card'));
+  if (!cards.length) return;
 
-  // ── Copied verbatim from animation_spatial_gallery.html (spiralProps, createSpiralSpring) ──
+  var compact = window.matchMedia('(max-width: 1199px), (max-width: 1366px) and (any-pointer: coarse)');
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  /* ─── From the study page, verbatim ─────────────────────────── */
   // One continuous helix: positive offsets wait below/right; negative offsets recede above/left.
   function spiralProps(offset) {
     var angle = offset * Math.PI * 55 / 180;
@@ -3941,8 +3938,8 @@ document.addEventListener('click', (e) => {
     };
   }
 
-  // Critically damped spring (units: cards, cards/s): continuous velocity, settles
-  // exactly on the target with no overshoot, requests frames only while moving.
+  // Critically damped spring (units: cards, cards/s): velocity stays continuous,
+  // it settles exactly on the target with no overshoot, and requests frames only while moving.
   function createSpiralSpring(render) {
     var FREQUENCY = 14; // rad/s ≈ 0.45 s response, settles in ~0.75 s
     var position = 0, velocity = 0, target = 0;
@@ -3968,7 +3965,6 @@ document.addEventListener('click', (e) => {
     }
 
     return {
-      // Glide to `next`. Pass a velocity (cards/s) to hand off a finger's speed.
       moveTo: function (next, handoffVelocity) {
         target = next;
         if (typeof handoffVelocity === 'number') velocity = handoffVelocity;
@@ -3976,7 +3972,6 @@ document.addEventListener('click', (e) => {
           frame = requestAnimationFrame(step);
         }
       },
-      // Place instantly and stop any glide.
       jumpTo: function (next) {
         if (frame !== null) cancelAnimationFrame(frame);
         frame = null;
@@ -3987,11 +3982,51 @@ document.addEventListener('click', (e) => {
       }
     };
   }
-  // ── end of copied helpers ──
-  // ── Also from animation_spatial_gallery.html (section 1, desktop paths) ──
-  // Waiting cards approach along a hand-tuned arc (card 3 tucks behind card 2);
-  // past cards keep receding in depth instead of swinging back toward the viewer.
-  // tx: vw, ty: % of card height, tz: px, ry: degrees.
+
+  // Wheel and trackpad input moves the target freely; once input pauses the
+  // spiral settles on a whole card. A short deliberate scroll (0.15–1 card)
+  // advances one card; a longer one lands on the nearest.
+  function createSpiralWheel(options) {
+    var origin = null, timer = null;
+    return function nudge(delta) {
+      var target = options.getTarget();
+      if (origin === null) origin = Math.round(target);
+      options.setTarget(Math.max(0, Math.min(options.max, target + delta)));
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        var current = options.getTarget();
+        var travel = current - origin;
+        var card = Math.abs(travel) >= 0.15 && Math.abs(travel) < 1
+          ? origin + (travel > 0 ? 1 : -1)
+          : Math.round(current);
+        origin = null;
+        options.setTarget(Math.max(0, Math.min(options.max, card)));
+      }, 140);
+    };
+  }
+
+  // The spiral turns only while its section sits flush with the viewport. If the
+  // wheel arrives while the section is part-way scrolled, glide the page into
+  // place first (one smooth scroll, not restarted by every event).
+  var alignY = null, alignUntil = 0;
+  function sectionAligned() {
+    var top = section.getBoundingClientRect().top;
+    var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    return Math.abs(top) <= 1 ||
+      (top > 0 && window.scrollY >= maxScroll - 1) || (top < 0 && window.scrollY <= 0);
+  }
+  function alignSection() {
+    var y = Math.round(window.scrollY + section.getBoundingClientRect().top);
+    var now = performance.now();
+    if (y === alignY && now < alignUntil) return;
+    alignY = y;
+    alignUntil = now + 700;
+    window.scrollTo({ top: y, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
+  }
+
+  // Desktop paths: waiting cards approach along a hand-tuned arc (card 3 tucks
+  // behind card 2); past cards keep receding in depth. tx: vw, ty: % of card height,
+  // tz: px, ry: degrees.
   var waitingSlots = [
     spiralProps(1),
     { tx: 39.53, ty: 77.52, tz: -610,  ry: 95 },  // 3: behind card 2
@@ -4057,109 +4092,195 @@ document.addEventListener('click', (e) => {
     if (offset <= 1) return p;
     return samplePath(p, waitingSlots, waitingTangents, offset - 1);
   }
-  // ── end of section 1 paths ──
 
-  let on = false;
-  let trackTop = 0;
-  let stepPx = 1;
+  function buildTransform(p) {
+    return 'translateX(' + p.tx.toFixed(3) + 'vw) ' +
+      'translateY(' + p.ty.toFixed(3) + '%) ' +
+      'translateZ(' + p.tz.toFixed(2) + 'px) ' +
+      'rotateY(' + p.ry.toFixed(3) + 'deg) ' +
+      'scale(' + p.sc.toFixed(4) + ')';
+  }
+  /* ─── end of study code ──────────────────────────────────────── */
 
-  // Track geometry is re-read on every use: images and fonts above the section
-  // can still change its document position after load.
-  function measure() {
-    trackTop = track.getBoundingClientRect().top + window.scrollY;
-    stepPx = Math.max(1, (track.offsetHeight - window.innerHeight) / STEPS);
-  }
-  function progressForScroll(scrollY) {
-    return Math.max(0, Math.min(STEPS, (scrollY - trackTop) / stepPx));
-  }
-  function scrollYForStep(step) {
-    return trackTop + step * stepPx;
-  }
+  var MAX_PROGRESS = cards.length - 1;
+  var SENSITIVITY = 0.005;   // deltaY of 200 → advance 1 card
+  var on = false;
+  var finalPan = 0;
+  var targetProgress = 0;
+  var lerpedProgress = 0;
+  var scrollLocked = true;   // true = wheel turns the orbit
+  var inView = false;        // ≥ 50% visible: wheel may turn the orbit
+  var visible = false;       // ≥ 15% visible: videos may play
+  var announcedCard = -1;
+  var booted = false;
+  var entryActive = false;
+  var entryTimers = [];
 
-  function render(position) {
-    if (!on) return;
-    // As on the study page: hold the framing on card 1, then pan the field down
-    // to open space above the featured card as the earlier cards recede.
-    const panProgress = Math.max(0, Math.min(1, (position - 1) / Math.max(1, STEPS - 1)));
-    const pan = panProgress * panProgress * (3 - 2 * panProgress);
-    const finalPan = grid.offsetHeight * 0.1 + cards[0].offsetHeight * 0.25;
-    grid.style.transform = 'translateY(' + (finalPan * pan).toFixed(3) + 'px)';
-    cards.forEach((card, i) => {
-      const p = slotProps(i - position);
-      card.style.transform =
-        'translateX(' + p.tx.toFixed(2) + 'vw) ' +
-        'translateY(' + p.ty.toFixed(2) + '%) ' +
-        'translateZ(' + p.tz.toFixed(0) + 'px) ' +
-        'rotateY(' + p.ry.toFixed(1) + 'deg) ' +
-        'scale(' + p.sc.toFixed(4) + ')';
-      card.style.opacity = p.op.toFixed(3);
-      card.style.zIndex = String(Math.round(p.tz + 3000));
-    });
-    const current = Math.round(position);
-    section.dataset.sovPosition = String(current);
-    if (counter) counter.textContent = String(current + 1).padStart(2, '0');
+  /* ─── Video: a card starts when it first reaches the front ─── */
+  var videos = cards.map(function (card) { return card.querySelector('video'); });
+  var started = videos.map(function () { return false; });
+  function loadVideo(video, preload) {
+    var source = video && video.querySelector('source[data-src]');
+    if (!source) return;
+    source.src = source.getAttribute('data-src');
+    source.removeAttribute('data-src');
+    video.preload = preload;
+    video.load();
   }
-  const spring = createSpiralSpring(render);
-
-  // The orbit follows the scroll; once scrolling pauses it settles on the
-  // nearest whole card. Only the orbit moves — the page is never scrolled for
-  // the visitor (snap points here caught slow trackpad/wheel scrolling).
-  const SETTLE_DELAY_MS = 150;
-  let settleTimer = null;
-  function follow() {
-    if (!on) return;
-    measure();
-    spring.moveTo(progressForScroll(window.scrollY));
-    clearTimeout(settleTimer);
-    settleTimer = setTimeout(() => {
-      if (on) spring.moveTo(Math.round(progressForScroll(window.scrollY)));
-    }, SETTLE_DELAY_MS);
-  }
-
-  function setSpiralMode(next) {
-    if (next === on) return;
-    on = next;
-    section.classList.toggle('sov-spiral-on', on);
-    if (on) {
-      measure();
-      spring.jumpTo(Math.round(progressForScroll(window.scrollY))); // no glide from 01 on a restored scroll
-      return;
+  function syncVideos() {
+    if (on && visible && announcedCard >= 0 && !started[announcedCard]) {
+      started[announcedCard] = true;
+      loadVideo(videos[announcedCard], 'auto');
+      loadVideo(videos[announcedCard + 1], 'metadata');
     }
-    cards.forEach(card => ['transform', 'opacity', 'z-index'].forEach(prop => card.style.removeProperty(prop)));
-    grid.style.removeProperty('transform');
-    delete section.dataset.sovPosition;
-  }
-  function syncMode() { setSpiralMode(!compact.matches && !reducedMotion.matches); }
-
-  // Keyboard: tabbing to a card's link scrolls that card to the front of the orbit.
-  // Mouse presses also focus links; scrolling then would move the card out from
-  // under the pointer and lose the click, so only keyboard focus counts.
-  // Track the last input type ourselves rather than relying on the browser's
-  // :focus-visible heuristic, which proved unreliable at focusin time in Chrome.
-  let lastInputWasKeyboard = false;
-  document.addEventListener('keydown', () => { lastInputWasKeyboard = true; }, true);
-  document.addEventListener('pointerdown', () => { lastInputWasKeyboard = false; }, true);
-  grid.addEventListener('focusin', (e) => {
-    if (!on || !lastInputWasKeyboard) return;
-    const index = cards.indexOf(e.target.closest('.sov-card'));
-    if (index < 0) return;
-    // Run after the browser's own focus scroll-into-view, which would otherwise
-    // cancel this smooth scroll when it lands later (seen under load in Chrome).
-    requestAnimationFrame(() => {
-      if (!on || document.activeElement !== e.target) return;
-      measure();
-      window.scrollTo({ top: Math.round(scrollYForStep(index)) });
+    videos.forEach(function (video, i) {
+      if (!video) return;
+      var shouldPlay = on && visible && started[i];
+      if (shouldPlay && video.paused) {
+        var attempt = video.play();
+        if (attempt && attempt.catch) attempt.catch(function () {}); // autoplay refused: poster stays
+      } else if (!shouldPlay && !video.paused) {
+        video.pause();
+      }
     });
+  }
+
+  /* ─── Render ─────────────────────────────────────────────────── */
+  function applyFrame() {
+    if (!on) return;
+    // Hold the opening framing on card 1, then pan down to open space above the
+    // featured card as the earlier cards recede.
+    var panProgress = Math.max(0, Math.min(1, (lerpedProgress - 1) / Math.max(1, MAX_PROGRESS - 1)));
+    var pan = panProgress * panProgress * (3 - 2 * panProgress);
+    field.style.transform = 'translateY(' + (finalPan * pan).toFixed(3) + 'px)';
+    cards.forEach(function (card, i) {
+      var p = slotProps(i - lerpedProgress);
+      card.style.transform = buildTransform(p);
+      if (!entryActive) card.style.opacity = p.op.toFixed(3);
+      card.style.zIndex = String(Math.round(p.tz + 3000)); // featured card in front
+    });
+    var currentCard = Math.round(lerpedProgress);
+    if (currentCard !== announcedCard) {
+      announcedCard = currentCard;
+      section.setAttribute('data-sov-position', String(currentCard));
+      cards.forEach(function (card, index) { card.setAttribute('aria-hidden', String(index !== currentCard)); });
+      syncVideos();
+    }
+  }
+
+  var motion = createSpiralSpring(function (position) {
+    lerpedProgress = position;
+    applyFrame();
+  });
+  function requestTick() {
+    if (entryActive) return;
+    if (reducedMotion.matches) motion.jumpTo(targetProgress);
+    else motion.moveTo(targetProgress);
+  }
+  var nudge = createSpiralWheel({
+    max: MAX_PROGRESS,
+    getTarget: function () { return targetProgress; },
+    setTarget: function (value) { targetProgress = value; requestTick(); }
   });
 
-  syncMode();
+  /* ─── Wheel capture (as on the study page) ───────────────────── */
+  window.addEventListener('wheel', function (e) {
+    if (!on || !inView || e.ctrlKey || Math.abs(section.getBoundingClientRect().top) > window.innerHeight * 0.49) return;
+    var dy = e.deltaY * (e.deltaMode === 1 ? 20 : e.deltaMode === 2 ? window.innerHeight : 1);
+
+    if (!scrollLocked) {
+      // Re-lock when the wheel turns back into the orbit's range.
+      if (targetProgress >= MAX_PROGRESS && dy < 0) scrollLocked = true;
+      else if (targetProgress <= 0 && dy > 0) scrollLocked = true;
+      else return; // still unlocked: let the page scroll
+    }
+    // Release at either end once the orbit has settled there.
+    if (targetProgress >= MAX_PROGRESS && dy > 0 && Math.abs(targetProgress - lerpedProgress) < 0.01) {
+      scrollLocked = false;
+      return;
+    }
+    if (targetProgress <= 0 && dy < 0 && Math.abs(targetProgress - lerpedProgress) < 0.01) {
+      scrollLocked = false;
+      return;
+    }
+
+    e.preventDefault();
+    if (!sectionAligned()) {
+      alignSection();
+      return;
+    }
+    finishEntry();
+    nudge(dy * SENSITIVITY);
+  }, { passive: false });
+
+  /* ─── Entry: cards fade in one by one the first time the section shows ─── */
+  function finishEntry() {
+    if (!entryActive) return;
+    entryActive = false;
+    entryTimers.forEach(function (timer) { clearTimeout(timer); });
+    entryTimers = [];
+    cards.forEach(function (card) { card.style.transition = ''; });
+    applyFrame();
+    requestTick();
+  }
+  function boot() {
+    if (booted || !on) return;
+    booted = true;
+    if (reducedMotion.matches) return;
+    entryActive = true;
+    cards.forEach(function (card) { card.style.opacity = '0'; });
+    cards.forEach(function (card, i) {
+      entryTimers.push(setTimeout(function () {
+        card.style.transition = 'opacity 700ms ease';
+        card.style.opacity = slotProps(i - lerpedProgress).op.toFixed(3);
+      }, 220 + i * 110));
+    });
+    entryTimers.push(setTimeout(finishEntry, 220 + MAX_PROGRESS * 110 + 700 + 80));
+  }
+
+  /* ─── Desktop on / off ───────────────────────────────────────── */
+  function updateLayout() {
+    if (!on) return;
+    finalPan = field.offsetHeight * 0.1 + cards[0].offsetHeight * 0.25;
+    applyFrame();
+  }
+  function setMode(next) {
+    if (next === on) return;
+    on = next;
+    section.classList.toggle('sov-orbit-on', on);
+    if (on) {
+      announcedCard = -1;
+      updateLayout();
+      var rect = section.getBoundingClientRect();
+      if (rect.bottom > 0 && rect.top < window.innerHeight) boot();
+      return;
+    }
+    finishEntry();
+    field.style.removeProperty('transform');
+    cards.forEach(function (card) {
+      ['transform', 'opacity', 'z-index', 'transition'].forEach(function (prop) { card.style.removeProperty(prop); });
+      card.removeAttribute('aria-hidden');
+    });
+    section.removeAttribute('data-sov-position');
+    syncVideos();
+  }
+
+  new IntersectionObserver(function (entries) {
+    inView = entries[0].intersectionRatio >= 0.5;
+    if (entries[0].isIntersecting) boot();
+  }, { threshold: [0, 0.3, 0.5] }).observe(section);
+  // Looser threshold for playback: keep the front card playing while any
+  // meaningful part of the orbit is on screen.
+  new IntersectionObserver(function (entries) {
+    visible = entries[0].intersectionRatio >= 0.15;
+    syncVideos();
+  }, { threshold: [0, 0.15] }).observe(section);
+
+  function syncMode() { setMode(!compact.matches); }
   compact.addEventListener('change', syncMode);
-  reducedMotion.addEventListener('change', syncMode);
-  window.addEventListener('scroll', follow, { passive: true });
-  window.addEventListener('resize', follow, { passive: true });
-  window.addEventListener('load', follow);
-  // The intro locks scrolling (body.intro-active) for ~4s; re-measure once it ends.
-  new MutationObserver(follow).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  window.addEventListener('resize', updateLayout);
+  reducedMotion.addEventListener('change', function () { finishEntry(); requestTick(); });
+  syncMode();
 })();
 
 // ═══════ A11Y: FILTER PILLS ANNOUNCE THEIR STATE ═══════

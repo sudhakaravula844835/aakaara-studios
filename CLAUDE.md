@@ -144,15 +144,15 @@ Portfolio + video grids wrapped in `.ethereal-carousel`, driven by `EtherealCaro
 
 `.cs-wrapper` is `700vh` tall (intentional, all screen sizes). `.cs-sticky-zone` is `position: sticky; top: 0; height: 100vh`. JS reads `scrollY` vs `wrapTop`, translates each `.cs-panel` via `translateY()` for slide-over wipe. Videos are HLS streams via `hls.js` with image/gradient fallback chain.
 
-### Services Spiral (`#services-overview`, desktop only)
+### Services Orbit (`#services-overview`, desktop only)
 
-"Five Ways We Tell Your Story" (Maternity card removed 2026-11-19) becomes a scroll-driven 3D spiral on desktop: `Script.js` adds `.sov-spiral-on` only when the screen is ≥1200px with a fine pointer and no `prefers-reduced-motion`. Phones keep the contact-sheet list and tablets the 2-column grid — the same five `.sov-card`s, no second copy of the content.
+On desktop (≥1200px, fine pointer) `Script.js` adds `.sov-orbit-on`: the section becomes one screen tall and shows `.sov-orbit` — a copy of the **first** spiral on `animation_spatial_gallery.html` (same five video cards: Weddings, Engagement, Pre-wedding, Celebrations, Conceptual; same 35rem × 1.42 card, paths, field pan, spring, wheel capture). The services list (`.container`) is hidden there. Phones keep the contact-sheet list and tablets the 2-column grid of five services (Maternity removed 2026-11-19).
 
-- `.sov-track` is `100vh + (cards − 1) × 50vh` tall (`--sov-steps`, `--sov-step-h`); `.sov-stage` is sticky. Page scroll → orbit position 0–4 → critically damped spring → `slotProps()` (the study page's *first* section: `spiralProps()` plus its hand-tuned waiting/past paths, and the field pans down from card 2 on — all copied from `animation_spatial_gallery.html`). No wheel capture. The heading block sits at the page gutter, sized to stop 2.5rem short of the centred 35rem front card.
-- When scrolling pauses (150ms) the orbit — not the page — settles on the nearest whole card. Don't add CSS scroll-snap here: proximity snap points caught slow trackpad/wheel scrolling (review, Nov 2026).
-- `data-sov-position` on the section and `[data-sov-current]` expose the current card (tests use them). Keyboard focus on a card's link (last input was a key, not a pointer) scrolls it to the front, one frame after the browser's own focus scroll; mouse presses don't, so clicks on side cards land.
-- Sanskrit name/meaning lines (`.sov-sa`, `.sov-meaning`) show only in spiral mode.
-- `services_viewed` (GA) observes `.sov-intro`, since the tall track can never be 50% visible.
+- Keep it in step with the study page: the `SERVICES ORBIT` IIFE in `Script.js` copies the study's desktop code, and the `SERVICES ORBIT` CSS block copies its values. The only deliberate differences: the heading clears the fixed nav (+64px), and the section clips overflow.
+- The wheel turns the orbit only while the section is ≥50% in view and within half a screen of flush; it first glides the page flush, then each gesture (~200px of wheel) turns one card, and releases the page after the last (or before the first) card. Keyboard and scrollbar scrolling pass straight through.
+- Videos (`/media/spatial-gallery/*.mp4`) keep their file in `data-src`; a card's video loads when it first reaches the front (the next one preloads metadata).
+- `data-sov-position` on the section exposes the front card (tests use it). Non-front cards are `aria-hidden`.
+- Adobe Fonts kit (`ffu1awu`, Cesso for the card subtitles) is loaded non-blocking in `index.html`.
 - Tests: `services-spiral.cases.js`, run by `services-spiral.spec.js` (Chromium) and `services-spiral.webkit.spec.js` (WebKit).
 
 ### Intro Animation & Sub-page Navigation

@@ -1919,9 +1919,6 @@ body.intro-active #heroScroll { opacity: 0; }
   flex-direction: column;
   gap: 0.5rem;
 }
-/* Services spiral hooks: shown only inside #services-overview.sov-spiral-on
-   (desktop), so phones/tablets/reduced motion keep today's layout exactly. */
-.sov-sa, .sov-sa-sep, .sov-meaning, .sov-counter { display: none; }
 .sov-card::after {
   content: '';
   position: absolute;
@@ -2012,118 +2009,177 @@ body.intro-active #heroScroll { opacity: 0; }
 .sov-stamp--conceptual { color: var(--mauve); transform: rotate(0deg) scale(1); }
 
 /* ═══════════════════════════════════════════════════════════
-   SERVICES SPIRAL (desktop) — #services-overview.sov-spiral-on
-   Script.js adds the class only at ≥1200px with a fine pointer and no
-   reduced-motion preference. Ordinary page scrolling through the tall
-   .sov-track turns the six cards; .sov-stage stays pinned meanwhile.
-   Geometry and motion come from animation_spatial_gallery.html.
+   SERVICES ORBIT (desktop) — #services-overview.sov-orbit-on
+   A copy of the first spiral on animation_spatial_gallery.html: same
+   cards, sizes, colours and type. Script.js adds the class only at
+   ≥1200px with a fine pointer; otherwise .sov-orbit stays hidden and
+   the services list shows as before. Values below are the study's.
    ═══════════════════════════════════════════════════════════ */
-#services-overview.sov-spiral-on {
-  --sov-steps: 4;              /* five cards → four steps */
-  --sov-step-h: 50vh;
-  padding-top: 0 !important;    /* the track starts at the section top (overrides inline padding) */
-}
-#services-overview.sov-spiral-on .sov-track {
+.sov-orbit { display: none; }
+#services-overview.sov-orbit-on {
   position: relative;
-  height: calc(100vh + var(--sov-steps) * var(--sov-step-h));
-}
-#services-overview.sov-spiral-on .sov-stage {
-  position: sticky;
-  top: 0;
   height: 100vh;
-  overflow: clip;               /* cards far out on the arc never widen the page */
+  padding: 0 !important;        /* one screen, like the study (overrides inline padding) */
+  overflow: clip;               /* cards far out on the arc never spill into neighbours */
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 58% 56%, rgba(196, 140, 89, 0.1), transparent 26%),
+    radial-gradient(circle at 30% 22%, rgba(130, 86, 64, 0.08), transparent 22%),
+    linear-gradient(180deg, #090707 0%, #050404 100%);
+  color: #f5eee8;
+  font-family: "Cormorant Garamond", Georgia, serif;
 }
-/* As on the study page, the words sit at the page edge in the column left of
-   the front card (centred, 35rem wide), so they never run into it. */
-#services-overview.sov-spiral-on .sov-intro {
-  position: absolute;
-  top: 6.5rem;                  /* clear the fixed nav */
-  left: 0;                      /* the stage already starts at the page gutter */
-  z-index: 4000;                /* above every card (card z-index ≤ 3000) */
-  width: calc(50% - 17.5rem - 2.5rem); /* stops 2.5rem short of the front card */
-  margin: 0;
-  text-align: left;
-  pointer-events: none;
-}
-#services-overview.sov-spiral-on .sov-intro .section-title { font-size: clamp(2rem, 2.9vw, 2.8rem); }
-#services-overview.sov-spiral-on .sov-intro .section-title br { display: none; }
-#services-overview.sov-spiral-on .sov-grid {
+#services-overview.sov-orbit-on::before {
+  content: "";
   position: absolute;
   inset: 0;
-  display: block;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.38), transparent 22%, transparent 80%, rgba(0, 0, 0, 0.38)),
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.02), transparent 58%);
+  pointer-events: none;
+  z-index: 0;
+}
+#services-overview.sov-orbit-on > .container { display: none; }
+#services-overview.sov-orbit-on .sov-orbit { display: block; }
+.sov-orbit-head {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  gap: 0.65rem;
+  pointer-events: none;
+  max-width: 36rem;
+  padding: calc(2rem + 64px) 1.5rem 0;   /* the study's 2rem, plus the fixed nav */
+}
+.sov-orbit-kicker {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+}
+.sov-orbit-title {
+  margin: 0;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(2.6rem, 4.2vw, 4.8rem);
+  letter-spacing: -0.045em;
+  line-height: 0.94;
+  font-weight: 500;
+  max-width: 10ch;
+  color: #f5eee8;
+}
+.sov-orbit-title em { color: #c9956b; font-style: italic; font-weight: 400; }
+.sov-orbit-meta {
+  position: absolute;
+  bottom: 2rem;
+  left: 1.5rem;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.34);
+  pointer-events: none;
+}
+.sov-orbit-meta::before {
+  content: "";
+  width: 2.6rem;
+  height: 1px;
+  background: rgba(201, 149, 107, 0.25);
+}
+.sov-orbit-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.sov-orbit-field {
+  position: absolute;
+  inset: 0;
   perspective: 1900px;
   perspective-origin: 50% 48%;
-  overflow: visible;
-  background: none;
-  border: 0;
-  border-radius: 0;
 }
-#services-overview.sov-spiral-on .sov-card {
+.sov-orbit-card {
   position: absolute;
-  top: 50%;
-  left: 50%;
   width: 35rem;
   aspect-ratio: 1.42;
-  margin: -12.324rem 0 0 -17.5rem;
+  top: 50%;
+  left: 50%;
+  margin-top: -12.324rem;
+  margin-left: -17.5rem;
+  overflow: hidden;
   border-radius: 1.2rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: #110d0c;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   box-shadow: 0 40px 90px rgba(0, 0, 0, 0.28);
-  overflow: hidden;
-  justify-content: flex-end;
-  padding: 1.6rem 1.8rem 1.5rem;
   will-change: transform, opacity;
 }
-/* Per-service tints, as on the study page (Weddings, Couple Portraits, Celebrations, Commercial, Conceptual) */
-#services-overview.sov-spiral-on .sov-card:nth-child(1) { background: radial-gradient(circle at 68% 28%, rgba(201,149,107,0.13), transparent 45%), linear-gradient(148deg, #1c1410 0%, #0d0907 100%); }
-#services-overview.sov-spiral-on .sov-card:nth-child(2) { background: radial-gradient(circle at 32% 70%, rgba(108,93,140,0.14), transparent 40%), linear-gradient(148deg, #14121c 0%, #0a0910 100%); }
-#services-overview.sov-spiral-on .sov-card:nth-child(3) { background: radial-gradient(circle at 40% 55%, rgba(201,149,80,0.1), transparent 40%), linear-gradient(148deg, #1a1510 0%, #0e0c08 100%); }
-#services-overview.sov-spiral-on .sov-card:nth-child(4) { background: radial-gradient(circle at 55% 35%, rgba(140,140,160,0.09), transparent 40%), linear-gradient(148deg, #131316 0%, #0b0b0e 100%); }
-#services-overview.sov-spiral-on .sov-card:nth-child(5) { background: radial-gradient(circle at 38% 62%, rgba(90,110,160,0.1), transparent 42%), linear-gradient(148deg, #111318 0%, #09090e 100%); }
-#services-overview.sov-spiral-on .sov-sa,
-#services-overview.sov-spiral-on .sov-sa-sep { display: inline; }
-#services-overview.sov-spiral-on .sov-meaning { display: block; }
-/* Card look — study-page proportions on site fonts and audit-safe colours */
-#services-overview.sov-spiral-on .sov-intro .section-desc { margin: 0; max-width: 100%; text-align: left; }
-#services-overview.sov-spiral-on .sov-num,
-#services-overview.sov-spiral-on .sov-card::after { display: none; }
-#services-overview.sov-spiral-on .sov-stamp { top: 1.4rem; left: 1.6rem; width: 68px; height: 68px; }
-#services-overview.sov-spiral-on .sov-title {
-  margin-top: 0;
-  font-size: clamp(1.45rem, 1.9vw, 1.9rem);
+/* Video frames can be bright behind the copy, so the scrim deepens at the bottom. */
+.sov-orbit-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(11, 8, 8, 0.05) 8%, rgba(11, 8, 8, 0.14) 38%, rgba(11, 8, 8, 0.46) 62%, rgba(11, 8, 8, 0.76) 100%),
+    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.14), transparent 38%);
+  pointer-events: none;
+}
+.sov-orbit-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  pointer-events: none;
+  z-index: 2;
+}
+.sov-orbit-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.sov-orbit-copy {
+  position: absolute;
+  left: 1.35rem;
+  right: 1.35rem;
+  bottom: 1.2rem;
+  z-index: 2;
+  display: grid;
+  gap: 0.3rem;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+}
+.sov-orbit-card-title {
+  margin: 0;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.5rem, 2vw, 2rem);
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: 0.01em;
+  color: #f5eee8;
 }
-#services-overview.sov-spiral-on .sov-sa { font-style: italic; }
-#services-overview.sov-spiral-on .sov-sa-sep { color: rgba(201, 149, 107, 0.7); }
-#services-overview.sov-spiral-on .sov-meaning {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 1.05rem;
+.sov-orbit-sa { font-style: italic; }
+.sov-orbit-sep { color: rgba(201, 149, 107, 0.7); }
+/* Meaning line, set in Cesso (Adobe Fonts) in sentence case. */
+.sov-orbit-sub {
+  margin: 0;
+  font-family: cesso, "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(0.8rem, 0.88vw, 0.88rem);
+  font-weight: 400;
   line-height: 1.3;
-  color: var(--ivory-soft);
-}
-#services-overview.sov-spiral-on .sov-desc { flex: none; max-width: 46ch; font-size: 0.85rem; }
-#services-overview.sov-spiral-on .sov-counter {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  position: absolute;
-  left: 0;                      /* lines up with the heading at the page gutter */
-  bottom: 2rem;
-  z-index: 4000;
-  font-size: 0.75rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--ivory-soft);
-  pointer-events: none;
-}
-#services-overview.sov-spiral-on .sov-counter::before {
-  content: '';
-  width: 2.6rem;
-  height: 1px;
-  margin-right: 0.9rem;
-  background: rgba(201, 149, 107, 0.25);
+  letter-spacing: 0.04em;
+  color: rgba(245, 238, 232, 0.62);
 }
 
 .sov-cta {
