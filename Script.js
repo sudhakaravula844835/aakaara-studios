@@ -3898,11 +3898,12 @@ document.addEventListener('click', (e) => {
   sessionStorage.setItem('returnScrollY', String(window.scrollY));
 });
 
-// ═══════ SERVICES ORBIT (desktop) ═══════
-// A copy of the first spiral on animation_spatial_gallery.html, desktop part:
-// same helix, hand-tuned waiting/past paths, field pan, spring, wheel capture
-// and video loading. Shown only at ≥1200px with a fine pointer (.sov-orbit-on);
-// phones and tablets keep the services list. Keep in step with the study page.
+// ═══════ SERVICES ORBIT (desktop + phone) ═══════
+// A copy of the first spiral on animation_spatial_gallery.html: same helix,
+// hand-tuned waiting/past paths, field pan, spring, wheel capture, phone
+// swipe/buttons and video loading. Desktop (≥1200px, fine pointer) and phones
+// (.sov-orbit-phone) show it as .sov-orbit-on; tablets keep the services list.
+// Keep in step with the study page.
 (function () {
   'use strict';
   var section = document.getElementById('services-overview');
@@ -3912,7 +3913,13 @@ document.addEventListener('click', (e) => {
   if (!cards.length) return;
 
   var compact = window.matchMedia('(max-width: 1199px), (max-width: 1366px) and (any-pointer: coarse)');
+  var phone = window.matchMedia('(max-width: 599px), (max-width: 959px) and (max-height: 500px)');
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var copies = cards.map(function (card) { return card.querySelector('.sov-orbit-copy'); });
+  var previousButton = section.querySelector('.sov-orbit-prev');
+  var nextButton = section.querySelector('.sov-orbit-next');
+  var countLabel = section.querySelector('.sov-orbit-count');
+  var gestureLabel = section.querySelector('.sov-orbit-gesture');
 
   /* ─── From the study page, verbatim ─────────────────────────── */
   // One continuous helix: positive offsets wait below/right; negative offsets recede above/left.
@@ -4086,8 +4093,36 @@ document.addEventListener('click', (e) => {
     return p;
   }
 
+  // Phone slots use the same renderer with a tighter arc and two previews.
+  var phoneWaiting = [
+    spiralProps(0),
+    { tx: 11, ty: 55, tz: -650, ry: 35 },
+    { tx: -2, ty: 110, tz: -1250, ry: 65 },
+    { tx: -8, ty: 155, tz: -1800, ry: 140 },
+    { tx: -18, ty: 180, tz: -2200, ry: 180 },
+    { tx: -28, ty: 205, tz: -2600, ry: 220 }
+  ];
+  var phonePast = [
+    spiralProps(0),
+    { tx: -12, ty: -105, tz: -700, ry: -40 },
+    { tx: -9, ty: -180, tz: -1400, ry: -90 },
+    { tx: -4, ty: -225, tz: -1800, ry: -140 },
+    { tx: 0, ty: -255, tz: -2200, ry: -180 },
+    { tx: 4, ty: -285, tz: -2600, ry: -220 }
+  ];
+  var phoneWaitingTangents = pathTangents(phoneWaiting, { tx: 14, ty: 80, tz: 0, ry: 42 });
+  var phonePastTangents = pathTangents(phonePast, { tx: -14, ty: -80, tz: 0, ry: -42 });
+
   function slotProps(offset) {
     var p = spiralProps(offset);
+    if (isPhone) {
+      p = offset < 0
+        ? samplePath(p, phonePast, phonePastTangents, -offset)
+        : samplePath(p, phoneWaiting, phoneWaitingTangents, offset);
+      var shown = Math.max(0, Math.min(1, (2.5 - Math.abs(offset)) / 1.5));
+      p.op = shown * shown * (3 - 2 * shown);
+      return p;
+    }
     if (offset < 0) return samplePath(p, pastSlots, pastTangents, -offset);
     if (offset <= 1) return p;
     return samplePath(p, waitingSlots, waitingTangents, offset - 1);
@@ -4099,13 +4134,24 @@ document.addEventListener('click', (e) => {
   // curve's shape, depth (tz) and turns (ry) stay the study's.
   var pathCardHeight = 394;
   var spacing = 1;
+  var cardWidth = 560;
   function measurePath() {
     var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
     pathCardHeight = 35 * rem / 1.42;
     spacing = parseFloat(getComputedStyle(section).getPropertyValue('--sov-orbit-spacing')) || 1;
+    cardWidth = cards[0].offsetWidth || cardWidth;
   }
 
   function buildTransform(p) {
+    if (isPhone) {
+      // As the study's compact renderer: scale x, z and perspective with the card
+      // so phone cards keep their shape. Spacing spreads x and y only.
+      return 'translateX(' + (p.tx * cardWidth * 0.03 * spacing).toFixed(3) + 'px) ' +
+        'translateY(' + (p.ty * spacing).toFixed(3) + '%) ' +
+        'translateZ(' + (p.tz * cardWidth / 560).toFixed(2) + 'px) ' +
+        'rotateY(' + p.ry.toFixed(3) + 'deg) ' +
+        'scale(' + p.sc.toFixed(4) + ')';
+    }
     return 'translateX(' + (p.tx * spacing).toFixed(3) + 'vw) ' +
       'translateY(' + (p.ty * pathCardHeight * spacing / 100).toFixed(2) + 'px) ' +
       'translateZ(' + p.tz.toFixed(2) + 'px) ' +
@@ -4117,6 +4163,7 @@ document.addEventListener('click', (e) => {
   var MAX_PROGRESS = cards.length - 1;
   var SENSITIVITY = 0.005;   // deltaY of 200 → advance 1 card
   var on = false;
+  var isPhone = false;
   var finalPan = 0;
   var targetProgress = 0;
   var lerpedProgress = 0;
@@ -4147,7 +4194,10 @@ document.addEventListener('click', (e) => {
     }
     videos.forEach(function (video, i) {
       if (!video) return;
-      var shouldPlay = on && visible && started[i];
+      // A card faded fully out of view (phone: 2.5+ cards away) pauses to save
+      // battery, and resumes when it comes back.
+      var cardShown = announcedCard < 0 || slotProps(i - announcedCard).op > 0.01;
+      var shouldPlay = on && visible && started[i] && cardShown;
       if (shouldPlay && video.paused) {
         var attempt = video.play();
         if (attempt && attempt.catch) attempt.catch(function () {}); // autoplay refused: poster stays
@@ -4164,30 +4214,44 @@ document.addEventListener('click', (e) => {
     // featured card as the earlier cards recede.
     var panProgress = Math.max(0, Math.min(1, (lerpedProgress - 1) / Math.max(1, MAX_PROGRESS - 1)));
     var pan = panProgress * panProgress * (3 - 2 * panProgress);
-    field.style.transform = 'translateY(' + (finalPan * pan).toFixed(3) + 'px)';
+    field.style.transform = isPhone ? '' : 'translateY(' + (finalPan * pan).toFixed(3) + 'px)';
     cards.forEach(function (card, i) {
-      var p = slotProps(i - lerpedProgress);
+      var offset = i - lerpedProgress;
+      var p = slotProps(offset);
       card.style.transform = buildTransform(p);
       if (!entryActive) card.style.opacity = p.op.toFixed(3);
       card.style.zIndex = String(Math.round(p.tz + 3000)); // featured card in front
+      // Phone cards overlap, so only the card in focus shows its words; they
+      // fade out within the first ~half card of travel and back in on arrival.
+      var words = 1;
+      if (isPhone) {
+        words = Math.max(0, 1 - Math.abs(offset) / 0.45);
+        words = words * words * (3 - 2 * words);
+      }
+      copies[i].style.opacity = words === 1 ? '' : words.toFixed(3);
     });
     var currentCard = Math.round(lerpedProgress);
     if (currentCard !== announcedCard) {
       announcedCard = currentCard;
       section.setAttribute('data-sov-position', String(currentCard));
+      if (countLabel) countLabel.textContent = String(currentCard + 1).padStart(2, '0') + ' / ' + String(cards.length).padStart(2, '0');
+      if (gestureLabel) gestureLabel.textContent = currentCard === MAX_PROGRESS ? 'Swipe up to continue' : 'Swipe up to explore';
       cards.forEach(function (card, index) { card.setAttribute('aria-hidden', String(index !== currentCard)); });
       syncVideos();
     }
+    if (previousButton) previousButton.disabled = targetProgress <= 0;
+    if (nextButton) nextButton.disabled = targetProgress >= MAX_PROGRESS;
   }
 
   var motion = createSpiralSpring(function (position) {
     lerpedProgress = position;
     applyFrame();
   });
-  function requestTick() {
+  // Glide to targetProgress; a velocity (cards/s) hands off a finger's speed.
+  function requestTick(handoffVelocity) {
     if (entryActive) return;
     if (reducedMotion.matches) motion.jumpTo(targetProgress);
-    else motion.moveTo(targetProgress);
+    else motion.moveTo(targetProgress, handoffVelocity);
   }
   var nudge = createSpiralWheel({
     max: MAX_PROGRESS,
@@ -4225,6 +4289,183 @@ document.addEventListener('click', (e) => {
     nudge(dy * SENSITIVITY);
   }, { passive: false });
 
+  /* ─── Phone buttons ──────────────────────────────────────────── */
+  function stepCard(direction) {
+    targetProgress = Math.max(0, Math.min(MAX_PROGRESS, Math.round(targetProgress) + direction));
+    scrollLocked = true;
+    finishEntry();
+    applyFrame();
+    requestTick();
+  }
+  if (previousButton) previousButton.addEventListener('click', function () { stepCard(-1); });
+  if (nextButton) nextButton.addEventListener('click', function () { stepCard(1); });
+
+  /* ─── Phone touch: from the study page, verbatim ─────────────── */
+  function installSpiralTouch(options) {
+    var element = options.element;
+    var win = options.window || element.ownerDocument.defaultView;
+    var maximum = options.max;
+    var gesture = null;
+    var threshold = 6;
+    var interactive = 'a,button,input,select,textarea,summary,video,audio,' +
+      '[contenteditable]:not([contenteditable="false"]),[role="button"],' +
+      '[role="link"],[tabindex]';
+
+    function clamp(value, minimum, maximumValue) {
+      return Math.max(minimum, Math.min(maximumValue, value));
+    }
+    function eligible() {
+      return (!options.enabled || options.enabled()) &&
+        (!options.isVisible || options.isVisible());
+    }
+    function findTouch(touches, identifier) {
+      for (var i = 0; i < touches.length; i++) {
+        if (touches[i].identifier === identifier) return touches[i];
+      }
+      return null;
+    }
+    function cancel() {
+      if (gesture && gesture.captured) {
+        options.onSettle(clamp(Math.round(gesture.progress), 0, maximum));
+      }
+      gesture = null;
+    }
+    function start(event) {
+      if (event.touches.length !== 1) {
+        cancel();
+        return;
+      }
+      if (!eligible()) return;
+      var target = event.target;
+      if (target && target.nodeType !== 1) target = target.parentElement;
+      // Only controls INSIDE the orbit count (changed from the study page): the
+      // home page's <main tabindex="-1"> would otherwise match every touch.
+      var control = target && target.closest && target.closest(interactive);
+      if (control && element.contains(control)) return;
+      var touch = event.touches[0];
+      gesture = {
+        identifier: touch.identifier,
+        x: touch.clientX,
+        y: touch.clientY,
+        lastY: touch.clientY,
+        lastTime: event.timeStamp,
+        velocity: 0,
+        captured: false
+      };
+    }
+    function move(event) {
+      if (!gesture) return;
+      if (event.touches.length !== 1) {
+        cancel();
+        return;
+      }
+      if (!eligible()) {
+        cancel();
+        return;
+      }
+      var touch = findTouch(event.touches, gesture.identifier);
+      if (!touch) {
+        cancel();
+        return;
+      }
+      var dx = touch.clientX - gesture.x;
+      var travel = gesture.y - touch.clientY; // An upward finger advances.
+      var elapsed = event.timeStamp - gesture.lastTime;
+      if (elapsed > 0) {
+        var sampleVelocity = (gesture.lastY - touch.clientY) / elapsed;
+        gesture.velocity = elapsed > 120 ? sampleVelocity
+          : 0.6 * sampleVelocity + 0.4 * gesture.velocity;
+      }
+      gesture.lastY = touch.clientY;
+      gesture.lastTime = event.timeStamp;
+
+      if (!gesture.captured) {
+        if (Math.max(Math.abs(dx), Math.abs(travel)) < threshold) return;
+        if (Math.abs(dx) >= Math.abs(travel)) {
+          gesture = null; // Let a horizontal gesture remain native.
+          return;
+        }
+        var progress = clamp(options.getProgress(), 0, maximum);
+        if ((progress <= 0.001 && travel < 0) ||
+            (progress >= maximum - 0.001 && travel > 0)) {
+          gesture = null; // Outward motion at an endpoint scrolls the page.
+          return;
+        }
+        if (!event.cancelable) {
+          gesture = null;
+          return;
+        }
+        gesture.captured = true;
+        gesture.originProgress = progress;
+        gesture.originIndex = Math.round(progress);
+        gesture.minimum = Math.max(0, gesture.originIndex - 1);
+        gesture.maximum = Math.min(maximum, gesture.originIndex + 1);
+        gesture.distance = options.getStepDistance
+          ? Math.max(1, options.getStepDistance())
+          : clamp(element.clientHeight * 0.4, 180, 360);
+        gesture.progress = progress;
+        if (options.onCapture) options.onCapture();
+      }
+      if (!event.cancelable) {
+        cancel();
+        return;
+      }
+      event.preventDefault();
+      gesture.progress = clamp(gesture.originProgress + travel / gesture.distance,
+        gesture.minimum, gesture.maximum);
+      options.onDrag(gesture.progress);
+    }
+    function end(event) {
+      if (!gesture) return;
+      if (findTouch(event.touches, gesture.identifier)) return;
+      if (!gesture.captured) {
+        gesture = null;
+        return;
+      }
+      var touch = findTouch(event.changedTouches, gesture.identifier);
+      var travel = gesture.y - (touch ? touch.clientY : gesture.lastY);
+      var velocity = event.timeStamp - gesture.lastTime <= 100 ? gesture.velocity : 0;
+      var enoughTravel = Math.abs(travel) >= gesture.distance * 0.22;
+      var flick = Math.abs(travel) >= 12 && Math.abs(velocity) >= 0.45 &&
+        travel * velocity > 0;
+      var next = gesture.originIndex;
+      if (enoughTravel || flick) next += travel > 0 ? 1 : -1;
+      // Hand the finger's speed to the settle animation (px/ms → cards/s).
+      var handoff = velocity / gesture.distance * 1000;
+      gesture = null;
+      options.onSettle(clamp(next, 0, maximum), handoff);
+    }
+    function interrupted() {
+      cancel();
+    }
+
+    element.addEventListener('touchstart', start, { passive: true });
+    element.addEventListener('touchmove', move, { passive: false });
+    element.addEventListener('touchend', end, { passive: true });
+    element.addEventListener('touchcancel', interrupted, { passive: true });
+    win.addEventListener('resize', cancel);
+  }
+
+  installSpiralTouch({
+    element: section,
+    enabled: function () { return on && isPhone; },
+    isVisible: function () {
+      return inView && Math.abs(section.getBoundingClientRect().top) < window.innerHeight * 0.25;
+    },
+    max: MAX_PROGRESS,
+    getProgress: function () { return lerpedProgress; },
+    onCapture: function () { finishEntry(); scrollLocked = true; },
+    onDrag: function (progress) {
+      targetProgress = progress;
+      motion.jumpTo(progress); // the cards follow the finger exactly
+    },
+    onSettle: function (progress, handoffVelocity) {
+      targetProgress = progress;
+      applyFrame();
+      requestTick(handoffVelocity);
+    }
+  });
+
   /* ─── Entry: cards fade in one by one the first time the section shows ─── */
   function finishEntry() {
     if (!entryActive) return;
@@ -4250,17 +4491,25 @@ document.addEventListener('click', (e) => {
     entryTimers.push(setTimeout(finishEntry, 220 + MAX_PROGRESS * 110 + 700 + 80));
   }
 
-  /* ─── Desktop on / off ───────────────────────────────────────── */
+  /* ─── On / off, desktop / phone ──────────────────────────────── */
   function updateLayout() {
     if (!on) return;
     measurePath();
     finalPan = field.offsetHeight * 0.1 + pathCardHeight * spacing * 0.25;
     applyFrame();
   }
-  function setMode(next) {
-    if (next === on) return;
+  function setMode(next, nextPhone) {
+    if (next === on && nextPhone === isPhone) return;
+    var wasOn = on;
     on = next;
+    isPhone = next && nextPhone;
     section.classList.toggle('sov-orbit-on', on);
+    section.classList.toggle('sov-orbit-phone', isPhone);
+    if (on && wasOn) { // desktop ↔ phone: same orbit, new framing
+      announcedCard = -1;
+      updateLayout();
+      return;
+    }
     if (on) {
       announcedCard = -1;
       updateLayout();
@@ -4270,9 +4519,10 @@ document.addEventListener('click', (e) => {
     }
     finishEntry();
     field.style.removeProperty('transform');
-    cards.forEach(function (card) {
+    cards.forEach(function (card, i) {
       ['transform', 'opacity', 'z-index', 'transition'].forEach(function (prop) { card.style.removeProperty(prop); });
       card.removeAttribute('aria-hidden');
+      copies[i].style.removeProperty('opacity');
     });
     section.removeAttribute('data-sov-position');
     syncVideos();
@@ -4287,10 +4537,22 @@ document.addEventListener('click', (e) => {
   new IntersectionObserver(function (entries) {
     visible = entries[0].intersectionRatio >= 0.15;
     syncVideos();
+    syncBackToTop();
   }, { threshold: [0, 0.15] }).observe(section);
 
-  function syncMode() { setMode(!compact.matches); }
+  // On phones the floating back-to-top button would sit on the Next button;
+  // hide it while the orbit is on screen (as it hides over the inquiry form).
+  var backToTop = document.getElementById('backToTop');
+  function syncBackToTop() {
+    if (backToTop) backToTop.classList.toggle('over-orbit', on && isPhone && visible);
+  }
+
+  function syncMode() {
+    setMode(!compact.matches || phone.matches, phone.matches);
+    syncBackToTop();
+  }
   compact.addEventListener('change', syncMode);
+  phone.addEventListener('change', syncMode);
   window.addEventListener('resize', updateLayout);
   reducedMotion.addEventListener('change', function () { finishEntry(); requestTick(); });
   syncMode();

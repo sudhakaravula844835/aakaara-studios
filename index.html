@@ -1680,6 +1680,20 @@
       </div>
     </div>
     <p class="sov-orbit-meta" aria-hidden="true">Scroll to explore</p>
+    <!-- Phone controls (shown only with .sov-orbit-phone), as on the study page.
+         A div, not <nav>: the site's global `nav` rule styles the fixed header. -->
+    <div class="sov-orbit-controls" role="group" aria-label="Our work, card by card">
+      <button type="button" class="sov-orbit-prev" aria-label="Previous card" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>
+      </button>
+      <div class="sov-orbit-status">
+        <p class="sov-orbit-count" role="status" aria-live="polite" aria-atomic="true">01 / 05</p>
+        <p class="sov-orbit-gesture">Swipe up to explore</p>
+      </div>
+      <button type="button" class="sov-orbit-next" aria-label="Next card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg>
+      </button>
+    </div>
   </div>
   <div class="container">
     <div class="reveal sov-intro">

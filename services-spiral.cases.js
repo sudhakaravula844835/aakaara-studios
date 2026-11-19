@@ -16,9 +16,17 @@ module.exports = function defineSpiralTests(test, expect) {
   const jump = (page, y) => page.evaluate(top => window.scrollTo({ top, behavior: 'instant' }), y);
   const scrollY = page => page.evaluate(() => Math.round(window.scrollY));
   // Bring the section flush with the viewport, as the study expects before it turns.
+  // Re-check: images still loading above can shift it after the first jump, and a
+  // misaligned section spends the next wheel on aligning (correct, but not a turn).
   async function arrive(page) {
     await jump(page, await sectionTop(page));
     await page.waitForTimeout(SETTLE_MS);
+    for (let i = 0; i < 3; i++) {
+      const top = await section(page).evaluate(s => s.getBoundingClientRect().top);
+      if (Math.abs(top) <= 1) break;
+      await jump(page, await sectionTop(page));
+      await page.waitForTimeout(400);
+    }
     await page.mouse.move(720, 450);
   }
   async function wheel(page, dy) {
@@ -158,25 +166,110 @@ module.exports = function defineSpiralTests(test, expect) {
     });
   });
 
-  test.describe('Services orbit — compact keeps the list', () => {
-    test.describe('phone', () => {
-      test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  test.describe('Services orbit — phone (the study\'s phone spiral)', () => {
+    test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+    test.beforeEach(async ({ page }) => { await page.addInitScript(skipIntro); });
+    const rect = (page, sel) => page.locator(sel).first().evaluate(e => {
+      const r = e.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, left: r.left, right: r.right };
+    });
+    const count = page => page.locator('#services-overview .sov-orbit-count');
 
-      test('phone keeps the contact-sheet list', async ({ page }) => {
-        await page.addInitScript(skipIntro);
-        await page.goto('/');
-        await expect(section(page)).not.toHaveClass(/sov-orbit-on/);
-        await expect(page.locator('#services-overview .sov-orbit')).toBeHidden();
-        const cards = page.locator('#services-overview .sov-card');
-        await expect(cards).toHaveCount(CARDS);
-        const sizes = await cards.evaluateAll(els => els.map(e => [e.offsetWidth, e.offsetHeight]));
-        for (const [w, h] of sizes) {
-          expect(Math.abs(w - 342)).toBeLessThanOrEqual(2);
-          expect(h).toBeLessThanOrEqual(96);
-        }
-      });
+    test('phone shows the orbit with its controls', async ({ page }) => {
+      await page.goto('/');
+      await expect(section(page)).toHaveClass(/sov-orbit-on/);
+      await expect(section(page)).toHaveClass(/sov-orbit-phone/);
+      await expect(page.locator('#services-overview .sov-grid')).toBeHidden();
+      await expect(page.locator('#services-overview .sov-orbit-controls')).toBeVisible();
+      await arrive(page);
+      await expect(count(page)).toHaveText('01 / 05');
+      await expect(page.locator('#services-overview .sov-orbit-prev')).toBeDisabled();
+      const w = await page.locator('#services-overview .sov-orbit-card').first().evaluate(e => e.offsetWidth);
+      expect(w).toBe(312); // min(80vw, 26rem), as on the study page
     });
 
+    test('next and previous buttons turn one card', async ({ page }) => {
+      await page.goto('/');
+      await arrive(page);
+      await page.locator('#services-overview .sov-orbit-next').click();
+      await page.waitForTimeout(SETTLE_MS);
+      expect(await position(page)).toBe('1');
+      await expect(count(page)).toHaveText('02 / 05');
+      await page.locator('#services-overview .sov-orbit-prev').click();
+      await page.waitForTimeout(SETTLE_MS);
+      expect(await position(page)).toBe('0');
+    });
+
+    test('only the front card shows its words', async ({ page }) => {
+      await page.goto('/');
+      await arrive(page);
+      const words = await page.locator('#services-overview .sov-orbit-copy')
+        .evaluateAll(els => els.map(e => Number(getComputedStyle(e).opacity)));
+      expect(words[0]).toBe(1);
+      expect(words[1]).toBe(0);
+    });
+
+    test('the front card sits close under the heading', async ({ page }) => {
+      await page.goto('/');
+      await arrive(page);
+      const title = await rect(page, '#services-overview .sov-orbit-title');
+      const card = await rect(page, '#services-overview .sov-orbit-card');
+      const navBottom = await page.locator('#navbar').evaluate(n => n.getBoundingClientRect().bottom);
+      expect(title.top).toBeGreaterThanOrEqual(navBottom);
+      expect(card.top - title.bottom).toBeLessThanOrEqual(110);
+      expect(card.top - title.bottom).toBeGreaterThanOrEqual(24);
+    });
+
+    test('the next card peeks out below the front card instead of covering it', async ({ page }) => {
+      await page.goto('/');
+      await arrive(page);
+      const front = await rect(page, '#services-overview .sov-orbit-card:nth-child(1)');
+      const next = await rect(page, '#services-overview .sov-orbit-card:nth-child(2)');
+      expect(next.top).toBeGreaterThanOrEqual(front.bottom - 2);
+    });
+
+    test('a swipe up turns one card', async ({ page, browserName }) => {
+      test.skip(browserName !== 'chromium', 'touch is driven through the Chrome DevTools protocol');
+      await page.goto('/');
+      await arrive(page);
+      const cdp = await page.context().newCDPSession(page);
+      const touch = (type, y) => cdp.send('Input.dispatchTouchEvent', {
+        type, touchPoints: type === 'touchEnd' ? [] : [{ x: 195, y }] });
+      await touch('touchStart', 600);
+      for (let y = 580; y >= 420; y -= 20) await touch('touchMove', y);
+      await touch('touchEnd');
+      await page.waitForTimeout(SETTLE_MS);
+      expect(await position(page)).toBe('1');
+    });
+
+    test('back-to-top button stays off the Next button', async ({ page }) => {
+      await page.goto('/');
+      await arrive(page);
+      await expect(page.locator('#backToTop')).toBeHidden();
+      await expect(page.locator('#services-overview .sov-orbit-next')).toBeVisible();
+    });
+
+    test('no horizontal overflow on a phone', async ({ page }) => {
+      await page.goto('/');
+      await arrive(page);
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      expect(overflow).toBeLessThanOrEqual(0);
+    });
+  });
+
+  test.describe('Services orbit — landscape phone', () => {
+    test.use({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true });
+
+    test('landscape phone shows the orbit', async ({ page }) => {
+      await page.addInitScript(skipIntro);
+      await page.goto('/');
+      await expect(section(page)).toHaveClass(/sov-orbit-phone/);
+      await arrive(page);
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      expect(overflow).toBeLessThanOrEqual(0);
+    });
+  });
+
+  test.describe('Services orbit — tablets keep the list', () => {
     test.describe('tablet', () => {
       test.use({ viewport: { width: 1024, height: 768 }, hasTouch: true });
 
