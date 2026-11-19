@@ -1919,6 +1919,9 @@ body.intro-active #heroScroll { opacity: 0; }
   flex-direction: column;
   gap: 0.5rem;
 }
+/* Services spiral hooks: shown only inside #services-overview.sov-spiral-on
+   (desktop), so phones/tablets/reduced motion keep today's layout exactly. */
+.sov-sa, .sov-sa-sep, .sov-meaning, .sov-counter, .sov-step { display: none; }
 .sov-card::after {
   content: '';
   position: absolute;
