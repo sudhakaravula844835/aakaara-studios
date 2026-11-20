@@ -282,11 +282,34 @@ nav.scrolled {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  /* Depth layers via drop-shadow (works on gradient/transparent text) */
-  filter: drop-shadow(0 4px 18px rgba(201,149,107,0.18))
-          drop-shadow(0 12px 40px rgba(0,0,0,0.35));
-  will-change: transform;
+  /* Film halation + depth via stacked drop-shadows (works on gradient/transparent text):
+     hot warm-white core → red-orange bleed → wide red halo → dark depth shadow.
+     Drop-shadows compound, so each layer's alpha is kept moderate.
+     heroHalation slowly breathes the glow; static under reduced motion. */
+  filter: drop-shadow(0 0 1px rgba(255, 234, 212, 0.5))
+          drop-shadow(0 0 6px rgba(255, 110, 62, 0.36))
+          drop-shadow(0 0 20px rgba(210, 66, 34, 0.24))
+          drop-shadow(0 12px 40px rgba(0, 0, 0, 0.35));
+  animation: heroHalation 7s ease-in-out infinite;
+  will-change: transform, filter;
   transform-style: preserve-3d;
+}
+@keyframes heroHalation {
+  0%, 100% {
+    filter: drop-shadow(0 0 1px rgba(255, 234, 212, 0.5))
+            drop-shadow(0 0 6px rgba(255, 110, 62, 0.36))
+            drop-shadow(0 0 20px rgba(210, 66, 34, 0.24))
+            drop-shadow(0 12px 40px rgba(0, 0, 0, 0.35));
+  }
+  50% {
+    filter: drop-shadow(0 0 1.5px rgba(255, 236, 216, 0.58))
+            drop-shadow(0 0 8px rgba(255, 110, 62, 0.44))
+            drop-shadow(0 0 26px rgba(214, 66, 34, 0.32))
+            drop-shadow(0 12px 40px rgba(0, 0, 0, 0.35));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-title { animation: none; }
 }
 /* hero-content gets perspective so child 3D transforms are projected correctly */
 .hero-content {
