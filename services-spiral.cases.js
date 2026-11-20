@@ -113,9 +113,34 @@ module.exports = function defineSpiralTests(test, expect) {
     test('only the front card and the next one load their video', async ({ page }) => {
       await page.goto('/');
       await arrive(page);
-      const loaded = await page.locator('#services-overview .sov-orbit-card video source')
-        .evaluateAll(els => els.map(s => !!s.getAttribute('src')));
-      expect(loaded).toEqual([true, true, false, false, false]);
+      // Card 1 streams from Bunny (HLS), so no MP4 of its own; card 2 warms up
+      // its MP4; cards 3–5 load nothing yet. (hls.js may add its own blob:
+      // <source>, so look for an actual .mp4, not just any src.)
+      const mp4 = await page.locator('#services-overview .sov-orbit-card video').evaluateAll(vs => vs.map(v =>
+        /\.mp4$/.test(v.getAttribute('src') || '') ||
+        [...v.querySelectorAll('source')].some(s => /\.mp4$/.test(s.getAttribute('src') || ''))));
+      const state = await page.locator('#services-overview .sov-orbit-card video').first().getAttribute('data-hls-state');
+      expect(mp4, `Weddings stream state: ${state}`).toEqual([false, true, false, false, false]);
+    });
+
+    test('the Weddings card falls back to its MP4 if the stream fails', async ({ page }) => {
+      await page.route('**/caaee9e1-dc0f-4aff-a41f-80eb9b0e6303/**', route => route.abort());
+      await page.goto('/');
+      await arrive(page);
+      const video = page.locator('#services-overview .sov-orbit-card').first().locator('video');
+      await expect.poll(() => video.getAttribute('data-hls-state'), { timeout: 20000 }).toMatch(/^fallback/);
+      await expect.poll(() => video.evaluate(v => v.currentSrc), { timeout: 10000 }).toMatch(/wedding-showreel\.mp4$/);
+    });
+
+    test('the Weddings card streams its 4K reel from Bunny', async ({ page }) => {
+      await page.goto('/');
+      await arrive(page);
+      const video = page.locator('#services-overview .sov-orbit-card').first().locator('video');
+      await expect(video).toHaveAttribute('data-hls', /caaee9e1-dc0f-4aff-a41f-80eb9b0e6303\/playlist\.m3u8$/);
+      // hls.js plays through a blob: MediaSource; Safari plays the .m3u8 natively.
+      await expect.poll(() => video.evaluate(v => v.currentSrc), { timeout: 15000 })
+        .toMatch(/^blob:|\.m3u8$/);
+      await expect.poll(() => video.evaluate(v => v.readyState), { timeout: 15000 }).toBeGreaterThanOrEqual(2);
     });
 
     test('reduced motion still turns, without the glide', async ({ page }) => {

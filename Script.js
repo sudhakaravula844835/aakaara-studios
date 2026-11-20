@@ -4178,13 +4178,74 @@ document.addEventListener('click', (e) => {
   /* ─── Video: a card starts when it first reaches the front ─── */
   var videos = cards.map(function (card) { return card.querySelector('video'); });
   var started = videos.map(function () { return false; });
-  function loadVideo(video, preload) {
+  function loadMp4(video, preload) {
     var source = video && video.querySelector('source[data-src]');
     if (!source) return;
     source.src = source.getAttribute('data-src');
     source.removeAttribute('data-src');
     video.preload = preload;
     video.load();
+  }
+  // A card whose <video> has data-hls streams from Bunny instead (adaptive, up
+  // to 4K): native HLS on Safari, hls.js elsewhere, capped to the card's size
+  // so a 448px card never pulls the 4K rendition. Its MP4 <source> is only the
+  // fallback. HLS cards start when they reach the front (no metadata warm-up).
+  function loadVideo(video, preload) {
+    if (!video) return;
+    var hlsUrl = video.getAttribute('data-hls');
+    if (!hlsUrl) { loadMp4(video, preload); return; }
+    if (preload !== 'auto' || video.dataset.hlsState) return;
+    video.dataset.hlsState = 'loading';
+    // hls.js may replace the <video>'s <source> children with its own (Managed
+    // MediaSource), so keep the MP4 fallback URL aside and drop that <source>.
+    var mp4Source = video.querySelector('source[data-src]');
+    var mp4Url = mp4Source && mp4Source.getAttribute('data-src');
+    if (mp4Source) mp4Source.remove();
+    function useMp4(reason) {
+      video.dataset.hlsState = 'fallback: ' + reason;
+      video.removeAttribute('src');
+      if (mp4Url) { video.src = mp4Url; video.preload = 'auto'; video.load(); }
+      syncVideos();
+    }
+    function playNative() {
+      // No MediaSource (older iPhones): the browser's own HLS player.
+      if (!video.canPlayType('application/vnd.apple.mpegurl')) throw new Error('no HLS');
+      video.src = hlsUrl;
+      video.addEventListener('error', function () { useMp4('native error'); }, { once: true });
+      syncVideos();
+    }
+    // Prefer hls.js wherever it runs: unlike native HLS it can cap the rendition
+    // to the card's size and start from a sensible quality.
+    ensureHlsLibrary().then(function (HlsCtor) {
+      if (!HlsCtor || !HlsCtor.isSupported()) { playNative(); return; }
+      var hls = new HlsCtor({
+        capLevelToPlayerSize: true,          // a 448px card never pulls 1440p/4K
+        abrEwmaDefaultEstimate: 5000000      // open near 720p, not 240p, then adapt
+      });
+      var recovered = false;
+      var manifestLoaded = false;
+      hls.on(HlsCtor.Events.MANIFEST_PARSED, function () { manifestLoaded = true; });
+      hls.on(HlsCtor.Events.ERROR, function (event, data) {
+        if (!data || !data.fatal) return;
+        video.dataset.hlsLastError = data.type + ' / ' + data.details;
+        // Once the stream is playing, one recovery attempt for a network blip or
+        // decode hiccup. If the playlist itself never loaded, there is nothing to
+        // resume (startLoad would sit idle), so go straight to the MP4.
+        if (manifestLoaded && !recovered && data.type === HlsCtor.ErrorTypes.NETWORK_ERROR) { recovered = true; hls.startLoad(); return; }
+        if (manifestLoaded && !recovered && data.type === HlsCtor.ErrorTypes.MEDIA_ERROR) { recovered = true; hls.recoverMediaError(); return; }
+        hls.destroy(); // stream still failing: fall back to the bundled MP4
+        useMp4(data.type + ' / ' + data.details);
+      });
+      video.dataset.hlsState = 'hls.js';
+      hls.loadSource(hlsUrl);
+      hls.attachMedia(video);
+      syncVideos();
+    }).catch(function (err) {
+      // Library couldn't load (or no HLS at all): native HLS, else the MP4.
+      try { playNative(); video.dataset.hlsState = 'native'; } catch (e) {
+        useMp4((err && err.message) || 'hls.js unavailable');
+      }
+    });
   }
   function syncVideos() {
     if (on && visible && announcedCard >= 0 && !started[announcedCard]) {
