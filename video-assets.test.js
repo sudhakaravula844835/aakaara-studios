@@ -15,7 +15,32 @@ function getAttr(markup, attr) {
   return markup.match(new RegExp(`${attr}="([^"]*)"`))?.[1] || '';
 }
 
+function getPreweddingCardTitles() {
+  return Array.from(
+    html.matchAll(/<div\b[^>]*class="[^"]*vw-card[^"]*"[^>]*data-vcat="prewedding"[^>]*data-title="([^"]+)"[^>]*>/g),
+    match => match[1]
+  );
+}
+
 describe('video asset wiring', () => {
+  it('places Nisaanth & Vasavi third among pre-wedding films', () => {
+    expect(getPreweddingCardTitles().slice(0, 3)).toEqual([
+      'Abhinav &amp; Megha',
+      'Siri &amp; Tharun',
+      'Nisaanth &amp; Vasavi',
+    ]);
+  });
+
+  it('wires the Nisaanth & Vasavi Chicago pre-wedding HLS card and cover', () => {
+    const card = getVideoCard('Nisaanth &amp; Vasavi');
+
+    expect(card).toBeTruthy();
+    expect(getAttr(card, 'data-vcat')).toBe('prewedding');
+    expect(getAttr(card, 'data-type')).toBe('Pre-Wedding Film · Chicago');
+    expect(getAttr(card, 'data-poster')).toBe('/images/video-covers/prewedding/nisaanth-vasavi.jpg');
+    expect(getAttr(card, 'data-video')).toBe('https://vz-757250d0-999.b-cdn.net/c1464f58-9334-46bd-adff-0ce86e69ef64/playlist.m3u8');
+  });
+
   it('wires the Manish & Sreeja pre-wedding HLS card', () => {
     const card = getVideoCard('Manish &amp; Sreeja');
 
