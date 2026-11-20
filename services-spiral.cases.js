@@ -84,6 +84,29 @@ module.exports = function defineSpiralTests(test, expect) {
       expect(await position(page)).toBe('0');
     });
 
+    test('a trackpad swipe with its momentum tail turns exactly one card, without backing up', async ({ page }) => {
+      await page.goto('/');
+      await arrive(page);
+      // Record card 1's rotateY every frame: along its path it only ever decreases.
+      await page.evaluate(() => {
+        window.__ry = [];
+        const card = document.querySelector('#services-overview .sov-orbit-card');
+        (function tick() {
+          const m = /rotateY\(([-\d.]+)deg\)/.exec(card.style.transform);
+          if (m) window.__ry.push(+m[1]);
+          requestAnimationFrame(tick);
+        })();
+      });
+      const deltas = [6, 14, 28, 42, 50, 46, 40];
+      for (let d = 34; d > 1; d *= 0.9) deltas.push(Math.round(d)); // ~1 s momentum tail
+      for (const d of deltas) { await page.mouse.wheel(0, d); await page.waitForTimeout(16); }
+      await page.waitForTimeout(SETTLE_MS);
+      expect(await position(page)).toBe('1');
+      const ry = await page.evaluate(() => window.__ry);
+      const backups = ry.slice(1).filter((v, i) => v - ry[i] > 0.05).length;
+      expect(backups).toBe(0);
+    });
+
     test('after the last card the page moves on, and comes back to it', async ({ page }) => {
       await page.goto('/');
       await arrive(page);

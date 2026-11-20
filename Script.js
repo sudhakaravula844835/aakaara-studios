@@ -3948,7 +3948,7 @@ document.addEventListener('click', (e) => {
   // Critically damped spring (units: cards, cards/s): velocity stays continuous,
   // it settles exactly on the target with no overshoot, and requests frames only while moving.
   function createSpiralSpring(render) {
-    var FREQUENCY = 14; // rad/s ≈ 0.45 s response, settles in ~0.75 s
+    var FREQUENCY = 11.4; // rad/s = 2π / 0.55 s — iOS's default spring response; settles in ~0.9 s
     var position = 0, velocity = 0, target = 0;
     var frame = null, lastTime = 0;
 
@@ -3990,27 +3990,6 @@ document.addEventListener('click', (e) => {
     };
   }
 
-  // Wheel and trackpad input moves the target freely; once input pauses the
-  // spiral settles on a whole card. A short deliberate scroll (0.15–1 card)
-  // advances one card; a longer one lands on the nearest.
-  function createSpiralWheel(options) {
-    var origin = null, timer = null;
-    return function nudge(delta) {
-      var target = options.getTarget();
-      if (origin === null) origin = Math.round(target);
-      options.setTarget(Math.max(0, Math.min(options.max, target + delta)));
-      clearTimeout(timer);
-      timer = setTimeout(function () {
-        var current = options.getTarget();
-        var travel = current - origin;
-        var card = Math.abs(travel) >= 0.15 && Math.abs(travel) < 1
-          ? origin + (travel > 0 ? 1 : -1)
-          : Math.round(current);
-        origin = null;
-        options.setTarget(Math.max(0, Math.min(options.max, card)));
-      }, 140);
-    };
-  }
 
   // The spiral turns only while its section sits flush with the viewport. If the
   // wheel arrives while the section is part-way scrolled, glide the page into
@@ -4161,7 +4140,6 @@ document.addEventListener('click', (e) => {
   /* ─── end of study code ──────────────────────────────────────── */
 
   var MAX_PROGRESS = cards.length - 1;
-  var SENSITIVITY = 0.005;   // deltaY of 200 → advance 1 card
   var on = false;
   var isPhone = false;
   var finalPan = 0;
@@ -4258,7 +4236,11 @@ document.addEventListener('click', (e) => {
       // A card faded fully out of view (phone: 2.5+ cards away) pauses to save
       // battery, and resumes when it comes back.
       var cardShown = announcedCard < 0 || slotProps(i - announcedCard).op > 0.01;
-      var shouldPlay = on && visible && started[i] && cardShown;
+      // Only the front card plays; cards turned away hold their frame. Decoding
+      // several videos inside 3D-transformed layers was costing frames mid-turn.
+      // It also holds still for the ~0.6 s of a turn and resumes on landing:
+      // decoding while the card moves in 3D was the main source of dropped frames.
+      var shouldPlay = on && visible && started[i] && cardShown && i === announcedCard && !turning;
       if (shouldPlay && video.paused) {
         var attempt = video.play();
         if (attempt && attempt.catch) attempt.catch(function () {}); // autoplay refused: poster stays
@@ -4269,19 +4251,37 @@ document.addEventListener('click', (e) => {
   }
 
   /* ─── Render ─────────────────────────────────────────────────── */
+  var lastStyles = new WeakMap();
+  function setStyle(el, prop, value) {
+    var cache = lastStyles.get(el);
+    if (!cache) { cache = {}; lastStyles.set(el, cache); }
+    if (cache[prop] === value) return;
+    cache[prop] = value;
+    el.style[prop] = value;
+  }
+  function forgetStyles(el) { lastStyles.delete(el); }
+
   function applyFrame() {
     if (!on) return;
     // Hold the opening framing on card 1, then pan down to open space above the
     // featured card as the earlier cards recede.
     var panProgress = Math.max(0, Math.min(1, (lerpedProgress - 1) / Math.max(1, MAX_PROGRESS - 1)));
     var pan = panProgress * panProgress * (3 - 2 * panProgress);
-    field.style.transform = isPhone ? '' : 'translateY(' + (finalPan * pan).toFixed(3) + 'px)';
+    // Write a style only when its value changes: re-setting z-index on every
+    // card every frame forces Chrome to rebuild the 3D stacking each frame.
+    setStyle(field, 'transform', isPhone ? '' : 'translateY(' + (finalPan * pan).toFixed(2) + 'px)');
+    var props = cards.map(function (card, i) { return slotProps(i - lerpedProgress); });
+    // Stacking: rank cards by depth (nearest on top). The rank only changes when
+    // two cards actually swap depth, so z-index is rewritten a handful of times
+    // per turn instead of every frame.
+    var order = props.map(function (p, i) { return i; })
+      .sort(function (a, b) { return props[a].tz - props[b].tz; });
+    order.forEach(function (cardIndex, rank) { setStyle(cards[cardIndex], 'zIndex', String(rank + 1)); });
     cards.forEach(function (card, i) {
       var offset = i - lerpedProgress;
-      var p = slotProps(offset);
-      card.style.transform = buildTransform(p);
-      if (!entryActive) card.style.opacity = p.op.toFixed(3);
-      card.style.zIndex = String(Math.round(p.tz + 3000)); // featured card in front
+      var p = props[i];
+      setStyle(card, 'transform', buildTransform(p));
+      if (!entryActive) setStyle(card, 'opacity', p.op.toFixed(3));
       // Phone cards overlap, so only the card in focus shows its words; they
       // fade out within the first ~half card of travel and back in on arrival.
       var words = 1;
@@ -4289,7 +4289,7 @@ document.addEventListener('click', (e) => {
         words = Math.max(0, 1 - Math.abs(offset) / 0.45);
         words = words * words * (3 - 2 * words);
       }
-      copies[i].style.opacity = words === 1 ? '' : words.toFixed(3);
+      setStyle(copies[i], 'opacity', words === 1 ? '' : words.toFixed(2));
     });
     var currentCard = Math.round(lerpedProgress);
     if (currentCard !== announcedCard) {
@@ -4304,9 +4304,12 @@ document.addEventListener('click', (e) => {
     if (nextButton) nextButton.disabled = targetProgress >= MAX_PROGRESS;
   }
 
+  var turning = false;
   var motion = createSpiralSpring(function (position) {
     lerpedProgress = position;
     applyFrame();
+    var nowTurning = Math.abs(targetProgress - position) > 0.002;
+    if (nowTurning !== turning) { turning = nowTurning; syncVideos(); }
   });
   // Glide to targetProgress; a velocity (cards/s) hands off a finger's speed.
   function requestTick(handoffVelocity) {
@@ -4314,40 +4317,76 @@ document.addEventListener('click', (e) => {
     if (reducedMotion.matches) motion.jumpTo(targetProgress);
     else motion.moveTo(targetProgress, handoffVelocity);
   }
-  var nudge = createSpiralWheel({
-    max: MAX_PROGRESS,
-    getTarget: function () { return targetProgress; },
-    setTarget: function (value) { targetProgress = value; requestTick(); }
-  });
+  /* ─── Wheel / trackpad: one gesture turns one card ───────────────
+     Paging like iOS: a gesture commits to a turn once it has travelled a
+     little, then the rest of it — including the trackpad's momentum tail,
+     which keeps firing for ~1 s after the fingers lift — is absorbed. Adding
+     those deltas up (the study page's model) overshot the next card and
+     snapped back, which read as a stutter. A gesture ends after a short pause,
+     a change of direction, or a fresh push once the turn has landed (momentum
+     only ever decays, so a rising delta is a new swipe). */
+  var WHEEL_GAP_MS = 200;   // a pause this long ends a gesture
+  var WHEEL_COMMIT_PX = 12; // travel before a gesture commits to a turn
+  var gesture = null;       // { dir, sum, stepped, last, lastAbs }
 
-  /* ─── Wheel capture (as on the study page) ───────────────────── */
+  function trackGesture(dy, now) {
+    var abs = Math.abs(dy);
+    var dir = dy > 0 ? 1 : -1;
+    var settled = Math.abs(targetProgress - lerpedProgress) < 0.02;
+    // Momentum only decays, so a delta that jumps well above the previous one
+    // (once the last turn has landed) is a new swipe, not the tail.
+    var fresh = !gesture || now - gesture.last > WHEEL_GAP_MS || dir !== gesture.dir ||
+      (gesture.stepped && settled && abs >= 10 && abs > gesture.lastAbs * 1.6);
+    if (fresh) gesture = { dir: dir, sum: 0, stepped: false, last: now, lastAbs: abs };
+    gesture.last = now;
+    gesture.lastAbs = abs;
+    return gesture;
+  }
+
+  function turn(direction) {
+    var next = Math.max(0, Math.min(MAX_PROGRESS, Math.round(targetProgress) + direction));
+    if (next === targetProgress) return;
+    targetProgress = next;
+    requestTick();
+  }
+
   window.addEventListener('wheel', function (e) {
     if (!on || !inView || e.ctrlKey || Math.abs(section.getBoundingClientRect().top) > window.innerHeight * 0.49) return;
     var dy = e.deltaY * (e.deltaMode === 1 ? 20 : e.deltaMode === 2 ? window.innerHeight : 1);
+    if (!dy) return;
 
     if (!scrollLocked) {
       // Re-lock when the wheel turns back into the orbit's range.
       if (targetProgress >= MAX_PROGRESS && dy < 0) scrollLocked = true;
       else if (targetProgress <= 0 && dy > 0) scrollLocked = true;
       else return; // still unlocked: let the page scroll
+      gesture = null;
     }
-    // Release at either end once the orbit has settled there.
-    if (targetProgress >= MAX_PROGRESS && dy > 0 && Math.abs(targetProgress - lerpedProgress) < 0.01) {
+
+    var g = trackGesture(dy, e.timeStamp || performance.now());
+    if (g.stepped) { e.preventDefault(); return; } // rest of a gesture that already turned
+
+    // A new gesture pushing outward at a settled end hands the page back.
+    var settled = Math.abs(targetProgress - lerpedProgress) < 0.02;
+    if (g.sum === 0 && settled &&
+        ((targetProgress >= MAX_PROGRESS && dy > 0) || (targetProgress <= 0 && dy < 0))) {
       scrollLocked = false;
-      return;
-    }
-    if (targetProgress <= 0 && dy < 0 && Math.abs(targetProgress - lerpedProgress) < 0.01) {
-      scrollLocked = false;
+      gesture = null;
       return;
     }
 
     e.preventDefault();
     if (!sectionAligned()) {
       alignSection();
+      g.stepped = true; // the gesture that brings the section into place doesn't also turn it
       return;
     }
     finishEntry();
-    nudge(dy * SENSITIVITY);
+    g.sum += dy;
+    if (Math.abs(g.sum) >= WHEEL_COMMIT_PX) {
+      g.stepped = true;
+      turn(g.dir);
+    }
   }, { passive: false });
 
   /* ─── Phone buttons ──────────────────────────────────────────── */
@@ -4533,7 +4572,7 @@ document.addEventListener('click', (e) => {
     entryActive = false;
     entryTimers.forEach(function (timer) { clearTimeout(timer); });
     entryTimers = [];
-    cards.forEach(function (card) { card.style.transition = ''; });
+    cards.forEach(function (card) { card.style.transition = ''; forgetStyles(card); });
     applyFrame();
     requestTick();
   }
@@ -4580,10 +4619,13 @@ document.addEventListener('click', (e) => {
     }
     finishEntry();
     field.style.removeProperty('transform');
+    forgetStyles(field);
     cards.forEach(function (card, i) {
       ['transform', 'opacity', 'z-index', 'transition'].forEach(function (prop) { card.style.removeProperty(prop); });
       card.removeAttribute('aria-hidden');
       copies[i].style.removeProperty('opacity');
+      forgetStyles(card);
+      forgetStyles(copies[i]);
     });
     section.removeAttribute('data-sov-position');
     syncVideos();
