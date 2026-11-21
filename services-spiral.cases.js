@@ -233,7 +233,7 @@ module.exports = function defineSpiralTests(test, expect) {
       await expect(count(page)).toHaveText('01 / 05');
       await expect(page.locator('#services-overview .sov-orbit-prev')).toBeDisabled();
       const w = await page.locator('#services-overview .sov-orbit-card').first().evaluate(e => e.offsetWidth);
-      expect(w).toBe(312); // min(80vw, 26rem), as on the study page
+      expect(w).toBe(242); // min(62vw, 20rem): narrower, so the tower's neighbours show
     });
 
     test('next and previous buttons turn one card', async ({ page }) => {
@@ -264,16 +264,53 @@ module.exports = function defineSpiralTests(test, expect) {
       const card = await rect(page, '#services-overview .sov-orbit-card');
       const navBottom = await page.locator('#navbar').evaluate(n => n.getBoundingClientRect().bottom);
       expect(title.top).toBeGreaterThanOrEqual(navBottom);
-      expect(card.top - title.bottom).toBeLessThanOrEqual(110);
+      expect(card.top - title.bottom).toBeLessThanOrEqual(140);
       expect(card.top - title.bottom).toBeGreaterThanOrEqual(24);
     });
 
-    test('the next card peeks out below the front card instead of covering it', async ({ page }) => {
+    test('the front card faces you, centred, with a neighbour turned away on each side', async ({ page }) => {
       await page.goto('/');
       await arrive(page);
-      const front = await rect(page, '#services-overview .sov-orbit-card:nth-child(1)');
-      const next = await rect(page, '#services-overview .sov-orbit-card:nth-child(2)');
-      expect(next.top).toBeGreaterThanOrEqual(front.bottom - 2);
+      await page.locator('#services-overview .sov-orbit-next').click(); // front = card 2, so both sides exist
+      await page.waitForTimeout(SETTLE_MS);
+      const boxes = await page.locator('#services-overview .sov-orbit-card').evaluateAll(els => els.map(e => {
+        const r = e.getBoundingClientRect();
+        return { cx: (r.left + r.right) / 2, cy: (r.top + r.bottom) / 2, w: r.width, h: r.height, op: Number(getComputedStyle(e).opacity) };
+      }));
+      const vw = 390;
+      expect(Math.abs(boxes[1].cx - vw / 2)).toBeLessThanOrEqual(4);
+      expect(boxes[0].cx).toBeLessThan(boxes[1].cx - 40);        // previous card off to the left
+      expect(boxes[2].cx).toBeGreaterThan(boxes[1].cx + 40);     // next card off to the right
+      // Beside the front card, a step up or down — not stacked clear above or below it.
+      expect(Math.abs(boxes[0].cy - boxes[1].cy)).toBeLessThan(boxes[1].h * 0.75);
+      expect(Math.abs(boxes[2].cy - boxes[1].cy)).toBeLessThan(boxes[1].h * 0.75);
+      expect(boxes[0].w).toBeLessThan(boxes[1].w);               // turned away = foreshortened
+      expect(boxes[2].w).toBeLessThan(boxes[1].w);
+      expect(boxes[0].op).toBeGreaterThanOrEqual(0.35);
+      expect(boxes[2].op).toBeGreaterThanOrEqual(0.35);
+    });
+
+    test('the tower steps down: each later card sits lower than the one before', async ({ page }) => {
+      await page.goto('/');
+      await arrive(page);
+      const mids = await page.locator('#services-overview .sov-orbit-card')
+        .evaluateAll(els => els.slice(0, 3).map(e => { const r = e.getBoundingClientRect(); return r.top + r.height / 2; }));
+      expect(mids[1]).toBeGreaterThan(mids[0]);
+      expect(mids[2]).toBeGreaterThan(mids[1]);
+    });
+
+    test('rotating the phone keeps the current card', async ({ page }) => {
+      await page.goto('/');
+      await arrive(page);
+      await page.locator('#services-overview .sov-orbit-next').click();
+      await page.waitForTimeout(SETTLE_MS);
+      await page.setViewportSize({ width: 844, height: 390 });
+      await page.waitForTimeout(600);
+      await expect(section(page)).toHaveClass(/sov-orbit-phone/);
+      expect(await position(page)).toBe('1');
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.waitForTimeout(600);
+      expect(await position(page)).toBe('1');
     });
 
     test('a swipe up turns one card', async ({ page, browserName }) => {

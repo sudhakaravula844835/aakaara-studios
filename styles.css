@@ -2195,13 +2195,13 @@ body.intro-active #heroScroll { opacity: 0; }
    below the front card instead of covering it. */
 .sov-orbit-controls { display: none; }
 #services-overview.sov-orbit-phone {
-  --sov-orbit-card-w: min(80vw, 26rem);
-  --sov-orbit-spacing: 1.55;
+  /* Tower: narrower cards so a neighbour shows on each side of the front one.
+     The ring's radius is a multiple of the card width (read by Script.js). */
+  --sov-orbit-card-w: min(62vw, 20rem);
+  --sov-orbit-tower-radius: 0.85;   /* ring radius, in card widths */
+  --sov-orbit-tower-step: 38;       /* degrees between neighbours */
+  --sov-orbit-tower-rise: 0.42;     /* drop per card, in card widths */
   --sov-orbit-nav: 76px;
-  /* Front card's top edge, measured from the stage top: 2.5rem clears the
-     stage's top fade band. Its centre (also the perspective origin) follows. */
-  --sov-orbit-front-top: 2.5rem;
-  --sov-orbit-front-y: calc(var(--sov-orbit-front-top) + var(--sov-orbit-card-w) * 0.352113);
   height: 100svh;
   min-height: 32rem;
 }
@@ -2212,30 +2212,27 @@ body.intro-active #heroScroll { opacity: 0; }
 }
 .sov-orbit-phone .sov-orbit-kicker { letter-spacing: 0.25em; }
 .sov-orbit-phone .sov-orbit-title { font-size: clamp(2.4rem, 10vw, 3.2rem); max-width: 17ch; line-height: 0.98; }
+/* The tower stands in the space between the heading and the controls. Cards
+   past 90° hide their backs instead of showing mirrored. No preserve-3d: the
+   tucked cards never intersect, so Script.js's depth-ranked z-index orders
+   them (Chrome draws translucent cards above opaque ones in a 3D context). */
 .sov-orbit-phone .sov-orbit-stage {
   inset: calc(var(--sov-orbit-nav) + 7.5rem) 0 6.5rem;   /* starts right under the heading */
   overflow: hidden;
-  /* Cards passing the top or bottom of the stage dissolve over a short band
-     instead of being sliced by the edge. */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 2.25rem, #000 calc(100% - 3rem), transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 2.25rem, #000 calc(100% - 3rem), transparent 100%);
 }
-/* Phone cards overlap their neighbours, so draw them in true 3D depth: the
-   front card changes along the moving intersection instead of popping. */
 .sov-orbit-phone .sov-orbit-field {
-  perspective: calc(var(--sov-orbit-card-w) * 3.392857);
-  perspective-origin: 50% var(--sov-orbit-front-y);
-  transform-style: preserve-3d;
+  perspective: calc(var(--sov-orbit-card-w) * 3.2);
+  perspective-origin: 50% 42%;
 }
-/* `top` is the card's centre before its transform; the front card's transform
-   lifts it by 25% of its height × spacing, so add that back. */
 .sov-orbit-phone .sov-orbit-card {
-  top: calc(var(--sov-orbit-front-y) + var(--sov-orbit-card-w) * 0.704225 * 0.25 * var(--sov-orbit-spacing));
+  top: 42%;
   border-radius: 1rem;
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 .sov-orbit-phone .sov-orbit-copy { left: 1rem; right: 1rem; bottom: 1rem; }
-.sov-orbit-phone .sov-orbit-card-title { font-size: 1.55rem; }
+.sov-orbit-phone .sov-orbit-card-title { font-size: 1.3rem; }
 .sov-orbit-phone .sov-orbit-sub { font-size: 0.78rem; }
 .sov-orbit-phone .sov-orbit-meta { display: none; }
 .sov-orbit-phone .sov-orbit-controls {
@@ -2275,7 +2272,8 @@ body.intro-active #heroScroll { opacity: 0; }
    left column and the spiral gets the full height on the right. */
 @media (max-width: 959px) and (max-height: 500px) {
   #services-overview.sov-orbit-phone {
-    --sov-orbit-card-w: min(40vw, 62svh);
+    --sov-orbit-card-w: min(34vw, 50svh);
+    --sov-orbit-tower-rise: 0.3;
     --sov-orbit-nav: 96px;
     min-height: 0;
   }
@@ -2291,9 +2289,9 @@ body.intro-active #heroScroll { opacity: 0; }
   }
   .sov-orbit-phone .sov-orbit-title { max-width: 9ch; font-size: clamp(1.9rem, 4.4vw, 2.6rem); }
   .sov-orbit-phone .sov-orbit-stage { inset: var(--sov-orbit-nav) 0 0.5rem 36%; }
-  .sov-orbit-phone .sov-orbit-field { perspective-origin: 50% 48%; }
+  .sov-orbit-phone .sov-orbit-field { perspective-origin: 50% 50%; }
   .sov-orbit-phone .sov-orbit-card { top: 50%; }
-  .sov-orbit-phone .sov-orbit-card-title { font-size: 1.2rem; }
+  .sov-orbit-phone .sov-orbit-card-title { font-size: 1rem; }
   .sov-orbit-phone .sov-orbit-controls {
     left: max(1.5rem, env(safe-area-inset-left));
     right: auto;

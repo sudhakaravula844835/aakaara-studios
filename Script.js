@@ -4072,36 +4072,32 @@ document.addEventListener('click', (e) => {
     return p;
   }
 
-  // Phone slots use the same renderer with a tighter arc and two previews.
-  var phoneWaiting = [
-    spiralProps(0),
-    { tx: 11, ty: 55, tz: -650, ry: 35 },
-    { tx: -2, ty: 110, tz: -1250, ry: 65 },
-    { tx: -8, ty: 155, tz: -1800, ry: 140 },
-    { tx: -18, ty: 180, tz: -2200, ry: 180 },
-    { tx: -28, ty: 205, tz: -2600, ry: 220 }
-  ];
-  var phonePast = [
-    spiralProps(0),
-    { tx: -12, ty: -105, tz: -700, ry: -40 },
-    { tx: -9, ty: -180, tz: -1400, ry: -90 },
-    { tx: -4, ty: -225, tz: -1800, ry: -140 },
-    { tx: 0, ty: -255, tz: -2200, ry: -180 },
-    { tx: 4, ty: -285, tz: -2600, ry: -220 }
-  ];
-  var phoneWaitingTangents = pathTangents(phoneWaiting, { tx: 14, ty: 80, tz: 0, ry: 42 });
-  var phonePastTangents = pathTangents(phonePast, { tx: -14, ty: -80, tz: 0, ry: -42 });
+  // Phones: a tower. Cards sit on a ring, each one a step lower than the last;
+  // the front card faces you and its neighbours turn away to either side.
+  // Radius, step and drop come from the phone CSS (measurePath). tx/ty/tz are
+  // in card widths (buildTransform scales them).
+  var towerRadius = 0.85, towerStep = 38, towerRise = 0.42;
+  function towerProps(offset) {
+    var a = offset * towerStep * Math.PI / 180;
+    var facing = Math.cos(a);
+    // Cards two away turn nearly edge-on: fade them out so they don't read as slivers.
+    var shown = Math.max(0, Math.min(1, (1.9 - Math.abs(offset)) / 0.6));
+    var light = Math.max(0, Math.min(1, 0.3 + 0.7 * facing));
+    return {
+      tx: Math.sin(a) * towerRadius,
+      ty: offset * towerRise,
+      // Pull each card back by the depth its near edge swings forward, so a
+      // turned neighbour tucks behind the front card instead of cutting through it.
+      tz: (facing - 1) * towerRadius - Math.abs(Math.sin(a)) * 0.5,
+      ry: offset * towerStep,
+      sc: 1,
+      op: shown * shown * (3 - 2 * shown) * light
+    };
+  }
 
   function slotProps(offset) {
+    if (isPhone) return towerProps(offset);
     var p = spiralProps(offset);
-    if (isPhone) {
-      p = offset < 0
-        ? samplePath(p, phonePast, phonePastTangents, -offset)
-        : samplePath(p, phoneWaiting, phoneWaitingTangents, offset);
-      var shown = Math.max(0, Math.min(1, (2.5 - Math.abs(offset)) / 1.5));
-      p.op = shown * shown * (3 - 2 * shown);
-      return p;
-    }
     if (offset < 0) return samplePath(p, pastSlots, pastTangents, -offset);
     if (offset <= 1) return p;
     return samplePath(p, waitingSlots, waitingTangents, offset - 1);
@@ -4119,17 +4115,18 @@ document.addEventListener('click', (e) => {
     pathCardHeight = 35 * rem / 1.42;
     spacing = parseFloat(getComputedStyle(section).getPropertyValue('--sov-orbit-spacing')) || 1;
     cardWidth = cards[0].offsetWidth || cardWidth;
+    var css = getComputedStyle(section);
+    towerRadius = parseFloat(css.getPropertyValue('--sov-orbit-tower-radius')) || 0.85;
+    towerStep = parseFloat(css.getPropertyValue('--sov-orbit-tower-step')) || 38;
+    towerRise = parseFloat(css.getPropertyValue('--sov-orbit-tower-rise')) || 0.42;
   }
 
   function buildTransform(p) {
     if (isPhone) {
-      // As the study's compact renderer: scale x, z and perspective with the card
-      // so phone cards keep their shape. Spacing spreads x and y only.
-      return 'translateX(' + (p.tx * cardWidth * 0.03 * spacing).toFixed(3) + 'px) ' +
-        'translateY(' + (p.ty * spacing).toFixed(3) + '%) ' +
-        'translateZ(' + (p.tz * cardWidth / 560).toFixed(2) + 'px) ' +
-        'rotateY(' + p.ry.toFixed(3) + 'deg) ' +
-        'scale(' + p.sc.toFixed(4) + ')';
+      return 'translate3d(' + (p.tx * cardWidth).toFixed(2) + 'px, ' +
+        (p.ty * cardWidth).toFixed(2) + 'px, ' +
+        (p.tz * cardWidth).toFixed(2) + 'px) ' +
+        'rotateY(' + p.ry.toFixed(3) + 'deg)';
     }
     return 'translateX(' + (p.tx * spacing).toFixed(3) + 'vw) ' +
       'translateY(' + (p.ty * pathCardHeight * spacing / 100).toFixed(2) + 'px) ' +
