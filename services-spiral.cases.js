@@ -313,18 +313,96 @@ module.exports = function defineSpiralTests(test, expect) {
       expect(await position(page)).toBe('1');
     });
 
-    test('a swipe up turns one card', async ({ page, browserName }) => {
-      test.skip(browserName !== 'chromium', 'touch is driven through the Chrome DevTools protocol');
+    // Touch is driven through the Chrome DevTools protocol, so these run in Chromium only.
+    async function swipe(page, from, to, steps = 8) {
+      const cdp = await page.context().newCDPSession(page);
+      const send = (type, p) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: p ? [p] : [] });
+      await send('touchStart', { x: from.x, y: from.y });
+      for (let i = 1; i <= steps; i++) await send('touchMove', {
+        x: from.x + (to.x - from.x) * i / steps, y: from.y + (to.y - from.y) * i / steps });
+      await send('touchEnd');
+      await page.waitForTimeout(SETTLE_MS);
+    }
+    const LEFT = [{ x: 320, y: 500 }, { x: 60, y: 500 }];
+    const RIGHT = [{ x: 60, y: 500 }, { x: 320, y: 500 }];
+    const cdpOnly = browserName => test.skip(browserName !== 'chromium', 'touch is driven through the Chrome DevTools protocol');
+
+    test('a swipe left turns exactly one card', async ({ page, browserName }) => {
+      cdpOnly(browserName);
       await page.goto('/');
       await arrive(page);
-      const cdp = await page.context().newCDPSession(page);
-      const touch = (type, y) => cdp.send('Input.dispatchTouchEvent', {
-        type, touchPoints: type === 'touchEnd' ? [] : [{ x: 195, y }] });
-      await touch('touchStart', 600);
-      for (let y = 580; y >= 420; y -= 20) await touch('touchMove', y);
-      await touch('touchEnd');
-      await page.waitForTimeout(SETTLE_MS);
+      await swipe(page, ...LEFT);
       expect(await position(page)).toBe('1');
+      await swipe(page, { x: 370, y: 500 }, { x: 10, y: 500 }); // a long swipe still turns only one
+      expect(await position(page)).toBe('2');
+    });
+
+    test('a swipe right goes back one card', async ({ page, browserName }) => {
+      cdpOnly(browserName);
+      await page.goto('/');
+      await arrive(page);
+      await swipe(page, ...LEFT);
+      expect(await position(page)).toBe('1');
+      await swipe(page, ...RIGHT);
+      expect(await position(page)).toBe('0');
+    });
+
+    test('a vertical swipe scrolls the page and never turns the tower', async ({ page, browserName }) => {
+      cdpOnly(browserName);
+      await page.goto('/');
+      await arrive(page);
+      const before = await scrollY(page);
+      await swipe(page, { x: 195, y: 650 }, { x: 195, y: 250 });
+      expect(await position(page)).toBe('0');
+      expect(await scrollY(page)).toBeGreaterThanOrEqual(before + 100);
+    });
+
+    test('a diagonal swipe scrolls the page', async ({ page, browserName }) => {
+      cdpOnly(browserName);
+      await page.goto('/');
+      await arrive(page);
+      const before = await scrollY(page);
+      await swipe(page, { x: 260, y: 650 }, { x: 120, y: 380 });
+      expect(await position(page)).toBe('0');
+      expect(await scrollY(page)).toBeGreaterThan(before);
+    });
+
+    test('swiping outward at the ends does nothing', async ({ page, browserName }) => {
+      cdpOnly(browserName);
+      await page.goto('/');
+      await arrive(page);
+      await swipe(page, ...RIGHT);
+      expect(await position(page)).toBe('0');
+      for (let i = 0; i < 4; i++) {
+        await page.locator('#services-overview .sov-orbit-next').click();
+        await page.waitForTimeout(SETTLE_MS);
+      }
+      expect(await position(page)).toBe('4');
+      await swipe(page, ...LEFT);
+      expect(await position(page)).toBe('4');
+    });
+
+    test('after a swipe only the new front card plays', async ({ page, browserName }) => {
+      cdpOnly(browserName);
+      await page.goto('/');
+      await arrive(page);
+      await swipe(page, ...LEFT);
+      const videos = page.locator('#services-overview .sov-orbit-video');
+      await expect.poll(() => videos.nth(1).evaluate(v => v.paused), { timeout: 8000 }).toBe(false);
+      const paused = await videos.evaluateAll(vs => vs.map(v => v.paused));
+      paused.forEach((p, i) => { if (i !== 1) expect(p).toBe(true); });
+    });
+
+    test('the hint says to swipe sideways', async ({ page }) => {
+      await page.goto('/');
+      await arrive(page);
+      const hint = page.locator('#services-overview .sov-orbit-gesture');
+      await expect(hint).toHaveText('Swipe to explore');
+      for (let i = 0; i < 4; i++) {
+        await page.locator('#services-overview .sov-orbit-next').click();
+        await page.waitForTimeout(SETTLE_MS);
+      }
+      await expect(hint).toHaveText('Scroll on to continue');
     });
 
     test('back-to-top button stays off the Next button', async ({ page }) => {

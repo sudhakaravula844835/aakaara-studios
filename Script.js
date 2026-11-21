@@ -4293,7 +4293,7 @@ document.addEventListener('click', (e) => {
       announcedCard = currentCard;
       section.setAttribute('data-sov-position', String(currentCard));
       if (countLabel) countLabel.textContent = String(currentCard + 1).padStart(2, '0') + ' / ' + String(cards.length).padStart(2, '0');
-      if (gestureLabel) gestureLabel.textContent = currentCard === MAX_PROGRESS ? 'Swipe up to continue' : 'Swipe up to explore';
+      if (gestureLabel) gestureLabel.textContent = currentCard === MAX_PROGRESS ? 'Scroll on to continue' : 'Swipe to explore';
       cards.forEach(function (card, index) { card.setAttribute('aria-hidden', String(index !== currentCard)); });
       syncVideos();
     }
@@ -4404,6 +4404,11 @@ document.addEventListener('click', (e) => {
     var maximum = options.max;
     var gesture = null;
     var threshold = 6;
+    // 'y': an upward finger advances (the study page). 'x': a leftward finger
+    // advances, and only a mostly-sideways gesture is taken; anything else
+    // stays native so the page scrolls.
+    var horizontal = options.axis === 'x';
+    function along(touch) { return horizontal ? touch.clientX : touch.clientY; }
     var interactive = 'a,button,input,select,textarea,summary,video,audio,' +
       '[contenteditable]:not([contenteditable="false"]),[role="button"],' +
       '[role="link"],[tabindex]';
@@ -4444,7 +4449,7 @@ document.addEventListener('click', (e) => {
         identifier: touch.identifier,
         x: touch.clientX,
         y: touch.clientY,
-        lastY: touch.clientY,
+        lastP: along(touch),
         lastTime: event.timeStamp,
         velocity: 0,
         captured: false
@@ -4465,21 +4470,21 @@ document.addEventListener('click', (e) => {
         cancel();
         return;
       }
-      var dx = touch.clientX - gesture.x;
-      var travel = gesture.y - touch.clientY; // An upward finger advances.
+      var cross = horizontal ? touch.clientY - gesture.y : touch.clientX - gesture.x;
+      var travel = horizontal ? gesture.x - touch.clientX : gesture.y - touch.clientY;
       var elapsed = event.timeStamp - gesture.lastTime;
       if (elapsed > 0) {
-        var sampleVelocity = (gesture.lastY - touch.clientY) / elapsed;
+        var sampleVelocity = (gesture.lastP - along(touch)) / elapsed;
         gesture.velocity = elapsed > 120 ? sampleVelocity
           : 0.6 * sampleVelocity + 0.4 * gesture.velocity;
       }
-      gesture.lastY = touch.clientY;
+      gesture.lastP = along(touch);
       gesture.lastTime = event.timeStamp;
 
       if (!gesture.captured) {
-        if (Math.max(Math.abs(dx), Math.abs(travel)) < threshold) return;
-        if (Math.abs(dx) >= Math.abs(travel)) {
-          gesture = null; // Let a horizontal gesture remain native.
+        if (Math.max(Math.abs(cross), Math.abs(travel)) < threshold) return;
+        if (Math.abs(cross) >= Math.abs(travel)) {
+          gesture = null; // Let a gesture across the axis remain native.
           return;
         }
         var progress = clamp(options.getProgress(), 0, maximum);
@@ -4499,6 +4504,7 @@ document.addEventListener('click', (e) => {
         gesture.maximum = Math.min(maximum, gesture.originIndex + 1);
         gesture.distance = options.getStepDistance
           ? Math.max(1, options.getStepDistance())
+          : horizontal ? clamp(element.clientWidth * 0.35, 110, 220)
           : clamp(element.clientHeight * 0.4, 180, 360);
         gesture.progress = progress;
         if (options.onCapture) options.onCapture();
@@ -4520,7 +4526,9 @@ document.addEventListener('click', (e) => {
         return;
       }
       var touch = findTouch(event.changedTouches, gesture.identifier);
-      var travel = gesture.y - (touch ? touch.clientY : gesture.lastY);
+      var travel = horizontal
+        ? gesture.x - (touch ? touch.clientX : gesture.lastP)
+        : gesture.y - (touch ? touch.clientY : gesture.lastP);
       var velocity = event.timeStamp - gesture.lastTime <= 100 ? gesture.velocity : 0;
       var enoughTravel = Math.abs(travel) >= gesture.distance * 0.22;
       var flick = Math.abs(travel) >= 12 && Math.abs(velocity) >= 0.45 &&
@@ -4545,6 +4553,7 @@ document.addEventListener('click', (e) => {
 
   installSpiralTouch({
     element: section,
+    axis: 'x', // phones turn the tower sideways; vertical swipes scroll the page
     enabled: function () { return on && isPhone; },
     isVisible: function () {
       return inView && Math.abs(section.getBoundingClientRect().top) < window.innerHeight * 0.25;
