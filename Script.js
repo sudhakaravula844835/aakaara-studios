@@ -3899,11 +3899,11 @@ document.addEventListener('click', (e) => {
 });
 
 // ═══════ SERVICES ORBIT (desktop + phone) ═══════
-// A copy of the first spiral on animation_spatial_gallery.html: same helix,
-// hand-tuned waiting/past paths, field pan, spring, wheel capture, phone
-// swipe/buttons and video loading. Desktop (≥1200px, fine pointer) and phones
-// (.sov-orbit-phone) show it as .sov-orbit-on; tablets keep the services list.
-// Keep in step with the study page.
+// Desktop: a copy of the first spiral on animation_spatial_gallery.html (same
+// helix, hand-tuned waiting/past paths, field pan, spring, wheel capture and
+// video loading) — keep that in step with the study page. Phones
+// (.sov-orbit-phone) show a tower instead (towerProps), turned by sideways
+// swipes, with buttons; this differs from the study. Tablets keep the list.
 (function () {
   'use strict';
   var section = document.getElementById('services-overview');
@@ -4311,7 +4311,15 @@ document.addEventListener('click', (e) => {
   // Glide to targetProgress; a velocity (cards/s) hands off a finger's speed.
   function requestTick(handoffVelocity) {
     if (entryActive) return;
-    if (reducedMotion.matches) motion.jumpTo(targetProgress);
+    if (reducedMotion.matches) {
+      // No glide: jump, softened on phones by a brief dip of the field.
+      if (isPhone && Math.abs(lerpedProgress - targetProgress) > 0.01) {
+        field.classList.remove('sov-orbit-jump');
+        void field.offsetWidth; // restart the animation
+        field.classList.add('sov-orbit-jump');
+      }
+      motion.jumpTo(targetProgress);
+    }
     else motion.moveTo(targetProgress, handoffVelocity);
   }
   /* ─── Wheel / trackpad: one gesture turns one card ───────────────
@@ -4582,6 +4590,18 @@ document.addEventListener('click', (e) => {
     applyFrame();
     requestTick();
   }
+  // Phones: once the cards have faded in, the tower turns about a third of a
+  // card and springs back, so people see that it moves. Only after an
+  // undisturbed entry (a swipe or tap during it skips this), once per page, and
+  // never with reduced motion. targetProgress stays put, so the counter,
+  // buttons and videos don't change; the return glides to targetProgress in
+  // case a turn was asked for meanwhile.
+  function nudge() {
+    if (!isPhone || reducedMotion.matches || section.dataset.sovNudged || lerpedProgress > 0.01) return;
+    section.dataset.sovNudged = 'true';
+    motion.moveTo(0.33);
+    setTimeout(function () { motion.moveTo(targetProgress); }, 450);
+  }
   function boot() {
     if (booted || !on) return;
     booted = true;
@@ -4594,7 +4614,7 @@ document.addEventListener('click', (e) => {
         card.style.opacity = slotProps(i - lerpedProgress).op.toFixed(3);
       }, 220 + i * 110));
     });
-    entryTimers.push(setTimeout(finishEntry, 220 + MAX_PROGRESS * 110 + 700 + 80));
+    entryTimers.push(setTimeout(function () { finishEntry(); nudge(); }, 220 + MAX_PROGRESS * 110 + 700 + 80));
   }
 
   /* ─── On / off, desktop / phone ──────────────────────────────── */

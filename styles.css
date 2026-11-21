@@ -2223,6 +2223,9 @@ body.intro-active #heroScroll { opacity: 0; }
 /* Vertical pans stay with the browser (page scroll); Script.js takes only
    mostly-sideways swipes, which turn the tower. */
 #services-overview.sov-orbit-phone { touch-action: pan-y; }
+/* Reduced motion: turns jump; a brief dip of the field softens the cut. */
+.sov-orbit-phone .sov-orbit-field.sov-orbit-jump { animation: sovOrbitJump 200ms ease; }
+@keyframes sovOrbitJump { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 .sov-orbit-phone .sov-orbit-field {
   perspective: calc(var(--sov-orbit-card-w) * 3.2);
   perspective-origin: 50% 42%;

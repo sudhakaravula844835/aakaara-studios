@@ -1,7 +1,7 @@
 // Shared test cases for the home-page services orbit (#services-overview).
 // Desktop shows a copy of the first spiral on animation_spatial_gallery.html
-// (same cards, size, paths and wheel behaviour); phones and tablets keep the
-// services list. Run per engine by services-spiral.spec.js (Chromium) and
+// (same cards, size, paths and wheel behaviour); phones show a tower turned by
+// sideways swipes; tablets keep the services list. Run per engine by services-spiral.spec.js (Chromium) and
 // services-spiral.webkit.spec.js (WebKit).
 module.exports = function defineSpiralTests(test, expect) {
   const skipIntro = () => sessionStorage.setItem('skipIntro', '1');
@@ -403,6 +403,35 @@ module.exports = function defineSpiralTests(test, expect) {
         await page.waitForTimeout(SETTLE_MS);
       }
       await expect(hint).toHaveText('Scroll on to continue');
+    });
+
+    test('the tower nudges once when it first shows, then rests on card 1', async ({ page }) => {
+      await page.goto('/');
+      const peak = page.evaluate(() => new Promise(resolve => {
+        let max = 0;
+        const card = document.querySelectorAll('#services-overview .sov-orbit-card')[0];
+        const t0 = performance.now();
+        (function tick() {
+          const t = getComputedStyle(card).transform;
+          if (t && t !== 'none') max = Math.max(max, Math.abs(new DOMMatrix(t).m41));
+          performance.now() - t0 < 4500 ? requestAnimationFrame(tick) : resolve(max);
+        })();
+      }));
+      await jump(page, await sectionTop(page));
+      expect(await peak).toBeGreaterThan(20);              // card 1 visibly swung aside
+      await page.waitForTimeout(400);
+      expect(await position(page)).toBe('0');
+      await expect(section(page)).toHaveAttribute('data-sov-nudged', 'true');
+    });
+
+    test('reduced motion: no nudge, and Next jumps straight to the card', async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto('/');
+      await arrive(page);
+      await expect(section(page)).not.toHaveAttribute('data-sov-nudged', 'true');
+      await page.locator('#services-overview .sov-orbit-next').click();
+      await page.waitForTimeout(120);
+      expect(await position(page)).toBe('1');
     });
 
     test('back-to-top button stays off the Next button', async ({ page }) => {
