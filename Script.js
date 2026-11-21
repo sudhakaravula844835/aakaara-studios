@@ -4416,6 +4416,10 @@ document.addEventListener('click', (e) => {
     // advances, and only a mostly-sideways gesture is taken; anything else
     // stays native so the page scrolls.
     var horizontal = options.axis === 'x';
+    // Sideways: decide later and only take a clearly sideways swipe, so a
+    // thumb's diagonal scroll always stays with the page.
+    if (horizontal) threshold = 10;
+    var dominance = horizontal ? 1.5 : 1;
     function along(touch) { return horizontal ? touch.clientX : touch.clientY; }
     var interactive = 'a,button,input,select,textarea,summary,video,audio,' +
       '[contenteditable]:not([contenteditable="false"]),[role="button"],' +
@@ -4491,7 +4495,7 @@ document.addEventListener('click', (e) => {
 
       if (!gesture.captured) {
         if (Math.max(Math.abs(cross), Math.abs(travel)) < threshold) return;
-        if (Math.abs(cross) >= Math.abs(travel)) {
+        if (Math.abs(travel) <= dominance * Math.abs(cross)) {
           gesture = null; // Let a gesture across the axis remain native.
           return;
         }
@@ -4563,9 +4567,9 @@ document.addEventListener('click', (e) => {
     element: section,
     axis: 'x', // phones turn the tower sideways; vertical swipes scroll the page
     enabled: function () { return on && isPhone; },
-    isVisible: function () {
-      return inView && Math.abs(section.getBoundingClientRect().top) < window.innerHeight * 0.25;
-    },
+    // A sideways swipe never fights the page scroll, so the section only needs
+    // to be mostly on screen (not lined up with the top, as the vertical swipe needed).
+    isVisible: function () { return inView; },
     max: MAX_PROGRESS,
     getProgress: function () { return lerpedProgress; },
     onCapture: function () { finishEntry(); scrollLocked = true; },

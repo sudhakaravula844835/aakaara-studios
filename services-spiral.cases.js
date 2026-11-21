@@ -367,6 +367,39 @@ module.exports = function defineSpiralTests(test, expect) {
       expect(await scrollY(page)).toBeGreaterThan(before);
     });
 
+    // Only a clearly sideways swipe turns the tower. (A swipe that starts more
+    // sideways than vertical doesn't scroll the page either: touch-action pan-y
+    // locks it out of panning — browser behaviour, not ours.)
+    test('a near-45° swipe does not turn the tower', async ({ page, browserName }) => {
+      cdpOnly(browserName);
+      await page.goto('/');
+      await arrive(page);
+      await swipe(page, { x: 300, y: 650 }, { x: 60, y: 450 }); // a little more sideways than vertical
+      expect(await position(page)).toBe('0');
+    });
+
+    test('pinch-zoom still works over the tower', async ({ page }) => {
+      await page.goto('/');
+      await arrive(page);
+      const ta = await section(page).evaluate(s => getComputedStyle(s).touchAction);
+      expect(ta).toContain('pan-y');
+      expect(ta).toContain('pinch-zoom');
+    });
+
+    test('a sideways swipe turns the tower even when the section is not lined up with the top', async ({ page, browserName }) => {
+      cdpOnly(browserName);
+      await page.goto('/');
+      await arrive(page);
+      await jump(page, (await sectionTop(page)) - Math.round(844 * 0.35));
+      await page.waitForTimeout(400);
+      const card = await page.locator('#services-overview .sov-orbit-card').first().evaluate(e => {
+        const r = e.getBoundingClientRect(); return { y: Math.round((r.top + r.bottom) / 2) };
+      });
+      expect(card.y).toBeLessThan(844);
+      await swipe(page, { x: 320, y: card.y }, { x: 60, y: card.y });
+      expect(await position(page)).toBe('1');
+    });
+
     test('swiping outward at the ends does nothing', async ({ page, browserName }) => {
       cdpOnly(browserName);
       await page.goto('/');

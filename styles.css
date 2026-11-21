@@ -2220,9 +2220,9 @@ body.intro-active #heroScroll { opacity: 0; }
   inset: calc(var(--sov-orbit-nav) + 7.5rem) 0 6.5rem;   /* starts right under the heading */
   overflow: hidden;
 }
-/* Vertical pans stay with the browser (page scroll); Script.js takes only
-   mostly-sideways swipes, which turn the tower. */
-#services-overview.sov-orbit-phone { touch-action: pan-y; }
+/* Vertical pans and pinch-zoom stay with the browser; Script.js takes only
+   clearly sideways swipes, which turn the tower. */
+#services-overview.sov-orbit-phone { touch-action: pan-y pinch-zoom; }
 /* Reduced motion: turns jump; a brief dip of the field softens the cut. */
 .sov-orbit-phone .sov-orbit-field.sov-orbit-jump { animation: sovOrbitJump 200ms ease; }
 @keyframes sovOrbitJump { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
