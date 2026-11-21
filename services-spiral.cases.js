@@ -1,7 +1,7 @@
 // Shared test cases for the home-page services orbit (#services-overview).
 // Desktop shows a copy of the first spiral on animation_spatial_gallery.html
-// (same cards, size, paths and wheel behaviour); phones show a tower turned by
-// sideways swipes; tablets keep the services list. Run per engine by services-spiral.spec.js (Chromium) and
+// (same cards, size, paths and wheel behaviour); phones show a looping ring
+// turned by sideways swipes; tablets keep the services list. Run per engine by services-spiral.spec.js (Chromium) and
 // services-spiral.webkit.spec.js (WebKit).
 module.exports = function defineSpiralTests(test, expect) {
   const skipIntro = () => sessionStorage.setItem('skipIntro', '1');
@@ -215,7 +215,7 @@ module.exports = function defineSpiralTests(test, expect) {
     });
   });
 
-  test.describe('Services orbit — phone (the study\'s phone spiral)', () => {
+  test.describe('Services orbit — phone (the ring)', () => {
     test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
     test.beforeEach(async ({ page }) => { await page.addInitScript(skipIntro); });
     const rect = (page, sel) => page.locator(sel).first().evaluate(e => {
@@ -231,9 +231,11 @@ module.exports = function defineSpiralTests(test, expect) {
       await expect(page.locator('#services-overview .sov-orbit-controls')).toBeVisible();
       await arrive(page);
       await expect(count(page)).toHaveText('01 / 05');
-      await expect(page.locator('#services-overview .sov-orbit-prev')).toBeDisabled();
-      const w = await page.locator('#services-overview .sov-orbit-card').first().evaluate(e => e.offsetWidth);
-      expect(w).toBe(242); // min(62vw, 20rem): narrower, so the tower's neighbours show
+      await expect(page.locator('#services-overview .sov-orbit-prev')).toBeEnabled(); // the ring loops
+      const size = await page.locator('#services-overview .sov-orbit-card').first()
+        .evaluate(e => ({ w: e.offsetWidth, h: e.offsetHeight }));
+      expect(size.w).toBe(187); // min(48vw, 15rem): about half the screen, so the cards either side show
+      expect(size.h).toBeGreaterThan(size.w); // portrait cards
     });
 
     test('next and previous buttons turn one card', async ({ page }) => {
@@ -290,13 +292,36 @@ module.exports = function defineSpiralTests(test, expect) {
       expect(boxes[2].op).toBeGreaterThanOrEqual(0.35);
     });
 
-    test('the tower steps down: each later card sits lower than the one before', async ({ page }) => {
+    test('the ring loops: Previous from card 1 goes to card 5, Next brings it back', async ({ page }) => {
       await page.goto('/');
       await arrive(page);
-      const mids = await page.locator('#services-overview .sov-orbit-card')
-        .evaluateAll(els => els.slice(0, 3).map(e => { const r = e.getBoundingClientRect(); return r.top + r.height / 2; }));
-      expect(mids[1]).toBeGreaterThan(mids[0]);
-      expect(mids[2]).toBeGreaterThan(mids[1]);
+      await page.locator('#services-overview .sov-orbit-prev').click();
+      await page.waitForTimeout(SETTLE_MS);
+      expect(await position(page)).toBe('4');
+      await expect(count(page)).toHaveText('05 / 05');
+      await page.locator('#services-overview .sov-orbit-next').click();
+      await page.waitForTimeout(SETTLE_MS);
+      expect(await position(page)).toBe('0');
+    });
+
+    test('the far side of the ring shows the backs of its cards, faded', async ({ page }) => {
+      await page.goto('/');
+      await arrive(page);
+      const far = await page.locator('#services-overview .sov-orbit-card').nth(2).evaluate(e => ({
+        op: Number(getComputedStyle(e).opacity), back: getComputedStyle(e).backfaceVisibility }));
+      expect(far.back).toBe('visible');
+      expect(far.op).toBeGreaterThan(0);
+      expect(far.op).toBeLessThan(0.5);
+    });
+
+    test('the mouse wheel never turns the ring', async ({ page, browserName }) => {
+      test.skip(browserName !== 'chromium', 'mobile WebKit has no mouse wheel');
+      await page.goto('/');
+      await arrive(page);
+      await page.mouse.move(195, 500);
+      await page.mouse.wheel(0, 300);
+      await page.waitForTimeout(SETTLE_MS);
+      expect(await position(page)).toBe('0');
     });
 
     test('rotating the phone keeps the current card', async ({ page }) => {
@@ -347,7 +372,7 @@ module.exports = function defineSpiralTests(test, expect) {
       expect(await position(page)).toBe('0');
     });
 
-    test('a vertical swipe scrolls the page and never turns the tower', async ({ page, browserName }) => {
+    test('a vertical swipe scrolls the page and never turns the ring', async ({ page, browserName }) => {
       cdpOnly(browserName);
       await page.goto('/');
       await arrive(page);
@@ -367,10 +392,10 @@ module.exports = function defineSpiralTests(test, expect) {
       expect(await scrollY(page)).toBeGreaterThan(before);
     });
 
-    // Only a clearly sideways swipe turns the tower. (A swipe that starts more
+    // Only a clearly sideways swipe turns the ring. (A swipe that starts more
     // sideways than vertical doesn't scroll the page either: touch-action pan-y
     // locks it out of panning — browser behaviour, not ours.)
-    test('a near-45° swipe does not turn the tower', async ({ page, browserName }) => {
+    test('a near-45° swipe does not turn the ring', async ({ page, browserName }) => {
       cdpOnly(browserName);
       await page.goto('/');
       await arrive(page);
@@ -378,7 +403,7 @@ module.exports = function defineSpiralTests(test, expect) {
       expect(await position(page)).toBe('0');
     });
 
-    test('pinch-zoom still works over the tower', async ({ page }) => {
+    test('pinch-zoom still works over the ring', async ({ page }) => {
       await page.goto('/');
       await arrive(page);
       const ta = await section(page).evaluate(s => getComputedStyle(s).touchAction);
@@ -386,7 +411,7 @@ module.exports = function defineSpiralTests(test, expect) {
       expect(ta).toContain('pinch-zoom');
     });
 
-    test('a sideways swipe turns the tower even when the section is not lined up with the top', async ({ page, browserName }) => {
+    test('a sideways swipe turns the ring even when the section is not lined up with the top', async ({ page, browserName }) => {
       cdpOnly(browserName);
       await page.goto('/');
       await arrive(page);
@@ -400,19 +425,14 @@ module.exports = function defineSpiralTests(test, expect) {
       expect(await position(page)).toBe('1');
     });
 
-    test('swiping outward at the ends does nothing', async ({ page, browserName }) => {
+    test('swiping keeps going round: right from card 1 goes to card 5, left from card 5 to card 1', async ({ page, browserName }) => {
       cdpOnly(browserName);
       await page.goto('/');
       await arrive(page);
       await swipe(page, ...RIGHT);
-      expect(await position(page)).toBe('0');
-      for (let i = 0; i < 4; i++) {
-        await page.locator('#services-overview .sov-orbit-next').click();
-        await page.waitForTimeout(SETTLE_MS);
-      }
       expect(await position(page)).toBe('4');
       await swipe(page, ...LEFT);
-      expect(await position(page)).toBe('4');
+      expect(await position(page)).toBe('0');
     });
 
     test('after a swipe only the new front card plays', async ({ page, browserName }) => {
@@ -435,10 +455,10 @@ module.exports = function defineSpiralTests(test, expect) {
         await page.locator('#services-overview .sov-orbit-next').click();
         await page.waitForTimeout(SETTLE_MS);
       }
-      await expect(hint).toHaveText('Scroll on to continue');
+      await expect(hint).toHaveText('Swipe to explore'); // the ring has no last card
     });
 
-    test('the tower nudges once when it first shows, then rests on card 1', async ({ page }) => {
+    test('the ring turns into place as the cards fade in, then rests on card 1', async ({ page }) => {
       await page.goto('/');
       const peak = page.evaluate(() => new Promise(resolve => {
         let max = 0;
@@ -451,17 +471,52 @@ module.exports = function defineSpiralTests(test, expect) {
         })();
       }));
       await jump(page, await sectionTop(page));
-      expect(await peak).toBeGreaterThan(20);              // card 1 visibly swung aside
+      expect(await peak).toBeGreaterThan(20);              // card 1 came in from the side
       await page.waitForTimeout(400);
       expect(await position(page)).toBe('0');
-      await expect(section(page)).toHaveAttribute('data-sov-nudged', 'true');
+      const x = await page.locator('#services-overview .sov-orbit-card').first()
+        .evaluate(e => Math.abs(new DOMMatrix(getComputedStyle(e).transform).m41));
+      expect(x).toBeLessThan(1);                           // and rests square-on
     });
 
-    test('reduced motion: no nudge, and Next jumps straight to the card', async ({ page }) => {
-      await page.emulateMedia({ reducedMotion: 'reduce' });
+    test('while the front film plays, the ring holds still', async ({ page }) => {
       await page.goto('/');
       await arrive(page);
-      await expect(section(page)).not.toHaveAttribute('data-sov-nudged', 'true');
+      await page.waitForTimeout(1500);
+      const xAt = () => page.locator('#services-overview .sov-orbit-card').first()
+        .evaluate(e => new DOMMatrix(getComputedStyle(e).transform).m41);
+      const a = await xAt();
+      await page.waitForTimeout(2500);
+      expect(Math.abs((await xAt()) - a)).toBeLessThan(1);
+      expect(await position(page)).toBe('0');
+    });
+
+    test('when the phone refuses autoplay, the ring turns slowly on its own', async ({ page }) => {
+      await page.addInitScript(() => {
+        HTMLMediaElement.prototype.play = function () { return Promise.reject(new DOMException('blocked', 'NotAllowedError')); };
+      });
+      await page.goto('/');
+      await arrive(page);
+      await page.waitForTimeout(1500);
+      const xAt = () => page.locator('#services-overview .sov-orbit-card').first()
+        .evaluate(e => new DOMMatrix(getComputedStyle(e).transform).m41);
+      const a = await xAt();
+      await page.waitForTimeout(2500);
+      expect(Math.abs((await xAt()) - a)).toBeGreaterThan(10);
+    });
+
+    test('reduced motion: no turning on its own, and Next jumps straight to the card', async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.addInitScript(() => {
+        HTMLMediaElement.prototype.play = function () { return Promise.reject(new DOMException('blocked', 'NotAllowedError')); };
+      });
+      await page.goto('/');
+      await arrive(page);
+      const xAt = () => page.locator('#services-overview .sov-orbit-card').first()
+        .evaluate(e => new DOMMatrix(getComputedStyle(e).transform).m41);
+      const a = await xAt();
+      await page.waitForTimeout(2500);
+      expect(Math.abs((await xAt()) - a)).toBeLessThan(1);
       await page.locator('#services-overview .sov-orbit-next').click();
       await page.waitForTimeout(120);
       expect(await position(page)).toBe('1');
