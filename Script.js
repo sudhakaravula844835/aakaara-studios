@@ -4161,6 +4161,7 @@ document.addEventListener('click', (e) => {
   /* ─── Video: a card starts when it first reaches the front ─── */
   var videos = cards.map(function (card) { return card.querySelector('video'); });
   var started = videos.map(function () { return false; });
+  var playedOnce = videos.map(function () { return false; }); // desktop: has reached the front
   function loadMp4(video, preload) {
     var source = video && video.querySelector('source[data-src]');
     if (!source) return;
@@ -4242,11 +4243,15 @@ document.addEventListener('click', (e) => {
       // A card faded fully out of view (phone: 2.5+ cards away) pauses to save
       // battery, and resumes when it comes back.
       var cardShown = announcedCard < 0 || slotProps(cardOffset(i, announcedCard)).op > 0.01;
-      // Only the front card plays; cards turned away hold their frame. Decoding
-      // several videos inside 3D-transformed layers was costing frames mid-turn.
-      // It also holds still for the ~0.6 s of a turn and resumes on landing:
-      // decoding while the card moves in 3D was the main source of dropped frames.
-      var shouldPlay = on && visible && started[i] && cardShown && i === announcedCard && !turning;
+      // A film starts only once its card has landed in front (not mid-turn:
+      // starting decode while the card moves in 3D dropped frames).
+      // Desktop: every card waits paused until it first reaches the front, then
+      // keeps looping from there on, even after it moves past (playedOnce).
+      // Phones: only the front card plays; the others hold their frame.
+      var front = i === announcedCard && !turning;
+      if (front && !isPhone) playedOnce[i] = true;
+      var shouldPlay = on && visible && started[i] && cardShown &&
+        (front || (!isPhone && playedOnce[i]));
       if (shouldPlay && video.paused) {
         var attempt = video.play();
         if (attempt && attempt.catch) attempt.catch(function () {}); // autoplay refused: poster stays

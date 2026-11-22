@@ -146,6 +146,29 @@ module.exports = function defineSpiralTests(test, expect) {
       expect(mp4, `Weddings stream state: ${state}`).toEqual([false, true, false, false, false]);
     });
 
+    test('each film waits paused until its card reaches the front, then keeps playing', async ({ page }) => {
+      test.setTimeout(60000);
+      await page.goto('/');
+      await arrive(page);
+      const playing = () => page.locator('#services-overview .sov-orbit-card video')
+        .evaluateAll(vs => vs.map(v => !v.paused));
+      // Before they reach the front, cards 2–5 hold still.
+      expect((await playing()).slice(1)).toEqual([false, false, false, false]);
+      await wheel(page, 120);                                   // card 2 to the front
+      await expect.poll(async () => (await playing())[1], { timeout: 8000 }).toBe(true);
+      await wheel(page, 120);                                   // card 3 to the front
+      await expect.poll(async () => (await playing())[2], { timeout: 8000 }).toBe(true);
+      expect((await playing())[1]).toBe(true);                  // card 2 keeps playing past the centre
+      expect((await playing()).slice(3)).toEqual([false, false]);
+      await wheel(page, 120);
+      await wheel(page, 120);                                   // all five have been in front
+      await expect.poll(async () => (await playing())[4], { timeout: 8000 }).toBe(true);
+      for (let i = 0; i < 4; i++) await wheel(page, -120);      // back to card 1
+      expect(await position(page)).toBe('0');
+      await expect.poll(async () => (await playing()).slice(1), { timeout: 8000 })
+        .toEqual([true, true, true, true]);
+    });
+
     test('the Weddings card falls back to its MP4 if the stream fails', async ({ page }) => {
       await page.route('**/caaee9e1-dc0f-4aff-a41f-80eb9b0e6303/**', route => route.abort());
       await page.goto('/');
