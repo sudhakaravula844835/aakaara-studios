@@ -337,6 +337,7 @@ Fall back to Grep/Glob/Read **only** when graph doesn't cover what you need.
 2. Use `detect_changes` for code review.
 3. Use `get_affected_flows` to understand impact.
 4. Use `query_graph` pattern="tests_for" to check coverage.
+
 ## UI/UX skills
 
 Taste, a11y, bans, voice, and icon library for this project live in `.ux-profile.md`.
