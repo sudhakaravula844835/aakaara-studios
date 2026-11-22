@@ -46,6 +46,16 @@
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# CAROUSEL COVER COPIES  (/thumbs/*, made by build/make_cover_thumbs.py)
+#
+# Remade when a cover changes (covers do get swapped in place), so a week with
+# background revalidation rather than immutable.
+# ─────────────────────────────────────────────────────────────────────────────
+/thumbs/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # FONTS  (/fonts/*)
 #
 # Self-hosted font files are content-addressed by filename and never mutated

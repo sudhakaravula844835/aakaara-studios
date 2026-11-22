@@ -207,6 +207,8 @@ Global functions exposed to inline HTML:
 
 **New multi-event wedding project (Haldi/Sangeet/Wedding, etc.):** Instead of one `.vw-card` per film, author a single `.vw-card` (its own `data-video`/`data-type` should point at the default/hero film) and add a nested `<div class="vw-chapters">` with one `<button class="vw-chapter" data-label="..." data-video="..." data-type="...">` per event. Mark exactly one chapter `active` to control which film plays by default when the modal opens. The grid tile auto-shows an "N Films" badge; the video modal auto-shows chapter tabs. No live example ships in `index.html` right now; `video-chapters.spec.js` splices a sample "Wedding Weekend" card into the page as a test fixture — copy its markup.
 
+**Carousel cover copies:** after adding or changing a gallery item or film card, run `python3 build/make_cover_thumbs.py`. It saves a 1000px copy of every card cover in `index.html` under `/thumbs/` (same path, `.jpg`); `setCoverSrc()` in `Script.js` loads the copy and falls back to the original if there isn't one. The gallery viewer and video player still use the originals.
+
 **Gradient fallback classes:** Gallery `gi-1`–`gi-8`; video `vw-gi-1`–`vw-gi-8`. Defined in `styles.css`. Reuse or add following same pattern.
 
 ## CSS Conventions

@@ -747,6 +747,23 @@ function initPortfolioStoryCards() {
 
 initPortfolioStoryCards();
 
+// ═══════ CAROUSEL COVER COPIES ═══════
+// Cards show small copies of their covers (/thumbs/…, 1000px wide, made by
+// build/make_cover_thumbs.py) instead of the 1600–6000px originals. A cover
+// without a copy yet falls back to the original. The gallery viewer and the
+// video player still use the originals.
+function coverThumb(src) {
+  if (!src || /^(https?:|data:)/.test(src)) return src;
+  const [path, query] = src.split('?');
+  return '/thumbs/' + path.replace(/^\//, '').replace(/\.[^./]+$/, '') + '.jpg' + (query ? '?' + query : '');
+}
+// Point an <img> (or new Image()) at a cover's copy, falling back to the original.
+function setCoverSrc(img, src) {
+  const thumb = coverThumb(src);
+  img.onerror = thumb === src ? null : function () { img.onerror = null; img.src = src; };
+  img.src = thumb;
+}
+
 // ═══════ AUTO-LOAD COVER IMAGES ═══════
 const galleryObserver = new IntersectionObserver((entries, observer) => {
   entries.forEach(entry => {
@@ -765,11 +782,11 @@ const galleryObserver = new IntersectionObserver((entries, observer) => {
           const img = new Image();
           img.decoding = 'async';
           img.onload = function() {
-            bg.style.backgroundImage = `url('${versionedCoverSrc}')`;
+            bg.style.backgroundImage = `url('${img.src}')`;
             if (item.dataset.bgSize) bg.style.backgroundSize = item.dataset.bgSize;
             if (item.dataset.bgPos) bg.style.backgroundPosition = item.dataset.bgPos;
           };
-          img.src = versionedCoverSrc;
+          setCoverSrc(img, versionedCoverSrc);
         }
       }
       observer.unobserve(item);
@@ -1645,9 +1662,9 @@ function filterVideos(cat, btn) {
         const img = new Image();
         img.decoding = 'async';
         img.onload = () => {
-          posterEl.style.backgroundImage = `url('${posterSrc}')`;
+          posterEl.style.backgroundImage = `url('${img.src}')`;
         };
-        img.src = posterSrc;
+        setCoverSrc(img, posterSrc);
       }
       observer.unobserve(card);
     });
@@ -3135,11 +3152,11 @@ function lazyLoadGalleryItem(item) {
     const img = new Image();
     img.decoding = 'async';
     img.onload = function() {
-      bg.style.backgroundImage = `url('${coverSrc}')`;
+      bg.style.backgroundImage = `url('${img.src}')`;
       if (item.dataset.bgSize) bg.style.backgroundSize = item.dataset.bgSize;
       if (item.dataset.bgPos) bg.style.backgroundPosition = item.dataset.bgPos;
     };
-    img.src = coverSrc;
+    setCoverSrc(img, coverSrc);
     // Keep the first-click experience snappy on desktop without front-loading
     // several multi-megabyte gallery frames on mobile.
     if (!item.dataset.comingSoon && folder && shouldPreloadGalleryFrames()) {
@@ -3189,7 +3206,7 @@ class VideoFocusRail {
     // Inject poster <img> and sheen overlay into each card
     this.cards.forEach(card => {
       const img = document.createElement('img');
-      img.src = card.dataset.poster || '';
+      if (card.dataset.poster) setCoverSrc(img, card.dataset.poster);
       img.alt = card.dataset.title || '';
       card.appendChild(img);
       const sheen = document.createElement('div');
@@ -3250,14 +3267,14 @@ class VideoFocusRail {
     const outgoing = this._ambSlot === 'a' ? this._ambA : this._ambB;
 
     if (immediate) {
-      incoming.src = poster;
+      setCoverSrc(incoming, poster);
       incoming.classList.add('vfr-amb-active');
       outgoing.classList.remove('vfr-amb-active');
       this._ambSlot = incoming === this._ambA ? 'a' : 'b';
       return;
     }
 
-    incoming.src = poster;
+    setCoverSrc(incoming, poster);
     incoming.onload = () => {
       incoming.classList.add('vfr-amb-active');
       outgoing.classList.remove('vfr-amb-active');
@@ -3419,7 +3436,7 @@ let portfolioCarousel, videoCarousel;
       lastPoster = poster;
       const next = useA ? imgA : imgB;
       const prev = useA ? imgB : imgA;
-      next.src = poster;
+      setCoverSrc(next, poster);
       next.onload = () => {
         next.classList.add('vfr-amb-active');
         prev.classList.remove('vfr-amb-active');
