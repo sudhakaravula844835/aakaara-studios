@@ -6,7 +6,7 @@ Guidance for Claude Code (claude.ai/code) when working with this repo.
 
 ## Site Overview
 
-Aakaara Studios NYC — static photography portfolio. No build step, no framework. Pure HTML/CSS/JS on Netlify. ~7,600 lines total.
+Aakaara Studios NYC — static photography portfolio. No build step, no framework. Pure HTML/CSS/JS on Netlify.
 
 - **URL**: https://www.aakaarastudios.com/
 - **Deployment**: Netlify (auto-deploy from repo root)
@@ -56,8 +56,8 @@ Test files: `gallery.spec.js`, `location-guide.test.js`, `mobile.integration.spe
 | `index.html` | Main site (intro → hero → portfolio → films → about → services → testimonials → contact → footer) |
 | `couple-portraits.html` | Gallery page for couple portraits |
 | `404.html` / `thank-you.html` | Utility pages |
-| `styles.css` | All styles (~3,568 lines) |
-| `Script.js` | All JS for `index.html` (~2,553 lines) |
+| `styles.css` | All styles (~5,300 lines) |
+| `Script.js` | All JS for `index.html` (~4,800 lines) |
 | `favicon.svg` | Site logo SVG favicon |
 | `package.json` | Dev deps: Vitest, Playwright |
 | `playwright.config.js` / `vitest.config.js` | Test config |
@@ -109,7 +109,6 @@ Test files: `gallery.spec.js`, `location-guide.test.js`, `mobile.integration.spe
 ├── house-warming/     (4 sub-folders)
 ├── maternity/         (3 sub-folders)
 ├── nyc/               (location guides)
-├── nyfw-runway/       (fashion/runway)
 └── video-covers/      (7 sub-folders)
 ```
 
@@ -297,11 +296,13 @@ Footer "Connect" links have inline SVG icons:
 
 ## Known Constraints
 
+- **Cleanup 2026-11-22**: removed prototypes (`gallery-preview/`, `components/`, `animation_check.*`, `timeline-concept.html`, `logo_dinesh.html`, `qa_quote.js`), scratch (`.superpowers/`, `output/`, `CLAUDE.original.md`), the disabled NYFW section (HTML, CSS, and raw `images/nyfw-runway/` camera files) and CSS for classes no page uses. All recoverable: `git show <commit>^:<path>`.
+
 - **Testimonials** (`#testimonials`) — placeholder copy, replace before publishing.
 - **Bhandhavi graduation** (`/images/graduation/bhandhavi`) — `data-folder` corrected but disk folder may differ, verify before deploy.
 - `#services` scroll stack **700vh on all screen sizes** by design (mobile UX trade-off).
 - **Business card PDF**: reportlab PDF won't match HTML exactly. Use browser print-to-PDF from `business-card-print.html` with "Background graphics" enabled.
-- `styles.css` single global file (~3,568 lines). Watch specificity when adding mobile overrides — must appear after base definitions.
+- `styles.css` single global file (~5,300 lines). Watch specificity when adding mobile overrides — must appear after base definitions.
 
 <!-- code-review-graph MCP tools -->
 ## MCP Tools: code-review-graph

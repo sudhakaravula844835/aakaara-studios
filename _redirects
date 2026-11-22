@@ -8,13 +8,9 @@ https://www.aakaarastudiosnyc.com/*  https://aakaarastudios.com/:splat  301!
 # Must stay above /board/* and the /* catch-all (first match wins).
 /docs/*                    /404.html  404!
 /tests/*                   /404.html  404!
-/output/*                  /404.html  404!
 /build/*                   /404.html  404!
 /scripts/*                 /404.html  404!
-/components/*              /404.html  404!
-/gallery-preview/*         /404.html  404!
 /netlify/*                 /404.html  404!
-/.superpowers/*            /404.html  404!
 /.vscode/*                 /404.html  404!
 /board/test/*              /404.html  404!
 /board/supabase/*          /404.html  404!
@@ -22,7 +18,6 @@ https://www.aakaarastudiosnyc.com/*  https://aakaarastudios.com/:splat  301!
 /board/.env.example        /404.html  404!
 /AGENTS.md                 /404.html  404!
 /CLAUDE.md                 /404.html  404!
-/CLAUDE.original.md        /404.html  404!
 /GEMINI.md                 /404.html  404!
 /.cursorrules              /404.html  404!
 /.windsurfrules            /404.html  404!
@@ -35,12 +30,7 @@ https://www.aakaarastudiosnyc.com/*  https://aakaarastudios.com/:splat  301!
 /netlify.toml              /404.html  404!
 /playwright.config.js      /404.html  404!
 /vitest.config.mjs         /404.html  404!
-/qa_quote.js               /404.html  404!
-/animation_check.js        /404.html  404!
-/animation_check.html      /404.html  404!
 /animation_spatial_gallery.html  /404.html  404!
-/timeline-concept.html     /404.html  404!
-/logo_dinesh.html          /404.html  404!
 /about-redesign.spec.js    /404.html  404!
 /cover-color.spec.js       /404.html  404!
 /gallery.spec.js           /404.html  404!
@@ -57,6 +47,10 @@ https://www.aakaarastudiosnyc.com/*  https://aakaarastudios.com/:splat  301!
 /portfolio-assets.test.js  /404.html  404!
 /video-assets.test.js      /404.html  404!
 /video-focus-rail.test.js  /404.html  404!
+/prewedding-film.spec.js   /404.html  404!
+/services-spiral.cases.js  /404.html  404!
+/services-spiral.spec.js   /404.html  404!
+/services-spiral.webkit.spec.js  /404.html  404!
 
 /the-experience.html   /couple-portraits.html   301
 /couple-portraits      /couple-portraits.html   301
