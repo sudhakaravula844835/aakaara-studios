@@ -2096,6 +2096,21 @@ body.intro-active #heroScroll { opacity: 0; }
   color: #f5eee8;
 }
 .sov-orbit-title em { color: #c9956b; font-style: italic; font-weight: 400; white-space: nowrap; } /* "Your Story" stays on one line */
+/* Desktop: one calm centred line across the top (2026-11-22), clear of the spiral */
+#services-overview.sov-orbit-on:not(.sov-orbit-phone) .sov-orbit-head {
+  max-width: none;
+  justify-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  padding: calc(1.6rem + 64px) 1.5rem 0;
+}
+#services-overview.sov-orbit-on:not(.sov-orbit-phone) .sov-orbit-title {
+  max-width: none;
+  font-size: clamp(2.2rem, 3.1vw, 3.4rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  white-space: nowrap;
+}
 .sov-orbit-meta {
   position: absolute;
   bottom: 2rem;
