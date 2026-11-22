@@ -4234,7 +4234,8 @@ document.addEventListener('click', (e) => {
     if (on && visible && announcedCard >= 0 && !started[announcedCard]) {
       started[announcedCard] = true;
       loadVideo(videos[announcedCard], 'auto');
-      loadVideo(videos[(announcedCard + 1) % videos.length], 'metadata');
+      // The next card's film starts loading; on the phone ring, card 1 follows card 5.
+      loadVideo(videos[isPhone ? (announcedCard + 1) % videos.length : announcedCard + 1], 'metadata');
     }
     videos.forEach(function (video, i) {
       if (!video) return;
