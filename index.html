@@ -1,14 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-R0B8G15NCL"></script>
+<!-- Google tag (gtag.js). PERF (2026-11-22): the page view and any events queue in
+     dataLayer from the start, but the ~180 KB library loads only once the page has
+     loaded and the browser is idle, or at the first scroll/tap/key — whichever comes
+     first — so it no longer blocks the main thread during start-up. -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
   gtag('config', 'G-R0B8G15NCL');
+
+  (function () {
+    var loaded = false;
+    var cues = ['scroll', 'pointerdown', 'keydown', 'touchstart'];
+    function loadGtag() {
+      if (loaded) return;
+      loaded = true;
+      cues.forEach(function (type) { window.removeEventListener(type, loadGtag); });
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-R0B8G15NCL';
+      document.head.appendChild(s);
+    }
+    cues.forEach(function (type) { window.addEventListener(type, loadGtag, { once: true, passive: true }); });
+    window.addEventListener('load', function () {
+      if ('requestIdleCallback' in window) requestIdleCallback(loadGtag, { timeout: 4000 });
+      else setTimeout(loadGtag, 2500);
+    });
+  })();
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
