@@ -4341,37 +4341,31 @@ document.addEventListener('click', (e) => {
     }
     else motion.moveTo(targetProgress, handoffVelocity);
   }
-  /* ─── Wheel / trackpad: one gesture turns one card ───────────────
-     Paging like iOS: a gesture commits to a turn once it has travelled a
-     little, then the rest of it — including the trackpad's momentum tail,
-     which keeps firing for ~1 s after the fingers lift — is absorbed. Adding
-     those deltas up (the study page's model) overshot the next card and
-     snapped back, which read as a stutter. A gesture ends after a short pause,
-     a change of direction, or a fresh push once the turn has landed (momentum
-     only ever decays, so a rising delta is a new swipe). */
-  var WHEEL_GAP_MS = 200;   // a pause this long ends a gesture
-  var WHEEL_COMMIT_PX = 12; // travel before a gesture commits to a turn
-  var gesture = null;       // { dir, sum, stepped, last, lastAbs }
+  /* ─── Wheel / trackpad: the study page's free glide (2026-11-22) ──
+     As on animation_spatial_gallery.html: every delta moves the target
+     (200px of scroll = one card), so one long swipe can carry the spiral
+     through all five cards and a short one moves it a little. When the
+     wheel pauses for 140 ms it settles on the nearest card; a short
+     deliberate push (0.15–1 card) still advances one. (Replaces the
+     one-gesture-one-card paging of 2026-11-19, at the user's request.) */
+  var WHEEL_SENSITIVITY = 0.005; // cards per px of deltaY
+  var WHEEL_SETTLE_MS = 140;
+  var wheelOrigin = null, wheelTimer = null;
 
-  function trackGesture(dy, now) {
-    var abs = Math.abs(dy);
-    var dir = dy > 0 ? 1 : -1;
-    var settled = Math.abs(targetProgress - lerpedProgress) < 0.02;
-    // Momentum only decays, so a delta that jumps well above the previous one
-    // (once the last turn has landed) is a new swipe, not the tail.
-    var fresh = !gesture || now - gesture.last > WHEEL_GAP_MS || dir !== gesture.dir ||
-      (gesture.stepped && settled && abs >= 10 && abs > gesture.lastAbs * 1.6);
-    if (fresh) gesture = { dir: dir, sum: 0, stepped: false, last: now, lastAbs: abs };
-    gesture.last = now;
-    gesture.lastAbs = abs;
-    return gesture;
-  }
-
-  function turn(direction) {
-    var next = Math.max(0, Math.min(MAX_PROGRESS, Math.round(targetProgress) + direction));
-    if (next === targetProgress) return;
-    targetProgress = next;
+  function nudge(delta) {
+    if (wheelOrigin === null) wheelOrigin = Math.round(targetProgress);
+    targetProgress = Math.max(0, Math.min(MAX_PROGRESS, targetProgress + delta));
     requestTick();
+    clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(function () {
+      var travel = targetProgress - wheelOrigin;
+      var card = Math.abs(travel) >= 0.15 && Math.abs(travel) < 1
+        ? wheelOrigin + (travel > 0 ? 1 : -1)
+        : Math.round(targetProgress);
+      wheelOrigin = null;
+      targetProgress = Math.max(0, Math.min(MAX_PROGRESS, card));
+      requestTick();
+    }, WHEEL_SETTLE_MS);
   }
 
   window.addEventListener('wheel', function (e) {
@@ -4385,33 +4379,19 @@ document.addEventListener('click', (e) => {
       if (targetProgress >= MAX_PROGRESS && dy < 0) scrollLocked = true;
       else if (targetProgress <= 0 && dy > 0) scrollLocked = true;
       else return; // still unlocked: let the page scroll
-      gesture = null;
     }
 
-    var g = trackGesture(dy, e.timeStamp || performance.now());
-    if (g.stepped) { e.preventDefault(); return; } // rest of a gesture that already turned
-
-    // A new gesture pushing outward at a settled end hands the page back.
-    var settled = Math.abs(targetProgress - lerpedProgress) < 0.02;
-    if (g.sum === 0 && settled &&
-        ((targetProgress >= MAX_PROGRESS && dy > 0) || (targetProgress <= 0 && dy < 0))) {
+    // Settled at an end and pushed outward: hand the page back.
+    var settled = Math.abs(targetProgress - lerpedProgress) < 0.01;
+    if (settled && ((targetProgress >= MAX_PROGRESS && dy > 0) || (targetProgress <= 0 && dy < 0))) {
       scrollLocked = false;
-      gesture = null;
       return;
     }
 
     e.preventDefault();
-    if (!sectionAligned()) {
-      alignSection();
-      g.stepped = true; // the gesture that brings the section into place doesn't also turn it
-      return;
-    }
+    if (!sectionAligned()) { alignSection(); return; }
     finishEntry();
-    g.sum += dy;
-    if (Math.abs(g.sum) >= WHEEL_COMMIT_PX) {
-      g.stepped = true;
-      turn(g.dir);
-    }
+    nudge(dy * WHEEL_SENSITIVITY);
   }, { passive: false });
 
   /* ─── Phone buttons ──────────────────────────────────────────── */
@@ -4716,6 +4696,7 @@ document.addEventListener('click', (e) => {
     isPhone = next && nextPhone;
     section.classList.toggle('sov-orbit-on', on);
     section.classList.toggle('sov-orbit-phone', isPhone);
+    setPictures();
     if (on && wasOn) { // desktop ↔ phone: same orbit, new framing
       stopAutoTurn();
       if (!isPhone) { targetProgress = cardAt(targetProgress); motion.jumpTo(targetProgress); }
@@ -4747,6 +4728,25 @@ document.addEventListener('click', (e) => {
     section.removeAttribute('data-sov-position');
     syncVideos();
   }
+
+  // Card pictures wait in data-bg / data-poster (a <video poster> downloads even
+  // while hidden, which cost ~365 KB on first load). Set them once the section is
+  // within a screen, and only when the orbit is actually shown (tablets keep the list).
+  var near = false, pictured = false;
+  function setPictures() {
+    if (pictured || !on || !near) return;
+    pictured = true;
+    cards.forEach(function (card) {
+      var bg = card.getAttribute('data-bg');
+      if (bg) card.style.backgroundImage = "url('" + bg + "')";
+      var video = card.querySelector('video[data-poster]');
+      if (video) video.poster = video.getAttribute('data-poster');
+    });
+  }
+  new IntersectionObserver(function (entries) {
+    near = entries[0].isIntersecting;
+    setPictures();
+  }, { rootMargin: '100% 0px' }).observe(section);
 
   new IntersectionObserver(function (entries) {
     inView = entries[0].intersectionRatio >= 0.5;

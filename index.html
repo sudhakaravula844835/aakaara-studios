@@ -66,7 +66,12 @@
 <!-- PERF FIX: preconnect for Formspree — contact form POSTs to this origin -->
 <link rel="preconnect" href="https://formspree.io">
 <!-- PERF FIX: Flatpickr CSS removed from here — injected lazily by Script.js when the date picker is first focused, saving one render-blocking stylesheet request on every page load. -->
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Outfit:wght@200;300;400;500;600&family=Noto+Sans+Telugu:wght@300;400&family=Noto+Sans+Devanagari:wght@300;400&display=swap" rel="stylesheet">
+<!-- PERF: fonts load without blocking the first paint (display=swap; the intro covers the swap) -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Outfit:wght@200;300;400;500;600&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet"></noscript>
+<!-- PERF: Telugu/Devanagari only for the two About words — text= serves just those glyphs (~2 KB, not ~300 KB) -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@300;400&family=Noto+Sans+Devanagari:wght@300;400&display=swap&text=%E0%B0%86%E0%B0%95%E0%B0%BE%E0%B0%B0%E0%B0%82%E0%A4%86%E0%A4%95%E0%A4%BE%E0%A4%B0%28%C4%80k%C4%81ram%29" rel="stylesheet" media="print" onload="this.media='all'">
 <!-- PERF FIX: TypeKit CSS removed from index.html — Adobe font kit is unused here (styles.css uses Cormorant Garamond + Outfit from Google Fonts). Typekit still loaded in couple-portraits.html where it is used. Removing saves 1 render-blocking cross-origin stylesheet request. -->
 <!-- Adobe Fonts kit, for Cesso in the desktop services orbit's subtitles (as on the study page).
      Loaded without blocking render: media="print" switches to "all" once it arrives. -->
@@ -1663,10 +1668,10 @@
     </header>
     <div class="sov-orbit-stage" aria-label="Our work, in orbit">
       <div class="sov-orbit-field">
-      <article class="sov-orbit-card" style="background-image: url('/media/spatial-gallery/wedding-reel-4k.jpg')">
+      <article class="sov-orbit-card" data-bg="/media/spatial-gallery/wedding-reel-4k.jpg">
         <!-- data-hls: 4K reel streamed from Bunny (adaptive, 240p–2160p). The MP4
              below is only the fallback if the stream can't play. -->
-        <video class="sov-orbit-video" muted loop playsinline preload="none" poster="/media/spatial-gallery/wedding-reel-4k.jpg" aria-hidden="true"
+        <video class="sov-orbit-video" muted loop playsinline preload="none" data-poster="/media/spatial-gallery/wedding-reel-4k.jpg" aria-hidden="true"
           data-hls="https://vz-757250d0-999.b-cdn.net/caaee9e1-dc0f-4aff-a41f-80eb9b0e6303/playlist.m3u8">
           <source data-src="/media/spatial-gallery/wedding-showreel.mp4" type="video/mp4">
         </video>
@@ -1675,8 +1680,8 @@
           <p class="sov-orbit-sub">The sacred union</p>
         </div>
       </article>
-      <article class="sov-orbit-card" style="background-image: url('/media/spatial-gallery/vyshnavi-daniel.jpg')">
-        <video class="sov-orbit-video" muted loop playsinline preload="none" poster="/media/spatial-gallery/vyshnavi-daniel.jpg" aria-hidden="true">
+      <article class="sov-orbit-card" data-bg="/media/spatial-gallery/vyshnavi-daniel.jpg">
+        <video class="sov-orbit-video" muted loop playsinline preload="none" data-poster="/media/spatial-gallery/vyshnavi-daniel.jpg" aria-hidden="true">
           <source data-src="/media/spatial-gallery/vyshnavi-daniel.mp4" type="video/mp4">
         </video>
         <div class="sov-orbit-copy">
@@ -1684,8 +1689,8 @@
           <p class="sov-orbit-sub">A promise, given in words</p>
         </div>
       </article>
-      <article class="sov-orbit-card" style="background-image: url('/media/spatial-gallery/prewedding-showreel.jpg')">
-        <video class="sov-orbit-video" muted loop playsinline preload="none" poster="/media/spatial-gallery/prewedding-showreel.jpg" aria-hidden="true">
+      <article class="sov-orbit-card" data-bg="/media/spatial-gallery/prewedding-showreel.jpg">
+        <video class="sov-orbit-video" muted loop playsinline preload="none" data-poster="/media/spatial-gallery/prewedding-showreel.jpg" aria-hidden="true">
           <source data-src="/media/spatial-gallery/prewedding-showreel.mp4" type="video/mp4">
         </video>
         <div class="sov-orbit-copy">
@@ -1693,8 +1698,8 @@
           <p class="sov-orbit-sub">Love, the first of the nine rasas</p>
         </div>
       </article>
-      <article class="sov-orbit-card" style="background-image: url('/media/spatial-gallery/celebrations-showreel.jpg')">
-        <video class="sov-orbit-video" muted loop playsinline preload="none" poster="/media/spatial-gallery/celebrations-showreel.jpg" aria-hidden="true">
+      <article class="sov-orbit-card" data-bg="/media/spatial-gallery/celebrations-showreel.jpg">
+        <video class="sov-orbit-video" muted loop playsinline preload="none" data-poster="/media/spatial-gallery/celebrations-showreel.jpg" aria-hidden="true">
           <source data-src="/media/spatial-gallery/celebrations-showreel.mp4" type="video/mp4">
         </video>
         <div class="sov-orbit-copy">
@@ -1702,8 +1707,8 @@
           <p class="sov-orbit-sub">Every milestone, a festival</p>
         </div>
       </article>
-      <article class="sov-orbit-card" style="background-image: url('/media/spatial-gallery/conceptual-showreel.jpg')">
-        <video class="sov-orbit-video" muted loop playsinline preload="none" poster="/media/spatial-gallery/conceptual-showreel.jpg" aria-hidden="true">
+      <article class="sov-orbit-card" data-bg="/media/spatial-gallery/conceptual-showreel.jpg">
+        <video class="sov-orbit-video" muted loop playsinline preload="none" data-poster="/media/spatial-gallery/conceptual-showreel.jpg" aria-hidden="true">
           <source data-src="/media/spatial-gallery/conceptual-showreel.mp4" type="video/mp4">
         </video>
         <div class="sov-orbit-copy">
