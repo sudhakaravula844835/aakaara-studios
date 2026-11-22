@@ -233,7 +233,12 @@ module.exports = function defineSpiralTests(test, expect) {
 
   test.describe('Services orbit — phone (the ring)', () => {
     test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
-    test.beforeEach(async ({ page }) => { await page.addInitScript(skipIntro); });
+    // The ring drifts round on its own; tests other than the drift's own hold it
+    // still so positions stay exact.
+    test.beforeEach(async ({ page }, info) => {
+      await page.addInitScript(skipIntro);
+      if (!/drifts|reduced motion/.test(info.title)) await page.addInitScript(() => { window.__sovNoDrift = true; });
+    });
     const rect = (page, sel) => page.locator(sel).first().evaluate(e => {
       const r = e.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, left: r.left, right: r.right };
     });
@@ -495,28 +500,36 @@ module.exports = function defineSpiralTests(test, expect) {
       expect(x).toBeLessThan(1);                           // and rests square-on
     });
 
-    test('the ring turns itself on to the next card after a few seconds, and keeps looping', async ({ page }) => {
+    test('the ring drifts round on its own in a steady circular motion, and keeps looping', async ({ page }) => {
       test.setTimeout(45000);
       await page.goto('/');
       await arrive(page);
-      expect(await position(page)).toBe('0');
-      await page.waitForTimeout(3000);
-      expect(await position(page)).toBe('0');                  // holds the card while its film plays
-      await expect.poll(() => position(page), { timeout: 9000 }).toBe('1');
-      await expect.poll(() => position(page), { timeout: 9000 }).toBe('2');
+      // Sample the progress (card 1's rotateY) several times: it keeps moving the
+      // same way at an even pace — never parked on a card.
+      const angle = () => page.locator('#services-overview .sov-orbit-card').first()
+        .evaluate(e => +/rotateY\(([-\d.]+)deg\)/.exec(e.style.transform)[1]);
+      await page.waitForTimeout(2500);
+      const a = await angle();
+      await page.waitForTimeout(1000);
+      const b = await angle();
+      await page.waitForTimeout(1000);
+      const c = await angle();
+      expect(a - b).toBeGreaterThan(5);                        // ~14°/s (0.2 cards/s × 72°)
+      expect(b - c).toBeGreaterThan(5);
+      expect(Math.abs((a - b) - (b - c))).toBeLessThan(6);     // steady, not stop-and-go
+      await expect.poll(() => position(page), { timeout: 12000 }).toBe('2');
     });
 
-    test('after a tap it waits before turning itself again', async ({ page }) => {
+    test('after a tap the ring holds still, then drifts on again', async ({ page }) => {
       test.setTimeout(45000);
       await page.goto('/');
       await arrive(page);
-      await page.waitForTimeout(4000);
       await page.locator('#services-overview .sov-orbit-next').click();
       await page.waitForTimeout(SETTLE_MS);
-      expect(await position(page)).toBe('1');
-      await page.waitForTimeout(5500);                         // past the normal hold, inside the wait
-      expect(await position(page)).toBe('1');
-      await expect.poll(() => position(page), { timeout: 6000 }).toBe('2');
+      const held = await position(page);
+      await page.waitForTimeout(5000);                         // inside the 8 s wait
+      expect(await position(page)).toBe(held);
+      await expect.poll(() => position(page), { timeout: 12000 }).not.toBe(held);
     });
 
     test('reduced motion: never turns itself, and Next jumps straight to the card', async ({ page }) => {

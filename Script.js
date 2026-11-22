@@ -4664,39 +4664,50 @@ document.addEventListener('click', (e) => {
     entryTimers.push(setTimeout(finishEntry, fadeEnd + 80));
   }
 
-  /* ─── Phones: the ring turns itself, card by card ───────────────
-     Each card stays in front for AUTO_HOLD_MS while its film plays, then the
-     ring glides on to the next and loops. A swipe or tap holds it for
-     AUTO_IDLE_MS. Never with reduced motion, while the page is hidden, or
-     while keyboard focus is inside the section. */
-  var AUTO_HOLD_MS = 6000;
-  var AUTO_IDLE_MS = 8000;
-  var autoTimer = null, landedAt = 0, touchedAt = -Infinity;
+  /* ─── Phones: the ring drifts round on its own ─────────────────────
+     A slow, steady circular motion (one full turn in ~25 s, 2026-11-22; it
+     used to hold each card 6 s and then step). Each frame moves the ring a
+     little and parks the spring there, so the ring never counts as "turning":
+     the front card's film keeps playing and a swipe takes over from wherever
+     it is. A swipe, tap or button holds the drift for AUTO_IDLE_MS. Never with
+     reduced motion, while the page is hidden, or with keyboard focus inside. */
+  var DRIFT_CARDS_PER_S = 0.2;   // 5 cards → one full turn in 25 s
+  var DRIFT_START_MS = 1200;     // after the entry turn-in lands
+  var AUTO_IDLE_MS = 8000;       // quiet time after a touch before drifting again
+  var autoFrame = null, autoLast = 0, landedAt = 0, touchedAt = -Infinity;
   function holdAutoTurn() { touchedAt = performance.now(); }
   function autoAllowed() {
     return on && isPhone && inView && !entryActive && entryTurn === null && !turning &&
-      !reducedMotion.matches && !document.hidden && !section.querySelector(':focus-visible');
+      !reducedMotion.matches && !document.hidden && !section.querySelector(':focus-visible') &&
+      !window.__sovNoDrift; // tests that need the ring to stay put set this
   }
-  function autoTick() {
-    autoTimer = null;
-    if (!on || !isPhone || !inView) return;
+  function autoTick(time) {
+    autoFrame = null;
+    if (!on || !isPhone || !inView) { autoLast = 0; return; }
     var now = performance.now();
-    if (autoAllowed() && now - landedAt >= AUTO_HOLD_MS && now - touchedAt >= AUTO_IDLE_MS) {
-      targetProgress = Math.round(targetProgress) + 1;
-      applyFrame();
-      requestTick();
+    if (autoAllowed() && now - landedAt >= DRIFT_START_MS && now - touchedAt >= AUTO_IDLE_MS) {
+      var dt = autoLast ? Math.min(0.1, (time - autoLast) / 1000) : 0;
+      if (dt > 0) {
+        targetProgress += DRIFT_CARDS_PER_S * dt;
+        motion.jumpTo(targetProgress);
+      }
+      autoLast = time;
+    } else {
+      autoLast = 0;
     }
-    autoTimer = setTimeout(autoTick, 250);
+    autoFrame = requestAnimationFrame(autoTick);
   }
   function startAutoTurn() {
-    if (autoTimer === null && on && isPhone && inView) {
-      landedAt = performance.now(); // a fresh arrival gets a full hold first
-      autoTimer = setTimeout(autoTick, 250);
+    if (autoFrame === null && on && isPhone && inView) {
+      landedAt = performance.now();
+      autoLast = 0;
+      autoFrame = requestAnimationFrame(autoTick);
     }
   }
   function stopAutoTurn() {
-    if (autoTimer !== null) clearTimeout(autoTimer);
-    autoTimer = null;
+    if (autoFrame !== null) cancelAnimationFrame(autoFrame);
+    autoFrame = null;
+    autoLast = 0;
   }
 
   /* ─── On / off, desktop / phone ──────────────────────────────── */
