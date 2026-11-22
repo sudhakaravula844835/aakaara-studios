@@ -4315,7 +4315,11 @@ document.addEventListener('click', (e) => {
     lerpedProgress = position;
     applyFrame();
     var nowTurning = Math.abs(targetProgress - position) > 0.002;
-    if (nowTurning !== turning) { turning = nowTurning; syncVideos(); }
+    if (nowTurning !== turning) {
+      turning = nowTurning;
+      if (!turning) landedAt = performance.now();
+      syncVideos();
+    }
   });
   // Glide to targetProgress; a velocity (cards/s) hands off a finger's speed.
   function requestTick(handoffVelocity) {
@@ -4408,7 +4412,7 @@ document.addEventListener('click', (e) => {
   function stepCard(direction) {
     var next = Math.round(targetProgress) + direction;
     targetProgress = isPhone ? next : Math.max(0, Math.min(MAX_PROGRESS, next));
-    holdDrift();
+    holdAutoTurn();
     scrollLocked = true;
     finishEntry();
     applyFrame();
@@ -4587,13 +4591,13 @@ document.addEventListener('click', (e) => {
     isVisible: function () { return inView; },
     max: MAX_PROGRESS,
     getProgress: function () { return lerpedProgress; },
-    onCapture: function () { finishEntry(); holdDrift(); scrollLocked = true; },
+    onCapture: function () { finishEntry(); holdAutoTurn(); scrollLocked = true; },
     onDrag: function (progress) {
       targetProgress = progress;
       motion.jumpTo(progress); // the cards follow the finger exactly
     },
     onSettle: function (progress, handoffVelocity) {
-      holdDrift();
+      holdAutoTurn();
       targetProgress = progress;
       applyFrame();
       requestTick(handoffVelocity);
@@ -4626,6 +4630,7 @@ document.addEventListener('click', (e) => {
     entryTurn = null;
     motion.jumpTo(lerpedProgress); // the spring carries on from where the ring is
     turning = false;
+    landedAt = performance.now();
     if (!entryActive) requestTick();
     syncVideos();
   }
@@ -4656,53 +4661,39 @@ document.addEventListener('click', (e) => {
     entryTimers.push(setTimeout(finishEntry, fadeEnd + 80));
   }
 
-  /* ─── Phones: the ring turns slowly on its own ───────────────────
-     Only while the front card's film isn't playing (still loading, or the
-     phone refused autoplay, e.g. Low Power Mode): a playing film holds the
-     ring still. Never with reduced motion, and it waits a few seconds after
-     any swipe or tap. Where it stops, the ring settles on the nearest card. */
-  var DRIFT_CARDS_PER_SECOND = 0.05; // one card every 20 s
-  var DRIFT_HOLD_MS = 3000;
-  var driftFrame = null, driftLast = 0, drifting = false, driftResumeAt = 0;
-  function holdDrift() { driftResumeAt = performance.now() + DRIFT_HOLD_MS; }
-  function driftAllowed(now) {
-    var film = videos[announcedCard];
-    return on && isPhone && inView && !entryActive && entryTurn === null &&
-      !reducedMotion.matches && !document.hidden && now >= driftResumeAt &&
-      (drifting || Math.abs(targetProgress - lerpedProgress) < 0.002) &&
-      (!film || film.paused);
+  /* ─── Phones: the ring turns itself, card by card ───────────────
+     Each card stays in front for AUTO_HOLD_MS while its film plays, then the
+     ring glides on to the next and loops. A swipe or tap holds it for
+     AUTO_IDLE_MS. Never with reduced motion, while the page is hidden, or
+     while keyboard focus is inside the section. */
+  var AUTO_HOLD_MS = 6000;
+  var AUTO_IDLE_MS = 8000;
+  var autoTimer = null, landedAt = 0, touchedAt = -Infinity;
+  function holdAutoTurn() { touchedAt = performance.now(); }
+  function autoAllowed() {
+    return on && isPhone && inView && !entryActive && entryTurn === null && !turning &&
+      !reducedMotion.matches && !document.hidden && !section.querySelector(':focus-visible');
   }
-  function driftStep(now) {
-    driftFrame = null;
-    if (!on || !isPhone || !inView) { stopDrift(); return; }
-    if (driftAllowed(now)) {
-      var dt = driftLast ? Math.min(0.1, (now - driftLast) / 1000) : 0;
-      drifting = true;
-      targetProgress = lerpedProgress + DRIFT_CARDS_PER_SECOND * dt;
-      motion.jumpTo(targetProgress);
-    } else if (drifting) {
-      // Stopped mid-way (a film started, or a touch): land on the nearest card.
-      drifting = false;
-      targetProgress = Math.round(lerpedProgress);
+  function autoTick() {
+    autoTimer = null;
+    if (!on || !isPhone || !inView) return;
+    var now = performance.now();
+    if (autoAllowed() && now - landedAt >= AUTO_HOLD_MS && now - touchedAt >= AUTO_IDLE_MS) {
+      targetProgress = Math.round(targetProgress) + 1;
+      applyFrame();
       requestTick();
     }
-    driftLast = now;
-    driftFrame = requestAnimationFrame(driftStep);
+    autoTimer = setTimeout(autoTick, 250);
   }
-  function startDrift() {
-    if (driftFrame === null && on && isPhone && inView) {
-      driftLast = 0;
-      driftFrame = requestAnimationFrame(driftStep);
+  function startAutoTurn() {
+    if (autoTimer === null && on && isPhone && inView) {
+      landedAt = performance.now(); // a fresh arrival gets a full hold first
+      autoTimer = setTimeout(autoTick, 250);
     }
   }
-  function stopDrift() {
-    if (driftFrame !== null) cancelAnimationFrame(driftFrame);
-    driftFrame = null;
-    if (drifting) {
-      drifting = false;
-      targetProgress = Math.round(lerpedProgress);
-      requestTick();
-    }
+  function stopAutoTurn() {
+    if (autoTimer !== null) clearTimeout(autoTimer);
+    autoTimer = null;
   }
 
   /* ─── On / off, desktop / phone ──────────────────────────────── */
@@ -4720,9 +4711,9 @@ document.addEventListener('click', (e) => {
     section.classList.toggle('sov-orbit-on', on);
     section.classList.toggle('sov-orbit-phone', isPhone);
     if (on && wasOn) { // desktop ↔ phone: same orbit, new framing
-      stopDrift();
+      stopAutoTurn();
       if (!isPhone) { targetProgress = cardAt(targetProgress); motion.jumpTo(targetProgress); }
-      else startDrift();
+      else startAutoTurn();
       announcedCard = -1;
       updateLayout();
       return;
@@ -4735,7 +4726,7 @@ document.addEventListener('click', (e) => {
       return;
     }
     finishEntry();
-    stopDrift();
+    stopAutoTurn();
     targetProgress = cardAt(targetProgress);
     motion.jumpTo(targetProgress);
     field.style.removeProperty('transform');
@@ -4754,7 +4745,7 @@ document.addEventListener('click', (e) => {
   new IntersectionObserver(function (entries) {
     inView = entries[0].intersectionRatio >= 0.5;
     if (entries[0].isIntersecting) boot();
-    if (inView) startDrift(); else stopDrift();
+    if (inView) startAutoTurn(); else stopAutoTurn();
   }, { threshold: [0, 0.3, 0.5] }).observe(section);
   // Looser threshold for playback: keep the front card playing while any
   // meaningful part of the orbit is on screen.

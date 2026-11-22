@@ -479,44 +479,37 @@ module.exports = function defineSpiralTests(test, expect) {
       expect(x).toBeLessThan(1);                           // and rests square-on
     });
 
-    test('while the front film plays, the ring holds still', async ({ page }) => {
+    test('the ring turns itself on to the next card after a few seconds, and keeps looping', async ({ page }) => {
+      test.setTimeout(45000);
       await page.goto('/');
       await arrive(page);
-      await page.waitForTimeout(1500);
-      const xAt = () => page.locator('#services-overview .sov-orbit-card').first()
-        .evaluate(e => new DOMMatrix(getComputedStyle(e).transform).m41);
-      const a = await xAt();
-      await page.waitForTimeout(2500);
-      expect(Math.abs((await xAt()) - a)).toBeLessThan(1);
       expect(await position(page)).toBe('0');
+      await page.waitForTimeout(3000);
+      expect(await position(page)).toBe('0');                  // holds the card while its film plays
+      await expect.poll(() => position(page), { timeout: 9000 }).toBe('1');
+      await expect.poll(() => position(page), { timeout: 9000 }).toBe('2');
     });
 
-    test('when the phone refuses autoplay, the ring turns slowly on its own', async ({ page }) => {
-      await page.addInitScript(() => {
-        HTMLMediaElement.prototype.play = function () { return Promise.reject(new DOMException('blocked', 'NotAllowedError')); };
-      });
+    test('after a tap it waits before turning itself again', async ({ page }) => {
+      test.setTimeout(45000);
       await page.goto('/');
       await arrive(page);
-      await page.waitForTimeout(1500);
-      const xAt = () => page.locator('#services-overview .sov-orbit-card').first()
-        .evaluate(e => new DOMMatrix(getComputedStyle(e).transform).m41);
-      const a = await xAt();
-      await page.waitForTimeout(2500);
-      expect(Math.abs((await xAt()) - a)).toBeGreaterThan(10);
+      await page.waitForTimeout(4000);
+      await page.locator('#services-overview .sov-orbit-next').click();
+      await page.waitForTimeout(SETTLE_MS);
+      expect(await position(page)).toBe('1');
+      await page.waitForTimeout(5500);                         // past the normal hold, inside the wait
+      expect(await position(page)).toBe('1');
+      await expect.poll(() => position(page), { timeout: 6000 }).toBe('2');
     });
 
-    test('reduced motion: no turning on its own, and Next jumps straight to the card', async ({ page }) => {
+    test('reduced motion: never turns itself, and Next jumps straight to the card', async ({ page }) => {
+      test.setTimeout(45000);
       await page.emulateMedia({ reducedMotion: 'reduce' });
-      await page.addInitScript(() => {
-        HTMLMediaElement.prototype.play = function () { return Promise.reject(new DOMException('blocked', 'NotAllowedError')); };
-      });
       await page.goto('/');
       await arrive(page);
-      const xAt = () => page.locator('#services-overview .sov-orbit-card').first()
-        .evaluate(e => new DOMMatrix(getComputedStyle(e).transform).m41);
-      const a = await xAt();
-      await page.waitForTimeout(2500);
-      expect(Math.abs((await xAt()) - a)).toBeLessThan(1);
+      await page.waitForTimeout(9000);
+      expect(await position(page)).toBe('0');
       await page.locator('#services-overview .sov-orbit-next').click();
       await page.waitForTimeout(120);
       expect(await position(page)).toBe('1');
