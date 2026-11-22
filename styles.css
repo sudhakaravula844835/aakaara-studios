@@ -2321,6 +2321,18 @@ body.intro-active #heroScroll { opacity: 0; }
   .sov-grid { grid-template-columns: repeat(2, 1fr); }
 }
 /* sov-grid stays at 2 columns on mobile (overridden in mobile block below) */
+/* Five services, no empty cell: three columns become 3 + 2 (the last two
+   cards share the second row); two columns become 2 + 2 + 1 (the last card
+   takes the full width). */
+.sov-grid { grid-template-columns: repeat(6, 1fr); }
+.sov-grid > .sov-card { grid-column: span 2; }
+.sov-grid > .sov-card:nth-child(n+4) { grid-column: span 3; }
+@media (max-width: 1024px) {
+  .sov-grid { grid-template-columns: repeat(2, 1fr); }
+  .sov-grid > .sov-card,
+  .sov-grid > .sov-card:nth-child(n+4) { grid-column: auto; }
+  .sov-grid > .sov-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
 
 /* ═══════════════════════════════════════════════════════════
    CINEMATIC SERVICES — SCROLL STACK
@@ -3454,9 +3466,9 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .cs-text-overlay { left: 2rem; right: 5rem; top: clamp(7rem, 13vh, 9rem); min-height: min(24rem, 48vh); }
 }
 
-@media (max-width: 768px) {
-  nav { padding: 1rem 1.5rem; }
-  nav.scrolled { padding: 0.6rem 1.5rem; }
+/* Menu: the full link row needs about 1080px; below that (iPad portrait,
+   small laptops, phones) it folds into the ☰ menu instead of wrapping. */
+@media (max-width: 1080px) {
   .nav-links { display: none; }
   /* MOBILE FIX: hamburger was ~30×22px — Apple HIG + WCAG require 44×44px minimum touch target */
   .nav-toggle {
@@ -3468,6 +3480,17 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
     padding: 0;
     margin-right: -0.5rem; /* compensate for added width so nav edge stays flush */
   }
+  .nav-links.show { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: rgba(9,8,11,1); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 2rem; gap: 1.5rem; max-height: 85vh; overflow-y: auto; isolation: isolate; }
+  /* a11y audit #11: 44px-tall tap rows (were 18px text with gaps between) */
+  .nav-links.show { gap: 0.2rem; }
+  .nav-links.show a:not(.nav-cta) { display: flex; align-items: center; min-height: 44px; }
+  .nav-links.show a:not(.nav-cta)::after { bottom: 8px; }
+  .nav-links.show a.nav-cta { margin-top: 0.8rem; min-height: 44px; display: inline-flex; align-items: center; align-self: center; } /* centred under the centred links */
+}
+
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.5rem; }
+  nav.scrolled { padding: 0.6rem 1.5rem; }
   .section { padding: var(--section-space-tablet) var(--page-gutter-tablet); }
   .about-grid, .contact-grid { grid-template-columns: 1fr; grid-template-rows: auto; gap: 2rem; }
   .contact-info { position: static; padding-top: 0; }
@@ -3571,12 +3594,6 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .ec-prev { left: 0.5rem; }
   .ec-next { right: 0.5rem; }
 
-  .nav-links.show { display: flex !important; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: rgba(9,8,11,1); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 2rem; gap: 1.5rem; max-height: 85vh; overflow-y: auto; isolation: isolate; }
-  /* a11y audit #11: 44px-tall tap rows (were 18px text with gaps between) */
-  .nav-links.show { gap: 0.2rem; }
-  .nav-links.show a:not(.nav-cta) { display: flex; align-items: center; min-height: 44px; }
-  .nav-links.show a:not(.nav-cta)::after { bottom: 8px; }
-  .nav-links.show a.nav-cta { margin-top: 0.8rem; min-height: 44px; display: inline-flex; align-items: center; align-self: flex-start; }
 
   /* Disable custom cursor on touch devices */
   .gallery-item { cursor: pointer; }
