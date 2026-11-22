@@ -12,6 +12,8 @@ images/couple-portraits/Suprith-pragna/
 # Ignore local video source files
 *.mp4
 *.mov
+# …except the short web-encoded loops the spatial gallery serves (~30 MB total)
+!media/spatial-gallery/*.mp4
 node_modules/
 playwright-report/
 test-results/

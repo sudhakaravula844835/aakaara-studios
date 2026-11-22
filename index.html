@@ -68,6 +68,9 @@
 <!-- PERF FIX: Flatpickr CSS removed from here — injected lazily by Script.js when the date picker is first focused, saving one render-blocking stylesheet request on every page load. -->
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Outfit:wght@200;300;400;500;600&family=Noto+Sans+Telugu:wght@300;400&family=Noto+Sans+Devanagari:wght@300;400&display=swap" rel="stylesheet">
 <!-- PERF FIX: TypeKit CSS removed from index.html — Adobe font kit is unused here (styles.css uses Cormorant Garamond + Outfit from Google Fonts). Typekit still loaded in couple-portraits.html where it is used. Removing saves 1 render-blocking cross-origin stylesheet request. -->
+<!-- Adobe Fonts kit, for Cesso in the desktop services orbit's subtitles (as on the study page).
+     Loaded without blocking render: media="print" switches to "all" once it arrives. -->
+<link rel="stylesheet" href="https://use.typekit.net/ffu1awu.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="/styles.css">
 <!-- SEO FIX: theme-color surfaces brand gold in Android Chrome's address bar and
      in the "Install as app" prompt — minor but reinforces brand identity -->
@@ -1648,11 +1651,89 @@
 
 <!-- ════════════════════ SERVICES OVERVIEW ════════════════════ -->
 <section class="section section-dark" id="services-overview" style="padding-top:4.5rem;padding-bottom:4.5rem;">
+  <!-- Services orbit (desktop only): a copy of the first spiral on
+       animation_spatial_gallery.html — same cards, size, paths and wheel behaviour.
+       Script.js adds .sov-orbit-on (≥1200px, fine pointer), which shows this and hides
+       the services list below; phones and tablets keep the list. Each card's video
+       keeps its file in data-src until the card first reaches the front. -->
+  <div class="sov-orbit">
+    <header class="sov-orbit-head">
+      <p class="sov-orbit-kicker">What We Offer</p>
+      <h2 class="sov-orbit-title">Five Ways We Tell <em>Your Story</em></h2>
+    </header>
+    <div class="sov-orbit-stage" aria-label="Our work, in orbit">
+      <div class="sov-orbit-field">
+      <article class="sov-orbit-card" style="background-image: url('/media/spatial-gallery/wedding-reel-4k.jpg')">
+        <!-- data-hls: 4K reel streamed from Bunny (adaptive, 240p–2160p). The MP4
+             below is only the fallback if the stream can't play. -->
+        <video class="sov-orbit-video" muted loop playsinline preload="none" poster="/media/spatial-gallery/wedding-reel-4k.jpg" aria-hidden="true"
+          data-hls="https://vz-757250d0-999.b-cdn.net/caaee9e1-dc0f-4aff-a41f-80eb9b0e6303/playlist.m3u8">
+          <source data-src="/media/spatial-gallery/wedding-showreel.mp4" type="video/mp4">
+        </video>
+        <div class="sov-orbit-copy">
+          <h3 class="sov-orbit-card-title"><span class="sov-orbit-sa" lang="sa-Latn">Vivāha</span><span class="sov-orbit-sep" aria-hidden="true">&nbsp;/ </span>Weddings</h3>
+          <p class="sov-orbit-sub">The sacred union</p>
+        </div>
+      </article>
+      <article class="sov-orbit-card" style="background-image: url('/media/spatial-gallery/vyshnavi-daniel.jpg')">
+        <video class="sov-orbit-video" muted loop playsinline preload="none" poster="/media/spatial-gallery/vyshnavi-daniel.jpg" aria-hidden="true">
+          <source data-src="/media/spatial-gallery/vyshnavi-daniel.mp4" type="video/mp4">
+        </video>
+        <div class="sov-orbit-copy">
+          <h3 class="sov-orbit-card-title"><span class="sov-orbit-sa" lang="sa-Latn">Vāgdāna</span><span class="sov-orbit-sep" aria-hidden="true">&nbsp;/ </span>Engagement</h3>
+          <p class="sov-orbit-sub">A promise, given in words</p>
+        </div>
+      </article>
+      <article class="sov-orbit-card" style="background-image: url('/media/spatial-gallery/prewedding-showreel.jpg')">
+        <video class="sov-orbit-video" muted loop playsinline preload="none" poster="/media/spatial-gallery/prewedding-showreel.jpg" aria-hidden="true">
+          <source data-src="/media/spatial-gallery/prewedding-showreel.mp4" type="video/mp4">
+        </video>
+        <div class="sov-orbit-copy">
+          <h3 class="sov-orbit-card-title"><span class="sov-orbit-sa" lang="sa-Latn">Śṛṅgāra</span><span class="sov-orbit-sep" aria-hidden="true">&nbsp;/ </span>Pre-wedding</h3>
+          <p class="sov-orbit-sub">Love, the first of the nine rasas</p>
+        </div>
+      </article>
+      <article class="sov-orbit-card" style="background-image: url('/media/spatial-gallery/celebrations-showreel.jpg')">
+        <video class="sov-orbit-video" muted loop playsinline preload="none" poster="/media/spatial-gallery/celebrations-showreel.jpg" aria-hidden="true">
+          <source data-src="/media/spatial-gallery/celebrations-showreel.mp4" type="video/mp4">
+        </video>
+        <div class="sov-orbit-copy">
+          <h3 class="sov-orbit-card-title"><span class="sov-orbit-sa" lang="sa-Latn">Utsava</span><span class="sov-orbit-sep" aria-hidden="true">&nbsp;/ </span>Celebrations</h3>
+          <p class="sov-orbit-sub">Every milestone, a festival</p>
+        </div>
+      </article>
+      <article class="sov-orbit-card" style="background-image: url('/media/spatial-gallery/conceptual-showreel.jpg')">
+        <video class="sov-orbit-video" muted loop playsinline preload="none" poster="/media/spatial-gallery/conceptual-showreel.jpg" aria-hidden="true">
+          <source data-src="/media/spatial-gallery/conceptual-showreel.mp4" type="video/mp4">
+        </video>
+        <div class="sov-orbit-copy">
+          <h3 class="sov-orbit-card-title"><span class="sov-orbit-sa" lang="sa-Latn">Kalpanā</span><span class="sov-orbit-sep" aria-hidden="true">&nbsp;/ </span>Conceptual</h3>
+          <p class="sov-orbit-sub">Imagination, given form</p>
+        </div>
+      </article>
+      </div>
+    </div>
+    <p class="sov-orbit-meta" aria-hidden="true">Scroll to explore</p>
+    <!-- Phone controls (shown only with .sov-orbit-phone), as on the study page.
+         A div, not <nav>: the site's global `nav` rule styles the fixed header. -->
+    <div class="sov-orbit-controls" role="group" aria-label="Our work, card by card">
+      <button type="button" class="sov-orbit-prev" aria-label="Previous card" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>
+      </button>
+      <div class="sov-orbit-status">
+        <p class="sov-orbit-count" role="status" aria-live="polite" aria-atomic="true">01 / 05</p>
+        <p class="sov-orbit-gesture">Swipe to explore</p>
+      </div>
+      <button type="button" class="sov-orbit-next" aria-label="Next card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg>
+      </button>
+    </div>
+  </div>
   <div class="container">
     <div class="reveal sov-intro">
       <div class="section-tag">What We Offer</div>
-      <!-- SEO FIX: promoted div → h2; "Six Ways We Tell Your Story" is the Services section heading -->
-      <h2 class="section-title" style="color:var(--ivory);">Six Ways We Tell<br>Your Story</h2>
+      <!-- SEO FIX: promoted div → h2; "Five Ways We Tell Your Story" is the Services section heading -->
+      <h2 class="section-title" style="color:var(--ivory);">Five Ways We Tell<br>Your Story</h2>
       <div class="section-desc">From grand weddings to quiet intimate portraits — every session is crafted with intention.</div>
     </div>
     <!-- Mobile (≤768px): .sov-grid becomes a compact single-column "contact sheet"
@@ -1727,53 +1808,6 @@
         <a href="couple-portraits.html#couple-experience" class="sov-link sov-link-view">The Experience</a>
         </div>
       </div>
-      <div class="sov-card sov-card--maternity">
-        <div class="sov-stamp sov-stamp--maternity" aria-hidden="true">
-          <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Crescent moon cradling a star — nurturing glow -->
-            <!-- Outer crescent (formed by two overlapping circles) -->
-            <defs>
-              <mask id="crescent-mask">
-                <rect width="80" height="80" fill="white"/>
-                <circle cx="44" cy="32" r="16" fill="black"/>
-              </mask>
-            </defs>
-            <circle cx="38" cy="34" r="18" stroke="currentColor" stroke-width="0.6" opacity="0.5" fill="currentColor" fill-opacity="0.04" mask="url(#crescent-mask)"/>
-            <!-- Inner crescent edge highlight -->
-            <path d="M46 18 C38 24, 36 44, 48 50" stroke="currentColor" stroke-width="0.4" opacity="0.3" fill="none"/>
-            <!-- Cradled star — new life -->
-            <circle cx="48" cy="40" r="3" fill="currentColor" opacity="0.2"/>
-            <circle cx="48" cy="40" r="1.2" fill="currentColor" opacity="0.45"/>
-            <!-- Star rays -->
-            <line x1="48" y1="35" x2="48" y2="36.5" stroke="currentColor" stroke-width="0.35" opacity="0.35"/>
-            <line x1="48" y1="43.5" x2="48" y2="45" stroke="currentColor" stroke-width="0.35" opacity="0.35"/>
-            <line x1="43" y1="40" x2="44.5" y2="40" stroke="currentColor" stroke-width="0.35" opacity="0.35"/>
-            <line x1="51.5" y1="40" x2="53" y2="40" stroke="currentColor" stroke-width="0.35" opacity="0.35"/>
-            <!-- Diagonal rays -->
-            <line x1="44.5" y1="36.5" x2="45.5" y2="37.5" stroke="currentColor" stroke-width="0.25" opacity="0.2"/>
-            <line x1="50.5" y1="37.5" x2="51.5" y2="36.5" stroke="currentColor" stroke-width="0.25" opacity="0.2"/>
-            <line x1="44.5" y1="43.5" x2="45.5" y2="42.5" stroke="currentColor" stroke-width="0.25" opacity="0.2"/>
-            <line x1="50.5" y1="42.5" x2="51.5" y2="43.5" stroke="currentColor" stroke-width="0.25" opacity="0.2"/>
-            <!-- Gentle radiating arcs — the glow of anticipation -->
-            <path d="M22 52 C26 46, 30 42, 34 40" stroke="currentColor" stroke-width="0.3" opacity="0.12" fill="none"/>
-            <path d="M24 56 C30 48, 36 44, 42 44" stroke="currentColor" stroke-width="0.25" opacity="0.08" fill="none"/>
-            <!-- Tiny floating particles — bokeh dust -->
-            <circle cx="28" cy="22" r="1" stroke="currentColor" stroke-width="0.25" opacity="0.12"/>
-            <circle cx="58" cy="28" r="0.8" stroke="currentColor" stroke-width="0.25" opacity="0.1"/>
-            <circle cx="54" cy="52" r="1.2" stroke="currentColor" stroke-width="0.25" opacity="0.1"/>
-            <text x="40" y="66" text-anchor="middle" font-size="4" font-family="var(--font-display)" letter-spacing="0.25em" fill="currentColor" opacity="0.5">SCENE III</text>
-          </svg>
-        </div>
-        <div class="sov-num">03</div>
-        <div class="sov-row">
-        <h3 class="sov-title">Maternity</h3>
-        <p class="sov-desc">From the radiant glow of maternity to the tender first days of a newborn, we create timeless portraits of new beginnings.</p>
-        <div class="sov-tags">
-          <span>New Born Baby Portraits</span>
-        </div>
-        <a href="#contact" class="sov-link">Inquire <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
-        </div>
-      </div>
       <div class="sov-card sov-card--celebrations">
         <div class="sov-stamp sov-stamp--celebration" aria-hidden="true">
           <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1795,7 +1829,7 @@
             <text x="40" y="66" text-anchor="middle" font-size="4" font-family="var(--font-display)" letter-spacing="0.25em" fill="currentColor" opacity="0.5">SCENE IV</text>
           </svg>
         </div>
-        <div class="sov-num">04</div>
+        <div class="sov-num">03</div>
         <div class="sov-row">
         <h3 class="sov-title">Celebrations</h3>
         <p class="sov-desc">From milestones to new beginnings, we capture the joy of your special occasions with a cinematic touch.</p>
@@ -1828,7 +1862,7 @@
             <text x="40" y="66" text-anchor="middle" font-size="4" font-family="var(--font-display)" letter-spacing="0.25em" fill="currentColor" opacity="0.5">SCENE V</text>
           </svg>
         </div>
-        <div class="sov-num">05</div>
+        <div class="sov-num">04</div>
         <div class="sov-row">
         <h3 class="sov-title">Commercial</h3>
         <p class="sov-desc">Product photography, brand campaigns, and editorial content for businesses and creators who refuse to be ordinary.</p>
@@ -1858,7 +1892,7 @@
             <text x="40" y="12" text-anchor="middle" font-size="4" font-family="var(--font-display)" letter-spacing="0.25em" fill="currentColor" opacity="0.5">SCENE VI</text>
           </svg>
         </div>
-        <div class="sov-num">06</div>
+        <div class="sov-num">05</div>
         <div class="sov-row">
         <h3 class="sov-title">Conceptual</h3>
         <p class="sov-desc">Surreal, editorial, and experimental visual storytelling — for those who see photography as pure art, unbound by convention.</p>

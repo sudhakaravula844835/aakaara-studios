@@ -3898,6 +3898,887 @@ document.addEventListener('click', (e) => {
   sessionStorage.setItem('returnScrollY', String(window.scrollY));
 });
 
+// ═══════ SERVICES ORBIT (desktop + phone) ═══════
+// Desktop: a copy of the first spiral on animation_spatial_gallery.html (same
+// helix, hand-tuned waiting/past paths, field pan, spring, wheel capture and
+// video loading) — keep that in step with the study page. Phones
+// (.sov-orbit-phone) show a looping ring instead (ringProps), turned by
+// sideways swipes, with buttons; this differs from the study. Tablets keep the list.
+(function () {
+  'use strict';
+  var section = document.getElementById('services-overview');
+  var field = section && section.querySelector('.sov-orbit-field');
+  if (!section || !field) return;
+  var cards = Array.prototype.slice.call(field.querySelectorAll('.sov-orbit-card'));
+  if (!cards.length) return;
+
+  var compact = window.matchMedia('(max-width: 1199px), (max-width: 1366px) and (any-pointer: coarse)');
+  var phone = window.matchMedia('(max-width: 599px), (max-width: 959px) and (max-height: 500px)');
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var copies = cards.map(function (card) { return card.querySelector('.sov-orbit-copy'); });
+  var previousButton = section.querySelector('.sov-orbit-prev');
+  var nextButton = section.querySelector('.sov-orbit-next');
+  var countLabel = section.querySelector('.sov-orbit-count');
+  var gestureLabel = section.querySelector('.sov-orbit-gesture');
+
+  /* ─── From the study page, verbatim ─────────────────────────── */
+  // One continuous helix: positive offsets wait below/right; negative offsets recede above/left.
+  function spiralProps(offset) {
+    var angle = offset * Math.PI * 55 / 180;
+    var distance = Math.abs(offset);
+    // Local position adjustment for the third slot; zero at slots two and four.
+    var thirdSlot = offset > 1 && offset < 3
+      ? Math.pow(Math.sin(Math.PI * (offset - 1) / 2), 2) : 0;
+    var fade = Math.max(0, Math.min(1, (4.5 - distance) / 0.75));
+    return {
+      // Shift the second slot right, blending smoothly into adjacent positions.
+      tx: 34 * Math.sin(angle) + (offset > 0 && offset < 2
+        ? 4 * Math.pow(Math.sin(Math.PI * offset / 2), 2) : 0) + 12.85 * thirdSlot,
+      ty: -25 + 52 * offset + 32.7 * thirdSlot,
+      tz: -650 * (1 - Math.cos(angle)),
+      // Open the second slot toward the viewer, easing away toward adjacent slots.
+      ry: offset * 55 + (offset > 0 && offset < 2
+        ? -10 * Math.pow(Math.sin(Math.PI * offset / 2), 2) : 0),
+      // Card 3 recedes behind card 2, then returns to full size along the path.
+      sc: 1 - 0.28 * thirdSlot,
+      op: fade * fade * (3 - 2 * fade)
+    };
+  }
+
+  // Critically damped spring (units: cards, cards/s): velocity stays continuous,
+  // it settles exactly on the target with no overshoot, and requests frames only while moving.
+  function createSpiralSpring(render) {
+    var FREQUENCY = 11.4; // rad/s = 2π / 0.55 s — iOS's default spring response; settles in ~0.9 s
+    var position = 0, velocity = 0, target = 0;
+    var frame = null, lastTime = 0;
+
+    function step(time) {
+      frame = null;
+      var dt = lastTime ? Math.min(0.064, Math.max(0, (time - lastTime) / 1000)) : 1 / 60;
+      lastTime = time;
+      // Exact solution of the critically damped spring over dt (frame-rate independent).
+      var offset = position - target;
+      var drift = velocity + FREQUENCY * offset;
+      var decay = Math.exp(-FREQUENCY * dt);
+      position = target + (offset + drift * dt) * decay;
+      velocity = (drift - FREQUENCY * (offset + drift * dt)) * decay;
+      if (Math.abs(position - target) < 0.0005 && Math.abs(velocity) < 0.01) {
+        position = target; // sub-pixel from the slot: land exactly on it
+        velocity = 0;
+      }
+      render(position);
+      if (position !== target || velocity !== 0) frame = requestAnimationFrame(step);
+      else lastTime = 0;
+    }
+
+    return {
+      moveTo: function (next, handoffVelocity) {
+        target = next;
+        if (typeof handoffVelocity === 'number') velocity = handoffVelocity;
+        if (frame === null && (position !== target || velocity !== 0)) {
+          frame = requestAnimationFrame(step);
+        }
+      },
+      jumpTo: function (next) {
+        if (frame !== null) cancelAnimationFrame(frame);
+        frame = null;
+        lastTime = 0;
+        position = target = next;
+        velocity = 0;
+        render(position);
+      }
+    };
+  }
+
+
+  // The spiral turns only while its section sits flush with the viewport. If the
+  // wheel arrives while the section is part-way scrolled, glide the page into
+  // place first (one smooth scroll, not restarted by every event).
+  var alignY = null, alignUntil = 0;
+  function sectionAligned() {
+    var top = section.getBoundingClientRect().top;
+    var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    return Math.abs(top) <= 1 ||
+      (top > 0 && window.scrollY >= maxScroll - 1) || (top < 0 && window.scrollY <= 0);
+  }
+  function alignSection() {
+    var y = Math.round(window.scrollY + section.getBoundingClientRect().top);
+    var now = performance.now();
+    if (y === alignY && now < alignUntil) return;
+    alignY = y;
+    alignUntil = now + 700;
+    window.scrollTo({ top: y, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
+  }
+
+  // Desktop paths: waiting cards approach along a hand-tuned arc (card 3 tucks
+  // behind card 2); past cards keep receding in depth. tx: vw, ty: % of card height,
+  // tz: px, ry: degrees.
+  var waitingSlots = [
+    spiralProps(1),
+    { tx: 39.53, ty: 77.52, tz: -610,  ry: 95 },  // 3: behind card 2
+    { tx: 28,    ty: 159,   tz: -1500, ry: 146 }, // 4: below and to the left
+    { tx: -6.32, ty: 227,   tz: -1700, ry: 180 }, // 5: below/left, facing back
+    { tx: -40.64, ty: 295,  tz: -1900, ry: 214 }  // 6: continues the same outward arc
+  ];
+  var pastSlots = [
+    spiralProps(0),
+    { tx: -34.61, ty: -110.22, tz: -529.5,  ry: -46.62 },
+    { tx: -51.81, ty: -240.91, tz: -1492.4, ry: -99.42 },
+    { tx: -30.21, ty: -260.74, tz: -1630.9, ry: -134.72 },
+    { tx: 0,      ty: -320.20, tz: -2142.5, ry: -180 },
+    { tx: 30.21,  ty: -379.66, tz: -2654.1, ry: -225.28 }
+  ];
+  var pathKeys = ['tx', 'ty', 'tz', 'ry'];
+  var entryAngle = 55 * Math.PI / 180;
+  var entrySlope = {
+    tx: 34 * entryAngle * Math.cos(entryAngle),
+    ty: 52,
+    tz: -650 * entryAngle * Math.sin(entryAngle),
+    ry: 55
+  };
+  // Shape-preserving tangents prevent a stop or reversal between positions.
+  function pathTangents(slots, firstSlope) {
+    return slots.map(function (slot, index) {
+      var tangent = {};
+      pathKeys.forEach(function (key) {
+        if (index === 0) {
+          tangent[key] = firstSlope[key];
+        } else if (index === slots.length - 1) {
+          tangent[key] = slot[key] - slots[index - 1][key];
+        } else {
+          var before = slot[key] - slots[index - 1][key];
+          var after = slots[index + 1][key] - slot[key];
+          tangent[key] = before * after <= 0 ? 0 : 2 * before * after / (before + after);
+        }
+      });
+      return tangent;
+    });
+  }
+  var waitingTangents = pathTangents(waitingSlots, entrySlope);
+  var pastTangents = pathTangents(pastSlots, { tx: -34 * entryAngle, ty: -52, tz: 0, ry: -55 });
+
+  function samplePath(p, slots, tangents, position) {
+    position = Math.min(position, slots.length - 1);
+    var segment = Math.min(slots.length - 2, Math.floor(position));
+    var t = position - segment;
+    var t2 = t * t, t3 = t2 * t;
+    pathKeys.forEach(function (key) {
+      p[key] = (2 * t3 - 3 * t2 + 1) * slots[segment][key]
+        + (t3 - 2 * t2 + t) * tangents[segment][key]
+        + (-2 * t3 + 3 * t2) * slots[segment + 1][key]
+        + (t3 - t2) * tangents[segment + 1][key];
+    });
+    p.sc = 1; // Perspective depth supplies the gradual size reduction.
+    return p;
+  }
+
+  // Phones: a ring. The five cards stand on a circle seen slightly from above;
+  // the front card faces you, the others turn away round the ring and the far
+  // ones show their backs. It loops: past card 5 comes card 1 again. Radius and
+  // tilt come from the phone CSS (measurePath). tx/tz are in card widths; ry is
+  // the card's angle on the ring.
+  var ringRadius = 1.03, ringTilt = 9;
+  function ringProps(offset) {
+    var deg = offset * 360 / cards.length;
+    var a = deg * Math.PI / 180;
+    return {
+      tx: Math.sin(a) * ringRadius,
+      ty: 0,
+      tz: (Math.cos(a) - 1) * ringRadius,
+      ry: deg,
+      sc: 1,
+      op: Math.max(0.25, 1 - Math.abs(deg) / 150)
+    };
+  }
+  // A card's place relative to the front one: on phones the shortest way round
+  // the ring (-2.5…2.5), elsewhere the plain difference.
+  function cardOffset(index, progress) {
+    if (!isPhone) return index - progress;
+    var n = cards.length;
+    var o = ((index - progress) % n + n) % n;
+    return o > n / 2 ? o - n : o;
+  }
+  function cardAt(progress) {
+    var n = cards.length;
+    return ((Math.round(progress) % n) + n) % n;
+  }
+
+  function slotProps(offset) {
+    if (isPhone) return ringProps(offset);
+    var p = spiralProps(offset);
+    if (offset < 0) return samplePath(p, pastSlots, pastTangents, -offset);
+    if (offset <= 1) return p;
+    return samplePath(p, waitingSlots, waitingTangents, offset - 1);
+  }
+
+  // Our cards are smaller than the study's (35rem) and the path's spread is set
+  // separately: ty is a % of the STUDY card's height (not ours), and both tx and
+  // ty are multiplied by --sov-orbit-spacing (1 = the study's spacing). The
+  // curve's shape, depth (tz) and turns (ry) stay the study's.
+  var pathCardHeight = 394;
+  var spacing = 1;
+  var cardWidth = 560;
+  function measurePath() {
+    var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    pathCardHeight = 35 * rem / 1.42;
+    spacing = parseFloat(getComputedStyle(section).getPropertyValue('--sov-orbit-spacing')) || 1;
+    cardWidth = cards[0].offsetWidth || cardWidth;
+    var css = getComputedStyle(section);
+    ringRadius = parseFloat(css.getPropertyValue('--sov-orbit-ring-radius')) || 1.03;
+    ringTilt = parseFloat(css.getPropertyValue('--sov-orbit-ring-tilt')) || 9;
+  }
+
+  function buildTransform(p) {
+    if (isPhone) {
+      // Step back to the ring's centre, tilt the ring towards the viewer, turn
+      // to the card's angle and step out to the rim.
+      var r = (ringRadius * cardWidth).toFixed(2);
+      return 'translateZ(' + -r + 'px) rotateX(' + -ringTilt + 'deg) ' +
+        'rotateY(' + p.ry.toFixed(3) + 'deg) translateZ(' + r + 'px)';
+    }
+    return 'translateX(' + (p.tx * spacing).toFixed(3) + 'vw) ' +
+      'translateY(' + (p.ty * pathCardHeight * spacing / 100).toFixed(2) + 'px) ' +
+      'translateZ(' + p.tz.toFixed(2) + 'px) ' +
+      'rotateY(' + p.ry.toFixed(3) + 'deg) ' +
+      'scale(' + p.sc.toFixed(4) + ')';
+  }
+  /* ─── end of study code ──────────────────────────────────────── */
+
+  var MAX_PROGRESS = cards.length - 1;
+  var on = false;
+  var isPhone = false;
+  var finalPan = 0;
+  var targetProgress = 0;
+  var lerpedProgress = 0;
+  var scrollLocked = true;   // true = wheel turns the orbit
+  var inView = false;        // ≥ 50% visible: wheel may turn the orbit
+  var visible = false;       // ≥ 15% visible: videos may play
+  var announcedCard = -1;
+  var booted = false;
+  var entryActive = false;
+  var entryTimers = [];
+
+  /* ─── Video: a card starts when it first reaches the front ─── */
+  var videos = cards.map(function (card) { return card.querySelector('video'); });
+  var started = videos.map(function () { return false; });
+  var playedOnce = videos.map(function () { return false; }); // desktop: has reached the front
+  function loadMp4(video, preload) {
+    var source = video && video.querySelector('source[data-src]');
+    if (!source) return;
+    source.src = source.getAttribute('data-src');
+    source.removeAttribute('data-src');
+    video.preload = preload;
+    video.load();
+  }
+  // A card whose <video> has data-hls streams from Bunny instead (adaptive, up
+  // to 4K): native HLS on Safari, hls.js elsewhere, capped to the card's size
+  // so a 448px card never pulls the 4K rendition. Its MP4 <source> is only the
+  // fallback. HLS cards start when they reach the front (no metadata warm-up).
+  function loadVideo(video, preload) {
+    if (!video) return;
+    var hlsUrl = video.getAttribute('data-hls');
+    if (!hlsUrl) { loadMp4(video, preload); return; }
+    if (preload !== 'auto' || video.dataset.hlsState) return;
+    video.dataset.hlsState = 'loading';
+    // hls.js may replace the <video>'s <source> children with its own (Managed
+    // MediaSource), so keep the MP4 fallback URL aside and drop that <source>.
+    var mp4Source = video.querySelector('source[data-src]');
+    var mp4Url = mp4Source && mp4Source.getAttribute('data-src');
+    if (mp4Source) mp4Source.remove();
+    function useMp4(reason) {
+      video.dataset.hlsState = 'fallback: ' + reason;
+      video.removeAttribute('src');
+      if (mp4Url) { video.src = mp4Url; video.preload = 'auto'; video.load(); }
+      syncVideos();
+    }
+    function playNative() {
+      // No MediaSource (older iPhones): the browser's own HLS player.
+      if (!video.canPlayType('application/vnd.apple.mpegurl')) throw new Error('no HLS');
+      video.src = hlsUrl;
+      video.addEventListener('error', function () { useMp4('native error'); }, { once: true });
+      syncVideos();
+    }
+    // Prefer hls.js wherever it runs: unlike native HLS it can cap the rendition
+    // to the card's size and start from a sensible quality.
+    ensureHlsLibrary().then(function (HlsCtor) {
+      if (!HlsCtor || !HlsCtor.isSupported()) { playNative(); return; }
+      var hls = new HlsCtor({
+        capLevelToPlayerSize: true,          // a 448px card never pulls 1440p/4K
+        abrEwmaDefaultEstimate: 5000000      // open near 720p, not 240p, then adapt
+      });
+      var recovered = false;
+      var manifestLoaded = false;
+      hls.on(HlsCtor.Events.MANIFEST_PARSED, function () { manifestLoaded = true; });
+      hls.on(HlsCtor.Events.ERROR, function (event, data) {
+        if (!data || !data.fatal) return;
+        video.dataset.hlsLastError = data.type + ' / ' + data.details;
+        // Once the stream is playing, one recovery attempt for a network blip or
+        // decode hiccup. If the playlist itself never loaded, there is nothing to
+        // resume (startLoad would sit idle), so go straight to the MP4.
+        if (manifestLoaded && !recovered && data.type === HlsCtor.ErrorTypes.NETWORK_ERROR) { recovered = true; hls.startLoad(); return; }
+        if (manifestLoaded && !recovered && data.type === HlsCtor.ErrorTypes.MEDIA_ERROR) { recovered = true; hls.recoverMediaError(); return; }
+        hls.destroy(); // stream still failing: fall back to the bundled MP4
+        useMp4(data.type + ' / ' + data.details);
+      });
+      video.dataset.hlsState = 'hls.js';
+      hls.loadSource(hlsUrl);
+      hls.attachMedia(video);
+      syncVideos();
+    }).catch(function (err) {
+      // Library couldn't load (or no HLS at all): native HLS, else the MP4.
+      try { playNative(); video.dataset.hlsState = 'native'; } catch (e) {
+        useMp4((err && err.message) || 'hls.js unavailable');
+      }
+    });
+  }
+  function syncVideos() {
+    if (on && visible && announcedCard >= 0 && !started[announcedCard]) {
+      started[announcedCard] = true;
+      loadVideo(videos[announcedCard], 'auto');
+      // The next card's film starts loading; on the phone ring, card 1 follows card 5.
+      loadVideo(videos[isPhone ? (announcedCard + 1) % videos.length : announcedCard + 1], 'metadata');
+    }
+    videos.forEach(function (video, i) {
+      if (!video) return;
+      // A card faded fully out of view (phone: 2.5+ cards away) pauses to save
+      // battery, and resumes when it comes back.
+      var cardShown = announcedCard < 0 || slotProps(cardOffset(i, announcedCard)).op > 0.01;
+      // A film starts only once its card has landed in front (not mid-turn:
+      // starting decode while the card moves in 3D dropped frames).
+      // Desktop: every card waits paused until it first reaches the front, then
+      // keeps looping from there on, even after it moves past (playedOnce).
+      // Phones: only the front card plays; the others hold their frame.
+      var front = i === announcedCard && !turning;
+      if (front && !isPhone) playedOnce[i] = true;
+      var shouldPlay = on && visible && started[i] && cardShown &&
+        (front || (!isPhone && playedOnce[i]));
+      if (shouldPlay && video.paused) {
+        var attempt = video.play();
+        if (attempt && attempt.catch) attempt.catch(function () {}); // autoplay refused: poster stays
+      } else if (!shouldPlay && !video.paused) {
+        video.pause();
+      }
+    });
+  }
+
+  /* ─── Render ─────────────────────────────────────────────────── */
+  var lastStyles = new WeakMap();
+  function setStyle(el, prop, value) {
+    var cache = lastStyles.get(el);
+    if (!cache) { cache = {}; lastStyles.set(el, cache); }
+    if (cache[prop] === value) return;
+    cache[prop] = value;
+    el.style[prop] = value;
+  }
+  function forgetStyles(el) { lastStyles.delete(el); }
+
+  function applyFrame() {
+    if (!on) return;
+    // Hold the opening framing on card 1, then pan down to open space above the
+    // featured card as the earlier cards recede.
+    var panProgress = Math.max(0, Math.min(1, (lerpedProgress - 1) / Math.max(1, MAX_PROGRESS - 1)));
+    var pan = panProgress * panProgress * (3 - 2 * panProgress);
+    // Write a style only when its value changes: re-setting z-index on every
+    // card every frame forces Chrome to rebuild the 3D stacking each frame.
+    setStyle(field, 'transform', isPhone ? '' : 'translateY(' + (finalPan * pan).toFixed(2) + 'px)');
+    var props = cards.map(function (card, i) { return slotProps(cardOffset(i, lerpedProgress)); });
+    // Stacking: rank cards by depth (nearest on top). The rank only changes when
+    // two cards actually swap depth, so z-index is rewritten a handful of times
+    // per turn instead of every frame.
+    var order = props.map(function (p, i) { return i; })
+      .sort(function (a, b) { return props[a].tz - props[b].tz; });
+    order.forEach(function (cardIndex, rank) { setStyle(cards[cardIndex], 'zIndex', String(rank + 1)); });
+    cards.forEach(function (card, i) {
+      var offset = cardOffset(i, lerpedProgress);
+      var p = props[i];
+      setStyle(card, 'transform', buildTransform(p));
+      if (!entryActive) setStyle(card, 'opacity', p.op.toFixed(3));
+      // Phone cards overlap, so only the card in focus shows its words; they
+      // fade out within the first ~half card of travel and back in on arrival.
+      var words = 1;
+      if (isPhone) {
+        words = Math.max(0, 1 - Math.abs(offset) / 0.45);
+        words = words * words * (3 - 2 * words);
+      }
+      setStyle(copies[i], 'opacity', words === 1 ? '' : words.toFixed(2));
+    });
+    var currentCard = isPhone ? cardAt(lerpedProgress) : Math.round(lerpedProgress);
+    if (currentCard !== announcedCard) {
+      announcedCard = currentCard;
+      section.setAttribute('data-sov-position', String(currentCard));
+      if (countLabel) countLabel.textContent = String(currentCard + 1).padStart(2, '0') + ' / ' + String(cards.length).padStart(2, '0');
+      if (gestureLabel) gestureLabel.textContent = !isPhone && currentCard === MAX_PROGRESS ? 'Scroll on to continue' : 'Swipe to explore';
+      cards.forEach(function (card, index) { card.setAttribute('aria-hidden', String(index !== currentCard)); });
+      syncVideos();
+    }
+    // The phone ring loops, so its buttons never run out.
+    if (previousButton) previousButton.disabled = !isPhone && targetProgress <= 0;
+    if (nextButton) nextButton.disabled = !isPhone && targetProgress >= MAX_PROGRESS;
+  }
+
+  var turning = false;
+  var motion = createSpiralSpring(function (position) {
+    lerpedProgress = position;
+    applyFrame();
+    var nowTurning = Math.abs(targetProgress - position) > 0.002;
+    if (nowTurning !== turning) {
+      turning = nowTurning;
+      if (!turning) landedAt = performance.now();
+      syncVideos();
+    }
+  });
+  // Glide to targetProgress; a velocity (cards/s) hands off a finger's speed.
+  function requestTick(handoffVelocity) {
+    if (entryActive) return;
+    if (reducedMotion.matches) {
+      // No glide: jump, softened on phones by a brief dip of the field.
+      if (isPhone && Math.abs(lerpedProgress - targetProgress) > 0.01) {
+        field.classList.remove('sov-orbit-jump');
+        void field.offsetWidth; // restart the animation
+        field.classList.add('sov-orbit-jump');
+      }
+      motion.jumpTo(targetProgress);
+    }
+    else motion.moveTo(targetProgress, handoffVelocity);
+  }
+  /* ─── Wheel / trackpad: one gesture turns one card ───────────────
+     Paging like iOS: a gesture commits to a turn once it has travelled a
+     little, then the rest of it — including the trackpad's momentum tail,
+     which keeps firing for ~1 s after the fingers lift — is absorbed. Adding
+     those deltas up (the study page's model) overshot the next card and
+     snapped back, which read as a stutter. A gesture ends after a short pause,
+     a change of direction, or a fresh push once the turn has landed (momentum
+     only ever decays, so a rising delta is a new swipe). */
+  var WHEEL_GAP_MS = 200;   // a pause this long ends a gesture
+  var WHEEL_COMMIT_PX = 12; // travel before a gesture commits to a turn
+  var gesture = null;       // { dir, sum, stepped, last, lastAbs }
+
+  function trackGesture(dy, now) {
+    var abs = Math.abs(dy);
+    var dir = dy > 0 ? 1 : -1;
+    var settled = Math.abs(targetProgress - lerpedProgress) < 0.02;
+    // Momentum only decays, so a delta that jumps well above the previous one
+    // (once the last turn has landed) is a new swipe, not the tail.
+    var fresh = !gesture || now - gesture.last > WHEEL_GAP_MS || dir !== gesture.dir ||
+      (gesture.stepped && settled && abs >= 10 && abs > gesture.lastAbs * 1.6);
+    if (fresh) gesture = { dir: dir, sum: 0, stepped: false, last: now, lastAbs: abs };
+    gesture.last = now;
+    gesture.lastAbs = abs;
+    return gesture;
+  }
+
+  function turn(direction) {
+    var next = Math.max(0, Math.min(MAX_PROGRESS, Math.round(targetProgress) + direction));
+    if (next === targetProgress) return;
+    targetProgress = next;
+    requestTick();
+  }
+
+  window.addEventListener('wheel', function (e) {
+    // Phones: scrolling never turns the ring (only a sideways swipe does).
+    if (!on || isPhone || !inView || e.ctrlKey || Math.abs(section.getBoundingClientRect().top) > window.innerHeight * 0.49) return;
+    var dy = e.deltaY * (e.deltaMode === 1 ? 20 : e.deltaMode === 2 ? window.innerHeight : 1);
+    if (!dy) return;
+
+    if (!scrollLocked) {
+      // Re-lock when the wheel turns back into the orbit's range.
+      if (targetProgress >= MAX_PROGRESS && dy < 0) scrollLocked = true;
+      else if (targetProgress <= 0 && dy > 0) scrollLocked = true;
+      else return; // still unlocked: let the page scroll
+      gesture = null;
+    }
+
+    var g = trackGesture(dy, e.timeStamp || performance.now());
+    if (g.stepped) { e.preventDefault(); return; } // rest of a gesture that already turned
+
+    // A new gesture pushing outward at a settled end hands the page back.
+    var settled = Math.abs(targetProgress - lerpedProgress) < 0.02;
+    if (g.sum === 0 && settled &&
+        ((targetProgress >= MAX_PROGRESS && dy > 0) || (targetProgress <= 0 && dy < 0))) {
+      scrollLocked = false;
+      gesture = null;
+      return;
+    }
+
+    e.preventDefault();
+    if (!sectionAligned()) {
+      alignSection();
+      g.stepped = true; // the gesture that brings the section into place doesn't also turn it
+      return;
+    }
+    finishEntry();
+    g.sum += dy;
+    if (Math.abs(g.sum) >= WHEEL_COMMIT_PX) {
+      g.stepped = true;
+      turn(g.dir);
+    }
+  }, { passive: false });
+
+  /* ─── Phone buttons ──────────────────────────────────────────── */
+  function stepCard(direction) {
+    var next = Math.round(targetProgress) + direction;
+    targetProgress = isPhone ? next : Math.max(0, Math.min(MAX_PROGRESS, next));
+    holdAutoTurn();
+    scrollLocked = true;
+    finishEntry();
+    applyFrame();
+    requestTick();
+  }
+  if (previousButton) previousButton.addEventListener('click', function () { stepCard(-1); });
+  if (nextButton) nextButton.addEventListener('click', function () { stepCard(1); });
+
+  /* ─── Phone touch: from the study page, verbatim ─────────────── */
+  function installSpiralTouch(options) {
+    var element = options.element;
+    var win = options.window || element.ownerDocument.defaultView;
+    // wrap: the cards loop, so there are no ends to stop at.
+    var maximum = options.wrap ? Infinity : options.max;
+    var lowest = options.wrap ? -Infinity : 0;
+    var gesture = null;
+    var threshold = 6;
+    // 'y': an upward finger advances (the study page). 'x': a leftward finger
+    // advances, and only a mostly-sideways gesture is taken; anything else
+    // stays native so the page scrolls.
+    var horizontal = options.axis === 'x';
+    // Sideways: decide later and only take a clearly sideways swipe, so a
+    // thumb's diagonal scroll always stays with the page.
+    if (horizontal) threshold = 10;
+    var dominance = horizontal ? 1.5 : 1;
+    function along(touch) { return horizontal ? touch.clientX : touch.clientY; }
+    var interactive = 'a,button,input,select,textarea,summary,video,audio,' +
+      '[contenteditable]:not([contenteditable="false"]),[role="button"],' +
+      '[role="link"],[tabindex]';
+
+    function clamp(value, minimum, maximumValue) {
+      return Math.max(minimum, Math.min(maximumValue, value));
+    }
+    function eligible() {
+      return (!options.enabled || options.enabled()) &&
+        (!options.isVisible || options.isVisible());
+    }
+    function findTouch(touches, identifier) {
+      for (var i = 0; i < touches.length; i++) {
+        if (touches[i].identifier === identifier) return touches[i];
+      }
+      return null;
+    }
+    function cancel() {
+      if (gesture && gesture.captured) {
+        options.onSettle(clamp(Math.round(gesture.progress), lowest, maximum));
+      }
+      gesture = null;
+    }
+    function start(event) {
+      if (event.touches.length !== 1) {
+        cancel();
+        return;
+      }
+      if (!eligible()) return;
+      var target = event.target;
+      if (target && target.nodeType !== 1) target = target.parentElement;
+      // Only controls INSIDE the orbit count (changed from the study page): the
+      // home page's <main tabindex="-1"> would otherwise match every touch.
+      var control = target && target.closest && target.closest(interactive);
+      if (control && element.contains(control)) return;
+      var touch = event.touches[0];
+      gesture = {
+        identifier: touch.identifier,
+        x: touch.clientX,
+        y: touch.clientY,
+        lastP: along(touch),
+        lastTime: event.timeStamp,
+        velocity: 0,
+        captured: false
+      };
+    }
+    function move(event) {
+      if (!gesture) return;
+      if (event.touches.length !== 1) {
+        cancel();
+        return;
+      }
+      if (!eligible()) {
+        cancel();
+        return;
+      }
+      var touch = findTouch(event.touches, gesture.identifier);
+      if (!touch) {
+        cancel();
+        return;
+      }
+      var cross = horizontal ? touch.clientY - gesture.y : touch.clientX - gesture.x;
+      var travel = horizontal ? gesture.x - touch.clientX : gesture.y - touch.clientY;
+      var elapsed = event.timeStamp - gesture.lastTime;
+      if (elapsed > 0) {
+        var sampleVelocity = (gesture.lastP - along(touch)) / elapsed;
+        gesture.velocity = elapsed > 120 ? sampleVelocity
+          : 0.6 * sampleVelocity + 0.4 * gesture.velocity;
+      }
+      gesture.lastP = along(touch);
+      gesture.lastTime = event.timeStamp;
+
+      if (!gesture.captured) {
+        if (Math.max(Math.abs(cross), Math.abs(travel)) < threshold) return;
+        if (Math.abs(travel) <= dominance * Math.abs(cross)) {
+          gesture = null; // Let a gesture across the axis remain native.
+          return;
+        }
+        var progress = clamp(options.getProgress(), lowest, maximum);
+        if (!options.wrap && ((progress <= 0.001 && travel < 0) ||
+            (progress >= maximum - 0.001 && travel > 0))) {
+          gesture = null; // Outward motion at an endpoint scrolls the page.
+          return;
+        }
+        if (!event.cancelable) {
+          gesture = null;
+          return;
+        }
+        gesture.captured = true;
+        gesture.originProgress = progress;
+        gesture.originIndex = Math.round(progress);
+        gesture.minimum = Math.max(lowest, gesture.originIndex - 1);
+        gesture.maximum = Math.min(maximum, gesture.originIndex + 1);
+        gesture.distance = options.getStepDistance
+          ? Math.max(1, options.getStepDistance())
+          : horizontal ? clamp(element.clientWidth * 0.35, 110, 220)
+          : clamp(element.clientHeight * 0.4, 180, 360);
+        gesture.progress = progress;
+        if (options.onCapture) options.onCapture();
+      }
+      if (!event.cancelable) {
+        cancel();
+        return;
+      }
+      event.preventDefault();
+      gesture.progress = clamp(gesture.originProgress + travel / gesture.distance,
+        gesture.minimum, gesture.maximum);
+      options.onDrag(gesture.progress);
+    }
+    function end(event) {
+      if (!gesture) return;
+      if (findTouch(event.touches, gesture.identifier)) return;
+      if (!gesture.captured) {
+        gesture = null;
+        return;
+      }
+      var touch = findTouch(event.changedTouches, gesture.identifier);
+      var travel = horizontal
+        ? gesture.x - (touch ? touch.clientX : gesture.lastP)
+        : gesture.y - (touch ? touch.clientY : gesture.lastP);
+      var velocity = event.timeStamp - gesture.lastTime <= 100 ? gesture.velocity : 0;
+      var enoughTravel = Math.abs(travel) >= gesture.distance * 0.22;
+      var flick = Math.abs(travel) >= 12 && Math.abs(velocity) >= 0.45 &&
+        travel * velocity > 0;
+      var next = gesture.originIndex;
+      if (enoughTravel || flick) next += travel > 0 ? 1 : -1;
+      // Hand the finger's speed to the settle animation (px/ms → cards/s).
+      var handoff = velocity / gesture.distance * 1000;
+      gesture = null;
+      options.onSettle(clamp(next, lowest, maximum), handoff);
+    }
+    function interrupted() {
+      cancel();
+    }
+
+    element.addEventListener('touchstart', start, { passive: true });
+    element.addEventListener('touchmove', move, { passive: false });
+    element.addEventListener('touchend', end, { passive: true });
+    element.addEventListener('touchcancel', interrupted, { passive: true });
+    win.addEventListener('resize', cancel);
+  }
+
+  installSpiralTouch({
+    element: section,
+    axis: 'x', // phones turn the ring sideways; vertical swipes scroll the page
+    wrap: true, // the ring loops: past card 5 comes card 1
+    enabled: function () { return on && isPhone; },
+    // A sideways swipe never fights the page scroll, so the section only needs
+    // to be mostly on screen (not lined up with the top, as the vertical swipe needed).
+    isVisible: function () { return inView; },
+    max: MAX_PROGRESS,
+    getProgress: function () { return lerpedProgress; },
+    onCapture: function () { finishEntry(); holdAutoTurn(); scrollLocked = true; },
+    onDrag: function (progress) {
+      targetProgress = progress;
+      motion.jumpTo(progress); // the cards follow the finger exactly
+    },
+    onSettle: function (progress, handoffVelocity) {
+      holdAutoTurn();
+      targetProgress = progress;
+      applyFrame();
+      requestTick(handoffVelocity);
+    }
+  });
+
+  /* ─── Entry: cards fade in one by one the first time the section shows ─── */
+  // Phones: while they fade in, the ring also turns into place from about half
+  // a card back, easing out, so the section arrives already moving.
+  var ENTRY_TURN_FROM = -0.45; // rounds to card 1, so the counter and film don't change
+  var entryTurn = null;
+  function turnIn(duration) {
+    var startTime = 0;
+    turning = true;
+    motion.jumpTo(ENTRY_TURN_FROM);
+    function step(now) {
+      if (!startTime) startTime = now;
+      var t = Math.min(1, (now - startTime) / duration);
+      var eased = 1 - Math.pow(1 - t, 3);
+      lerpedProgress = targetProgress + ENTRY_TURN_FROM * (1 - eased);
+      applyFrame();
+      if (t < 1) { entryTurn = requestAnimationFrame(step); return; }
+      stopTurnIn();
+    }
+    entryTurn = requestAnimationFrame(step);
+  }
+  function stopTurnIn() {
+    if (entryTurn === null) return;
+    cancelAnimationFrame(entryTurn);
+    entryTurn = null;
+    motion.jumpTo(lerpedProgress); // the spring carries on from where the ring is
+    turning = false;
+    landedAt = performance.now();
+    if (!entryActive) requestTick();
+    syncVideos();
+  }
+  function finishEntry() {
+    stopTurnIn();
+    if (!entryActive) return;
+    entryActive = false;
+    entryTimers.forEach(function (timer) { clearTimeout(timer); });
+    entryTimers = [];
+    cards.forEach(function (card) { card.style.transition = ''; forgetStyles(card); });
+    applyFrame();
+    requestTick();
+  }
+  function boot() {
+    if (booted || !on) return;
+    booted = true;
+    if (reducedMotion.matches) return;
+    entryActive = true;
+    var fadeEnd = 220 + MAX_PROGRESS * 110 + 700;
+    if (isPhone) turnIn(fadeEnd + 200);
+    cards.forEach(function (card) { card.style.opacity = '0'; });
+    cards.forEach(function (card, i) {
+      entryTimers.push(setTimeout(function () {
+        card.style.transition = 'opacity 700ms ease';
+        card.style.opacity = slotProps(cardOffset(i, targetProgress)).op.toFixed(3);
+      }, 220 + i * 110));
+    });
+    entryTimers.push(setTimeout(finishEntry, fadeEnd + 80));
+  }
+
+  /* ─── Phones: the ring turns itself, card by card ───────────────
+     Each card stays in front for AUTO_HOLD_MS while its film plays, then the
+     ring glides on to the next and loops. A swipe or tap holds it for
+     AUTO_IDLE_MS. Never with reduced motion, while the page is hidden, or
+     while keyboard focus is inside the section. */
+  var AUTO_HOLD_MS = 6000;
+  var AUTO_IDLE_MS = 8000;
+  var autoTimer = null, landedAt = 0, touchedAt = -Infinity;
+  function holdAutoTurn() { touchedAt = performance.now(); }
+  function autoAllowed() {
+    return on && isPhone && inView && !entryActive && entryTurn === null && !turning &&
+      !reducedMotion.matches && !document.hidden && !section.querySelector(':focus-visible');
+  }
+  function autoTick() {
+    autoTimer = null;
+    if (!on || !isPhone || !inView) return;
+    var now = performance.now();
+    if (autoAllowed() && now - landedAt >= AUTO_HOLD_MS && now - touchedAt >= AUTO_IDLE_MS) {
+      targetProgress = Math.round(targetProgress) + 1;
+      applyFrame();
+      requestTick();
+    }
+    autoTimer = setTimeout(autoTick, 250);
+  }
+  function startAutoTurn() {
+    if (autoTimer === null && on && isPhone && inView) {
+      landedAt = performance.now(); // a fresh arrival gets a full hold first
+      autoTimer = setTimeout(autoTick, 250);
+    }
+  }
+  function stopAutoTurn() {
+    if (autoTimer !== null) clearTimeout(autoTimer);
+    autoTimer = null;
+  }
+
+  /* ─── On / off, desktop / phone ──────────────────────────────── */
+  function updateLayout() {
+    if (!on) return;
+    measurePath();
+    finalPan = field.offsetHeight * 0.1 + pathCardHeight * spacing * 0.25;
+    applyFrame();
+  }
+  function setMode(next, nextPhone) {
+    if (next === on && nextPhone === isPhone) return;
+    var wasOn = on;
+    on = next;
+    isPhone = next && nextPhone;
+    section.classList.toggle('sov-orbit-on', on);
+    section.classList.toggle('sov-orbit-phone', isPhone);
+    if (on && wasOn) { // desktop ↔ phone: same orbit, new framing
+      stopAutoTurn();
+      if (!isPhone) { targetProgress = cardAt(targetProgress); motion.jumpTo(targetProgress); }
+      else startAutoTurn();
+      announcedCard = -1;
+      updateLayout();
+      return;
+    }
+    if (on) {
+      announcedCard = -1;
+      updateLayout();
+      var rect = section.getBoundingClientRect();
+      if (rect.bottom > 0 && rect.top < window.innerHeight) boot();
+      return;
+    }
+    finishEntry();
+    stopAutoTurn();
+    targetProgress = cardAt(targetProgress);
+    motion.jumpTo(targetProgress);
+    field.style.removeProperty('transform');
+    forgetStyles(field);
+    cards.forEach(function (card, i) {
+      ['transform', 'opacity', 'z-index', 'transition'].forEach(function (prop) { card.style.removeProperty(prop); });
+      card.removeAttribute('aria-hidden');
+      copies[i].style.removeProperty('opacity');
+      forgetStyles(card);
+      forgetStyles(copies[i]);
+    });
+    section.removeAttribute('data-sov-position');
+    syncVideos();
+  }
+
+  new IntersectionObserver(function (entries) {
+    inView = entries[0].intersectionRatio >= 0.5;
+    if (entries[0].isIntersecting) boot();
+    if (inView) startAutoTurn(); else stopAutoTurn();
+  }, { threshold: [0, 0.3, 0.5] }).observe(section);
+  // Looser threshold for playback: keep the front card playing while any
+  // meaningful part of the orbit is on screen.
+  new IntersectionObserver(function (entries) {
+    visible = entries[0].intersectionRatio >= 0.15;
+    syncVideos();
+    syncBackToTop();
+  }, { threshold: [0, 0.15] }).observe(section);
+
+  // On phones the floating back-to-top button would sit on the Next button;
+  // hide it while the orbit is on screen (as it hides over the inquiry form).
+  var backToTop = document.getElementById('backToTop');
+  function syncBackToTop() {
+    if (backToTop) backToTop.classList.toggle('over-orbit', on && isPhone && visible);
+  }
+
+  function syncMode() {
+    setMode(!compact.matches || phone.matches, phone.matches);
+    syncBackToTop();
+  }
+  compact.addEventListener('change', syncMode);
+  phone.addEventListener('change', syncMode);
+  window.addEventListener('resize', updateLayout);
+  reducedMotion.addEventListener('change', function () { finishEntry(); requestTick(); });
+  syncMode();
+})();
+
 // ═══════ A11Y: FILTER PILLS ANNOUNCE THEIR STATE ═══════
 // a11y audit #09: several code paths toggle `.active` on filter buttons;
 // mirror it into aria-pressed so screen readers hear which filter is on.
