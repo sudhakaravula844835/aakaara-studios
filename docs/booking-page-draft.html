@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Book Your Wedding Film & Photography — Aakaara Studios NYC</title>
+<meta name="description" content="Cinematic photography and film for South Asian weddings across New York, New Jersey, Connecticut and the Northeast. Personal reply within 24 hours.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- GA4 (your existing property). Remove this block if the page is served inside your main site that already loads gtag. -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-72E9BMSGN3"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-72E9BMSGN3');</script>
+
+<style>
+:root{
+  --ink:#09080b; --ink-2:#121015; --ink-3:#1b181f; --line:rgba(237,228,218,.10);
+  --gold:#c9956b; --gold-2:#e2b892; --sand:rgba(201,149,107,.45); --mute:#3b3440;
+  --text:#ede4da; --text-2:rgba(237,228,218,.62); --text-3:rgba(237,228,218,.38);
+  --serif:'Cormorant Garamond',Georgia,serif; --sans:'Inter',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --wrap:1200px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--ink);color:var(--text);font-family:var(--sans);font-weight:300;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img,video{display:block;max-width:100%}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 28px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.05;letter-spacing:-.01em}
+h2{font-size:clamp(38px,5vw,64px)}
+h2 em,h1 em{font-style:italic;color:var(--gold-2)}
+.lead{color:var(--text-2);font-size:17px;max-width:520px}
+section{position:relative}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:16px 28px;border-radius:999px;font-family:var(--sans);font-size:14px;font-weight:500;letter-spacing:.04em;cursor:pointer;border:1px solid transparent;transition:transform .3s,background .3s,color .3s,border-color .3s}
+.btn-gold{background:var(--gold);color:var(--ink)}
+.btn-gold:hover{background:var(--gold-2);transform:translateY(-1px)}
+.btn-ghost{border-color:rgba(237,228,218,.25);color:var(--text)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold-2)}
+.btn .arr{transition:transform .3s}.btn:hover .arr{transform:translateX(3px)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+/* header */
+.top{position:fixed;inset:0 0 auto;z-index:50;transition:background .4s,border-color .4s;border-bottom:1px solid transparent}
+.top.scrolled{background:rgba(9,8,11,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-color:var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:72px}
+.logo{font-family:var(--serif);font-size:24px;letter-spacing:.32em;font-weight:500}
+.logo small{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.34em;color:var(--text-3);margin-top:-2px}
+.top .btn{padding:11px 20px;font-size:13px}
+
+/* hero */
+.hero{min-height:100svh;display:flex;align-items:flex-end;padding:140px 0 72px;overflow:hidden}
+.hero-media{position:absolute;inset:0;z-index:0}
+.hero-media video{width:100%;height:100%;object-fit:cover;opacity:.55}
+.hero-media::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(80% 60% at 70% 30%,rgba(201,149,107,.22),transparent 60%),
+  radial-gradient(60% 50% at 15% 80%,rgba(120,40,50,.25),transparent 70%),
+  linear-gradient(180deg,#0d0b10 0%,#09080b 100%)}
+.hero-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,8,11,.2) 0%,rgba(9,8,11,.15) 40%,var(--ink) 100%)}
+.grain{position:absolute;inset:-50%;z-index:1;pointer-events:none;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:grain 1.2s steps(6) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-3%)}60%{transform:translate(-2%,-1%)}80%{transform:translate(3%,3%)}100%{transform:translate(0,0)}}
+.hero .wrap{position:relative;z-index:2;width:100%}
+.badge{display:inline-flex;align-items:center;gap:10px;padding:8px 16px 8px 12px;border:1px solid rgba(201,149,107,.35);border-radius:999px;background:rgba(201,149,107,.08);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-2)}
+.badge i{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 0 rgba(201,149,107,.6);animation:ping 2s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(201,149,107,.6)}80%,100%{box-shadow:0 0 0 10px rgba(201,149,107,0)}}
+.hero h1{font-size:clamp(52px,8.4vw,124px);margin:28px 0 26px;max-width:1000px}
+.hero .lead{font-size:18px;max-width:560px}
+.hero-ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:38px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px 34px;margin-top:64px;padding-top:24px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3)}
+.hero-meta b{color:var(--text-2);font-weight:400}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(24px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+
+/* intro video */
+.intro{padding:120px 0 40px}
+.intro-grid{display:grid;grid-template-columns:1fr 1.6fr;gap:64px;align-items:end}
+.intro h2{margin-top:16px}
+.vid{position:relative;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:linear-gradient(135deg,#1d1720,#0f0d12);border:1px solid var(--line);cursor:pointer}
+.vid::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 70% at 50% 50%,transparent,rgba(9,8,11,.55))}
+.vid video,.vid iframe{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0}
+.play{position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);width:88px;height:88px;border-radius:50%;background:rgba(237,228,218,.1);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(237,228,218,.3);display:grid;place-items:center;transition:transform .4s,background .4s}
+.vid:hover .play{transform:translate(-50%,-50%) scale(1.07);background:rgba(201,149,107,.25)}
+.play svg{width:22px;margin-left:4px;fill:var(--text)}
+.vid-cap{position:absolute;z-index:2;left:22px;bottom:18px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-2)}
+.vid-time{position:absolute;z-index:2;right:22px;bottom:18px;font-family:var(--mono);font-size:11px;color:var(--text-3)}
+
+/* process */
+.process{padding:120px 0}
+.process-head{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;flex-wrap:wrap;margin-bottom:64px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}
+.step{padding:40px 36px 8px 0;position:relative}
+.step+.step{padding-left:36px;border-left:1px solid var(--line)}
+.step .n{font-family:var(--mono);font-size:12px;color:var(--gold);letter-spacing:.1em}
+.step h3{font-size:30px;margin:18px 0 12px}
+.step p{color:var(--text-2);font-size:15px}
+
+/* map */
+.where{padding:120px 0 80px;background:linear-gradient(180deg,var(--ink) 0%,#0b0a0e 100%);border-top:1px solid var(--line)}
+.where-grid{display:grid;grid-template-columns:minmax(330px,.8fr) 1.8fr;gap:40px;align-items:start}
+.where h2{margin:16px 0 22px;font-size:clamp(40px,4.2vw,58px)}
+.where .lead{font-size:15px}
+.filters{margin-top:34px;display:flex;flex-direction:column;gap:22px}
+.flabel{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--text-2);font-family:var(--sans);font-size:13px;cursor:pointer;transition:all .25s}
+.chip:hover{border-color:rgba(237,228,218,.3);color:var(--text)}
+.chip[aria-pressed="true"]{background:rgba(201,149,107,.12);border-color:rgba(201,149,107,.5);color:var(--gold-2)}
+.chip .sw{width:8px;height:8px;border-radius:50%}
+.stat-row{display:flex;gap:36px;margin-top:38px;padding-top:26px;border-top:1px solid var(--line)}
+.stat b{display:block;font-family:var(--serif);font-size:44px;font-weight:400;line-height:1;color:var(--text)}
+.stat span{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-3)}
+
+.map{position:relative;width:100%;aspect-ratio:1000/700;user-select:none;-webkit-user-select:none}
+.map canvas{position:absolute;inset:0;width:100%;height:100%}
+.slabel{position:absolute;transform:translate(-50%,-50%);font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3);pointer-events:none;transition:color .3s,opacity .3s;white-space:nowrap;text-shadow:0 0 8px var(--ink),0 0 3px var(--ink)}
+.slabel.hot{color:var(--text)}
+.slabel.dim{opacity:.35}
+.pin{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border:0;background:none;cursor:pointer;z-index:3;transition:opacity .35s,transform .35s}
+.pin::before{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--ink);border:1.5px solid var(--text);box-shadow:0 0 12px rgba(237,228,218,.45)}
+.pin::after{content:"";position:absolute;inset:11px;border-radius:50%;background:var(--gold-2)}
+.pin .ring{position:absolute;inset:4px;border-radius:50%;border:1px solid rgba(226,184,146,.6);animation:ring 2.8s ease-out infinite;animation-delay:var(--d,0s)}
+@keyframes ring{0%{transform:scale(.6);opacity:1}100%{transform:scale(2.2);opacity:0}}
+.pin.off{opacity:.12;pointer-events:none;transform:scale(.6)}
+.pin:hover,.pin:focus-visible,.pin.active{z-index:5}
+.pin.hub::before{inset:6px;border-color:var(--gold-2);box-shadow:0 0 18px rgba(226,184,146,.7)}
+.tip{position:absolute;z-index:10;pointer-events:none;min-width:190px;padding:14px 16px;border-radius:6px;background:rgba(18,16,21,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(201,149,107,.3);box-shadow:0 20px 40px rgba(0,0,0,.5);opacity:0;transform:translate(-50%,calc(-100% - 18px)) translateY(6px);transition:opacity .2s,transform .2s}
+.tip.on{opacity:1;transform:translate(-50%,calc(-100% - 18px))}
+.tip .t-city{font-family:var(--serif);font-size:22px;line-height:1.1}
+.tip .t-st{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-top:4px}
+.tip .t-v{font-size:12px;color:var(--text-2);margin-top:8px;border-top:1px solid var(--line);padding-top:8px}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 26px;margin-top:18px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3)}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.legend .lp{width:10px;height:10px;border:1.5px solid var(--text);background:var(--ink)}
+
+.directory{margin-top:72px;display:grid;grid-template-columns:repeat(4,1fr);gap:40px 32px;border-top:1px solid var(--line);padding-top:48px}
+.dir-col h4{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:400;margin-bottom:16px}
+.dir-item{display:block;padding:12px 0;border-bottom:1px solid var(--line);transition:opacity .3s,padding .3s}
+.dir-item:hover{padding-left:6px}
+.dir-item b{display:block;font-family:var(--serif);font-size:20px;font-weight:400;line-height:1.2}
+.dir-item span{font-size:12px;color:var(--text-3)}
+.dir-item.off{opacity:.18}
+
+/* films */
+.films{padding:120px 0}
+.films-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:30px;margin-bottom:48px}
+.film-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:20px}
+.film{position:relative;border-radius:6px;overflow:hidden;aspect-ratio:4/5;background:#151218;cursor:pointer;border:1px solid var(--line)}
+.film:first-child{aspect-ratio:auto}
+.film .poster{position:absolute;inset:0;background-size:cover;background-position:center;filter:grayscale(1) brightness(.7);transform:scale(1.02);transition:filter .8s,transform 1.4s cubic-bezier(.2,.7,.2,1)}
+.film:hover .poster{filter:grayscale(0) brightness(.85);transform:scale(1.06)}
+.film::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(9,8,11,.92))}
+.film .meta{position:absolute;z-index:2;left:24px;right:24px;bottom:22px}
+.film .meta .eyebrow{font-size:10px}
+.film h3{font-size:32px;margin:8px 0 4px}
+.film p{font-size:13px;color:var(--text-2)}
+.film .pill{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);opacity:0;padding:10px 20px;border-radius:999px;background:rgba(237,228,218,.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(237,228,218,.3);font-family:var(--mono);font-size:11px;letter-spacing:.2em;transition:all .4s}
+.film:hover .pill{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+/* events strip */
+.events{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;padding:26px 0}
+.marquee{display:flex;gap:56px;white-space:nowrap;animation:mq 38s linear infinite;width:max-content}
+.marquee span{font-family:var(--serif);font-size:34px;font-style:italic;color:var(--text-2)}
+.marquee span.dot{color:var(--gold);font-style:normal}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* words */
+.words{padding:120px 0}
+.quotes{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:48px}
+.quote{padding:44px 40px;border:1px solid var(--line);border-radius:6px;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent)}
+.quote blockquote{font-family:var(--serif);font-size:28px;line-height:1.3}
+.quote blockquote::before{content:"\201C";display:block;font-size:64px;line-height:.6;color:var(--gold);margin-bottom:14px}
+.quote cite{display:block;margin-top:24px;font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3)}
+.quote cite b{color:var(--gold-2);font-weight:400}
+
+/* faq */
+.faq{padding:120px 0;border-top:1px solid var(--line)}
+.faq-grid{display:grid;grid-template-columns:.8fr 1.4fr;gap:64px}
+details{border-bottom:1px solid var(--line)}
+summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:24px;padding:26px 0;font-family:var(--serif);font-size:25px;line-height:1.25}
+summary::-webkit-details-marker{display:none}
+summary .pm{flex:none;width:28px;height:28px;border:1px solid var(--line);border-radius:50%;position:relative;transition:transform .4s,border-color .3s}
+summary .pm::before,summary .pm::after{content:"";position:absolute;left:50%;top:50%;width:10px;height:1px;background:var(--text);transform:translate(-50%,-50%)}
+summary .pm::after{transform:translate(-50%,-50%) rotate(90deg);transition:transform .4s}
+details[open] summary .pm{border-color:var(--gold)}
+details[open] summary .pm::after{transform:translate(-50%,-50%) rotate(0)}
+details p{color:var(--text-2);padding:0 60px 28px 0;font-size:15px}
+
+/* form */
+.inquire{padding:120px 0;background:radial-gradient(70% 60% at 80% 0%,rgba(201,149,107,.1),transparent 70%),#0c0b0f;border-top:1px solid var(--line)}
+.inq-grid{display:grid;grid-template-columns:.9fr 1.3fr;gap:72px}
+.promise{margin-top:36px;display:flex;flex-direction:column;gap:16px}
+.promise div{display:flex;gap:14px;color:var(--text-2);font-size:15px}
+.promise div::before{content:"";flex:none;width:18px;height:1px;background:var(--gold);margin-top:12px}
+form{display:grid;grid-template-columns:1fr 1fr;gap:22px 20px}
+.f{display:flex;flex-direction:column;gap:8px}
+.f.full{grid-column:1/-1}
+.f label,.f legend{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-3)}
+.f input,.f select,.f textarea{width:100%;background:transparent;border:0;border-bottom:1px solid rgba(237,228,218,.2);color:var(--text);font-family:var(--sans);font-size:16px;font-weight:300;padding:10px 0 12px;border-radius:0;transition:border-color .3s;-webkit-appearance:none;appearance:none}
+.f select{background-image:linear-gradient(45deg,transparent 50%,var(--text-3) 50%),linear-gradient(135deg,var(--text-3) 50%,transparent 50%);background-position:calc(100% - 10px) 50%,calc(100% - 5px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+.f select option{background:var(--ink-2);color:var(--text)}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--gold)}
+.f input::placeholder,.f textarea::placeholder{color:rgba(237,228,218,.25)}
+.f input[type=date]{color-scheme:dark}
+.f textarea{resize:vertical;min-height:90px}
+fieldset.f{border:0}
+.ev{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.ev label{cursor:pointer}
+.ev input{position:absolute;opacity:0;pointer-events:none}
+.ev span{display:inline-block;padding:8px 14px;border-radius:999px;border:1px solid var(--line);font-family:var(--sans);font-size:13px;letter-spacing:0;text-transform:none;color:var(--text-2);transition:all .25s}
+.ev input:checked+span{background:rgba(201,149,107,.14);border-color:rgba(201,149,107,.55);color:var(--gold-2)}
+.ev input:focus-visible+span{outline:2px solid var(--gold);outline-offset:2px}
+.submit-row{grid-column:1/-1;display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:8px}
+.submit-row small{color:var(--text-3);font-size:12px}
+.form-ok{display:none;grid-column:1/-1;padding:40px;border:1px solid rgba(201,149,107,.4);border-radius:6px;text-align:center}
+.form-ok h3{font-size:40px;margin-bottom:10px}
+.form-ok p{color:var(--text-2)}
+
+/* closing + footer */
+.closing{padding:140px 0;text-align:center}
+.closing h2{font-size:clamp(44px,6.5vw,96px);margin:18px auto 36px;max-width:900px}
+footer{border-top:1px solid var(--line);padding:56px 0 100px}
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:28px;align-items:flex-end}
+.foot p{font-size:13px;color:var(--text-3)}
+.foot nav{display:flex;gap:24px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-2)}
+.foot nav a:hover{color:var(--gold-2)}
+
+/* mobile sticky */
+.mcta{display:none}
+
+@media (max-width:960px){
+  .intro-grid,.where-grid,.faq-grid,.inq-grid{grid-template-columns:1fr;gap:40px}
+  .steps{grid-template-columns:1fr}
+  .step,.step+.step{padding:32px 0;border-left:0;border-bottom:1px solid var(--line)}
+  .film-grid{grid-template-columns:1fr 1fr}
+  .film:first-child{grid-column:1/-1;aspect-ratio:16/10}
+  .directory{grid-template-columns:1fr 1fr}
+  .quotes{grid-template-columns:1fr}
+  .top .btn{display:none}
+  .mcta{display:flex;position:fixed;z-index:60;left:12px;right:12px;bottom:12px;justify-content:center;transform:translateY(140%);transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+  .mcta.on{transform:none}
+  .mcta .btn{width:100%;justify-content:center;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+}
+@media (max-width:600px){
+  .wrap{padding:0 20px}
+  form{grid-template-columns:1fr}
+  .film-grid{grid-template-columns:1fr}
+  .film{aspect-ratio:4/5}
+  .directory{grid-template-columns:1fr}
+  .slabel{font-size:8px;letter-spacing:.12em}
+  .pin{width:22px;height:22px;margin:-11px 0 0 -11px}
+  .pin::before{inset:7px}.pin::after{inset:9.5px}
+  .hero-meta{margin-top:44px}
+  summary{font-size:21px}
+  details p{padding-right:0}
+  .quote{padding:32px 26px}.quote blockquote{font-size:23px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="logo" href="https://aakaarastudiosnyc.com" aria-label="Aakaara Studios home">AAKAARA<small>STUDIOS · NYC</small></a>
+    <a class="btn btn-gold" href="#inquire" data-cta="header">Check your date <span class="arr">→</span></a>
+  </div>
+</header>
+
+<main>
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-media" aria-hidden="true">
+    <!-- EDIT: hero reel. Use a short muted loop from Bunny (videos.aakaarastudiosnyc.com). Leave src empty to show the gradient only. -->
+    <video id="heroVideo" autoplay muted loop playsinline preload="metadata" data-src=""></video>
+  </div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="wrap">
+    <!-- EDIT: set this to your real availability -->
+    <span class="badge rv"><i></i>2027 dates booking now · 2028 open</span>
+    <h1 class="rv">Every ritual.<br>Every glance.<br><em>Filmed like cinema.</em></h1>
+    <p class="lead rv">Cinematic photography and film for South Asian weddings across New York, New Jersey, Connecticut and the Northeast. Tell us about your celebration. You’ll hear back from us personally within 24 hours.</p>
+    <div class="hero-ctas rv">
+      <a class="btn btn-gold" href="#inquire" data-cta="hero">Start your inquiry <span class="arr">→</span></a>
+      <a class="btn btn-ghost" href="#films" data-cta="hero_films">Watch our films</a>
+    </div>
+    <div class="hero-meta rv">
+      <span><b>Photo + Film</b> one team</span>
+      <span><b>Haldi → Reception</b> every event</span>
+      <span><b>Based in NYC</b> travel ready</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INTRO VIDEO ============ -->
+<section class="intro">
+  <div class="wrap intro-grid">
+    <div class="rv">
+      <span class="eyebrow">Watch first</span>
+      <h2>A quick hello<br><em>from Sudhakar.</em></h2>
+      <p class="lead" style="margin-top:20px">Sixty seconds on how we work, what your wedding day feels like with us beside you, and why couples trust us with every one of their events.</p>
+    </div>
+    <!-- EDIT: set data-video to your intro video (Bunny HLS/MP4 URL or a Bunny embed URL). -->
+    <div class="vid rv" id="introVid" data-video="" role="button" tabindex="0" aria-label="Play intro video from Sudhakar">
+      <div class="play"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></div>
+      <span class="vid-cap">Meet your filmmaker</span>
+      <span class="vid-time">01:00</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROCESS ============ -->
+<section class="process">
+  <div class="wrap">
+    <div class="process-head">
+      <div class="rv">
+        <span class="eyebrow">How it works</span>
+        <h2 style="margin-top:16px">Inquire today.<br><em>Hear back in 24 hours.</em></h2>
+      </div>
+      <p class="lead rv">No automated packages and no pressure. Just a personal reply with your date’s availability, the coverage that fits your events, and sample films from weddings like yours.</p>
+    </div>
+    <div class="steps">
+      <div class="step rv"><span class="n">01</span><h3>Share your celebration</h3><p>Your dates, your events (Haldi, Mehndi, Sangeet, ceremony, reception) and your venues. Takes two minutes.</p></div>
+      <div class="step rv"><span class="n">02</span><h3>Get a personal reply</h3><p>Within 24 hours you’ll hear from us directly with availability, a tailored coverage plan and films to watch.</p></div>
+      <div class="step rv"><span class="n">03</span><h3>Meet us (optional)</h3><p>A relaxed 15-minute call or a coffee in the city to walk through your vision. Book when it feels right.</p></div>
+    </div>
+    <div style="margin-top:48px" class="rv"><a class="btn btn-ghost" href="#films">View films <span class="arr">→</span></a></div>
+  </div>
+</section>
+
+<!-- ============ WHERE WE'VE FILMED ============ -->
+<section class="where" id="where">
+  <div class="wrap where-grid">
+    <div class="rv">
+      <span class="eyebrow">Locations</span>
+      <h2>Northeast.<br><em>Where we’ve filmed.</em></h2>
+      <!-- EDIT: confirm which states have travel included -->
+      <p class="lead">Based in New York City. Travel is included across New York, New Jersey and Connecticut, and we regularly film throughout the Northeast and beyond.</p>
+
+      <div class="filters">
+        <div>
+          <div class="flabel">Region</div>
+          <div class="chips" id="regionChips" role="group" aria-label="Filter by region">
+            <button class="chip" data-r="all" aria-pressed="true">All locations</button>
+            <button class="chip" data-r="home" aria-pressed="false"><span class="sw" style="background:var(--gold)"></span>Tri-state</button>
+            <button class="chip" data-r="near" aria-pressed="false"><span class="sw" style="background:var(--sand)"></span>Northeast</button>
+            <button class="chip" data-r="travel" aria-pressed="false"><span class="sw" style="background:#6c6274"></span>Available for travel</button>
+          </div>
+        </div>
+        <div>
+          <div class="flabel">Sort by season</div>
+          <div class="chips" id="seasonChips" role="group" aria-label="Filter by season">
+            <button class="chip" data-s="all" aria-pressed="true">Any</button>
+            <button class="chip" data-s="spring" aria-pressed="false">Spring</button>
+            <button class="chip" data-s="summer" aria-pressed="false">Summer</button>
+            <button class="chip" data-s="fall" aria-pressed="false">Fall</button>
+            <button class="chip" data-s="winter" aria-pressed="false">Winter</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat"><b id="statLoc">0</b><span>Locations</span></div>
+        <div class="stat"><b id="statSt">0</b><span>States</span></div>
+      </div>
+    </div>
+
+    <div class="rv">
+      <div class="map" id="map">
+        <canvas id="mapCanvas" aria-hidden="true"></canvas>
+        <div class="tip" id="tip" role="status" aria-live="polite"></div>
+      </div>
+      <div class="legend">
+        <span><i class="lp"></i>Locations filmed</span>
+        <span><i style="background:var(--gold)"></i>Tri-state · travel included</span>
+        <span><i style="background:var(--sand)"></i>Northeast</span>
+        <span><i style="background:#6c6274"></i>Available for travel</span>
+      </div>
+    </div>
+  </div>
+  <div class="wrap"><div class="directory rv" id="directory"></div></div>
+</section>
+
+<!-- ============ EVENTS MARQUEE ============ -->
+<div class="events" aria-hidden="true">
+  <div class="marquee" id="marquee"></div>
+</div>
+
+<!-- ============ FILMS ============ -->
+<section class="films" id="films">
+  <div class="wrap">
+    <div class="films-head">
+      <div class="rv">
+        <span class="eyebrow">Full wedding films</span>
+        <h2 style="margin-top:16px">See our <em>work.</em></h2>
+      </div>
+      <a class="btn btn-gold rv" href="#inquire" data-cta="films">Contact now <span class="arr">→</span></a>
+    </div>
+    <!-- EDIT: poster = still image URL, href = film link. Couple/venue are placeholders. -->
+    <div class="film-grid">
+      <a class="film rv" href="#" data-poster="">
+        <div class="poster" style="background-image:linear-gradient(135deg,#3a2326,#14101a)"></div>
+        <span class="pill">WATCH FILM</span>
+        <div class="meta"><span class="eyebrow">Wedding film · Edison, NJ</span><h3>Couple &amp; Couple</h3><p>Venue name</p></div>
+      </a>
+      <a class="film rv" href="#" data-poster="">
+        <div class="poster" style="background-image:linear-gradient(160deg,#2c2a22,#100e12)"></div>
+        <span class="pill">WATCH FILM</span>
+        <div class="meta"><span class="eyebrow">Wedding film · Long Island, NY</span><h3>Couple &amp; Couple</h3><p>Venue name</p></div>
+      </a>
+      <a class="film rv" href="#" data-poster="">
+        <div class="poster" style="background-image:linear-gradient(200deg,#202734,#0e0d12)"></div>
+        <span class="pill">WATCH FILM</span>
+        <div class="meta"><span class="eyebrow">Wedding film · Stamford, CT</span><h3>Couple &amp; Couple</h3><p>Venue name</p></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIALS ============ -->
+<!-- EDIT: replace with real client reviews (with permission). Placeholders below. -->
+<section class="words">
+  <div class="wrap">
+    <span class="eyebrow rv">Kind words</span>
+    <h2 class="rv" style="margin-top:16px">From our <em>couples.</em></h2>
+    <div class="quotes">
+      <figure class="quote rv">
+        <blockquote>[Paste a real review from one of your couples here.]</blockquote>
+        <cite><b>Client name</b> · Married in New Jersey</cite>
+      </figure>
+      <figure class="quote rv">
+        <blockquote>[Paste a second real review here.]</blockquote>
+        <cite><b>Client name</b> · Married in New York</cite>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<!-- EDIT: fill in the bracketed specifics -->
+<section class="faq">
+  <div class="wrap faq-grid">
+    <div class="rv">
+      <span class="eyebrow">FAQ</span>
+      <h2 style="margin-top:16px">Questions,<br><em>answered.</em></h2>
+    </div>
+    <div class="rv">
+      <details><summary>How does booking work?<span class="pm"></span></summary><p>Send the form below and we’ll reply within 24 hours with availability and a coverage plan. Your date is reserved once the contract is signed and the retainer is paid. [Add your retainer terms.]</p></details>
+      <details><summary>Do you cover multi-day weddings?<span class="pm"></span></summary><p>Yes. Most of our couples book us across several events: Haldi, Mehndi, Sangeet, Baraat, the ceremony and the reception. We build coverage around your schedule, not a fixed package.</p></details>
+      <details><summary>Do you offer photo and video together?<span class="pm"></span></summary><p>Yes. One team handles both, so you get a consistent look and a crew that works together all day instead of competing for the same angles.</p></details>
+      <details><summary>Do you fly drones?<span class="pm"></span></summary><p>Where the venue and local rules allow it, yes. Baraat processions and estate venues are some of our favourite aerial moments. [Confirm your drone certification details.]</p></details>
+      <details><summary>When will we receive our film and photos?<span class="pm"></span></summary><p>Sneak peeks arrive within [X days]. Full galleries are delivered in [X weeks] and the final films in [X weeks].</p></details>
+      <details><summary>Do you charge travel fees?<span class="pm"></span></summary><p>Travel is included across New York, New Jersey and Connecticut. For weddings further afield, we quote travel transparently up front. [Adjust to your policy.]</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INQUIRY FORM ============ -->
+<section class="inquire" id="inquire">
+  <div class="wrap inq-grid">
+    <div class="rv">
+      <span class="eyebrow">Inquire</span>
+      <h2 style="margin-top:16px">Tell us about<br><em>your celebration.</em></h2>
+      <div class="promise">
+        <div>A personal reply within 24 hours, never a bot</div>
+        <div>Availability for your dates, checked first</div>
+        <div>A coverage plan built around your events</div>
+        <div>No spam and no pressure</div>
+      </div>
+    </div>
+
+    <!-- EDIT: set FORM_ENDPOINT in the script (Formspree, Supabase edge function, etc.). Without it, submissions open an email to info@aakaarastudiosnyc.com. -->
+    <form id="inqForm" class="rv" novalidate>
+      <div class="f"><label for="fn">Your names</label><input id="fn" name="names" required placeholder="You &amp; your partner" autocomplete="name"></div>
+      <div class="f"><label for="fe">Email</label><input id="fe" name="email" type="email" required placeholder="you@email.com" autocomplete="email"></div>
+      <div class="f"><label for="fp">Phone</label><input id="fp" name="phone" type="tel" placeholder="(555) 000-0000" autocomplete="tel"></div>
+      <div class="f"><label for="fd">Main wedding date</label><input id="fd" name="date" type="date" required></div>
+      <div class="f full"><label for="fv">Venue(s) or city</label><input id="fv" name="venue" placeholder="e.g. Edison, NJ, or still deciding"></div>
+      <fieldset class="f full">
+        <legend>Which events?</legend>
+        <div class="ev">
+          <label><input type="checkbox" name="events" value="Engagement"><span>Engagement</span></label>
+          <label><input type="checkbox" name="events" value="Haldi"><span>Haldi</span></label>
+          <label><input type="checkbox" name="events" value="Mehndi"><span>Mehndi</span></label>
+          <label><input type="checkbox" name="events" value="Sangeet"><span>Sangeet</span></label>
+          <label><input type="checkbox" name="events" value="Baraat"><span>Baraat</span></label>
+          <label><input type="checkbox" name="events" value="Ceremony"><span>Ceremony</span></label>
+          <label><input type="checkbox" name="events" value="Reception"><span>Reception</span></label>
+        </div>
+      </fieldset>
+      <div class="f"><label for="fs">Coverage</label>
+        <select id="fs" name="coverage"><option>Photo + Film</option><option>Film only</option><option>Photo only</option><option>Not sure yet</option></select></div>
+      <div class="f"><label for="fg">Guest count</label>
+        <select id="fg" name="guests"><option value="">Select</option><option>Under 150</option><option>150–300</option><option>300–500</option><option>500+</option></select></div>
+      <div class="f full"><label for="fm">Anything else?</label><textarea id="fm" name="message" placeholder="Your story, your vision, must-have moments…"></textarea></div>
+      <div class="f full"><label for="fh">How did you find us?</label>
+        <select id="fh" name="source"><option value="">Select</option><option>Instagram</option><option>Facebook</option><option>Google</option><option>Friend / family</option><option>Venue / planner</option><option>Other</option></select></div>
+      <input type="hidden" name="utm_source"><input type="hidden" name="utm_medium"><input type="hidden" name="utm_campaign"><input type="hidden" name="utm_content"><input type="hidden" name="fbclid">
+      <div class="submit-row">
+        <button class="btn btn-gold" type="submit">Check my date <span class="arr">→</span></button>
+        <small>Personal reply within 24 hours.</small>
+      </div>
+      <div class="form-ok" id="formOk"><h3>Thank you.</h3><p>We’ve got your details and will be in touch within 24 hours.</p></div>
+    </form>
+  </div>
+</section>
+
+<!-- ============ CLOSING ============ -->
+<section class="closing">
+  <div class="wrap">
+    <span class="eyebrow rv">Still scrolling?</span>
+    <h2 class="rv">Your date might be <em>still open.</em></h2>
+    <a class="btn btn-gold rv" href="#inquire" data-cta="closing">Back to the form <span class="arr">→</span></a>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>
+      <a class="logo" href="https://aakaarastudiosnyc.com">AAKAARA<small>STUDIOS · NYC</small></a>
+      <p style="margin-top:16px">© <span id="yr"></span> Aakaara Studios NYC · info@aakaarastudiosnyc.com</p>
+    </div>
+    <nav>
+      <a href="https://aakaarastudiosnyc.com">Website</a>
+      <a href="https://instagram.com/sudhakar_3697" target="_blank" rel="noopener">Instagram</a>
+      <a href="#inquire">Inquire</a>
+    </nav>
+  </div>
+</footer>
+
+<div class="mcta" id="mcta"><a class="btn btn-gold" href="#inquire" data-cta="mobile_sticky">Check your date <span class="arr">→</span></a></div>
+
+<script>
+/* ================== CONFIG ================== */
+const FORM_ENDPOINT = '';            // e.g. 'https://formspree.io/f/xxxx' (POST, JSON). Empty = mailto fallback.
+const INBOX = 'info@aakaarastudiosnyc.com';
+
+/* Map data (generated from US Census state boundaries). */
+const MAP = {"W":1000,"H":700,"STEP":6.5,"dots":{"ME":[731.3,16.3,724.8,22.8,731.3,22.8,737.8,22.8,763.8,22.8,770.3,22.8,776.8,22.8,783.3,22.8,718.3,29.3,724.8,29.3,731.3,29.3,737.8,29.3,750.8,29.3,757.3,29.3,763.8,29.3,770.3,29.3,776.8,29.3,783.3,29.3,789.8,29.3,718.3,35.8,724.8,35.8,731.3,35.8,737.8,35.8,744.3,35.8,750.8,35.8,757.3,35.8,763.8,35.8,770.3,35.8,776.8,35.8,783.3,35.8,789.8,35.8,796.3,35.8,711.8,42.3,718.3,42.3,724.8,42.3,731.3,42.3,737.8,42.3,744.3,42.3,750.8,42.3,757.3,42.3,763.8,42.3,770.3,42.3,776.8,42.3,783.3,42.3,789.8,42.3,796.3,42.3,711.8,48.8,718.3,48.8,724.8,48.8,731.3,48.8,737.8,48.8,744.3,48.8,750.8,48.8,757.3,48.8,763.8,48.8,770.3,48.8,776.8,48.8,783.3,48.8,789.8,48.8,796.3,48.8,705.3,55.3,711.8,55.3,718.3,55.3,724.8,55.3,731.3,55.3,737.8,55.3,744.3,55.3,750.8,55.3,757.3,55.3,763.8,55.3,770.3,55.3,776.8,55.3,783.3,55.3,789.8,55.3,796.3,55.3,698.8,61.8,705.3,61.8,711.8,61.8,718.3,61.8,724.8,61.8,731.3,61.8,737.8,61.8,744.3,61.8,750.8,61.8,757.3,61.8,763.8,61.8,770.3,61.8,776.8,61.8,783.3,61.8,789.8,61.8,796.3,61.8,698.8,68.3,705.3,68.3,711.8,68.3,718.3,68.3,724.8,68.3,731.3,68.3,737.8,68.3,744.3,68.3,750.8,68.3,757.3,68.3,763.8,68.3,770.3,68.3,776.8,68.3,783.3,68.3,789.8,68.3,796.3,68.3,698.8,74.8,705.3,74.8,711.8,74.8,718.3,74.8,724.8,74.8,731.3,74.8,737.8,74.8,744.3,74.8,750.8,74.8,757.3,74.8,763.8,74.8,770.3,74.8,776.8,74.8,783.3,74.8,789.8,74.8,796.3,74.8,698.8,81.3,705.3,81.3,711.8,81.3,718.3,81.3,724.8,81.3,731.3,81.3,737.8,81.3,744.3,81.3,750.8,81.3,757.3,81.3,763.8,81.3,770.3,81.3,776.8,81.3,783.3,81.3,789.8,81.3,796.3,81.3,692.3,87.8,698.8,87.8,705.3,87.8,711.8,87.8,718.3,87.8,724.8,87.8,731.3,87.8,737.8,87.8,744.3,87.8,750.8,87.8,757.3,87.8,763.8,87.8,770.3,87.8,776.8,87.8,783.3,87.8,789.8,87.8,796.3,87.8,802.8,87.8,685.8,94.3,692.3,94.3,698.8,94.3,705.3,94.3,711.8,94.3,718.3,94.3,724.8,94.3,731.3,94.3,737.8,94.3,744.3,94.3,750.8,94.3,757.3,94.3,763.8,94.3,770.3,94.3,776.8,94.3,783.3,94.3,789.8,94.3,796.3,94.3,802.8,94.3,685.8,100.8,692.3,100.8,698.8,100.8,705.3,100.8,711.8,100.8,718.3,100.8,724.8,100.8,731.3,100.8,737.8,100.8,744.3,100.8,750.8,100.8,757.3,100.8,763.8,100.8,770.3,100.8,776.8,100.8,783.3,100.8,789.8,100.8,796.3,100.8,802.8,100.8,685.8,107.3,692.3,107.3,698.8,107.3,705.3,107.3,711.8,107.3,718.3,107.3,724.8,107.3,731.3,107.3,737.8,107.3,744.3,107.3,750.8,107.3,757.3,107.3,763.8,107.3,770.3,107.3,776.8,107.3,783.3,107.3,789.8,107.3,796.3,107.3,802.8,107.3,685.8,113.8,692.3,113.8,698.8,113.8,705.3,113.8,711.8,113.8,718.3,113.8,724.8,113.8,731.3,113.8,737.8,113.8,744.3,113.8,750.8,113.8,757.3,113.8,763.8,113.8,770.3,113.8,776.8,113.8,783.3,113.8,789.8,113.8,796.3,113.8,802.8,113.8,685.8,120.3,692.3,120.3,698.8,120.3,705.3,120.3,711.8,120.3,718.3,120.3,724.8,120.3,731.3,120.3,737.8,120.3,744.3,120.3,750.8,120.3,757.3,120.3,763.8,120.3,770.3,120.3,776.8,120.3,783.3,120.3,789.8,120.3,796.3,120.3,802.8,120.3,685.8,126.8,692.3,126.8,698.8,126.8,705.3,126.8,711.8,126.8,718.3,126.8,724.8,126.8,731.3,126.8,737.8,126.8,744.3,126.8,750.8,126.8,757.3,126.8,763.8,126.8,770.3,126.8,776.8,126.8,783.3,126.8,789.8,126.8,796.3,126.8,802.8,126.8,679.3,133.3,685.8,133.3,692.3,133.3,698.8,133.3,705.3,133.3,711.8,133.3,718.3,133.3,724.8,133.3,731.3,133.3,737.8,133.3,744.3,133.3,750.8,133.3,757.3,133.3,763.8,133.3,770.3,133.3,776.8,133.3,783.3,133.3,789.8,133.3,796.3,133.3,802.8,133.3,679.3,139.8,685.8,139.8,692.3,139.8,698.8,139.8,705.3,139.8,711.8,139.8,718.3,139.8,724.8,139.8,731.3,139.8,737.8,139.8,744.3,139.8,750.8,139.8,757.3,139.8,763.8,139.8,770.3,139.8,776.8,139.8,783.3,139.8,789.8,139.8,796.3,139.8,802.8,139.8,809.3,139.8,815.8,139.8,822.3,139.8,666.3,146.3,672.8,146.3,679.3,146.3,685.8,146.3,692.3,146.3,698.8,146.3,705.3,146.3,711.8,146.3,718.3,146.3,724.8,146.3,731.3,146.3,737.8,146.3,744.3,146.3,750.8,146.3,757.3,146.3,763.8,146.3,770.3,146.3,776.8,146.3,783.3,146.3,789.8,146.3,796.3,146.3,802.8,146.3,809.3,146.3,815.8,146.3,666.3,152.8,672.8,152.8,679.3,152.8,685.8,152.8,692.3,152.8,698.8,152.8,705.3,152.8,711.8,152.8,718.3,152.8,724.8,152.8,731.3,152.8,737.8,152.8,744.3,152.8,750.8,152.8,757.3,152.8,763.8,152.8,770.3,152.8,776.8,152.8,783.3,152.8,789.8,152.8,796.3,152.8,802.8,152.8,809.3,152.8,815.8,152.8,822.3,152.8,659.8,159.3,672.8,159.3,679.3,159.3,685.8,159.3,692.3,159.3,698.8,159.3,705.3,159.3,711.8,159.3,718.3,159.3,724.8,159.3,731.3,159.3,737.8,159.3,744.3,159.3,750.8,159.3,757.3,159.3,763.8,159.3,770.3,159.3,776.8,159.3,783.3,159.3,789.8,159.3,796.3,159.3,802.8,159.3,809.3,159.3,815.8,159.3,822.3,159.3,659.8,165.8,666.3,165.8,672.8,165.8,679.3,165.8,685.8,165.8,692.3,165.8,698.8,165.8,705.3,165.8,711.8,165.8,718.3,165.8,724.8,165.8,731.3,165.8,737.8,165.8,744.3,165.8,750.8,165.8,757.3,165.8,763.8,165.8,770.3,165.8,776.8,165.8,783.3,165.8,789.8,165.8,796.3,165.8,802.8,165.8,809.3,165.8,815.8,165.8,822.3,165.8,646.8,172.3,653.3,172.3,659.8,172.3,666.3,172.3,672.8,172.3,679.3,172.3,685.8,172.3,692.3,172.3,698.8,172.3,705.3,172.3,711.8,172.3,718.3,172.3,724.8,172.3,731.3,172.3,737.8,172.3,744.3,172.3,750.8,172.3,757.3,172.3,763.8,172.3,770.3,172.3,776.8,172.3,783.3,172.3,789.8,172.3,796.3,172.3,802.8,172.3,809.3,172.3,815.8,172.3,822.3,172.3,828.8,172.3,835.3,172.3,841.8,172.3,646.8,178.8,653.3,178.8,659.8,178.8,666.3,178.8,672.8,178.8,679.3,178.8,685.8,178.8,692.3,178.8,698.8,178.8,705.3,178.8,711.8,178.8,718.3,178.8,724.8,178.8,731.3,178.8,737.8,178.8,744.3,178.8,750.8,178.8,757.3,178.8,763.8,178.8,770.3,178.8,776.8,178.8,783.3,178.8,789.8,178.8,796.3,178.8,802.8,178.8,809.3,178.8,815.8,178.8,822.3,178.8,828.8,178.8,835.3,178.8,841.8,178.8,653.3,185.3,659.8,185.3,666.3,185.3,672.8,185.3,679.3,185.3,685.8,185.3,692.3,185.3,698.8,185.3,705.3,185.3,711.8,185.3,718.3,185.3,724.8,185.3,731.3,185.3,737.8,185.3,744.3,185.3,750.8,185.3,757.3,185.3,763.8,185.3,770.3,185.3,776.8,185.3,783.3,185.3,789.8,185.3,796.3,185.3,802.8,185.3,809.3,185.3,815.8,185.3,822.3,185.3,828.8,185.3,835.3,185.3,841.8,185.3,848.3,185.3,653.3,191.8,659.8,191.8,666.3,191.8,672.8,191.8,679.3,191.8,685.8,191.8,692.3,191.8,698.8,191.8,705.3,191.8,711.8,191.8,718.3,191.8,724.8,191.8,731.3,191.8,737.8,191.8,744.3,191.8,750.8,191.8,757.3,191.8,763.8,191.8,770.3,191.8,776.8,191.8,783.3,191.8,789.8,191.8,796.3,191.8,802.8,191.8,809.3,191.8,815.8,191.8,822.3,191.8,828.8,191.8,835.3,191.8,841.8,191.8,848.3,191.8,653.3,198.3,659.8,198.3,666.3,198.3,672.8,198.3,679.3,198.3,685.8,198.3,692.3,198.3,698.8,198.3,705.3,198.3,711.8,198.3,718.3,198.3,724.8,198.3,731.3,198.3,737.8,198.3,744.3,198.3,750.8,198.3,757.3,198.3,763.8,198.3,770.3,198.3,776.8,198.3,783.3,198.3,789.8,198.3,796.3,198.3,802.8,198.3,809.3,198.3,815.8,198.3,822.3,198.3,828.8,198.3,835.3,198.3,841.8,198.3,653.3,204.8,659.8,204.8,666.3,204.8,672.8,204.8,679.3,204.8,685.8,204.8,692.3,204.8,698.8,204.8,705.3,204.8,711.8,204.8,718.3,204.8,724.8,204.8,731.3,204.8,737.8,204.8,744.3,204.8,750.8,204.8,757.3,204.8,763.8,204.8,770.3,204.8,776.8,204.8,783.3,204.8,789.8,204.8,796.3,204.8,802.8,204.8,809.3,204.8,815.8,204.8,822.3,204.8,828.8,204.8,653.3,211.3,659.8,211.3,666.3,211.3,672.8,211.3,679.3,211.3,685.8,211.3,692.3,211.3,698.8,211.3,705.3,211.3,711.8,211.3,718.3,211.3,724.8,211.3,731.3,211.3,737.8,211.3,744.3,211.3,750.8,211.3,757.3,211.3,763.8,211.3,770.3,211.3,776.8,211.3,783.3,211.3,789.8,211.3,796.3,211.3,802.8,211.3,809.3,211.3,815.8,211.3,822.3,211.3,653.3,217.8,659.8,217.8,666.3,217.8,672.8,217.8,679.3,217.8,685.8,217.8,692.3,217.8,698.8,217.8,705.3,217.8,711.8,217.8,718.3,217.8,724.8,217.8,731.3,217.8,737.8,217.8,744.3,217.8,750.8,217.8,757.3,217.8,763.8,217.8,770.3,217.8,776.8,217.8,783.3,217.8,789.8,217.8,796.3,217.8,802.8,217.8,809.3,217.8,822.3,217.8,653.3,224.3,659.8,224.3,666.3,224.3,672.8,224.3,679.3,224.3,685.8,224.3,692.3,224.3,698.8,224.3,705.3,224.3,711.8,224.3,718.3,224.3,724.8,224.3,731.3,224.3,737.8,224.3,744.3,224.3,750.8,224.3,763.8,224.3,770.3,224.3,789.8,224.3,796.3,224.3,653.3,230.8,659.8,230.8,666.3,230.8,672.8,230.8,679.3,230.8,685.8,230.8,692.3,230.8,698.8,230.8,705.3,230.8,711.8,230.8,718.3,230.8,724.8,230.8,731.3,230.8,737.8,230.8,744.3,230.8,750.8,230.8,757.3,230.8,763.8,230.8,770.3,230.8,783.3,230.8,789.8,230.8,653.3,237.3,659.8,237.3,666.3,237.3,672.8,237.3,679.3,237.3,685.8,237.3,692.3,237.3,698.8,237.3,705.3,237.3,711.8,237.3,718.3,237.3,724.8,237.3,731.3,237.3,737.8,237.3,744.3,237.3,750.8,237.3,770.3,237.3,653.3,243.8,659.8,243.8,666.3,243.8,672.8,243.8,679.3,243.8,685.8,243.8,692.3,243.8,698.8,243.8,705.3,243.8,711.8,243.8,718.3,243.8,724.8,243.8,731.3,243.8,737.8,243.8,744.3,243.8,763.8,243.8,770.3,243.8,653.3,250.3,659.8,250.3,666.3,250.3,672.8,250.3,679.3,250.3,685.8,250.3,692.3,250.3,698.8,250.3,705.3,250.3,711.8,250.3,718.3,250.3,724.8,250.3,731.3,250.3,737.8,250.3,744.3,250.3,763.8,250.3,653.3,256.8,659.8,256.8,666.3,256.8,672.8,256.8,679.3,256.8,685.8,256.8,692.3,256.8,698.8,256.8,705.3,256.8,711.8,256.8,718.3,256.8,724.8,256.8,731.3,256.8,737.8,256.8,744.3,256.8,659.8,263.3,666.3,263.3,672.8,263.3,679.3,263.3,685.8,263.3,692.3,263.3,698.8,263.3,705.3,263.3,711.8,263.3,718.3,263.3,724.8,263.3,659.8,269.8,666.3,269.8,672.8,269.8,679.3,269.8,685.8,269.8,692.3,269.8,698.8,269.8,705.3,269.8,711.8,269.8,718.3,269.8,659.8,276.3,666.3,276.3,672.8,276.3,679.3,276.3,685.8,276.3,692.3,276.3,698.8,276.3,711.8,276.3,659.8,282.8,666.3,282.8,672.8,282.8,679.3,282.8,685.8,282.8,692.3,282.8,659.8,289.3,666.3,289.3,672.8,289.3,679.3,289.3,685.8,289.3,692.3,289.3,659.8,295.8,666.3,295.8,672.8,295.8,679.3,295.8,685.8,295.8,659.8,302.3,666.3,302.3,672.8,302.3,679.3,302.3,666.3,308.8,672.8,308.8,666.3,315.3,672.8,315.3,666.3,321.8,672.8,321.8],"MA":[659.8,341.3,646.8,347.8,653.3,347.8,659.8,347.8,666.3,347.8,542.8,354.3,549.3,354.3,555.8,354.3,562.3,354.3,568.8,354.3,575.3,354.3,581.8,354.3,588.3,354.3,594.8,354.3,601.3,354.3,607.8,354.3,614.3,354.3,620.8,354.3,627.3,354.3,633.8,354.3,640.3,354.3,646.8,354.3,653.3,354.3,659.8,354.3,666.3,354.3,672.8,354.3,536.3,360.8,542.8,360.8,549.3,360.8,555.8,360.8,562.3,360.8,568.8,360.8,575.3,360.8,581.8,360.8,588.3,360.8,594.8,360.8,601.3,360.8,607.8,360.8,614.3,360.8,620.8,360.8,627.3,360.8,633.8,360.8,640.3,360.8,646.8,360.8,653.3,360.8,659.8,360.8,536.3,367.3,542.8,367.3,549.3,367.3,555.8,367.3,562.3,367.3,568.8,367.3,575.3,367.3,581.8,367.3,588.3,367.3,594.8,367.3,601.3,367.3,607.8,367.3,614.3,367.3,620.8,367.3,627.3,367.3,633.8,367.3,640.3,367.3,646.8,367.3,653.3,367.3,659.8,367.3,536.3,373.8,542.8,373.8,549.3,373.8,555.8,373.8,562.3,373.8,568.8,373.8,575.3,373.8,581.8,373.8,588.3,373.8,594.8,373.8,601.3,373.8,607.8,373.8,614.3,373.8,620.8,373.8,627.3,373.8,633.8,373.8,640.3,373.8,646.8,373.8,653.3,373.8,536.3,380.3,542.8,380.3,549.3,380.3,555.8,380.3,562.3,380.3,568.8,380.3,575.3,380.3,581.8,380.3,588.3,380.3,594.8,380.3,601.3,380.3,607.8,380.3,614.3,380.3,620.8,380.3,627.3,380.3,633.8,380.3,640.3,380.3,646.8,380.3,653.3,380.3,659.8,380.3,529.8,386.8,536.3,386.8,542.8,386.8,549.3,386.8,555.8,386.8,562.3,386.8,568.8,386.8,575.3,386.8,581.8,386.8,588.3,386.8,594.8,386.8,601.3,386.8,607.8,386.8,614.3,386.8,620.8,386.8,627.3,386.8,633.8,386.8,640.3,386.8,646.8,386.8,653.3,386.8,659.8,386.8,666.3,386.8,529.8,393.3,536.3,393.3,542.8,393.3,549.3,393.3,555.8,393.3,562.3,393.3,568.8,393.3,575.3,393.3,581.8,393.3,588.3,393.3,594.8,393.3,601.3,393.3,607.8,393.3,614.3,393.3,620.8,393.3,627.3,393.3,633.8,393.3,640.3,393.3,646.8,393.3,653.3,393.3,659.8,393.3,666.3,393.3,672.8,393.3,698.8,393.3,620.8,399.8,640.3,399.8,646.8,399.8,653.3,399.8,659.8,399.8,666.3,399.8,672.8,399.8,640.3,406.3,646.8,406.3,653.3,406.3,659.8,406.3,666.3,406.3,672.8,406.3,679.3,406.3,711.8,406.3,640.3,412.8,646.8,412.8,653.3,412.8,659.8,412.8,666.3,412.8,672.8,412.8,679.3,412.8,711.8,412.8,646.8,419.3,653.3,419.3,659.8,419.3,666.3,419.3,672.8,419.3,679.3,419.3,685.8,419.3,692.3,419.3,698.8,419.3,705.3,419.3,711.8,419.3,653.3,425.8,659.8,425.8,679.3,425.8,685.8,425.8,711.8,425.8,653.3,432.3,659.8,432.3,666.3,438.8,679.3,438.8,672.8,445.3,711.8,445.3],"NJ":[458.3,451.8,464.8,451.8,471.3,451.8,458.3,458.3,464.8,458.3,471.3,458.3,477.8,458.3,451.8,464.8,458.3,464.8,464.8,464.8,471.3,464.8,477.8,464.8,484.3,464.8,490.8,464.8,445.3,471.3,451.8,471.3,458.3,471.3,464.8,471.3,471.3,471.3,477.8,471.3,484.3,471.3,490.8,471.3,497.3,471.3,503.8,471.3,445.3,477.8,451.8,477.8,458.3,477.8,464.8,477.8,471.3,477.8,477.8,477.8,484.3,477.8,490.8,477.8,497.3,477.8,503.8,477.8,445.3,484.3,451.8,484.3,458.3,484.3,464.8,484.3,471.3,484.3,477.8,484.3,484.3,484.3,490.8,484.3,497.3,484.3,438.8,490.8,445.3,490.8,451.8,490.8,458.3,490.8,464.8,490.8,471.3,490.8,477.8,490.8,484.3,490.8,490.8,490.8,497.3,490.8,438.8,497.3,445.3,497.3,451.8,497.3,458.3,497.3,464.8,497.3,471.3,497.3,477.8,497.3,484.3,497.3,490.8,497.3,445.3,503.8,451.8,503.8,458.3,503.8,464.8,503.8,471.3,503.8,477.8,503.8,484.3,503.8,445.3,510.3,451.8,510.3,458.3,510.3,464.8,510.3,471.3,510.3,477.8,510.3,484.3,510.3,451.8,516.8,458.3,516.8,464.8,516.8,471.3,516.8,477.8,516.8,484.3,516.8,490.8,516.8,497.3,516.8,458.3,523.3,464.8,523.3,471.3,523.3,477.8,523.3,484.3,523.3,490.8,523.3,497.3,523.3,464.8,529.8,471.3,529.8,477.8,529.8,484.3,529.8,490.8,529.8,497.3,529.8,458.3,536.3,464.8,536.3,471.3,536.3,477.8,536.3,484.3,536.3,490.8,536.3,497.3,536.3,445.3,542.8,451.8,542.8,458.3,542.8,464.8,542.8,471.3,542.8,477.8,542.8,484.3,542.8,490.8,542.8,497.3,542.8,445.3,549.3,451.8,549.3,458.3,549.3,464.8,549.3,471.3,549.3,477.8,549.3,484.3,549.3,490.8,549.3,425.8,555.8,432.3,555.8,438.8,555.8,445.3,555.8,451.8,555.8,458.3,555.8,464.8,555.8,471.3,555.8,477.8,555.8,484.3,555.8,490.8,555.8,425.8,562.3,432.3,562.3,438.8,562.3,445.3,562.3,451.8,562.3,458.3,562.3,464.8,562.3,471.3,562.3,477.8,562.3,484.3,562.3,490.8,562.3,419.3,568.8,425.8,568.8,432.3,568.8,438.8,568.8,445.3,568.8,451.8,568.8,458.3,568.8,464.8,568.8,471.3,568.8,477.8,568.8,484.3,568.8,490.8,568.8,419.3,575.3,425.8,575.3,432.3,575.3,438.8,575.3,445.3,575.3,451.8,575.3,458.3,575.3,464.8,575.3,471.3,575.3,477.8,575.3,484.3,575.3,425.8,581.8,432.3,581.8,438.8,581.8,445.3,581.8,451.8,581.8,458.3,581.8,464.8,581.8,471.3,581.8,477.8,581.8,432.3,588.3,438.8,588.3,445.3,588.3,451.8,588.3,458.3,588.3,464.8,588.3,471.3,588.3,438.8,594.8,445.3,594.8,451.8,594.8,458.3,594.8,464.8,594.8,458.3,601.3,451.8,607.8,458.3,607.8,451.8,614.3],"PA":[185.3,380.3,191.8,380.3,198.3,380.3,178.8,386.8,185.3,386.8,191.8,386.8,198.3,386.8,165.8,393.3,172.3,393.3,178.8,393.3,185.3,393.3,191.8,393.3,198.3,393.3,204.8,393.3,211.3,393.3,165.8,399.8,172.3,399.8,178.8,399.8,185.3,399.8,191.8,399.8,198.3,399.8,204.8,399.8,211.3,399.8,217.8,399.8,224.3,399.8,230.8,399.8,237.3,399.8,243.8,399.8,250.3,399.8,256.8,399.8,263.3,399.8,269.8,399.8,276.3,399.8,282.8,399.8,289.3,399.8,295.8,399.8,302.3,399.8,308.8,399.8,315.3,399.8,321.8,399.8,328.3,399.8,334.8,399.8,341.3,399.8,347.8,399.8,354.3,399.8,165.8,406.3,172.3,406.3,178.8,406.3,185.3,406.3,191.8,406.3,198.3,406.3,204.8,406.3,211.3,406.3,217.8,406.3,224.3,406.3,230.8,406.3,237.3,406.3,243.8,406.3,250.3,406.3,256.8,406.3,263.3,406.3,269.8,406.3,276.3,406.3,282.8,406.3,289.3,406.3,295.8,406.3,302.3,406.3,308.8,406.3,315.3,406.3,321.8,406.3,328.3,406.3,334.8,406.3,341.3,406.3,347.8,406.3,354.3,406.3,360.8,406.3,367.3,406.3,373.8,406.3,380.3,406.3,386.8,406.3,393.3,406.3,399.8,406.3,406.3,406.3,412.8,406.3,419.3,406.3,425.8,406.3,432.3,406.3,165.8,412.8,172.3,412.8,178.8,412.8,185.3,412.8,191.8,412.8,198.3,412.8,204.8,412.8,211.3,412.8,217.8,412.8,224.3,412.8,230.8,412.8,237.3,412.8,243.8,412.8,250.3,412.8,256.8,412.8,263.3,412.8,269.8,412.8,276.3,412.8,282.8,412.8,289.3,412.8,295.8,412.8,302.3,412.8,308.8,412.8,315.3,412.8,321.8,412.8,328.3,412.8,334.8,412.8,341.3,412.8,347.8,412.8,354.3,412.8,360.8,412.8,367.3,412.8,373.8,412.8,380.3,412.8,386.8,412.8,393.3,412.8,399.8,412.8,406.3,412.8,412.8,412.8,419.3,412.8,425.8,412.8,432.3,412.8,438.8,412.8,159.3,419.3,165.8,419.3,172.3,419.3,178.8,419.3,185.3,419.3,191.8,419.3,198.3,419.3,204.8,419.3,211.3,419.3,217.8,419.3,224.3,419.3,230.8,419.3,237.3,419.3,243.8,419.3,250.3,419.3,256.8,419.3,263.3,419.3,269.8,419.3,276.3,419.3,282.8,419.3,289.3,419.3,295.8,419.3,302.3,419.3,308.8,419.3,315.3,419.3,321.8,419.3,328.3,419.3,334.8,419.3,341.3,419.3,347.8,419.3,354.3,419.3,360.8,419.3,367.3,419.3,373.8,419.3,380.3,419.3,386.8,419.3,393.3,419.3,399.8,419.3,406.3,419.3,412.8,419.3,419.3,419.3,425.8,419.3,432.3,419.3,438.8,419.3,445.3,419.3,159.3,425.8,165.8,425.8,172.3,425.8,178.8,425.8,185.3,425.8,191.8,425.8,198.3,425.8,204.8,425.8,211.3,425.8,217.8,425.8,224.3,425.8,230.8,425.8,237.3,425.8,243.8,425.8,250.3,425.8,256.8,425.8,263.3,425.8,269.8,425.8,276.3,425.8,282.8,425.8,289.3,425.8,295.8,425.8,302.3,425.8,308.8,425.8,315.3,425.8,321.8,425.8,328.3,425.8,334.8,425.8,341.3,425.8,347.8,425.8,354.3,425.8,360.8,425.8,367.3,425.8,373.8,425.8,380.3,425.8,386.8,425.8,393.3,425.8,399.8,425.8,406.3,425.8,412.8,425.8,419.3,425.8,425.8,425.8,432.3,425.8,438.8,425.8,445.3,425.8,159.3,432.3,165.8,432.3,172.3,432.3,178.8,432.3,185.3,432.3,191.8,432.3,198.3,432.3,204.8,432.3,211.3,432.3,217.8,432.3,224.3,432.3,230.8,432.3,237.3,432.3,243.8,432.3,250.3,432.3,256.8,432.3,263.3,432.3,269.8,432.3,276.3,432.3,282.8,432.3,289.3,432.3,295.8,432.3,302.3,432.3,308.8,432.3,315.3,432.3,321.8,432.3,328.3,432.3,334.8,432.3,341.3,432.3,347.8,432.3,354.3,432.3,360.8,432.3,367.3,432.3,373.8,432.3,380.3,432.3,386.8,432.3,393.3,432.3,399.8,432.3,406.3,432.3,412.8,432.3,419.3,432.3,425.8,432.3,432.3,432.3,438.8,432.3,445.3,432.3,159.3,438.8,165.8,438.8,172.3,438.8,178.8,438.8,185.3,438.8,191.8,438.8,198.3,438.8,204.8,438.8,211.3,438.8,217.8,438.8,224.3,438.8,230.8,438.8,237.3,438.8,243.8,438.8,250.3,438.8,256.8,438.8,263.3,438.8,269.8,438.8,276.3,438.8,282.8,438.8,289.3,438.8,295.8,438.8,302.3,438.8,308.8,438.8,315.3,438.8,321.8,438.8,328.3,438.8,334.8,438.8,341.3,438.8,347.8,438.8,354.3,438.8,360.8,438.8,367.3,438.8,373.8,438.8,380.3,438.8,386.8,438.8,393.3,438.8,399.8,438.8,406.3,438.8,412.8,438.8,419.3,438.8,425.8,438.8,432.3,438.8,438.8,438.8,445.3,438.8,451.8,438.8,159.3,445.3,165.8,445.3,172.3,445.3,178.8,445.3,185.3,445.3,191.8,445.3,198.3,445.3,204.8,445.3,211.3,445.3,217.8,445.3,224.3,445.3,230.8,445.3,237.3,445.3,243.8,445.3,250.3,445.3,256.8,445.3,263.3,445.3,269.8,445.3,276.3,445.3,282.8,445.3,289.3,445.3,295.8,445.3,302.3,445.3,308.8,445.3,315.3,445.3,321.8,445.3,328.3,445.3,334.8,445.3,341.3,445.3,347.8,445.3,354.3,445.3,360.8,445.3,367.3,445.3,373.8,445.3,380.3,445.3,386.8,445.3,393.3,445.3,399.8,445.3,406.3,445.3,412.8,445.3,419.3,445.3,425.8,445.3,432.3,445.3,438.8,445.3,445.3,445.3,451.8,445.3,458.3,445.3,159.3,451.8,165.8,451.8,172.3,451.8,178.8,451.8,185.3,451.8,191.8,451.8,198.3,451.8,204.8,451.8,211.3,451.8,217.8,451.8,224.3,451.8,230.8,451.8,237.3,451.8,243.8,451.8,250.3,451.8,256.8,451.8,263.3,451.8,269.8,451.8,276.3,451.8,282.8,451.8,289.3,451.8,295.8,451.8,302.3,451.8,308.8,451.8,315.3,451.8,321.8,451.8,328.3,451.8,334.8,451.8,341.3,451.8,347.8,451.8,354.3,451.8,360.8,451.8,367.3,451.8,373.8,451.8,380.3,451.8,386.8,451.8,393.3,451.8,399.8,451.8,406.3,451.8,412.8,451.8,419.3,451.8,425.8,451.8,432.3,451.8,438.8,451.8,445.3,451.8,451.8,451.8,159.3,458.3,165.8,458.3,172.3,458.3,178.8,458.3,185.3,458.3,191.8,458.3,198.3,458.3,204.8,458.3,211.3,458.3,217.8,458.3,224.3,458.3,230.8,458.3,237.3,458.3,243.8,458.3,250.3,458.3,256.8,458.3,263.3,458.3,269.8,458.3,276.3,458.3,282.8,458.3,289.3,458.3,295.8,458.3,302.3,458.3,308.8,458.3,315.3,458.3,321.8,458.3,328.3,458.3,334.8,458.3,341.3,458.3,347.8,458.3,354.3,458.3,360.8,458.3,367.3,458.3,373.8,458.3,380.3,458.3,386.8,458.3,393.3,458.3,399.8,458.3,406.3,458.3,412.8,458.3,419.3,458.3,425.8,458.3,432.3,458.3,438.8,458.3,445.3,458.3,451.8,458.3,159.3,464.8,165.8,464.8,172.3,464.8,178.8,464.8,185.3,464.8,191.8,464.8,198.3,464.8,204.8,464.8,211.3,464.8,217.8,464.8,224.3,464.8,230.8,464.8,237.3,464.8,243.8,464.8,250.3,464.8,256.8,464.8,263.3,464.8,269.8,464.8,276.3,464.8,282.8,464.8,289.3,464.8,295.8,464.8,302.3,464.8,308.8,464.8,315.3,464.8,321.8,464.8,328.3,464.8,334.8,464.8,341.3,464.8,347.8,464.8,354.3,464.8,360.8,464.8,367.3,464.8,373.8,464.8,380.3,464.8,386.8,464.8,393.3,464.8,399.8,464.8,406.3,464.8,412.8,464.8,419.3,464.8,425.8,464.8,432.3,464.8,438.8,464.8,445.3,464.8,159.3,471.3,165.8,471.3,172.3,471.3,178.8,471.3,185.3,471.3,191.8,471.3,198.3,471.3,204.8,471.3,211.3,471.3,217.8,471.3,224.3,471.3,230.8,471.3,237.3,471.3,243.8,471.3,250.3,471.3,256.8,471.3,263.3,471.3,269.8,471.3,276.3,471.3,282.8,471.3,289.3,471.3,295.8,471.3,302.3,471.3,308.8,471.3,315.3,471.3,321.8,471.3,328.3,471.3,334.8,471.3,341.3,471.3,347.8,471.3,354.3,471.3,360.8,471.3,367.3,471.3,373.8,471.3,380.3,471.3,386.8,471.3,393.3,471.3,399.8,471.3,406.3,471.3,412.8,471.3,419.3,471.3,425.8,471.3,432.3,471.3,438.8,471.3,159.3,477.8,165.8,477.8,172.3,477.8,178.8,477.8,185.3,477.8,191.8,477.8,198.3,477.8,204.8,477.8,211.3,477.8,217.8,477.8,224.3,477.8,230.8,477.8,237.3,477.8,243.8,477.8,250.3,477.8,256.8,477.8,263.3,477.8,269.8,477.8,276.3,477.8,282.8,477.8,289.3,477.8,295.8,477.8,302.3,477.8,308.8,477.8,315.3,477.8,321.8,477.8,328.3,477.8,334.8,477.8,341.3,477.8,347.8,477.8,354.3,477.8,360.8,477.8,367.3,477.8,373.8,477.8,380.3,477.8,386.8,477.8,393.3,477.8,399.8,477.8,406.3,477.8,412.8,477.8,419.3,477.8,425.8,477.8,432.3,477.8,438.8,477.8,159.3,484.3,165.8,484.3,172.3,484.3,178.8,484.3,185.3,484.3,191.8,484.3,198.3,484.3,204.8,484.3,211.3,484.3,217.8,484.3,224.3,484.3,230.8,484.3,237.3,484.3,243.8,484.3,250.3,484.3,256.8,484.3,263.3,484.3,269.8,484.3,276.3,484.3,282.8,484.3,289.3,484.3,295.8,484.3,302.3,484.3,308.8,484.3,315.3,484.3,321.8,484.3,328.3,484.3,334.8,484.3,341.3,484.3,347.8,484.3,354.3,484.3,360.8,484.3,367.3,484.3,373.8,484.3,380.3,484.3,386.8,484.3,393.3,484.3,399.8,484.3,406.3,484.3,412.8,484.3,419.3,484.3,425.8,484.3,432.3,484.3,438.8,484.3,159.3,490.8,165.8,490.8,172.3,490.8,178.8,490.8,185.3,490.8,191.8,490.8,198.3,490.8,204.8,490.8,211.3,490.8,217.8,490.8,224.3,490.8,230.8,490.8,237.3,490.8,243.8,490.8,250.3,490.8,256.8,490.8,263.3,490.8,269.8,490.8,276.3,490.8,282.8,490.8,289.3,490.8,295.8,490.8,302.3,490.8,308.8,490.8,315.3,490.8,321.8,490.8,328.3,490.8,334.8,490.8,341.3,490.8,347.8,490.8,354.3,490.8,360.8,490.8,367.3,490.8,373.8,490.8,380.3,490.8,386.8,490.8,393.3,490.8,399.8,490.8,406.3,490.8,412.8,490.8,419.3,490.8,425.8,490.8,432.3,490.8,159.3,497.3,165.8,497.3,172.3,497.3,178.8,497.3,185.3,497.3,191.8,497.3,198.3,497.3,204.8,497.3,211.3,497.3,217.8,497.3,224.3,497.3,230.8,497.3,237.3,497.3,243.8,497.3,250.3,497.3,256.8,497.3,263.3,497.3,269.8,497.3,276.3,497.3,282.8,497.3,289.3,497.3,295.8,497.3,302.3,497.3,308.8,497.3,315.3,497.3,321.8,497.3,328.3,497.3,334.8,497.3,341.3,497.3,347.8,497.3,354.3,497.3,360.8,497.3,367.3,497.3,373.8,497.3,380.3,497.3,386.8,497.3,393.3,497.3,399.8,497.3,406.3,497.3,412.8,497.3,419.3,497.3,425.8,497.3,432.3,497.3,152.8,503.8,159.3,503.8,165.8,503.8,172.3,503.8,178.8,503.8,185.3,503.8,191.8,503.8,198.3,503.8,204.8,503.8,211.3,503.8,217.8,503.8,224.3,503.8,230.8,503.8,237.3,503.8,243.8,503.8,250.3,503.8,256.8,503.8,263.3,503.8,269.8,503.8,276.3,503.8,282.8,503.8,289.3,503.8,295.8,503.8,302.3,503.8,308.8,503.8,315.3,503.8,321.8,503.8,328.3,503.8,334.8,503.8,341.3,503.8,347.8,503.8,354.3,503.8,360.8,503.8,367.3,503.8,373.8,503.8,380.3,503.8,386.8,503.8,393.3,503.8,399.8,503.8,406.3,503.8,412.8,503.8,419.3,503.8,425.8,503.8,432.3,503.8,438.8,503.8,152.8,510.3,159.3,510.3,165.8,510.3,172.3,510.3,178.8,510.3,185.3,510.3,191.8,510.3,198.3,510.3,204.8,510.3,211.3,510.3,217.8,510.3,224.3,510.3,230.8,510.3,237.3,510.3,243.8,510.3,250.3,510.3,256.8,510.3,263.3,510.3,269.8,510.3,276.3,510.3,282.8,510.3,289.3,510.3,295.8,510.3,302.3,510.3,308.8,510.3,315.3,510.3,321.8,510.3,328.3,510.3,334.8,510.3,341.3,510.3,347.8,510.3,354.3,510.3,360.8,510.3,367.3,510.3,373.8,510.3,380.3,510.3,386.8,510.3,393.3,510.3,399.8,510.3,406.3,510.3,412.8,510.3,419.3,510.3,425.8,510.3,432.3,510.3,438.8,510.3,152.8,516.8,159.3,516.8,165.8,516.8,172.3,516.8,178.8,516.8,185.3,516.8,191.8,516.8,198.3,516.8,204.8,516.8,211.3,516.8,217.8,516.8,224.3,516.8,230.8,516.8,237.3,516.8,243.8,516.8,250.3,516.8,256.8,516.8,263.3,516.8,269.8,516.8,276.3,516.8,282.8,516.8,289.3,516.8,295.8,516.8,302.3,516.8,308.8,516.8,315.3,516.8,321.8,516.8,328.3,516.8,334.8,516.8,341.3,516.8,347.8,516.8,354.3,516.8,360.8,516.8,367.3,516.8,373.8,516.8,380.3,516.8,386.8,516.8,393.3,516.8,399.8,516.8,406.3,516.8,412.8,516.8,419.3,516.8,425.8,516.8,432.3,516.8,438.8,516.8,445.3,516.8,152.8,523.3,159.3,523.3,165.8,523.3,172.3,523.3,178.8,523.3,185.3,523.3,191.8,523.3,198.3,523.3,204.8,523.3,211.3,523.3,217.8,523.3,224.3,523.3,230.8,523.3,237.3,523.3,243.8,523.3,250.3,523.3,256.8,523.3,263.3,523.3,269.8,523.3,276.3,523.3,282.8,523.3,289.3,523.3,295.8,523.3,302.3,523.3,308.8,523.3,315.3,523.3,321.8,523.3,328.3,523.3,334.8,523.3,341.3,523.3,347.8,523.3,354.3,523.3,360.8,523.3,367.3,523.3,373.8,523.3,380.3,523.3,386.8,523.3,393.3,523.3,399.8,523.3,406.3,523.3,412.8,523.3,419.3,523.3,425.8,523.3,432.3,523.3,438.8,523.3,445.3,523.3,451.8,523.3,152.8,529.8,159.3,529.8,165.8,529.8,172.3,529.8,178.8,529.8,185.3,529.8,191.8,529.8,198.3,529.8,204.8,529.8,211.3,529.8,217.8,529.8,224.3,529.8,230.8,529.8,237.3,529.8,243.8,529.8,250.3,529.8,256.8,529.8,263.3,529.8,269.8,529.8,276.3,529.8,282.8,529.8,289.3,529.8,295.8,529.8,302.3,529.8,308.8,529.8,315.3,529.8,321.8,529.8,328.3,529.8,334.8,529.8,341.3,529.8,347.8,529.8,354.3,529.8,360.8,529.8,367.3,529.8,373.8,529.8,380.3,529.8,386.8,529.8,393.3,529.8,399.8,529.8,406.3,529.8,412.8,529.8,419.3,529.8,425.8,529.8,432.3,529.8,438.8,529.8,445.3,529.8,451.8,529.8,458.3,529.8,152.8,536.3,159.3,536.3,165.8,536.3,172.3,536.3,178.8,536.3,185.3,536.3,191.8,536.3,198.3,536.3,204.8,536.3,211.3,536.3,217.8,536.3,224.3,536.3,230.8,536.3,237.3,536.3,243.8,536.3,250.3,536.3,256.8,536.3,263.3,536.3,269.8,536.3,276.3,536.3,282.8,536.3,289.3,536.3,295.8,536.3,302.3,536.3,308.8,536.3,315.3,536.3,321.8,536.3,328.3,536.3,334.8,536.3,341.3,536.3,347.8,536.3,354.3,536.3,360.8,536.3,367.3,536.3,373.8,536.3,380.3,536.3,386.8,536.3,393.3,536.3,399.8,536.3,406.3,536.3,412.8,536.3,419.3,536.3,425.8,536.3,432.3,536.3,438.8,536.3,445.3,536.3,451.8,536.3,152.8,542.8,159.3,542.8,165.8,542.8,172.3,542.8,178.8,542.8,185.3,542.8,191.8,542.8,198.3,542.8,204.8,542.8,211.3,542.8,217.8,542.8,224.3,542.8,230.8,542.8,237.3,542.8,243.8,542.8,250.3,542.8,256.8,542.8,263.3,542.8,269.8,542.8,276.3,542.8,282.8,542.8,289.3,542.8,295.8,542.8,302.3,542.8,308.8,542.8,315.3,542.8,321.8,542.8,328.3,542.8,334.8,542.8,341.3,542.8,347.8,542.8,354.3,542.8,360.8,542.8,367.3,542.8,373.8,542.8,380.3,542.8,386.8,542.8,393.3,542.8,399.8,542.8,406.3,542.8,412.8,542.8,419.3,542.8,425.8,542.8,432.3,542.8,438.8,542.8,159.3,549.3,165.8,549.3,172.3,549.3,178.8,549.3,185.3,549.3,191.8,549.3,198.3,549.3,204.8,549.3,211.3,549.3,217.8,549.3,224.3,549.3,230.8,549.3,237.3,549.3,243.8,549.3,250.3,549.3,256.8,549.3,263.3,549.3,269.8,549.3,276.3,549.3,282.8,549.3,289.3,549.3,295.8,549.3,302.3,549.3,308.8,549.3,315.3,549.3,321.8,549.3,328.3,549.3,334.8,549.3,341.3,549.3,347.8,549.3,354.3,549.3,360.8,549.3,367.3,549.3,373.8,549.3,380.3,549.3,386.8,549.3,393.3,549.3,399.8,549.3,406.3,549.3,412.8,549.3,419.3,549.3,425.8,549.3,432.3,549.3,438.8,549.3,263.3,555.8,269.8,555.8,276.3,555.8,282.8,555.8,289.3,555.8,295.8,555.8,302.3,555.8,308.8,555.8,315.3,555.8,321.8,555.8,328.3,555.8,334.8,555.8,341.3,555.8,347.8,555.8,354.3,555.8,360.8,555.8,367.3,555.8,373.8,555.8,380.3,555.8,386.8,555.8,393.3,555.8,399.8,555.8,406.3,555.8],"CT":[529.8,399.8,536.3,399.8,542.8,399.8,549.3,399.8,555.8,399.8,562.3,399.8,568.8,399.8,575.3,399.8,581.8,399.8,588.3,399.8,594.8,399.8,601.3,399.8,607.8,399.8,614.3,399.8,529.8,406.3,536.3,406.3,542.8,406.3,549.3,406.3,555.8,406.3,562.3,406.3,568.8,406.3,575.3,406.3,581.8,406.3,588.3,406.3,594.8,406.3,601.3,406.3,607.8,406.3,614.3,406.3,529.8,412.8,536.3,412.8,542.8,412.8,549.3,412.8,555.8,412.8,562.3,412.8,568.8,412.8,575.3,412.8,581.8,412.8,588.3,412.8,594.8,412.8,601.3,412.8,607.8,412.8,614.3,412.8,529.8,419.3,536.3,419.3,542.8,419.3,549.3,419.3,555.8,419.3,562.3,419.3,568.8,419.3,575.3,419.3,581.8,419.3,588.3,419.3,594.8,419.3,601.3,419.3,607.8,419.3,614.3,419.3,529.8,425.8,536.3,425.8,542.8,425.8,549.3,425.8,555.8,425.8,562.3,425.8,568.8,425.8,575.3,425.8,581.8,425.8,588.3,425.8,594.8,425.8,601.3,425.8,607.8,425.8,614.3,425.8,529.8,432.3,536.3,432.3,542.8,432.3,549.3,432.3,555.8,432.3,562.3,432.3,568.8,432.3,575.3,432.3,581.8,432.3,588.3,432.3,594.8,432.3,601.3,432.3,607.8,432.3,614.3,432.3,529.8,438.8,536.3,438.8,542.8,438.8,549.3,438.8,555.8,438.8,562.3,438.8,568.8,438.8,575.3,438.8,581.8,438.8,588.3,438.8,594.8,438.8,601.3,438.8,607.8,438.8,614.3,438.8,529.8,445.3,536.3,445.3,542.8,445.3,549.3,445.3,555.8,445.3,562.3,445.3,568.8,445.3,575.3,445.3,581.8,445.3,588.3,445.3,594.8,445.3,601.3,445.3,607.8,445.3,614.3,445.3,529.8,451.8,536.3,451.8,542.8,451.8,549.3,451.8,555.8,451.8,562.3,451.8,568.8,451.8,575.3,451.8,581.8,451.8,588.3,451.8,529.8,458.3,536.3,458.3,542.8,458.3,549.3,458.3,516.8,464.8,523.3,464.8,529.8,464.8,523.3,471.3],"DE":[412.8,555.8,419.3,555.8,406.3,562.3,412.8,562.3,419.3,562.3,406.3,568.8,412.8,568.8,406.3,575.3,412.8,575.3,406.3,581.8,412.8,581.8,406.3,588.3,412.8,588.3,419.3,588.3,406.3,594.8,412.8,594.8,419.3,594.8,406.3,601.3,412.8,601.3,419.3,601.3,406.3,607.8,412.8,607.8,419.3,607.8,412.8,614.3,419.3,614.3,425.8,614.3,412.8,620.8,419.3,620.8,425.8,620.8,412.8,627.3,419.3,627.3,425.8,627.3,432.3,627.3,412.8,633.8,419.3,633.8,425.8,633.8,432.3,633.8,438.8,633.8,412.8,640.3,419.3,640.3,425.8,640.3,432.3,640.3,438.8,640.3,412.8,646.8,419.3,646.8,425.8,646.8,432.3,646.8,438.8,646.8],"MD":[211.3,555.8,217.8,555.8,224.3,555.8,230.8,555.8,237.3,555.8,243.8,555.8,250.3,555.8,256.8,555.8,204.8,562.3,211.3,562.3,217.8,562.3,224.3,562.3,230.8,562.3,237.3,562.3,243.8,562.3,250.3,562.3,256.8,562.3,263.3,562.3,269.8,562.3,282.8,562.3,289.3,562.3,295.8,562.3,302.3,562.3,308.8,562.3,315.3,562.3,321.8,562.3,328.3,562.3,334.8,562.3,341.3,562.3,347.8,562.3,354.3,562.3,360.8,562.3,367.3,562.3,373.8,562.3,380.3,562.3,386.8,562.3,393.3,562.3,399.8,562.3,204.8,568.8,211.3,568.8,217.8,568.8,224.3,568.8,230.8,568.8,256.8,568.8,295.8,568.8,302.3,568.8,308.8,568.8,315.3,568.8,321.8,568.8,328.3,568.8,334.8,568.8,341.3,568.8,347.8,568.8,354.3,568.8,360.8,568.8,367.3,568.8,373.8,568.8,380.3,568.8,386.8,568.8,393.3,568.8,399.8,568.8,204.8,575.3,211.3,575.3,217.8,575.3,295.8,575.3,302.3,575.3,308.8,575.3,315.3,575.3,321.8,575.3,328.3,575.3,334.8,575.3,341.3,575.3,347.8,575.3,354.3,575.3,360.8,575.3,367.3,575.3,373.8,575.3,380.3,575.3,386.8,575.3,399.8,575.3,204.8,581.8,211.3,581.8,302.3,581.8,308.8,581.8,315.3,581.8,321.8,581.8,328.3,581.8,334.8,581.8,341.3,581.8,347.8,581.8,354.3,581.8,360.8,581.8,367.3,581.8,373.8,581.8,393.3,581.8,399.8,581.8,204.8,588.3,308.8,588.3,315.3,588.3,321.8,588.3,328.3,588.3,334.8,588.3,341.3,588.3,347.8,588.3,354.3,588.3,360.8,588.3,367.3,588.3,373.8,588.3,386.8,588.3,393.3,588.3,399.8,588.3,315.3,594.8,321.8,594.8,328.3,594.8,334.8,594.8,341.3,594.8,347.8,594.8,354.3,594.8,360.8,594.8,367.3,594.8,380.3,594.8,386.8,594.8,393.3,594.8,399.8,594.8,315.3,601.3,321.8,601.3,328.3,601.3,334.8,601.3,341.3,601.3,347.8,601.3,354.3,601.3,360.8,601.3,367.3,601.3,380.3,601.3,386.8,601.3,393.3,601.3,399.8,601.3,328.3,607.8,334.8,607.8,341.3,607.8,347.8,607.8,354.3,607.8,360.8,607.8,367.3,607.8,380.3,607.8,386.8,607.8,393.3,607.8,399.8,607.8,341.3,614.3,347.8,614.3,354.3,614.3,360.8,614.3,373.8,614.3,380.3,614.3,386.8,614.3,393.3,614.3,399.8,614.3,406.3,614.3,341.3,620.8,347.8,620.8,354.3,620.8,360.8,620.8,386.8,620.8,393.3,620.8,399.8,620.8,406.3,620.8,334.8,627.3,341.3,627.3,347.8,627.3,354.3,627.3,360.8,627.3,373.8,627.3,380.3,627.3,386.8,627.3,393.3,627.3,399.8,627.3,406.3,627.3,334.8,633.8,341.3,633.8,347.8,633.8,354.3,633.8,360.8,633.8,373.8,633.8,380.3,633.8,386.8,633.8,393.3,633.8,399.8,633.8,406.3,633.8,328.3,640.3,334.8,640.3,341.3,640.3,347.8,640.3,354.3,640.3,360.8,640.3,380.3,640.3,393.3,640.3,399.8,640.3,406.3,640.3,321.8,646.8,328.3,646.8,334.8,646.8,341.3,646.8,347.8,646.8,354.3,646.8,360.8,646.8,380.3,646.8,386.8,646.8,393.3,646.8,399.8,646.8,406.3,646.8,341.3,653.3,347.8,653.3,354.3,653.3,360.8,653.3,367.3,653.3,380.3,653.3,386.8,653.3,393.3,653.3,399.8,653.3,406.3,653.3,412.8,653.3,419.3,653.3,425.8,653.3,432.3,653.3,438.8,653.3,341.3,659.8,347.8,659.8,354.3,659.8,360.8,659.8,380.3,659.8,386.8,659.8,393.3,659.8,399.8,659.8,406.3,659.8,412.8,659.8,419.3,659.8,425.8,659.8,432.3,659.8,438.8,659.8,360.8,666.3,367.3,666.3,399.8,666.3,406.3,666.3,412.8,666.3,419.3,666.3,425.8,666.3,432.3,666.3,367.3,672.8,386.8,672.8,393.3,672.8,399.8,672.8,406.3,672.8,412.8,672.8,419.3,672.8,425.8,672.8,432.3,672.8,399.8,679.3,406.3,679.3,412.8,679.3,419.3,679.3,425.8,679.3,432.3,679.3,399.8,685.8],"NH":[633.8,172.3,640.3,172.3,633.8,178.8,640.3,178.8,627.3,185.3,633.8,185.3,640.3,185.3,646.8,185.3,627.3,191.8,633.8,191.8,640.3,191.8,646.8,191.8,627.3,198.3,633.8,198.3,640.3,198.3,646.8,198.3,627.3,204.8,633.8,204.8,640.3,204.8,646.8,204.8,627.3,211.3,633.8,211.3,640.3,211.3,646.8,211.3,627.3,217.8,633.8,217.8,640.3,217.8,646.8,217.8,627.3,224.3,633.8,224.3,640.3,224.3,646.8,224.3,620.8,230.8,627.3,230.8,633.8,230.8,640.3,230.8,646.8,230.8,607.8,237.3,614.3,237.3,620.8,237.3,627.3,237.3,633.8,237.3,640.3,237.3,646.8,237.3,601.3,243.8,607.8,243.8,614.3,243.8,620.8,243.8,627.3,243.8,633.8,243.8,640.3,243.8,646.8,243.8,601.3,250.3,607.8,250.3,614.3,250.3,620.8,250.3,627.3,250.3,633.8,250.3,640.3,250.3,646.8,250.3,601.3,256.8,607.8,256.8,614.3,256.8,620.8,256.8,627.3,256.8,633.8,256.8,640.3,256.8,646.8,256.8,601.3,263.3,607.8,263.3,614.3,263.3,620.8,263.3,627.3,263.3,633.8,263.3,640.3,263.3,646.8,263.3,653.3,263.3,594.8,269.8,601.3,269.8,607.8,269.8,614.3,269.8,620.8,269.8,627.3,269.8,633.8,269.8,640.3,269.8,646.8,269.8,653.3,269.8,594.8,276.3,601.3,276.3,607.8,276.3,614.3,276.3,620.8,276.3,627.3,276.3,633.8,276.3,640.3,276.3,646.8,276.3,653.3,276.3,588.3,282.8,594.8,282.8,601.3,282.8,607.8,282.8,614.3,282.8,620.8,282.8,627.3,282.8,633.8,282.8,640.3,282.8,646.8,282.8,653.3,282.8,588.3,289.3,594.8,289.3,601.3,289.3,607.8,289.3,614.3,289.3,620.8,289.3,627.3,289.3,633.8,289.3,640.3,289.3,646.8,289.3,653.3,289.3,588.3,295.8,594.8,295.8,601.3,295.8,607.8,295.8,614.3,295.8,620.8,295.8,627.3,295.8,633.8,295.8,640.3,295.8,646.8,295.8,653.3,295.8,588.3,302.3,594.8,302.3,601.3,302.3,607.8,302.3,614.3,302.3,620.8,302.3,627.3,302.3,633.8,302.3,640.3,302.3,646.8,302.3,653.3,302.3,588.3,308.8,594.8,308.8,601.3,308.8,607.8,308.8,614.3,308.8,620.8,308.8,627.3,308.8,633.8,308.8,640.3,308.8,646.8,308.8,653.3,308.8,659.8,308.8,581.8,315.3,588.3,315.3,594.8,315.3,601.3,315.3,607.8,315.3,614.3,315.3,620.8,315.3,627.3,315.3,633.8,315.3,640.3,315.3,646.8,315.3,653.3,315.3,659.8,315.3,581.8,321.8,588.3,321.8,594.8,321.8,601.3,321.8,607.8,321.8,614.3,321.8,620.8,321.8,627.3,321.8,633.8,321.8,640.3,321.8,646.8,321.8,653.3,321.8,659.8,321.8,581.8,328.3,588.3,328.3,594.8,328.3,601.3,328.3,607.8,328.3,614.3,328.3,620.8,328.3,627.3,328.3,633.8,328.3,640.3,328.3,646.8,328.3,653.3,328.3,659.8,328.3,666.3,328.3,581.8,334.8,588.3,334.8,594.8,334.8,601.3,334.8,607.8,334.8,614.3,334.8,620.8,334.8,627.3,334.8,633.8,334.8,640.3,334.8,646.8,334.8,653.3,334.8,659.8,334.8,581.8,341.3,588.3,341.3,594.8,341.3,601.3,341.3,607.8,341.3,614.3,341.3,620.8,341.3,627.3,341.3,633.8,341.3,640.3,341.3,646.8,341.3,653.3,341.3,581.8,347.8,588.3,347.8,594.8,347.8,601.3,347.8,607.8,347.8,614.3,347.8,620.8,347.8,627.3,347.8,633.8,347.8,640.3,347.8],"NY":[458.3,191.8,471.3,191.8,503.8,191.8,510.3,191.8,516.8,191.8,523.3,191.8,529.8,191.8,445.3,198.3,451.8,198.3,458.3,198.3,464.8,198.3,471.3,198.3,477.8,198.3,484.3,198.3,490.8,198.3,497.3,198.3,503.8,198.3,510.3,198.3,516.8,198.3,523.3,198.3,529.8,198.3,438.8,204.8,445.3,204.8,451.8,204.8,458.3,204.8,464.8,204.8,471.3,204.8,477.8,204.8,484.3,204.8,490.8,204.8,497.3,204.8,503.8,204.8,510.3,204.8,516.8,204.8,523.3,204.8,529.8,204.8,432.3,211.3,438.8,211.3,445.3,211.3,451.8,211.3,458.3,211.3,464.8,211.3,471.3,211.3,477.8,211.3,484.3,211.3,490.8,211.3,497.3,211.3,503.8,211.3,510.3,211.3,516.8,211.3,523.3,211.3,529.8,211.3,425.8,217.8,432.3,217.8,438.8,217.8,445.3,217.8,451.8,217.8,458.3,217.8,464.8,217.8,471.3,217.8,477.8,217.8,484.3,217.8,490.8,217.8,497.3,217.8,503.8,217.8,510.3,217.8,516.8,217.8,523.3,217.8,529.8,217.8,419.3,224.3,425.8,224.3,432.3,224.3,438.8,224.3,445.3,224.3,451.8,224.3,458.3,224.3,464.8,224.3,471.3,224.3,477.8,224.3,484.3,224.3,490.8,224.3,497.3,224.3,503.8,224.3,510.3,224.3,516.8,224.3,523.3,224.3,529.8,224.3,412.8,230.8,419.3,230.8,425.8,230.8,432.3,230.8,438.8,230.8,445.3,230.8,451.8,230.8,458.3,230.8,464.8,230.8,471.3,230.8,477.8,230.8,484.3,230.8,490.8,230.8,497.3,230.8,503.8,230.8,510.3,230.8,516.8,230.8,523.3,230.8,529.8,230.8,536.3,230.8,399.8,237.3,406.3,237.3,412.8,237.3,419.3,237.3,425.8,237.3,432.3,237.3,438.8,237.3,445.3,237.3,451.8,237.3,458.3,237.3,464.8,237.3,471.3,237.3,477.8,237.3,484.3,237.3,490.8,237.3,497.3,237.3,503.8,237.3,510.3,237.3,516.8,237.3,523.3,237.3,529.8,237.3,393.3,243.8,399.8,243.8,406.3,243.8,412.8,243.8,419.3,243.8,425.8,243.8,432.3,243.8,438.8,243.8,445.3,243.8,451.8,243.8,458.3,243.8,464.8,243.8,471.3,243.8,477.8,243.8,484.3,243.8,490.8,243.8,497.3,243.8,503.8,243.8,510.3,243.8,516.8,243.8,523.3,243.8,529.8,243.8,386.8,250.3,393.3,250.3,399.8,250.3,406.3,250.3,412.8,250.3,419.3,250.3,425.8,250.3,432.3,250.3,438.8,250.3,445.3,250.3,451.8,250.3,458.3,250.3,464.8,250.3,471.3,250.3,477.8,250.3,484.3,250.3,490.8,250.3,497.3,250.3,503.8,250.3,510.3,250.3,516.8,250.3,523.3,250.3,529.8,250.3,386.8,256.8,393.3,256.8,399.8,256.8,406.3,256.8,412.8,256.8,419.3,256.8,425.8,256.8,432.3,256.8,438.8,256.8,445.3,256.8,451.8,256.8,458.3,256.8,464.8,256.8,471.3,256.8,477.8,256.8,484.3,256.8,490.8,256.8,497.3,256.8,503.8,256.8,510.3,256.8,516.8,256.8,523.3,256.8,529.8,256.8,393.3,263.3,399.8,263.3,406.3,263.3,412.8,263.3,419.3,263.3,425.8,263.3,432.3,263.3,438.8,263.3,445.3,263.3,451.8,263.3,458.3,263.3,464.8,263.3,471.3,263.3,477.8,263.3,484.3,263.3,490.8,263.3,497.3,263.3,503.8,263.3,510.3,263.3,516.8,263.3,523.3,263.3,529.8,263.3,386.8,269.8,393.3,269.8,399.8,269.8,406.3,269.8,412.8,269.8,419.3,269.8,425.8,269.8,432.3,269.8,438.8,269.8,445.3,269.8,451.8,269.8,458.3,269.8,464.8,269.8,471.3,269.8,477.8,269.8,484.3,269.8,490.8,269.8,497.3,269.8,503.8,269.8,510.3,269.8,516.8,269.8,523.3,269.8,529.8,269.8,393.3,276.3,399.8,276.3,406.3,276.3,412.8,276.3,419.3,276.3,425.8,276.3,432.3,276.3,438.8,276.3,445.3,276.3,451.8,276.3,458.3,276.3,464.8,276.3,471.3,276.3,477.8,276.3,484.3,276.3,490.8,276.3,497.3,276.3,503.8,276.3,510.3,276.3,516.8,276.3,523.3,276.3,529.8,276.3,393.3,282.8,399.8,282.8,406.3,282.8,412.8,282.8,419.3,282.8,425.8,282.8,432.3,282.8,438.8,282.8,445.3,282.8,451.8,282.8,458.3,282.8,464.8,282.8,471.3,282.8,477.8,282.8,484.3,282.8,490.8,282.8,497.3,282.8,503.8,282.8,510.3,282.8,516.8,282.8,523.3,282.8,529.8,282.8,393.3,289.3,399.8,289.3,406.3,289.3,412.8,289.3,419.3,289.3,425.8,289.3,432.3,289.3,438.8,289.3,445.3,289.3,451.8,289.3,458.3,289.3,464.8,289.3,471.3,289.3,477.8,289.3,484.3,289.3,490.8,289.3,497.3,289.3,503.8,289.3,510.3,289.3,516.8,289.3,523.3,289.3,529.8,289.3,536.3,289.3,380.3,295.8,386.8,295.8,393.3,295.8,399.8,295.8,406.3,295.8,412.8,295.8,419.3,295.8,425.8,295.8,432.3,295.8,438.8,295.8,445.3,295.8,451.8,295.8,458.3,295.8,464.8,295.8,471.3,295.8,477.8,295.8,484.3,295.8,490.8,295.8,497.3,295.8,503.8,295.8,510.3,295.8,516.8,295.8,523.3,295.8,529.8,295.8,536.3,295.8,263.3,302.3,269.8,302.3,276.3,302.3,282.8,302.3,289.3,302.3,295.8,302.3,367.3,302.3,373.8,302.3,380.3,302.3,386.8,302.3,393.3,302.3,399.8,302.3,406.3,302.3,412.8,302.3,419.3,302.3,425.8,302.3,432.3,302.3,438.8,302.3,445.3,302.3,451.8,302.3,458.3,302.3,464.8,302.3,471.3,302.3,477.8,302.3,484.3,302.3,490.8,302.3,497.3,302.3,503.8,302.3,510.3,302.3,516.8,302.3,523.3,302.3,529.8,302.3,536.3,302.3,243.8,308.8,250.3,308.8,256.8,308.8,263.3,308.8,269.8,308.8,276.3,308.8,282.8,308.8,289.3,308.8,295.8,308.8,302.3,308.8,308.8,308.8,360.8,308.8,367.3,308.8,373.8,308.8,380.3,308.8,386.8,308.8,393.3,308.8,399.8,308.8,406.3,308.8,412.8,308.8,419.3,308.8,425.8,308.8,432.3,308.8,438.8,308.8,445.3,308.8,451.8,308.8,458.3,308.8,464.8,308.8,471.3,308.8,477.8,308.8,484.3,308.8,490.8,308.8,497.3,308.8,503.8,308.8,510.3,308.8,516.8,308.8,523.3,308.8,529.8,308.8,536.3,308.8,243.8,315.3,250.3,315.3,256.8,315.3,263.3,315.3,269.8,315.3,276.3,315.3,282.8,315.3,289.3,315.3,295.8,315.3,302.3,315.3,308.8,315.3,315.3,315.3,321.8,315.3,328.3,315.3,334.8,315.3,341.3,315.3,347.8,315.3,354.3,315.3,360.8,315.3,367.3,315.3,373.8,315.3,380.3,315.3,386.8,315.3,393.3,315.3,399.8,315.3,406.3,315.3,412.8,315.3,419.3,315.3,425.8,315.3,432.3,315.3,438.8,315.3,445.3,315.3,451.8,315.3,458.3,315.3,464.8,315.3,471.3,315.3,477.8,315.3,484.3,315.3,490.8,315.3,497.3,315.3,503.8,315.3,510.3,315.3,516.8,315.3,523.3,315.3,529.8,315.3,536.3,315.3,250.3,321.8,256.8,321.8,263.3,321.8,269.8,321.8,276.3,321.8,282.8,321.8,289.3,321.8,295.8,321.8,302.3,321.8,308.8,321.8,315.3,321.8,321.8,321.8,328.3,321.8,334.8,321.8,341.3,321.8,347.8,321.8,354.3,321.8,360.8,321.8,367.3,321.8,373.8,321.8,380.3,321.8,386.8,321.8,393.3,321.8,399.8,321.8,406.3,321.8,412.8,321.8,419.3,321.8,425.8,321.8,432.3,321.8,438.8,321.8,445.3,321.8,451.8,321.8,458.3,321.8,464.8,321.8,471.3,321.8,477.8,321.8,484.3,321.8,490.8,321.8,497.3,321.8,503.8,321.8,510.3,321.8,516.8,321.8,523.3,321.8,529.8,321.8,536.3,321.8,250.3,328.3,256.8,328.3,263.3,328.3,269.8,328.3,276.3,328.3,282.8,328.3,289.3,328.3,295.8,328.3,302.3,328.3,308.8,328.3,315.3,328.3,321.8,328.3,328.3,328.3,334.8,328.3,341.3,328.3,347.8,328.3,354.3,328.3,360.8,328.3,367.3,328.3,373.8,328.3,380.3,328.3,386.8,328.3,393.3,328.3,399.8,328.3,406.3,328.3,412.8,328.3,419.3,328.3,425.8,328.3,432.3,328.3,438.8,328.3,445.3,328.3,451.8,328.3,458.3,328.3,464.8,328.3,471.3,328.3,477.8,328.3,484.3,328.3,490.8,328.3,497.3,328.3,503.8,328.3,510.3,328.3,516.8,328.3,523.3,328.3,529.8,328.3,536.3,328.3,256.8,334.8,263.3,334.8,269.8,334.8,276.3,334.8,282.8,334.8,289.3,334.8,295.8,334.8,302.3,334.8,308.8,334.8,315.3,334.8,321.8,334.8,328.3,334.8,334.8,334.8,341.3,334.8,347.8,334.8,354.3,334.8,360.8,334.8,367.3,334.8,373.8,334.8,380.3,334.8,386.8,334.8,393.3,334.8,399.8,334.8,406.3,334.8,412.8,334.8,419.3,334.8,425.8,334.8,432.3,334.8,438.8,334.8,445.3,334.8,451.8,334.8,458.3,334.8,464.8,334.8,471.3,334.8,477.8,334.8,484.3,334.8,490.8,334.8,497.3,334.8,503.8,334.8,510.3,334.8,516.8,334.8,523.3,334.8,529.8,334.8,536.3,334.8,250.3,341.3,256.8,341.3,263.3,341.3,269.8,341.3,276.3,341.3,282.8,341.3,289.3,341.3,295.8,341.3,302.3,341.3,308.8,341.3,315.3,341.3,321.8,341.3,328.3,341.3,334.8,341.3,341.3,341.3,347.8,341.3,354.3,341.3,360.8,341.3,367.3,341.3,373.8,341.3,380.3,341.3,386.8,341.3,393.3,341.3,399.8,341.3,406.3,341.3,412.8,341.3,419.3,341.3,425.8,341.3,432.3,341.3,438.8,341.3,445.3,341.3,451.8,341.3,458.3,341.3,464.8,341.3,471.3,341.3,477.8,341.3,484.3,341.3,490.8,341.3,497.3,341.3,503.8,341.3,510.3,341.3,516.8,341.3,523.3,341.3,529.8,341.3,536.3,341.3,243.8,347.8,250.3,347.8,256.8,347.8,263.3,347.8,269.8,347.8,276.3,347.8,282.8,347.8,289.3,347.8,295.8,347.8,302.3,347.8,308.8,347.8,315.3,347.8,321.8,347.8,328.3,347.8,334.8,347.8,341.3,347.8,347.8,347.8,354.3,347.8,360.8,347.8,367.3,347.8,373.8,347.8,380.3,347.8,386.8,347.8,393.3,347.8,399.8,347.8,406.3,347.8,412.8,347.8,419.3,347.8,425.8,347.8,432.3,347.8,438.8,347.8,445.3,347.8,451.8,347.8,458.3,347.8,464.8,347.8,471.3,347.8,477.8,347.8,484.3,347.8,490.8,347.8,497.3,347.8,503.8,347.8,510.3,347.8,516.8,347.8,523.3,347.8,529.8,347.8,536.3,347.8,237.3,354.3,243.8,354.3,250.3,354.3,256.8,354.3,263.3,354.3,269.8,354.3,276.3,354.3,282.8,354.3,289.3,354.3,295.8,354.3,302.3,354.3,308.8,354.3,315.3,354.3,321.8,354.3,328.3,354.3,334.8,354.3,341.3,354.3,347.8,354.3,354.3,354.3,360.8,354.3,367.3,354.3,373.8,354.3,380.3,354.3,386.8,354.3,393.3,354.3,399.8,354.3,406.3,354.3,412.8,354.3,419.3,354.3,425.8,354.3,432.3,354.3,438.8,354.3,445.3,354.3,451.8,354.3,458.3,354.3,464.8,354.3,471.3,354.3,477.8,354.3,484.3,354.3,490.8,354.3,497.3,354.3,503.8,354.3,510.3,354.3,516.8,354.3,523.3,354.3,529.8,354.3,536.3,354.3,224.3,360.8,230.8,360.8,237.3,360.8,243.8,360.8,250.3,360.8,256.8,360.8,263.3,360.8,269.8,360.8,276.3,360.8,282.8,360.8,289.3,360.8,295.8,360.8,302.3,360.8,308.8,360.8,315.3,360.8,321.8,360.8,328.3,360.8,334.8,360.8,341.3,360.8,347.8,360.8,354.3,360.8,360.8,360.8,367.3,360.8,373.8,360.8,380.3,360.8,386.8,360.8,393.3,360.8,399.8,360.8,406.3,360.8,412.8,360.8,419.3,360.8,425.8,360.8,432.3,360.8,438.8,360.8,445.3,360.8,451.8,360.8,458.3,360.8,464.8,360.8,471.3,360.8,477.8,360.8,484.3,360.8,490.8,360.8,497.3,360.8,503.8,360.8,510.3,360.8,516.8,360.8,523.3,360.8,529.8,360.8,217.8,367.3,224.3,367.3,230.8,367.3,237.3,367.3,243.8,367.3,250.3,367.3,256.8,367.3,263.3,367.3,269.8,367.3,276.3,367.3,282.8,367.3,289.3,367.3,295.8,367.3,302.3,367.3,308.8,367.3,315.3,367.3,321.8,367.3,328.3,367.3,334.8,367.3,341.3,367.3,347.8,367.3,354.3,367.3,360.8,367.3,367.3,367.3,373.8,367.3,380.3,367.3,386.8,367.3,393.3,367.3,399.8,367.3,406.3,367.3,412.8,367.3,419.3,367.3,425.8,367.3,432.3,367.3,438.8,367.3,445.3,367.3,451.8,367.3,458.3,367.3,464.8,367.3,471.3,367.3,477.8,367.3,484.3,367.3,490.8,367.3,497.3,367.3,503.8,367.3,510.3,367.3,516.8,367.3,523.3,367.3,529.8,367.3,204.8,373.8,211.3,373.8,217.8,373.8,224.3,373.8,230.8,373.8,237.3,373.8,243.8,373.8,250.3,373.8,256.8,373.8,263.3,373.8,269.8,373.8,276.3,373.8,282.8,373.8,289.3,373.8,295.8,373.8,302.3,373.8,308.8,373.8,315.3,373.8,321.8,373.8,328.3,373.8,334.8,373.8,341.3,373.8,347.8,373.8,354.3,373.8,360.8,373.8,367.3,373.8,373.8,373.8,380.3,373.8,386.8,373.8,393.3,373.8,399.8,373.8,406.3,373.8,412.8,373.8,419.3,373.8,425.8,373.8,432.3,373.8,438.8,373.8,445.3,373.8,451.8,373.8,458.3,373.8,464.8,373.8,471.3,373.8,477.8,373.8,484.3,373.8,490.8,373.8,497.3,373.8,503.8,373.8,510.3,373.8,516.8,373.8,523.3,373.8,529.8,373.8,204.8,380.3,211.3,380.3,217.8,380.3,224.3,380.3,230.8,380.3,237.3,380.3,243.8,380.3,250.3,380.3,256.8,380.3,263.3,380.3,269.8,380.3,276.3,380.3,282.8,380.3,289.3,380.3,295.8,380.3,302.3,380.3,308.8,380.3,315.3,380.3,321.8,380.3,328.3,380.3,334.8,380.3,341.3,380.3,347.8,380.3,354.3,380.3,360.8,380.3,367.3,380.3,373.8,380.3,380.3,380.3,386.8,380.3,393.3,380.3,399.8,380.3,406.3,380.3,412.8,380.3,419.3,380.3,425.8,380.3,432.3,380.3,438.8,380.3,445.3,380.3,451.8,380.3,458.3,380.3,464.8,380.3,471.3,380.3,477.8,380.3,484.3,380.3,490.8,380.3,497.3,380.3,503.8,380.3,510.3,380.3,516.8,380.3,523.3,380.3,529.8,380.3,204.8,386.8,211.3,386.8,217.8,386.8,224.3,386.8,230.8,386.8,237.3,386.8,243.8,386.8,250.3,386.8,256.8,386.8,263.3,386.8,269.8,386.8,276.3,386.8,282.8,386.8,289.3,386.8,295.8,386.8,302.3,386.8,308.8,386.8,315.3,386.8,321.8,386.8,328.3,386.8,334.8,386.8,341.3,386.8,347.8,386.8,354.3,386.8,360.8,386.8,367.3,386.8,373.8,386.8,380.3,386.8,386.8,386.8,393.3,386.8,399.8,386.8,406.3,386.8,412.8,386.8,419.3,386.8,425.8,386.8,432.3,386.8,438.8,386.8,445.3,386.8,451.8,386.8,458.3,386.8,464.8,386.8,471.3,386.8,477.8,386.8,484.3,386.8,490.8,386.8,497.3,386.8,503.8,386.8,510.3,386.8,516.8,386.8,523.3,386.8,217.8,393.3,224.3,393.3,230.8,393.3,237.3,393.3,243.8,393.3,250.3,393.3,256.8,393.3,263.3,393.3,269.8,393.3,276.3,393.3,282.8,393.3,289.3,393.3,295.8,393.3,302.3,393.3,308.8,393.3,315.3,393.3,321.8,393.3,328.3,393.3,334.8,393.3,341.3,393.3,347.8,393.3,354.3,393.3,360.8,393.3,367.3,393.3,373.8,393.3,380.3,393.3,386.8,393.3,393.3,393.3,399.8,393.3,406.3,393.3,412.8,393.3,419.3,393.3,425.8,393.3,432.3,393.3,438.8,393.3,445.3,393.3,451.8,393.3,458.3,393.3,464.8,393.3,471.3,393.3,477.8,393.3,484.3,393.3,490.8,393.3,497.3,393.3,503.8,393.3,510.3,393.3,516.8,393.3,523.3,393.3,360.8,399.8,367.3,399.8,373.8,399.8,380.3,399.8,386.8,399.8,393.3,399.8,399.8,399.8,406.3,399.8,412.8,399.8,419.3,399.8,425.8,399.8,432.3,399.8,438.8,399.8,445.3,399.8,451.8,399.8,458.3,399.8,464.8,399.8,471.3,399.8,477.8,399.8,484.3,399.8,490.8,399.8,497.3,399.8,503.8,399.8,510.3,399.8,516.8,399.8,523.3,399.8,438.8,406.3,445.3,406.3,451.8,406.3,458.3,406.3,464.8,406.3,471.3,406.3,477.8,406.3,484.3,406.3,490.8,406.3,497.3,406.3,503.8,406.3,510.3,406.3,516.8,406.3,523.3,406.3,445.3,412.8,451.8,412.8,458.3,412.8,464.8,412.8,471.3,412.8,477.8,412.8,484.3,412.8,490.8,412.8,497.3,412.8,503.8,412.8,510.3,412.8,516.8,412.8,523.3,412.8,451.8,419.3,458.3,419.3,464.8,419.3,471.3,419.3,477.8,419.3,484.3,419.3,490.8,419.3,497.3,419.3,503.8,419.3,510.3,419.3,516.8,419.3,523.3,419.3,451.8,425.8,458.3,425.8,464.8,425.8,471.3,425.8,477.8,425.8,484.3,425.8,490.8,425.8,497.3,425.8,503.8,425.8,510.3,425.8,516.8,425.8,523.3,425.8,451.8,432.3,458.3,432.3,464.8,432.3,471.3,432.3,477.8,432.3,484.3,432.3,490.8,432.3,497.3,432.3,503.8,432.3,510.3,432.3,516.8,432.3,523.3,432.3,458.3,438.8,464.8,438.8,471.3,438.8,477.8,438.8,484.3,438.8,490.8,438.8,497.3,438.8,503.8,438.8,510.3,438.8,516.8,438.8,523.3,438.8,464.8,445.3,471.3,445.3,477.8,445.3,484.3,445.3,490.8,445.3,497.3,445.3,503.8,445.3,510.3,445.3,516.8,445.3,523.3,445.3,477.8,451.8,484.3,451.8,490.8,451.8,497.3,451.8,503.8,451.8,510.3,451.8,516.8,451.8,523.3,451.8,607.8,451.8,484.3,458.3,490.8,458.3,497.3,458.3,503.8,458.3,510.3,458.3,516.8,458.3,523.3,458.3,497.3,464.8,503.8,464.8,510.3,464.8,588.3,464.8,601.3,464.8,510.3,471.3,516.8,471.3,581.8,471.3,588.3,471.3,594.8,471.3,510.3,477.8,529.8,477.8,536.3,477.8,549.3,477.8,555.8,477.8,562.3,477.8,568.8,477.8,575.3,477.8,581.8,477.8,588.3,477.8,503.8,484.3,510.3,484.3,516.8,484.3,523.3,484.3,529.8,484.3,536.3,484.3,542.8,484.3,549.3,484.3,555.8,484.3,562.3,484.3,568.8,484.3,575.3,484.3,503.8,490.8,510.3,490.8,516.8,490.8,523.3,490.8,529.8,490.8,536.3,490.8,542.8,490.8,549.3,490.8,555.8,490.8,497.3,497.3,503.8,497.3,510.3,497.3,516.8,497.3,523.3,497.3,529.8,497.3,536.3,497.3,542.8,497.3,490.8,503.8],"VT":[536.3,191.8,542.8,191.8,549.3,191.8,555.8,191.8,562.3,191.8,568.8,191.8,575.3,191.8,581.8,191.8,588.3,191.8,594.8,191.8,601.3,191.8,607.8,191.8,614.3,191.8,620.8,191.8,536.3,198.3,542.8,198.3,549.3,198.3,555.8,198.3,562.3,198.3,568.8,198.3,575.3,198.3,581.8,198.3,588.3,198.3,594.8,198.3,601.3,198.3,607.8,198.3,614.3,198.3,620.8,198.3,536.3,204.8,542.8,204.8,549.3,204.8,555.8,204.8,562.3,204.8,568.8,204.8,575.3,204.8,581.8,204.8,588.3,204.8,594.8,204.8,601.3,204.8,607.8,204.8,614.3,204.8,620.8,204.8,536.3,211.3,542.8,211.3,549.3,211.3,555.8,211.3,562.3,211.3,568.8,211.3,575.3,211.3,581.8,211.3,588.3,211.3,594.8,211.3,601.3,211.3,607.8,211.3,614.3,211.3,620.8,211.3,536.3,217.8,542.8,217.8,549.3,217.8,555.8,217.8,562.3,217.8,568.8,217.8,575.3,217.8,581.8,217.8,588.3,217.8,594.8,217.8,601.3,217.8,607.8,217.8,614.3,217.8,620.8,217.8,536.3,224.3,542.8,224.3,549.3,224.3,555.8,224.3,562.3,224.3,568.8,224.3,575.3,224.3,581.8,224.3,588.3,224.3,594.8,224.3,601.3,224.3,607.8,224.3,614.3,224.3,620.8,224.3,542.8,230.8,549.3,230.8,555.8,230.8,562.3,230.8,568.8,230.8,575.3,230.8,581.8,230.8,588.3,230.8,594.8,230.8,601.3,230.8,607.8,230.8,614.3,230.8,536.3,237.3,542.8,237.3,549.3,237.3,555.8,237.3,562.3,237.3,568.8,237.3,575.3,237.3,581.8,237.3,588.3,237.3,594.8,237.3,601.3,237.3,536.3,243.8,542.8,243.8,549.3,243.8,555.8,243.8,562.3,243.8,568.8,243.8,575.3,243.8,581.8,243.8,588.3,243.8,594.8,243.8,536.3,250.3,542.8,250.3,549.3,250.3,555.8,250.3,562.3,250.3,568.8,250.3,575.3,250.3,581.8,250.3,588.3,250.3,594.8,250.3,536.3,256.8,542.8,256.8,549.3,256.8,555.8,256.8,562.3,256.8,568.8,256.8,575.3,256.8,581.8,256.8,588.3,256.8,594.8,256.8,536.3,263.3,542.8,263.3,549.3,263.3,555.8,263.3,562.3,263.3,568.8,263.3,575.3,263.3,581.8,263.3,588.3,263.3,594.8,263.3,536.3,269.8,542.8,269.8,549.3,269.8,555.8,269.8,562.3,269.8,568.8,269.8,575.3,269.8,581.8,269.8,588.3,269.8,536.3,276.3,542.8,276.3,549.3,276.3,555.8,276.3,562.3,276.3,568.8,276.3,575.3,276.3,581.8,276.3,588.3,276.3,536.3,282.8,542.8,282.8,549.3,282.8,555.8,282.8,562.3,282.8,568.8,282.8,575.3,282.8,581.8,282.8,542.8,289.3,549.3,289.3,555.8,289.3,562.3,289.3,568.8,289.3,575.3,289.3,581.8,289.3,542.8,295.8,549.3,295.8,555.8,295.8,562.3,295.8,568.8,295.8,575.3,295.8,581.8,295.8,542.8,302.3,549.3,302.3,555.8,302.3,562.3,302.3,568.8,302.3,575.3,302.3,581.8,302.3,542.8,308.8,549.3,308.8,555.8,308.8,562.3,308.8,568.8,308.8,575.3,308.8,581.8,308.8,542.8,315.3,549.3,315.3,555.8,315.3,562.3,315.3,568.8,315.3,575.3,315.3,542.8,321.8,549.3,321.8,555.8,321.8,562.3,321.8,568.8,321.8,575.3,321.8,542.8,328.3,549.3,328.3,555.8,328.3,562.3,328.3,568.8,328.3,575.3,328.3,542.8,334.8,549.3,334.8,555.8,334.8,562.3,334.8,568.8,334.8,575.3,334.8,542.8,341.3,549.3,341.3,555.8,341.3,562.3,341.3,568.8,341.3,575.3,341.3,542.8,347.8,549.3,347.8,555.8,347.8,562.3,347.8,568.8,347.8,575.3,347.8],"RI":[627.3,399.8,633.8,399.8,620.8,406.3,627.3,406.3,633.8,406.3,620.8,412.8,627.3,412.8,633.8,412.8,620.8,419.3,627.3,419.3,633.8,419.3,620.8,425.8,627.3,425.8,633.8,425.8,646.8,425.8,620.8,432.3,627.3,432.3,633.8,432.3,620.8,438.8,627.3,438.8,633.8,438.8,620.8,445.3]},"states":[{"a":"ME","name":"Maine","tier":"travel","lx":737,"ly":161},{"a":"MA","name":"Massachusetts","tier":"near","lx":576,"ly":367},{"a":"NJ","name":"New Jersey","tier":"home","lx":450,"ly":574},{"a":"PA","name":"Pennsylvania","tier":"near","lx":310,"ly":475},{"a":"CT","name":"Connecticut","tier":"home","lx":599,"ly":436},{"a":"DE","name":"Delaware","tier":"near","lx":422,"ly":623},{"a":"MD","name":"Maryland","tier":"travel","lx":317,"ly":578},{"a":"NH","name":"New Hampshire","tier":"travel","lx":626,"ly":278},{"a":"NY","name":"New York","tier":"home","lx":419,"ly":342},{"a":"VT","name":"Vermont","tier":"travel","lx":564,"ly":254},{"a":"RI","name":"Rhode Island","tier":"near","lx":660,"ly":452}],"pins":[{"city":"Manhattan","st":"NY","n":0,"seasons":["spring","summer","fall","winter"],"x":502,"y":489},{"city":"Long Island","st":"NY","n":0,"seasons":["summer","fall"],"x":533,"y":486},{"city":"Westchester","st":"NY","n":0,"seasons":["spring","fall"],"x":512,"y":464},{"city":"Hudson Valley","st":"NY","n":0,"seasons":["fall"],"x":504,"y":420},{"city":"Albany","st":"NY","n":0,"seasons":["summer"],"x":514,"y":357},{"city":"Edison","st":"NJ","n":0,"seasons":["spring","summer","fall","winter"],"x":479,"y":506},{"city":"Jersey City","st":"NJ","n":0,"seasons":["spring","winter"],"x":497,"y":491},{"city":"Princeton","st":"NJ","n":0,"seasons":["fall"],"x":465,"y":517},{"city":"Atlantic City","st":"NJ","n":0,"seasons":["summer"],"x":478,"y":588},{"city":"Stamford","st":"CT","n":0,"seasons":["summer","fall"],"x":526,"y":469},{"city":"New Haven","st":"CT","n":0,"seasons":["spring"],"x":558,"y":450},{"city":"Hartford","st":"CT","n":0,"seasons":["fall","winter"],"x":570,"y":419},{"city":"Philadelphia","st":"PA","n":0,"seasons":["spring","fall"],"x":438,"y":546},{"city":"Poconos","st":"PA","n":0,"seasons":["winter","summer"],"x":432,"y":465},{"city":"Boston","st":"MA","n":0,"seasons":["summer","fall"],"x":654,"y":374},{"city":"Newport","st":"RI","n":0,"seasons":["summer"],"x":643,"y":436}],"hub":[502,489]};
+
+/* EDIT: your real filmed locations. Pins are positioned from MAP.pins by city.
+   venues: list of venue names shown in the tooltip + directory. */
+const PLACES = {
+  'Manhattan':     { venues: ['Venue name'] },
+  'Long Island':   { venues: ['Venue name'] },
+  'Westchester':   { venues: ['Venue name'] },
+  'Hudson Valley': { venues: ['Venue name'] },
+  'Albany':        { venues: ['Venue name'] },
+  'Edison':        { venues: ['Venue name'] },
+  'Princeton':     { venues: ['Venue name'] },
+  'Atlantic City': { venues: ['Venue name'] },
+  'Stamford':      { venues: ['Venue name'] },
+  'New Haven':     { venues: ['Venue name'] },
+  'Hartford':      { venues: ['Venue name'] },
+  'Philadelphia':  { venues: ['Venue name'] },
+  'Poconos':       { venues: ['Venue name'] },
+  'Boston':        { venues: ['Venue name'] },
+  'Newport':       { venues: ['Venue name'] },
+};
+
+/* ================== UTILS ================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const track = (name, params = {}) => { try { window.gtag && gtag('event', name, params); window.fbq && fbq('track', name === 'generate_lead' ? 'Lead' : 'ViewContent', params); } catch (e) {} };
+$('#yr').textContent = new Date().getFullYear();
+
+/* header + sticky cta */
+const top_ = $('#top'), mcta = $('#mcta'), inq = $('#inquire');
+let inqVisible = false;
+new IntersectionObserver(([e]) => { inqVisible = e.isIntersecting; onScroll(); }, { threshold: .05 }).observe(inq);
+function onScroll() {
+  top_.classList.toggle('scrolled', scrollY > 40);
+  mcta.classList.toggle('on', scrollY > innerHeight * .7 && !inqVisible);
+}
+addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+/* reveal */
+const ro = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); } }), { threshold: .12, rootMargin: '0px 0px -40px' });
+$$('.rv').forEach((el, i) => { el.style.transitionDelay = (i % 4) * 80 + 'ms'; ro.observe(el); });
+
+/* hero video */
+const hv = $('#heroVideo');
+if (hv.dataset.src && !reduce) { hv.src = hv.dataset.src; } else { hv.remove(); }
+
+/* intro video */
+const iv = $('#introVid');
+function playIntro() {
+  const src = iv.dataset.video;
+  track('intro_video_play');
+  if (!src) return;
+  iv.innerHTML = /iframe|embed|player/.test(src)
+    ? `<iframe src="${src}${src.includes('?') ? '&' : '?'}autoplay=true" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`
+    : `<video src="${src}" controls autoplay playsinline></video>`;
+}
+iv.addEventListener('click', playIntro);
+iv.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); playIntro(); } });
+
+/* film posters */
+$$('.film').forEach(f => { if (f.dataset.poster) f.querySelector('.poster').style.backgroundImage = `url("${f.dataset.poster}")`; });
+
+/* marquee */
+const evs = ['Engagement', 'Haldi', 'Mehndi', 'Sangeet', 'Baraat', 'Pheras', 'Vidaai', 'Reception'];
+$('#marquee').innerHTML = [...evs, ...evs].map(e => `<span>${e}</span><span class="dot">✦</span>`).join('');
+
+/* cta tracking */
+$$('[data-cta]').forEach(a => a.addEventListener('click', () => track('cta_click', { location: a.dataset.cta })));
+
+/* ================== MAP ================== */
+(() => {
+  const wrap = $('#map'), cv = $('#mapCanvas'), ctx = cv.getContext('2d'), tip = $('#tip');
+  const { W, H, STEP, dots, states, hub } = MAP;
+  const tierOf = Object.fromEntries(states.map(s => [s.a, s.tier]));
+  const nameOf = Object.fromEntries(states.map(s => [s.a, s.name]));
+  const COLORS = { home: [214, 160, 116], near: [201, 149, 107], travel: [120, 108, 128] };
+  const pins = MAP.pins.filter(p => PLACES[p.city]).map(p => ({ ...p, ...PLACES[p.city], tier: tierOf[p.st] }));
+
+  // grid lookup for hover
+  const cell = {}; const pts = [];
+  for (const [a, arr] of Object.entries(dots)) for (let i = 0; i < arr.length; i += 2) {
+    const x = arr[i], y = arr[i + 1];
+    cell[Math.floor(x / STEP) + ',' + Math.floor(y / STEP)] = a;
+    pts.push({ x, y, a, d: Math.hypot(x - hub[0], y - hub[1]), tw: Math.random() });
+  }
+  const maxD = Math.max(...pts.map(p => p.d));
+
+  // labels
+  states.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'slabel'; el.dataset.a = s.a; el.textContent = ['RI','DE','CT','NJ'].includes(s.a) ? s.a : s.name;
+    el.style.left = (s.lx / W * 100) + '%'; el.style.top = (s.ly / H * 100) + '%';
+    wrap.appendChild(el);
+  });
+  // pins
+  pins.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.className = 'pin' + (p.city === 'Manhattan' ? ' hub' : '');
+    b.style.left = (p.x / W * 100) + '%'; b.style.top = (p.y / H * 100) + '%';
+    b.style.setProperty('--d', (i * .37 % 2.8) + 's');
+    b.innerHTML = '<span class="ring"></span>';
+    b.setAttribute('aria-label', `${p.city}, ${p.st}: ${p.venues.join(', ')}`);
+    p.el = b;
+    const show = () => { showTip(p); hot = p.st; draw(); };
+    const hide = () => { tip.classList.remove('on'); hot = null; draw(); };
+    b.addEventListener('mouseenter', show); b.addEventListener('focus', show);
+    b.addEventListener('mouseleave', hide); b.addEventListener('blur', hide);
+    b.addEventListener('click', () => { showTip(p); track('map_pin', { city: p.city }); });
+    wrap.appendChild(b);
+  });
+  function showTip(p) {
+    tip.innerHTML = `<div class="t-city">${p.city}</div><div class="t-st">${nameOf[p.st]}</div><div class="t-v">${p.venues.join('<br>')}</div>`;
+    tip.style.left = (p.x / W * 100) + '%'; tip.style.top = (p.y / H * 100) + '%';
+    tip.classList.add('on');
+  }
+
+  let region = 'all', season = 'all', hot = null, prog = reduce ? 1 : 0, t0 = null, dpr = 1, scale = 1;
+  const pinOn = p => (region === 'all' || p.tier === region) && (season === 'all' || p.seasons.includes(season));
+  const stateOn = a => region === 'all' || tierOf[a] === region;
+
+  function size() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    const w = wrap.clientWidth, h = wrap.clientHeight;
+    cv.width = w * dpr; cv.height = h * dpr; scale = w / W;
+    draw();
+  }
+  function draw(time = 0) {
+    ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    const r = Math.max(STEP * .27, 1.1 / scale);
+    const front = prog * (maxD + 120);
+    for (const p of pts) {
+      const k = Math.min(1, Math.max(0, (front - p.d) / 120));
+      if (k <= 0) continue;
+      const c = COLORS[tierOf[p.a]];
+      let a = tierOf[p.a] === 'home' ? 1 : tierOf[p.a] === 'near' ? .4 : .45;
+      if (!stateOn(p.a)) a *= .22;
+      if (hot && p.a !== hot) a *= .55;
+      if (hot && p.a === hot) a = 1;
+      const shimmer = reduce ? 1 : .82 + .18 * Math.sin(time / 900 + p.tw * 6.28);
+      ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${a * k * shimmer})`;
+      ctx.beginPath(); ctx.arc(p.x, p.y, r * (hot === p.a ? 1.15 : 1), 0, 6.283); ctx.fill();
+    }
+    $$('.slabel', wrap).forEach(el => { el.classList.toggle('hot', el.dataset.a === hot); el.classList.toggle('dim', !stateOn(el.dataset.a)); });
+  }
+  function loop(ts) {
+    if (t0 === null) t0 = ts;
+    prog = Math.min(1, (ts - t0) / 1800);
+    draw(ts);
+    if (!reduce) requestAnimationFrame(loop);
+  }
+  let started = false;
+  new IntersectionObserver(([e]) => { if (e.isIntersecting && !started) { started = true; reduce ? draw() : requestAnimationFrame(loop); } }, { threshold: .25 }).observe(wrap);
+
+  wrap.addEventListener('mousemove', e => {
+    if (e.target.classList.contains('pin')) return;
+    const rc = wrap.getBoundingClientRect();
+    const x = (e.clientX - rc.left) / scale, y = (e.clientY - rc.top) / scale;
+    const a = cell[Math.floor(x / STEP) + ',' + Math.floor(y / STEP)] || null;
+    if (a !== hot) { hot = a; if (reduce) draw(); }
+  });
+  wrap.addEventListener('mouseleave', () => { hot = null; if (reduce) draw(); });
+  addEventListener('resize', size); size();
+
+  // filters
+  function apply() {
+    pins.forEach(p => p.el.classList.toggle('off', !pinOn(p)));
+    $$('.dir-item').forEach(d => { const p = pins[+d.dataset.i]; d.classList.toggle('off', !pinOn(p)); });
+    const on = pins.filter(pinOn);
+    countTo($('#statLoc'), on.length); countTo($('#statSt'), new Set(on.map(p => p.st)).size);
+    tip.classList.remove('on'); draw();
+  }
+  function bind(id, key, set) {
+    $$('#' + id + ' .chip').forEach(c => c.addEventListener('click', () => {
+      $$('#' + id + ' .chip').forEach(x => x.setAttribute('aria-pressed', x === c));
+      set(c.dataset[key]); apply(); track('map_filter', { [id]: c.dataset[key] });
+    }));
+  }
+  bind('regionChips', 'r', v => region = v);
+  bind('seasonChips', 's', v => season = v);
+
+  function countTo(el, n) {
+    const from = +el.textContent || 0; if (reduce || from === n) { el.textContent = n; return; }
+    const t = performance.now();
+    (function f(now) { const k = Math.min(1, (now - t) / 600); el.textContent = Math.round(from + (n - from) * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(f); })(t);
+  }
+
+  // directory
+  const groups = [
+    ['New York', p => p.st === 'NY'],
+    ['New Jersey', p => p.st === 'NJ'],
+    ['Connecticut', p => p.st === 'CT'],
+    ['Northeast & beyond', p => !['NY', 'NJ', 'CT'].includes(p.st)],
+  ];
+  $('#directory').innerHTML = groups.map(([g, fn]) => {
+    const items = pins.map((p, i) => [p, i]).filter(([p]) => fn(p));
+    if (!items.length) return '';
+    return `<div class="dir-col"><h4>${g}</h4>${items.map(([p, i]) =>
+      `<a class="dir-item" href="#inquire" data-i="${i}"><b>${p.city}, ${p.st}</b><span>${p.venues.join(' · ')}</span></a>`).join('')}</div>`;
+  }).join('');
+  $$('.dir-item').forEach(d => {
+    const p = pins[+d.dataset.i];
+    d.addEventListener('mouseenter', () => { showTip(p); hot = p.st; p.el.classList.add('active'); draw(); });
+    d.addEventListener('mouseleave', () => { tip.classList.remove('on'); hot = null; p.el.classList.remove('active'); draw(); });
+  });
+  apply();
+})();
+
+/* ================== FORM ================== */
+(() => {
+  const form = $('#inqForm');
+  const qs = new URLSearchParams(location.search);
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'fbclid'].forEach(k => { if (qs.get(k)) form.elements[k].value = qs.get(k); });
+  if (/instagram|ig/i.test(qs.get('utm_source') || '') || qs.get('fbclid')) form.elements.source.value = 'Instagram';
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    let ok = true;
+    ['names', 'email', 'date'].forEach(n => {
+      const el = form.elements[n]; const bad = !el.value || (n === 'email' && !/^\S+@\S+\.\S+$/.test(el.value));
+      el.style.borderColor = bad ? '#c86b6b' : ''; if (bad) ok = false;
+    });
+    if (!ok) { form.querySelector('[style*="c86b6b"]').focus(); return; }
+    const fd = new FormData(form);
+    const data = Object.fromEntries(fd); data.events = fd.getAll('events').join(', ');
+    track('generate_lead', { coverage: data.coverage, events: data.events });
+    const btn = form.querySelector('button[type=submit]'); btn.disabled = true; btn.firstChild.textContent = 'Sending… ';
+    try {
+      if (!FORM_ENDPOINT) throw new Error('no endpoint');
+      const r = await fetch(FORM_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(data) });
+      if (!r.ok) throw new Error(r.status);
+    } catch (err) {
+      const body = Object.entries(data).filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`).join('\n');
+      location.href = `mailto:${INBOX}?subject=${encodeURIComponent('Wedding inquiry: ' + data.names + ' (' + data.date + ')')}&body=${encodeURIComponent(body)}`;
+    }
+    $$('.f, .submit-row', form).forEach(el => el.style.display = 'none');
+    $('#formOk').style.display = 'block';
+  });
+})();
+</script>
+</body>
+</html>
