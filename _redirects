@@ -23,7 +23,6 @@ https://www.aakaarastudiosnyc.com/*  https://aakaarastudios.com/:splat  301!
 /.windsurfrules            /404.html  404!
 /.mcp.json                 /404.html  404!
 /.gitignore                /404.html  404!
-/.netlifyignore            /404.html  404!
 /package.json              /404.html  404!
 /package-lock.json         /404.html  404!
 /deno.lock                 /404.html  404!
