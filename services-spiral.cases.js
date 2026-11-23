@@ -231,7 +231,9 @@ module.exports = function defineSpiralTests(test, expect) {
     });
   });
 
-  test.describe('Services orbit — phone (the ring)', () => {
+  // Phones show the services list since 2026-11-22 (see syncMode in Script.js).
+  // The ring code is kept; un-skip these if it comes back.
+  test.describe.skip('Services orbit — phone (the ring)', () => {
     test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
     // The ring drifts round on its own; tests other than the drift's own hold it
     // still so positions stay exact.
@@ -559,17 +561,23 @@ module.exports = function defineSpiralTests(test, expect) {
     });
   });
 
-  test.describe('Services orbit — landscape phone', () => {
-    test.use({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true });
+  test.describe('Services orbit — phones show the list', () => {
+    for (const [name, viewport] of [['portrait phone', { width: 390, height: 844 }], ['landscape phone', { width: 844, height: 390 }]]) {
+      test.describe(name, () => {
+        test.use({ viewport, hasTouch: true, isMobile: true });
 
-    test('landscape phone shows the orbit', async ({ page }) => {
-      await page.addInitScript(skipIntro);
-      await page.goto('/');
-      await expect(section(page)).toHaveClass(/sov-orbit-phone/);
-      await arrive(page);
-      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-      expect(overflow).toBeLessThanOrEqual(0);
-    });
+        test(`${name} shows the services list, not the ring`, async ({ page }) => {
+          await page.addInitScript(skipIntro);
+          await page.goto('/');
+          await expect(section(page)).not.toHaveClass(/sov-orbit-on|sov-orbit-phone/);
+          await expect(page.locator('#services-overview .sov-orbit')).toBeHidden();
+          await expect(page.locator('#services-overview .sov-card')).toHaveCount(5);
+          await expect(page.locator('#services-overview .sov-card').first()).toBeVisible();
+          const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+          expect(overflow).toBeLessThanOrEqual(0);
+        });
+      });
+    }
   });
 
   test.describe('Services orbit — tablets keep the list', () => {

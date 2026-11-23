@@ -4797,7 +4797,10 @@ document.addEventListener('click', (e) => {
   }
 
   function syncMode() {
-    setMode(!compact.matches || phone.matches, phone.matches);
+    // Phones are off since 2026-11-22 (user's choice): they get the services
+    // list, like tablets. The ring code stays; restore `|| phone.matches` and
+    // pass phone.matches as the second argument to bring it back.
+    setMode(!compact.matches, false);
     syncBackToTop();
   }
   compact.addEventListener('change', syncMode);
