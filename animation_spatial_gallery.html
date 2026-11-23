@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aakaara Spatial Gallery Study</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <!-- Adobe Fonts kit (same one test.html uses); provides Cesso for the card meaning lines. -->
+  <link rel="preconnect" href="https://use.typekit.net" crossorigin>
+  <link rel="stylesheet" href="https://use.typekit.net/ffu1awu.css">
   <style>
     :root {
       --bg: #050404;
@@ -170,8 +176,18 @@
       pointer-events: none;
     }
 
-    .gallery-card--video::before { z-index: 1; }
-    .gallery-card--video .gallery-card__copy { z-index: 2; }
+    /* Video frames can be bright behind the copy (sky, water), so video cards
+       get a deeper lower scrim and a soft shadow under the lettering. */
+    .gallery-card--video::before {
+      z-index: 1;
+      background:
+        linear-gradient(180deg, rgba(11, 8, 8, 0.05) 8%, rgba(11, 8, 8, 0.14) 38%, rgba(11, 8, 8, 0.46) 62%, rgba(11, 8, 8, 0.76) 100%),
+        radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.14), transparent 38%);
+    }
+    .gallery-card--video .gallery-card__copy {
+      z-index: 2;
+      text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+    }
 
     .gallery-card::after {
       content: "";
@@ -208,13 +224,31 @@
       font-weight: 500;
     }
 
+    /* Meaning line under each title, set in Cesso (Adobe Fonts) in sentence
+       case so its decorative letterforms show. */
     .gallery-card__subtitle {
-      font-family: Arial, sans-serif;
-      font-size: 0.72rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.56);
+      font-family: cesso, "Cormorant Garamond", Georgia, serif;
+      font-size: clamp(0.8rem, 0.88vw, 0.88rem);
+      font-weight: 400;
+      line-height: 1.3;
+      letter-spacing: 0.04em;
+      color: rgba(245, 238, 232, 0.62);
     }
+
+    /* Card titles (both spirals): "Vivāha / Weddings". The romanised Sanskrit
+       word is italic, the usual convention for a transliterated term; the
+       English name follows a quiet slash. */
+    .gallery-card__title.sa-title {
+      font-size: clamp(1.5rem, 2vw, 2rem);
+    }
+    .sa-title {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: 0.01em;
+    }
+    .sa-word { font-style: italic; }
+    .sa-sep { color: rgba(201, 149, 107, 0.7); }
 
     .gallery-controls { display: none; }
 
@@ -239,8 +273,8 @@
         box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
       }
       .study--gallery .gallery-card__copy { left: 1rem; right: 1rem; bottom: 1rem; }
-      .study--gallery .gallery-card__title { font-size: 1.65rem; }
-      .study--gallery .gallery-card__subtitle { font-size: 0.65rem; letter-spacing: 0.09em; }
+      .study--gallery .gallery-card__title.sa-title { font-size: 1.75rem; }
+      .study--gallery .gallery-card__subtitle { font-size: 0.82rem; }
       .study--gallery .study-meta { display: none; }
       .gallery-controls {
         display: flex;
@@ -278,24 +312,51 @@
     @media (max-width: 599px), (max-width: 959px) and (max-height: 500px) {
       .study--gallery { --gallery-card-width: min(80vw, 26rem); }
       .study--gallery .study-head { padding: max(1.5rem, env(safe-area-inset-top)) 1.375rem 0; gap: 0.75rem; }
-      .study--gallery .study-kicker { font-size: 0.62rem; letter-spacing: 0.25em; }
+      .study--gallery .study-kicker { font-size: 0.72rem; letter-spacing: 0.25em; }
       .study--gallery .study-head h1 { font-size: clamp(2.4rem, 10vw, 3.2rem); max-width: 17ch; line-height: 0.98; }
       .study--gallery .gallery-stage { inset: 9.25rem 0 6.5rem; }
-      .study--gallery .helix-field { perspective-origin: 50% 48%; }
+      /* Phone cards always overlap their neighbours, so draw them in true 3D
+         depth: the front card changes along the moving intersection instead
+         of popping over the whole overlap when z-index swaps. */
+      .study--gallery .helix-field { perspective-origin: 50% 48%; transform-style: preserve-3d; }
+      /* Cards passing the top or bottom of the gallery dissolve over a short
+         band instead of being sliced by the edge. */
+      .study--gallery .gallery-stage {
+        -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 2.25rem, #000 calc(100% - 3rem), transparent 100%);
+        mask-image: linear-gradient(to bottom, transparent 0, #000 2.25rem, #000 calc(100% - 3rem), transparent 100%);
+      }
       .study--gallery .gallery-card { left: 50%; border-radius: 1rem; }
       .study--gallery .gallery-card__eyebrow { font-size: 0.59rem; }
-      .study--gallery .gallery-card__title { font-size: 1.5rem; }
-      .study--gallery .gallery-card__subtitle { font-size: 0.61rem; }
+      .study--gallery .gallery-card__title.sa-title { font-size: 1.55rem; }
+      .study--gallery .gallery-card__subtitle { font-size: 0.78rem; }
       .gallery-controls { left: 1.375rem; right: 1.375rem; }
     }
 
+    /* Landscape phone: a wide, short screen, so the words and controls take a
+       left column and the spiral gets the full height on the right. */
     @media (max-width: 959px) and (max-height: 500px) {
-      .study--gallery { --gallery-card-width: min(44vw, 65svh); min-height: 0; }
-      .study--gallery .study-head { padding-top: max(0.8rem, env(safe-area-inset-top)); gap: 0.3rem; }
-      .study--gallery .study-head h1 { max-width: none; font-size: 1.8rem; }
-      .study--gallery .gallery-stage { inset: 5rem 0 4rem; }
-      .gallery-controls { bottom: max(0.5rem, env(safe-area-inset-bottom)); }
-      #galleryGesture { margin-top: 0.2rem; }
+      .study--gallery { --gallery-card-width: min(40vw, 62svh); min-height: 0; }
+      .study--gallery .study-head {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 36%;
+        align-content: center;
+        padding: max(1rem, env(safe-area-inset-top)) 1rem 5.5rem max(1.5rem, env(safe-area-inset-left));
+        gap: 0.5rem;
+      }
+      .study--gallery .study-head h1 { max-width: 9ch; font-size: clamp(1.9rem, 4.4vw, 2.6rem); }
+      .study--gallery .gallery-stage { inset: 0.5rem 0 0.5rem 36%; }
+      .study--gallery .gallery-card__title.sa-title { font-size: 1.2rem; }
+      .gallery-controls {
+        left: max(1.5rem, env(safe-area-inset-left));
+        right: auto;
+        width: calc(36% - 1.5rem);
+        gap: 0.5rem;
+        bottom: max(0.75rem, env(safe-area-inset-bottom));
+      }
+      #galleryGesture { margin-top: 0.2rem; white-space: nowrap; }
     }
 
   </style>
@@ -309,62 +370,75 @@
 
     <section class="gallery-stage" aria-label="3D spatial gallery study">
       <div class="helix-field" id="helixField">
+        <!-- Card videos carry their file in data-src: the gallery script loads and plays
+             only the card in focus (and warms up the next), so a visit does not
+             download every reel up front. The poster/background image shows until then. -->
 
         <article class="gallery-card gallery-card--video"
-          style="background-image: linear-gradient(180deg, rgba(12,8,8,0.02), rgba(12,8,8,0.32)), url('/images/couple-portraits/karthik-Sunayana/1.jpg')">
-          <video class="gallery-card__video" autoplay muted loop playsinline preload="metadata"
-            poster="/images/couple-portraits/karthik-Sunayana/1.jpg" aria-hidden="true">
-            <source src="videos/abhigna-nyc.mp4" type="video/mp4">
+          style="background-image: url('/media/spatial-gallery/wedding-showreel.jpg')">
+          <!-- 30s showreel: 12 shots cut from all four wedding films
+               (Pradyumna & Anusha, Pooja & Amit, Abhinav & Megha, Rohith & Harshitha) -->
+          <video class="gallery-card__video" muted loop playsinline preload="none"
+            poster="/media/spatial-gallery/wedding-showreel.jpg" aria-hidden="true">
+            <source data-src="/media/spatial-gallery/wedding-showreel.mp4" type="video/mp4">
           </video>
           <div class="gallery-card__copy">
-            <p class="gallery-card__eyebrow">Frame 01</p>
-            <h3 class="gallery-card__title">Weddings</h3>
-            <p class="gallery-card__subtitle">Grandeur in motion</p>
+            <h3 class="gallery-card__title sa-title"><span class="sa-word" lang="sa-Latn">Vivāha</span><span class="sa-sep" aria-hidden="true">&nbsp;/ </span>Weddings</h3>
+            <p class="gallery-card__subtitle">The sacred union</p>
           </div>
         </article>
 
-        <article class="gallery-card"
-          style="background-image: linear-gradient(180deg, rgba(12,8,8,0.03), rgba(12,8,8,0.32)), url('/images/couple-portraits/anusha-akshay/2.jpg')">
+        <article class="gallery-card gallery-card--video"
+          style="background-image: url('/media/spatial-gallery/vyshnavi-daniel.jpg')">
+          <!-- 15s clip of the engagement film (1:15–1:30): blessings, signing, both families -->
+          <video class="gallery-card__video" muted loop playsinline preload="none"
+            poster="/media/spatial-gallery/vyshnavi-daniel.jpg" aria-hidden="true">
+            <source data-src="/media/spatial-gallery/vyshnavi-daniel.mp4" type="video/mp4">
+          </video>
           <div class="gallery-card__copy">
-            <p class="gallery-card__eyebrow">Frame 02</p>
-            <h3 class="gallery-card__title">Portraits</h3>
-            <p class="gallery-card__subtitle">Soft contrast, held close</p>
+            <h3 class="gallery-card__title sa-title"><span class="sa-word" lang="sa-Latn">Vāgdāna</span><span class="sa-sep" aria-hidden="true">&nbsp;/ </span>Engagement</h3>
+            <p class="gallery-card__subtitle">A promise, given in words</p>
           </div>
         </article>
 
-        <article class="gallery-card"
-          style="background-image: linear-gradient(180deg, rgba(12,8,8,0.04), rgba(12,8,8,0.42)), url('/images/couple-portraits/sripad-ritika/2.jpg')">
+        <article class="gallery-card gallery-card--video"
+          style="background-image: url('/media/spatial-gallery/prewedding-showreel.jpg')">
+          <!-- 30s showreel: 12 shots cut from all eight pre-wedding films -->
+          <video class="gallery-card__video" muted loop playsinline preload="none"
+            poster="/media/spatial-gallery/prewedding-showreel.jpg" aria-hidden="true">
+            <source data-src="/media/spatial-gallery/prewedding-showreel.mp4" type="video/mp4">
+          </video>
           <div class="gallery-card__copy">
-            <p class="gallery-card__eyebrow">Frame 03</p>
-            <h3 class="gallery-card__title">Films</h3>
-            <p class="gallery-card__subtitle">Motion after dusk</p>
+            <h3 class="gallery-card__title sa-title"><span class="sa-word" lang="sa-Latn">Śṛṅgāra</span><span class="sa-sep" aria-hidden="true">&nbsp;/ </span>Pre-wedding</h3>
+            <p class="gallery-card__subtitle">Love, the first of the nine rasas</p>
           </div>
         </article>
 
-        <article class="gallery-card"
-          style="background-image: linear-gradient(180deg, rgba(12,8,8,0.03), rgba(12,8,8,0.36)), url('/images/couple-portraits/sameeksha-aman/5.jpg')">
+        <article class="gallery-card gallery-card--video"
+          style="background-image: url('/media/spatial-gallery/celebrations-showreel.jpg')">
+          <!-- 30s showreel: 12 shots from housewarming (Soundarya & Sharan, Rupa), Sweet 16 (Sarayu),
+               first birthday and gender reveal (Mounika & Harsha, Sirisha & Prasanth) films -->
+          <video class="gallery-card__video" muted loop playsinline preload="none"
+            poster="/media/spatial-gallery/celebrations-showreel.jpg" aria-hidden="true">
+            <source data-src="/media/spatial-gallery/celebrations-showreel.mp4" type="video/mp4">
+          </video>
           <div class="gallery-card__copy">
-            <p class="gallery-card__eyebrow">Frame 04</p>
-            <h3 class="gallery-card__title">Editorial</h3>
-            <p class="gallery-card__subtitle">Quiet cinematic rhythm</p>
+            <h3 class="gallery-card__title sa-title"><span class="sa-word" lang="sa-Latn">Utsava</span><span class="sa-sep" aria-hidden="true">&nbsp;/ </span>Celebrations</h3>
+            <p class="gallery-card__subtitle">Every milestone, a festival</p>
           </div>
         </article>
 
-        <article class="gallery-card"
-          style="background-image: linear-gradient(180deg, rgba(12,8,8,0.05), rgba(12,8,8,0.42)), url('/images/couple-portraits/yogesh-supritha/3.jpg')">
+        <article class="gallery-card gallery-card--video"
+          style="background-image: url('/media/spatial-gallery/conceptual-showreel.jpg')">
+          <!-- 30s showreel: 14 shots cut from six conceptual films
+               (Abhigna, Sameeksha NYC & Chicago, Darzi Suits, Karthik Concert, Get Away in NYC) -->
+          <video class="gallery-card__video" muted loop playsinline preload="none"
+            poster="/media/spatial-gallery/conceptual-showreel.jpg" aria-hidden="true">
+            <source data-src="/media/spatial-gallery/conceptual-showreel.mp4" type="video/mp4">
+          </video>
           <div class="gallery-card__copy">
-            <p class="gallery-card__eyebrow">Frame 05</p>
-            <h3 class="gallery-card__title">Couples</h3>
-            <p class="gallery-card__subtitle">Held in warmth</p>
-          </div>
-        </article>
-
-        <article class="gallery-card"
-          style="background-image: linear-gradient(180deg, rgba(12,8,8,0.03), rgba(12,8,8,0.38)), url('/images/conceptual/sameeksha-nyc-library/3.jpg')">
-          <div class="gallery-card__copy">
-            <p class="gallery-card__eyebrow">Frame 06</p>
-            <h3 class="gallery-card__title">Conceptual</h3>
-            <p class="gallery-card__subtitle">Art beyond the frame</p>
+            <h3 class="gallery-card__title sa-title"><span class="sa-word" lang="sa-Latn">Kalpanā</span><span class="sa-sep" aria-hidden="true">&nbsp;/ </span>Conceptual</h3>
+            <p class="gallery-card__subtitle">Imagination, given form</p>
           </div>
         </article>
 
@@ -377,7 +451,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>
       </button>
       <div class="gallery-controls__status">
-        <p id="galleryCount" role="status" aria-live="polite" aria-atomic="true">01 / 06</p>
+        <p id="galleryCount" role="status" aria-live="polite" aria-atomic="true">01 / 05</p>
         <p id="galleryGesture">Swipe up to explore</p>
       </div>
       <button type="button" id="galleryNext" aria-label="Next card">
@@ -415,8 +489,8 @@
             </svg>
           </div>
           <div class="svc-body">
-            <p class="svc-num">01</p>
-            <h3 class="svc-title">Weddings</h3>
+            <h3 class="svc-title sa-title"><span class="sa-word" lang="sa-Latn">Vivāha</span><span class="sa-sep" aria-hidden="true">&nbsp;/ </span>Weddings</h3>
+            <p class="svc-meaning">The sacred union</p>
             <p class="svc-desc">Full-day coverage, second shooter, and a beautifully curated gallery — every chapter of your day preserved.</p>
             <p class="svc-price">Starting from <strong>$2,500</strong></p>
           </div>
@@ -437,8 +511,8 @@
             </svg>
           </div>
           <div class="svc-body">
-            <p class="svc-num">02</p>
-            <h3 class="svc-title">Couple Portraits</h3>
+            <h3 class="svc-title sa-title"><span class="sa-word" lang="sa-Latn">Yugala</span><span class="sa-sep" aria-hidden="true">&nbsp;/ </span>Couple Portraits</h3>
+            <p class="svc-meaning">Two, as one pair</p>
             <p class="svc-desc">Engagements, anniversaries, and family milestones in New York's most iconic backdrops.</p>
             <div class="svc-tags"><span class="svc-tag">Engagement</span><span class="svc-tag">Family</span></div>
           </div>
@@ -462,8 +536,8 @@
             </svg>
           </div>
           <div class="svc-body">
-            <p class="svc-num">03</p>
-            <h3 class="svc-title">Maternity</h3>
+            <h3 class="svc-title sa-title"><span class="sa-word" lang="sa-Latn">Mātṛtva</span><span class="sa-sep" aria-hidden="true">&nbsp;/ </span>Maternity</h3>
+            <p class="svc-meaning">The becoming of a mother</p>
             <p class="svc-desc">From the radiant glow of pregnancy to the tender first days of a newborn — timeless portraits of new beginnings.</p>
             <div class="svc-tags"><span class="svc-tag">Newborn</span></div>
           </div>
@@ -487,8 +561,8 @@
             </svg>
           </div>
           <div class="svc-body">
-            <p class="svc-num">04</p>
-            <h3 class="svc-title">Celebrations</h3>
+            <h3 class="svc-title sa-title"><span class="sa-word" lang="sa-Latn">Utsava</span><span class="sa-sep" aria-hidden="true">&nbsp;/ </span>Celebrations</h3>
+            <p class="svc-meaning">Every milestone, a festival</p>
             <p class="svc-desc">Milestones and new beginnings — house warmings, first birthdays, and sweet sixteens — captured with a cinematic touch.</p>
             <div class="svc-tags"><span class="svc-tag">House Warming</span><span class="svc-tag">First Birthday</span><span class="svc-tag">Sweet Sixteen</span></div>
           </div>
@@ -513,8 +587,8 @@
             </svg>
           </div>
           <div class="svc-body">
-            <p class="svc-num">05</p>
-            <h3 class="svc-title">Commercial</h3>
+            <h3 class="svc-title sa-title"><span class="sa-word" lang="sa-Latn">Śilpa</span><span class="sa-sep" aria-hidden="true">&nbsp;/ </span>Commercial</h3>
+            <p class="svc-meaning">Craft, made with intent</p>
             <p class="svc-desc">Product photography, brand campaigns, and editorial content for those who refuse to be ordinary.</p>
             <div class="svc-tags"><span class="svc-tag">Campaigns</span><span class="svc-tag">Lookbooks</span><span class="svc-tag">Social-First</span></div>
           </div>
@@ -538,8 +612,8 @@
             </svg>
           </div>
           <div class="svc-body">
-            <p class="svc-num">06</p>
-            <h3 class="svc-title">Conceptual</h3>
+            <h3 class="svc-title sa-title"><span class="sa-word" lang="sa-Latn">Kalpanā</span><span class="sa-sep" aria-hidden="true">&nbsp;/ </span>Conceptual</h3>
+            <p class="svc-meaning">Imagination, given form</p>
             <p class="svc-desc">Surreal, editorial, and experimental visual storytelling — for those who see photography as pure art, unbound by convention.</p>
             <div class="svc-tags"><span class="svc-tag">Editorial</span><span class="svc-tag">Artist Collabs</span><span class="svc-tag">Exhibition</span></div>
           </div>
@@ -594,19 +668,27 @@
     gap: 0.44rem;
   }
 
-  .svc-num {
-    font-family: Arial, sans-serif;
-    font-size: 0.62rem;
-    letter-spacing: 0.34em;
-    text-transform: uppercase;
-    color: rgba(201, 149, 107, 0.6);
-  }
-
   .svc-title {
     font-size: clamp(1.25rem, 1.9vw, 1.85rem);
     line-height: 0.94;
     letter-spacing: -0.04em;
     font-weight: 500;
+  }
+
+  .svc-title.sa-title {
+    font-size: clamp(1.45rem, 1.9vw, 1.9rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: 0.01em; /* match the gallery titles */
+  }
+
+  .svc-meaning {
+    font-family: cesso, "Cormorant Garamond", Georgia, serif;
+    font-size: clamp(0.78rem, 0.85vw, 0.85rem);
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: 0.04em;
+    color: rgba(245, 238, 232, 0.6);
   }
 
   .svc-desc {
@@ -710,9 +792,20 @@
       padding: clamp(1.25rem, 3vw, 2rem);
     }
 
+    /* The decorative icon sits in the top-right corner instead of taking a
+       full row above the title, which shortens each card considerably. */
+    .study--services .svc-icon-wrap {
+      position: absolute;
+      top: clamp(1rem, 3vw, 1.5rem);
+      right: clamp(1rem, 3vw, 1.5rem);
+      width: 3rem;
+      height: 3rem;
+      opacity: 0.85;
+    }
+    .study--services .svc-title { padding-right: 3.25rem; }
     .study--services .svc-body { gap: 0.7rem; }
-    .study--services .svc-num { color: var(--accent); }
-    .study--services .svc-title { font-size: 1.9rem; line-height: 1.08; }
+    .study--services .svc-title.sa-title { font-size: 1.85rem; }
+    .study--services .svc-meaning { font-size: 0.85rem; }
     .study--services .svc-desc {
       max-width: 42ch;
       font-size: 0.9375rem;
@@ -721,7 +814,7 @@
     }
     .study--services .svc-price { font-size: 0.875rem; }
     .study--services .svc-tag {
-      font-size: 0.625rem;
+      font-size: 0.6875rem;
       line-height: 1.4;
       letter-spacing: 0.1em;
       padding: 0.35rem 0.65rem;
@@ -731,7 +824,12 @@
   }
 
   @media (max-width: 599px), (max-height: 500px) and (max-width: 959px) {
-    .study--services .helix-field { grid-template-columns: minmax(0, 1fr); }
+    .study--services { padding: 2.5rem 1rem 3rem; }
+    .study--services .study-head { margin-bottom: 1.5rem; }
+    .study--services .helix-field { grid-template-columns: minmax(0, 1fr); gap: 0.875rem; }
+    .study--services .svc-card-inner { padding: 1.15rem 1.2rem 1.25rem; }
+    .study--services .svc-body { gap: 0.5rem; }
+    .study--services .svc-desc { line-height: 1.55; }
   }
 </style>
 
@@ -758,6 +856,98 @@ function spiralProps(offset) {
     sc: 1 - 0.28 * thirdSlot,
     op: fade * fade * (3 - 2 * fade)
   };
+}
+
+/* ─── Shared spiral motion ─────────────────────────────────────────
+   Both spirals move on a critically damped spring (units: cards, cards/s).
+   Unlike easing a fixed fraction toward the target each frame, a spring keeps
+   velocity continuous: motion eases in from rest, carries its speed through a
+   change of target or a finger lift, and settles exactly on the target with no
+   overshoot and no creeping tail. It requests frames only while moving. */
+function createSpiralSpring(render) {
+  var FREQUENCY = 14; // rad/s ≈ 0.45 s response, settles in ~0.75 s
+  var position = 0, velocity = 0, target = 0;
+  var frame = null, lastTime = 0;
+
+  function step(time) {
+    frame = null;
+    var dt = lastTime ? Math.min(0.064, Math.max(0, (time - lastTime) / 1000)) : 1 / 60;
+    lastTime = time;
+    // Exact solution of the critically damped spring over dt (frame-rate independent).
+    var offset = position - target;
+    var drift = velocity + FREQUENCY * offset;
+    var decay = Math.exp(-FREQUENCY * dt);
+    position = target + (offset + drift * dt) * decay;
+    velocity = (drift - FREQUENCY * (offset + drift * dt)) * decay;
+    if (Math.abs(position - target) < 0.0005 && Math.abs(velocity) < 0.01) {
+      position = target; // sub-pixel from the slot: land exactly on it
+      velocity = 0;
+    }
+    render(position);
+    if (position !== target || velocity !== 0) frame = requestAnimationFrame(step);
+    else lastTime = 0;
+  }
+
+  return {
+    // Glide to `next`. Pass a velocity (cards/s) to hand off a finger's speed.
+    moveTo: function (next, handoffVelocity) {
+      target = next;
+      if (typeof handoffVelocity === 'number') velocity = handoffVelocity;
+      if (frame === null && (position !== target || velocity !== 0)) {
+        frame = requestAnimationFrame(step);
+      }
+    },
+    // Place instantly (finger tracking, reduced motion) and stop any glide.
+    jumpTo: function (next) {
+      if (frame !== null) cancelAnimationFrame(frame);
+      frame = null;
+      lastTime = 0;
+      position = target = next;
+      velocity = 0;
+      render(position);
+    }
+  };
+}
+
+/* Wheel and trackpad input moves the target freely; once input pauses the
+   spiral settles on a whole card, never parked between two. A short deliberate
+   scroll (0.15–1 card) advances one card; a longer one lands on the nearest. */
+function createSpiralWheel(options) {
+  var origin = null, timer = null;
+  return function nudge(delta) {
+    var target = options.getTarget();
+    if (origin === null) origin = Math.round(target);
+    options.setTarget(Math.max(0, Math.min(options.max, target + delta)));
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      var current = options.getTarget();
+      var travel = current - origin;
+      var card = Math.abs(travel) >= 0.15 && Math.abs(travel) < 1
+        ? origin + (travel > 0 ? 1 : -1)
+        : Math.round(current);
+      origin = null;
+      options.setTarget(Math.max(0, Math.min(options.max, card)));
+    }, 140);
+  };
+}
+
+/* A spiral turns only while its section sits flush with the viewport. If the
+   wheel arrives while the section is part-way scrolled, glide the page into
+   place first (one smooth scroll, not restarted by every event). */
+var spiralAlignY = null, spiralAlignUntil = 0;
+function spiralSectionAligned(section) {
+  var top = section.getBoundingClientRect().top;
+  var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+  return Math.abs(top) <= 1 ||
+    (top > 0 && window.scrollY >= maxScroll - 1) || (top < 0 && window.scrollY <= 0);
+}
+function alignSpiralSection(section, reducedMotion) {
+  var y = Math.round(window.scrollY + section.getBoundingClientRect().top);
+  var now = performance.now();
+  if (y === spiralAlignY && now < spiralAlignUntil) return;
+  spiralAlignY = y;
+  spiralAlignUntil = now + 700;
+  window.scrollTo({ top: y, behavior: reducedMotion ? 'auto' : 'smooth' });
 }
 </script>
 
@@ -796,6 +986,21 @@ function spiralProps(offset) {
   var lerpedP      = 0;
   var locked       = true;
   var s2InView     = false;
+  var reducedMotion2 = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var motion2 = createSpiralSpring(function (position) {
+    lerpedP = position;
+    applyFrame2();
+  });
+
+  function glide2() {
+    if (reducedMotion2.matches) motion2.jumpTo(targetP);
+    else motion2.moveTo(targetP);
+  }
+  var nudge2 = createSpiralWheel({
+    max: MAX,
+    getTarget: function () { return targetP; },
+    setTarget: function (value) { targetP = value; glide2(); }
+  });
 
   /* ─── Render ─────────────────────────────────────────────── */
   function applyFrame2() {
@@ -809,21 +1014,6 @@ function spiralProps(offset) {
     if (counter) {
       counter.textContent = String(Math.round(lerpedP) + 1).padStart(2, '0');
     }
-  }
-
-  var previousTime2 = 0;
-  function tick2(time) {
-    time = time || performance.now();
-    var dt = Math.min(64, Math.max(0, time - (previousTime2 || time - 16.667)));
-    previousTime2 = time;
-    if (!compactServices.matches && Math.abs(targetP - lerpedP) > 0.0001) {
-      var smoothing = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        ? 1 : 1 - Math.exp(-dt / 160);
-      lerpedP += (targetP - lerpedP) * smoothing;
-      if (Math.abs(targetP - lerpedP) < 0.001) lerpedP = targetP;
-      applyFrame2();
-    }
-    requestAnimationFrame(tick2);
   }
 
   /* ─── Scroll hijack (capture — runs before section 1's bubble listener) ── */
@@ -843,7 +1033,11 @@ function spiralProps(offset) {
 
     e.preventDefault();
     e.stopImmediatePropagation();
-    targetP = Math.max(0, Math.min(MAX, targetP + dy * SENS2));
+    if (!spiralSectionAligned(studyEl)) {
+      alignSpiralSection(studyEl, reducedMotion2.matches);
+      return;
+    }
+    nudge2(dy * SENS2);
   }, { capture: true, passive: false });
 
   /* ─── IntersectionObserver: in-view flag + lazy boot ───────── */
@@ -853,12 +1047,13 @@ function spiralProps(offset) {
     if (booted || compactServices.matches) return;
     booted = true;
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (reducedMotion2.matches) {
       applyFrame2();
-      tick2();
       return;
     }
 
+    // The cards fade in on their own timers; the spring can already respond
+    // to the wheel during the fade.
     setTimeout(function () {
       cards2.forEach(function (card, i) {
         setTimeout(function () {
@@ -869,7 +1064,6 @@ function spiralProps(offset) {
       });
       setTimeout(function () {
         cards2.forEach(function (c) { c.style.transition = ''; });
-        tick2();
       }, (NUM - 1) * 110 + 780);
     }, 220);
   }
@@ -1046,6 +1240,49 @@ function spiralProps(offset) {
   var galleryGesture = document.getElementById('galleryGesture');
   var announcedCard = -1;
 
+  /* ─── Video playback: a card starts when it first reaches focus ─ */
+  // Each card video keeps its file in <source data-src>, so nothing downloads
+  // until that card first reaches the main (focus) spot. From then on it keeps
+  // playing wherever it moves: passed to the left, or back to the right when
+  // the user scrolls back. Cards not yet reached stay paused on their poster;
+  // the next one is warmed up (metadata only) so it starts promptly. Everything
+  // pauses while the gallery is scrolled out of view and resumes on return.
+  var cardVideos = cards.map(function (card) { return card.querySelector('video'); });
+  var cardCopies = cards.map(function (card) { return card.querySelector('.gallery-card__copy'); });
+  var galleryVisible = false;
+  var startedCards = cardVideos.map(function () { return false; });
+
+  function loadVideo(video, preload) {
+    var source = video && video.querySelector('source[data-src]');
+    if (!source) return;
+    source.src = source.getAttribute('data-src');
+    source.removeAttribute('data-src');
+    video.preload = preload;
+    video.load();
+  }
+
+  function syncVideos() {
+    if (galleryVisible && announcedCard >= 0 && !startedCards[announcedCard]) {
+      startedCards[announcedCard] = true;
+      loadVideo(cardVideos[announcedCard], 'auto');
+      loadVideo(cardVideos[announcedCard + 1], 'metadata');
+    }
+    cardVideos.forEach(function (video, i) {
+      if (!video) return;
+      // A card faded fully out of view (phone spiral: 2.5+ cards away) pauses
+      // to save battery, and resumes when it comes back into view.
+      var inView = announcedCard < 0 || slotProps(i - announcedCard).op > 0.01;
+      var shouldPlay = galleryVisible && startedCards[i] && inView;
+      if (shouldPlay && video.paused) {
+        var attempt = video.play();
+        // Autoplay can still be refused (e.g. iOS Low Power Mode); the poster stays.
+        if (attempt && attempt.catch) attempt.catch(function () {});
+      } else if (!shouldPlay && !video.paused) {
+        video.pause();
+      }
+    });
+  }
+
   /* ─── Progress state ─────────────────────────────────────────── */
   var SENSITIVITY    = 0.005;   // deltaY of 200 → advance 1 card
   var targetProgress = 0;
@@ -1056,11 +1293,12 @@ function spiralProps(offset) {
   /* ─── Render ──────────────────────────────────────────────────── */
   function applyFrame() {
     // Open space above the featured card as the earlier cards recede.
-    // Retain the approved card-5 framing, then hold it through card 6.
-    var panProgress = Math.max(0, Math.min(1, (lerpedProgress - 1) / 3));
+    // Hold the opening framing on card 1, then ease into the full framing by the last card.
+    var panProgress = Math.max(0, Math.min(1, (lerpedProgress - 1) / Math.max(1, MAX_PROGRESS - 1)));
     var pan = panProgress * panProgress * (3 - 2 * panProgress);
     field.style.transform = phoneGallery.matches
       ? '' : 'translateY(' + (finalPan * pan).toFixed(3) + 'px)';
+    var phone = phoneGallery.matches;
     cards.forEach(function (card, i) {
       var offset = i - lerpedProgress;
       var p      = slotProps(offset);
@@ -1068,6 +1306,14 @@ function spiralProps(offset) {
       card.style.opacity   = p.op.toFixed(3);
       // Keep the featured card in front of cards farther along either arc.
       card.style.zIndex    = String(Math.round(p.tz + 3000));
+      // Phone cards overlap, so only the card in focus shows its words; they
+      // fade out within the first ~half card of travel and back in on arrival.
+      var words = 1;
+      if (phone) {
+        words = Math.max(0, 1 - Math.abs(offset) / 0.45);
+        words = words * words * (3 - 2 * words);
+      }
+      cardCopies[i].style.opacity = words === 1 ? '' : words.toFixed(3);
     });
     var currentCard = Math.round(lerpedProgress);
     if (currentCard !== announcedCard) {
@@ -1075,6 +1321,7 @@ function spiralProps(offset) {
       galleryCount.textContent = String(currentCard + 1).padStart(2, '0') + ' / ' + String(NUM_CARDS).padStart(2, '0');
       galleryGesture.textContent = currentCard === MAX_PROGRESS ? 'Swipe up to continue' : 'Swipe up to explore';
       cards.forEach(function (card, index) { card.setAttribute('aria-hidden', String(index !== currentCard)); });
+      syncVideos();
     }
     previousButton.disabled = targetProgress <= 0;
     nextButton.disabled = targetProgress >= MAX_PROGRESS;
@@ -1084,42 +1331,29 @@ function spiralProps(offset) {
     cardWidth = cards[0].offsetWidth;
     finalPan = field.offsetHeight * 0.1 + cards[0].offsetHeight * 0.25;
     if (!entryActive) applyFrame();
+    syncVideos(); // which cards count as in view depends on the layout
   }
   compactGallery.addEventListener('change', updateLayout);
   phoneGallery.addEventListener('change', updateLayout);
   window.addEventListener('resize', updateLayout);
 
-  var previousTime = 0;
-  var frameRequest = null;
+  var motion = createSpiralSpring(function (position) {
+    lerpedProgress = position;
+    applyFrame();
+  });
 
-  // One frame loop while moving; restart with a fresh clock after resting.
-  function requestTick() {
-    if (reducedMotion.matches) {
-      if (frameRequest !== null) cancelAnimationFrame(frameRequest);
-      frameRequest = null;
-      previousTime = 0;
-      lerpedProgress = targetProgress;
-      applyFrame();
-      return;
-    }
-    if (frameRequest === null && !entryActive) {
-      frameRequest = requestAnimationFrame(tick);
-    }
+  // Glide to targetProgress; a velocity (cards/s) hands off a finger's speed.
+  function requestTick(handoffVelocity) {
+    if (entryActive) return;
+    if (reducedMotion.matches) motion.jumpTo(targetProgress);
+    else motion.moveTo(targetProgress, handoffVelocity);
   }
 
-  function tick(time) {
-    frameRequest = null;
-    var dt = Math.min(64, Math.max(0, time - (previousTime || time - 16.667)));
-    previousTime = time;
-    if (targetProgress !== lerpedProgress) {
-      var smoothing = 1 - Math.exp(-dt / 160);
-      lerpedProgress += (targetProgress - lerpedProgress) * smoothing;
-      if (Math.abs(targetProgress - lerpedProgress) < 0.00001) lerpedProgress = targetProgress;
-      applyFrame();
-    }
-    if (targetProgress !== lerpedProgress) requestTick();
-    else previousTime = 0;
-  }
+  var nudge = createSpiralWheel({
+    max: MAX_PROGRESS,
+    getTarget: function () { return targetProgress; },
+    setTarget: function (value) { targetProgress = value; requestTick(); }
+  });
 
   /* ─── Scroll hijack ───────────────────────────────────────────── */
   window.addEventListener('wheel', function (e) {
@@ -1149,10 +1383,12 @@ function spiralProps(offset) {
     }
 
     e.preventDefault();
-    targetProgress = Math.max(0, Math.min(MAX_PROGRESS,
-      targetProgress + dy * SENSITIVITY));
+    if (!spiralSectionAligned(studyS1)) {
+      alignSpiralSection(studyS1, reducedMotion.matches);
+      return;
+    }
     finishEntry();
-    requestTick();
+    nudge(dy * SENSITIVITY);
   }, { passive: false });
 
   function stepCard(direction) {
@@ -1335,8 +1571,10 @@ function spiralProps(offset) {
         travel * velocity > 0;
       var next = gesture.originIndex;
       if (enoughTravel || flick) next += travel > 0 ? 1 : -1;
+      // Hand the finger's speed to the settle animation (px/ms → cards/s).
+      var handoff = velocity / gesture.distance * 1000;
       gesture = null;
-      options.onSettle(clamp(next, 0, maximum));
+      options.onSettle(clamp(next, 0, maximum), handoff);
     }
   
     function interrupted() {
@@ -1368,6 +1606,12 @@ function spiralProps(offset) {
     new IntersectionObserver(function (entries) {
       s1InView = entries[0].intersectionRatio >= 0.5;
     }, { threshold: [0.3, 0.5] }).observe(studyS1);
+    // Separate, looser threshold for video playback: keep the focused card
+    // playing while any meaningful part of the gallery is on screen.
+    new IntersectionObserver(function (entries) {
+      galleryVisible = entries[0].intersectionRatio >= 0.15;
+      syncVideos();
+    }, { threshold: [0, 0.15] }).observe(studyS1);
   }
 
   installSpiralTouch({
@@ -1380,10 +1624,14 @@ function spiralProps(offset) {
     getProgress: function () { return lerpedProgress; },
     onCapture: function () { finishEntry(); scrollLocked = true; },
     onDrag: function (progress) {
-      targetProgress = lerpedProgress = progress;
-      applyFrame();
+      targetProgress = progress;
+      motion.jumpTo(progress); // the cards follow the finger exactly
     },
-    onSettle: function (progress) { targetProgress = progress; applyFrame(); requestTick(); }
+    onSettle: function (progress, handoffVelocity) {
+      targetProgress = progress;
+      applyFrame();
+      requestTick(handoffVelocity);
+    }
   });
 
   reducedMotion.addEventListener('change', function () {
