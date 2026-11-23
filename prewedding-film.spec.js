@@ -17,11 +17,17 @@ test('opens Nisaanth and Vasavi’s Chicago pre-wedding film', async ({ page }) 
 
   await page.locator('#videoCarousel .ec-next').click();
   await expect(card).toHaveAttribute('data-ec-offset', '1');
-  await card.click();
-  await expect(card).toHaveAttribute('data-ec-offset', '0');
-  await card.click();
 
-  await expect(page.locator('#videoModal')).toHaveClass(/vm-open/);
+  // The carousel ignores clicks for ~0.5 s after it moves (so a double-click
+  // can't open a film by accident), so retry each click until it takes.
+  await expect(async () => {
+    await card.click();
+    await expect(card).toHaveAttribute('data-ec-offset', '0', { timeout: 400 });
+  }).toPass({ timeout: 5000 });
+  await expect(async () => {
+    await card.click();
+    await expect(page.locator('#videoModal')).toHaveClass(/vm-open/, { timeout: 400 });
+  }).toPass({ timeout: 5000 });
   await expect(page.locator('#vmTitle')).toHaveText('Nisaanth & Vasavi');
   await expect(page.locator('#vmSubtitle')).toHaveText('Pre-Wedding Film · Chicago');
 });
