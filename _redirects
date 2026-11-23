@@ -50,6 +50,8 @@ https://www.aakaarastudiosnyc.com/*  https://aakaarastudios.com/:splat  301!
 /services-spiral.cases.js  /404.html  404!
 /services-spiral.spec.js   /404.html  404!
 /services-spiral.webkit.spec.js  /404.html  404!
+/spatial-gallery-mobile.spec.js  /404.html  404!
+/spatial-gallery-motion.spec.js  /404.html  404!
 
 /the-experience.html   /couple-portraits.html   301
 /couple-portraits      /couple-portraits.html   301
