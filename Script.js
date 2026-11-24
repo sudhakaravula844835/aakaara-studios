@@ -2417,7 +2417,10 @@ function filterVideos(cat, btn) {
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', function(e) {
     e.preventDefault();
-    const t = document.querySelector(this.getAttribute('href'));
+    // A bare "#" (every portfolio card) has no target; their own onclick opens the gallery.
+    const href = this.getAttribute('href');
+    if (href === '#') return;
+    const t = document.querySelector(href);
     if (t) t.scrollIntoView({ behavior: 'smooth' });
     // a11y audit #19: the skip link must move focus, not just scroll
     if (t && this.classList.contains('skip-link')) t.focus({ preventScroll: true });
