@@ -4799,7 +4799,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
 .lab-quote-card footer {
   position: relative;
   margin-top: 1.15rem;
-  padding: 0.92rem 4.2rem 0.9rem 0.92rem;
+  padding: 0.92rem 0.8rem 0.9rem 0.92rem;
   border: 1px solid rgba(201, 149, 107, 0.1);
   border-radius: 18px;
   background:
@@ -4810,13 +4810,17 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
     0 8px 24px rgba(0, 0, 0, 0.12);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  display: block;
+  /* Person and seal share one row, so the seal can never sit over the words. */
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   transform: translate3d(0, var(--footer-parallax), 14px);
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .lab-quote-person {
   display: flex;
+  flex: 1 1 auto;
   align-items: center;
   gap: 0.78rem;
   min-width: 0;
@@ -4860,24 +4864,21 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   line-height: 1.05;
   letter-spacing: 0.02em;
   color: rgba(232, 196, 168, 0.9);
-  white-space: nowrap;
+  text-wrap: balance;
 }
 .lab-quote-meta span {
   display: block;
-  margin-top: 0.22rem;
-  font-size: 0.46rem;
-  line-height: 1.4;
-  letter-spacing: 0.05em;
-  color: rgba(240, 235, 228, 0.34);
+  margin-top: 0.3rem;
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+  color: var(--ivory-soft);
   text-transform: uppercase;
-  white-space: nowrap;
 }
 
 .lab-quote-seal {
-  position: absolute;
-  top: 50%;
-  right: 0.8rem;
-  transform: translateY(-50%) translate3d(0, var(--seal-parallax), 20px);
+  flex: none;
+  transform: translate3d(0, var(--seal-parallax), 20px);
   padding: 0.4rem 0.62rem;
   border: 1px solid rgba(201, 149, 107, 0.16);
   border-radius: 999px;
@@ -4890,8 +4891,11 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Mobile overrides — testimonials */
-@media (max-width: 768px) {
+/* Swipe layout — testimonials. Phones and portrait tablets: below 1024px
+   there is no room for a card lane on each side of the button, so the
+   floating layout would push quotes under it. Keep in step with SWIPE_MQ
+   in Script.js. */
+@media (max-width: 1023px) {
   .lab-testimonial-stage {
     min-height: auto;
     padding: 1.5rem 0 0.4rem;
@@ -4956,7 +4960,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .lab-testimonial-track {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: minmax(78vw, 78vw);
+    grid-auto-columns: min(78vw, 26rem);
     width: 100%;
     transform: none !important;
     gap: 0.7rem;
@@ -5011,13 +5015,10 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   }
   .lab-quote-card footer {
     margin-top: 1.05rem;
-    padding: 0.88rem 3.9rem 0.88rem 0.86rem;
+    padding: 0.88rem 0.7rem 0.88rem 0.86rem;
   }
   .lab-quote-meta strong {
     font-size: 1.08rem;
-  }
-  .lab-quote-meta span {
-    font-size: 0.5rem;
   }
   .lab-section-rail {
     grid-template-columns: 1fr;
@@ -5026,6 +5027,66 @@ footer::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%;
   .lab-section-rail span:nth-child(2),
   .lab-section-rail span:last-child {
     text-align: left;
+  }
+}
+
+/* Portrait tablets: the wider cards don't need the phone's minimum height;
+   stretching keeps every card in the track the same height. */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .lab-testimonial-track { align-items: stretch; }
+  .lab-quote-card { min-height: 0; }
+}
+
+/* Reduced motion, 1024px and up: no floating or scroll-driven cards. The
+   four quotes sit still in a 2×2 grid under the heading, all in view. */
+@media (prefers-reduced-motion: reduce) and (min-width: 1024px) {
+  .lab-testimonial-wrapper { height: auto; }
+  .lab-testimonial-stage {
+    position: relative;
+    height: auto;
+    overflow: visible;
+    padding: clamp(3rem, 7vh, 5rem) 2rem clamp(3rem, 8vh, 5.5rem);
+  }
+  .lab-testimonial-word { display: none; }
+  .lab-testimonial-mobile-head {
+    display: grid;
+    gap: 0.85rem;
+    width: min(100%, 38rem);
+    margin: 0 auto;
+    justify-items: center;
+    text-align: center;
+  }
+  .lab-testimonial-mobile-head h3 { font-size: clamp(2rem, 3vw, 2.8rem); }
+  .lab-testimonial-mobile-kicker { justify-content: center; }
+  .lab-testimonial-center {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    justify-content: center;
+    margin: 1.4rem auto 0;
+  }
+  .lab-testimonial-marquee {
+    position: relative;
+    inset: auto;
+    overflow: visible;
+    margin-top: 2.2rem;
+  }
+  .lab-testimonial-marquee::before,
+  .lab-testimonial-marquee::after { display: none; }
+  .lab-testimonial-track {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 23rem));
+    justify-content: center;
+    gap: 1.25rem;
+    height: auto;
+  }
+  .lab-quote-card {
+    position: static;
+    width: auto;
+    transform: none;
+    opacity: 1;
+    transition: none;
   }
 }
 

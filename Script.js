@@ -3657,7 +3657,11 @@ let portfolioCarousel, videoCarousel;
   const cards = Array.from(stage.querySelectorAll('.lab-quote-card'));
   if (!marquee || !track || !cards.length) return;
 
-  const interactiveViewport = () => window.innerWidth > 767 && !prefersReducedMotion.matches;
+  // Below 1024px the cards are a swipe track (see "Swipe layout — testimonials"
+  // in styles.css); keep this query in step with that block.
+  const SWIPE_MQ = window.matchMedia('(max-width: 1023px)');
+  const center = stage.querySelector('.lab-testimonial-center');
+  const interactiveViewport = () => !SWIPE_MQ.matches && !prefersReducedMotion.matches;
   const mobileCurrentEl = stage.querySelector('[data-testimonial-mobile-current]');
   const mobilePips = Array.from(stage.querySelectorAll('.lab-testimonial-mobile-pip'));
   const clampValue = (value, min, max) => Math.min(max, Math.max(min, value));
@@ -3683,7 +3687,7 @@ let portfolioCarousel, videoCarousel;
   };
 
   const syncMobileActive = () => {
-    if (interactiveViewport()) return;
+    if (!SWIPE_MQ.matches) return;
     const trackRect = track.getBoundingClientRect();
     const trackCenter = trackRect.left + (trackRect.width / 2);
 
@@ -3730,7 +3734,7 @@ let portfolioCarousel, videoCarousel;
   };
 
   const snapMobileTrack = () => {
-    if (interactiveViewport()) return;
+    if (!SWIPE_MQ.matches) return;
     const activeIndex = syncMobileActive();
     const activeCard = cards[activeIndex];
     if (!activeCard) return;
@@ -3742,12 +3746,14 @@ let portfolioCarousel, videoCarousel;
     });
   };
 
+  // Half the button's width: floating cards keep their lane clear of it.
+  let buttonHalfWidth = 0;
+
   const cacheLayout = () => {
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
     wrapTop = wrapper.getBoundingClientRect().top + scrollTop;
-    if (!interactiveViewport()) {
-      syncMobileActive();
-    }
+    buttonHalfWidth = center ? center.offsetWidth / 2 : 0;
+    syncMobileActive();
   };
 
   const pauseTrack = () => stage.classList.add('is-paused');
@@ -3797,31 +3803,31 @@ let portfolioCarousel, videoCarousel;
 
   let activeTime = 0;
   let lastTime = 0;
+  let frame = 0;
+  let inView = false;
+  // Gap between a card's lane and the button, so floating cards never pass under it.
+  const BUTTON_CLEARANCE = 24;
+
+  const scrollProgress = () => {
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
+    const scrollInto = scrollY - wrapTop;
+    return clampValue(scrollInto / (window.innerHeight || 1), 0, Math.max(cards.length - 1, 0));
+  };
 
   const render = (time) => {
+    frame = 0;
+    if (!inView || !interactiveViewport()) { lastTime = 0; return; }
     if (!lastTime) lastTime = time;
     const delta = Math.min(time - lastTime, 40);
     lastTime = time;
 
-    const isInteractive = interactiveViewport();
-    const isPaused = stage.classList.contains('is-paused');
-
-    if (isInteractive && !isPaused) activeTime += delta;
-
-    if (isInteractive) {
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
-      const viewportHeight = window.innerHeight || 1;
-      const scrollInto = scrollY - wrapTop;
-      const maxProgress = Math.max(cards.length - 1, 0);
-      targetProgress = Math.max(0, Math.min(maxProgress, scrollInto / viewportHeight));
-      currentProgress += (targetProgress - currentProgress) * 0.12;
-    } else {
-      currentProgress = 0;
-      targetProgress = 0;
-    }
+    if (!stage.classList.contains('is-paused')) activeTime += delta;
+    targetProgress = scrollProgress();
+    currentProgress += (targetProgress - currentProgress) * 0.12;
 
     const stageWidth = stage.clientWidth || window.innerWidth;
     const horizontalGutter = Math.max(18, stageWidth * 0.025);
+    const verticalStep = (window.innerHeight || 900) * 0.74;
 
     motionCards.forEach((card) => {
       const t = activeTime * card.speed + card.phase;
@@ -3830,16 +3836,19 @@ let portfolioCarousel, videoCarousel;
       const rotation = card.rotationBase + Math.sin(t * 0.74) * card.rotationAmplitude;
       const relative = card.order - currentProgress;
       const distance = Math.abs(relative);
-      const verticalStep = (window.innerHeight || 900) * 0.74;
       const scrollY = relative * verticalStep;
       const opacity = Math.max(0, Math.min(1, 1 - distance * 0.4));
       const scale = Math.max(0.84, 1 - distance * 0.08);
       const zIndex = String(40 - Math.round(distance * 10));
       const halfCardWidth = (card.element.offsetWidth * scale) / 2;
       const baseX = (card.baseX / 100) * stageWidth;
+      // Each card moves up and down in its own lane, left or right of the
+      // button, so it never crosses the button while you scroll.
+      const side = baseX < 0 ? -1 : 1;
+      const laneX = side * Math.max(Math.abs(baseX + driftX), buttonHalfWidth + BUTTON_CLEARANCE + halfCardWidth);
       const safeX = Math.max(
         (-stageWidth / 2) + halfCardWidth + horizontalGutter,
-        Math.min((stageWidth / 2) - halfCardWidth - horizontalGutter, baseX + driftX)
+        Math.min((stageWidth / 2) - halfCardWidth - horizontalGutter, laneX)
       );
 
       card.element.style.setProperty('--float-x', '0px');
@@ -3852,14 +3861,33 @@ let portfolioCarousel, videoCarousel;
       card.element.style.zIndex = zIndex;
     });
 
-    if (!isInteractive) {
-      syncMobileActive();
-    }
-
-    requestAnimationFrame(render);
+    frame = requestAnimationFrame(render);
   };
 
-  requestAnimationFrame(render);
+  // Animate only while the section is near the screen, and only in the
+  // floating layout; swipe and reduced-motion layouts need no frame loop.
+  const start = () => {
+    if (frame || !inView || !interactiveViewport()) return;
+    currentProgress = scrollProgress(); // arrive in place, no catch-up sweep
+    frame = requestAnimationFrame(render);
+  };
+  const onLayoutChange = () => {
+    if (!interactiveViewport()) cards.forEach(card => { card.style.zIndex = ''; });
+    cacheLayout();
+    start();
+  };
+  SWIPE_MQ.addEventListener('change', onLayoutChange);
+  prefersReducedMotion.addEventListener('change', onLayoutChange);
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      inView = entries[entries.length - 1].isIntersecting;
+      if (inView) { cacheLayout(); start(); }
+    }, { rootMargin: '200px 0px' }).observe(wrapper);
+  } else {
+    inView = true;
+    start();
+  }
 })();
 
 // ═══════ ABOUT NAME REVEAL ═══════

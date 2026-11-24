@@ -33,6 +33,7 @@ https://www.aakaarastudiosnyc.com/*  https://aakaarastudios.com/:splat  301!
 /about-redesign.spec.js    /404.html  404!
 /cover-color.spec.js       /404.html  404!
 /gallery.spec.js           /404.html  404!
+/kind-words.spec.js        /404.html  404!
 /mobile-journal.spec.js    /404.html  404!
 /mobile.integration.spec.js  /404.html  404!
 /quote-generator.spec.js   /404.html  404!

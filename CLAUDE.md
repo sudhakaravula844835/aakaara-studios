@@ -160,6 +160,10 @@ On desktop (≥1200px, fine pointer) and phones (≤599px wide, or a landscape p
 - Adobe Fonts kit (`ffu1awu`, Cesso for the card subtitles) is loaded non-blocking in `index.html`.
 - Tests: `services-spiral.cases.js`, run by `services-spiral.spec.js` (Chromium) and `services-spiral.webkit.spec.js` (WebKit).
 
+### Kind Words (`#testimonials`)
+
+Three layouts. **≥1024px**: four quote cards float past a centred "Book a Session" button as you scroll (wrapper ~4.5 screens tall). Each card keeps a lane left or right of the button (`data-x` sign picks the side; JS pushes the lane clear of the button), so a card never passes under it — keep cards alternating sides. The frame loop runs only while the section is within 200px of the screen. **<1024px**: swipe track with counter and dots (`SWIPE_MQ` in `Script.js` must match the "Swipe layout — testimonials" block in `styles.css`). **Reduced motion ≥1024px**: still 2×2 grid, no loop. Tests: `kind-words.spec.js`.
+
 ### Intro Animation & Sub-page Navigation
 
 `body.intro-active` locks scroll during 4s intro. Skipped when `sessionStorage.getItem('skipIntro') === '1'`. When linking to `couple-portraits.html`, always set both:
